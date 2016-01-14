@@ -223,6 +223,7 @@ Library/AssetServerCacheV3
 Library/FailedAssetImports.txt
 Library/ScriptAssemblies
 Library/ScriptMapper
+Library/ShaderCache
 Library/assetDatabase3
 Library/cache
 Library/expandedItems
