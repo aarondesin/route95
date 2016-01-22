@@ -23,8 +23,8 @@ public class TerrainGeneration : MonoBehaviour {
 		int numVertices = vertexSize * vertexSize;
 		Vector3[] uniformArray = new Vector3 [numVertices];
 		for (int vert = 0; vert < numVertices; vert++) {
-			uniformArray [vert] = new Vector3 (vert % vertexSize, 0, vert / vertexSize);
-			uniformArray [vert] = uniformArray[vert] * scale;
+			uniformArray [vert] = new Vector3 (vert % vertexSize, 0, vert / vertexSize); //create vertex
+			uniformArray [vert] = uniformArray[vert] * scale; //scale vector appropriately
 		}
 		return uniformArray;
 	}
@@ -34,10 +34,10 @@ public class TerrainGeneration : MonoBehaviour {
 		int numVertices = vertexSize * vertexSize;
 		Vector2[] uniformUVArray = new Vector2[numVertices];
 		for (int vert = 0; vert < numVertices; vert++) {
-			int x = vert % vertexSize;
-			int y = vert / vertexSize;
+			int x = vert % vertexSize; //get x position of vert
+			int y = vert / vertexSize; //get y position of vert
 			float u = x / (float)(vertexSize - 1); // normalize x into u between 0 and 1
-			float v = ((vertexSize - 1) - y) / (float)(vertexSize - 1); //normalize y into v between 0 and 1
+			float v = ((vertexSize - 1) - y) / (float)(vertexSize - 1); //normalize y into v between 0 and 1 and flip direction
 			uniformUVArray[vert] = new Vector2(u , v);
 		}
 		return uniformUVArray;
@@ -50,17 +50,32 @@ public class TerrainGeneration : MonoBehaviour {
 		int numVertices = vertexSize * vertexSize;
 		int i = 0; //index into triangleArray (next two are the sibling vertices for its triangle, add 3 to jump to next triangle)
 		for (int vert = 0; vert < numVertices - vertexSize; vert++) {
+			/* Make these types of triangles
+			 * 1---2
+			 * *\**|
+			 * **\*|
+			 * ***\|
+			 * ****3
+			 */
 			if (((vert + 1) % vertexSize) != 0) { //if vertex is not on the right edge
-				triangleArray [i] = vert;
-				triangleArray [i + 1] = vert + 1;
-				triangleArray [i + 2] = vert + vertexSize; 
+				triangleArray [i] = vert; //vertex 1
+				triangleArray [i + 1] = vert + 1; //vertex 2
+				triangleArray [i + 2] = vert + vertexSize; //vertex 3
 				i = i + 3; //jump to next triangle
 			}
+
+			/* Make these types of triangles
+			 * ****1 
+			 * ***7|
+			 * **7*|
+			 * *7**|
+			 * 3---2
+			 */
 			if ((vert % vertexSize) != 0) { //if vertex is not on the left edge
-				triangleArray [i] = vert;
-				triangleArray [i + 1] = vert + vertexSize;
-				triangleArray [i + 2] = vert + vertexSize - 1;
-				i = i + 3;
+				triangleArray [i] = vert; //vertex 1
+				triangleArray [i + 1] = vert + vertexSize; //vertex 2
+				triangleArray [i + 2] = vert + vertexSize - 1; //vertex 3
+				i = i + 3; //jump to next triangle
 			}
 		}
 		return triangleArray;
