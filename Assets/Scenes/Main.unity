@@ -949,7 +949,7 @@ GameObject:
   - 4: {fileID: 898432915}
   - 114: {fileID: 898432916}
   m_Layer: 0
-  m_Name: Terrain Manager
+  m_Name: World Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -975,7 +975,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 898432913}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b53d5902a4ee1844cbe5b89078d8cac6, type: 3}
+  m_Script: {fileID: 11500000, guid: 1ccdf25ff8aa19e4dab28c956860d9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SIZE: 0

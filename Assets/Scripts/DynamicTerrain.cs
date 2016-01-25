@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DynamicTerrain : MonoBehaviour {
+public class DynamicTerrain {
 
 	private int SIZE; //the width of the terrain square in Unity distance units
 	private int LINEAR_RESOLUTION; //the number of vertices per row/column, minimum 2
@@ -124,13 +124,5 @@ public class DynamicTerrain : MonoBehaviour {
 		terrain.GetComponent<MeshRenderer> ().material = TERRAIN_MATERIAL;
 
 		return terrain;
-	}
-
-
-	void Start () {
-	}
-
-	void Update () {
-	
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TerrainManager : MonoBehaviour {
+public class WorldManager : MonoBehaviour {
 	public int SIZE;
 	public int LINEAR_RESOLUTION;
 	public Material TERRAIN_MATERIAL;
