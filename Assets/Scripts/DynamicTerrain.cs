@@ -1,22 +1,45 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class TerrainGeneration : MonoBehaviour {
+public class DynamicTerrain {
 
-	public int SIZE; //the width of the terrain square in Unity distance units
-	public int LINEAR_RESOLUTION; //the number of vertices per row/column, minimum 2
-	public Material terrainMat; //the material to apply to the terrain
+	private int SIZE; //the width of the terrain square in Unity distance units
+	private int LINEAR_RESOLUTION; //the number of vertices per row/column, minimum 2
+	private Material TERRAIN_MATERIAL; //the material to apply to the terrain
 
 	private GameObject terrain;
 
 	//if no value given for parameters in Unity Editor, set to these defaults
+
+	public void extrude (string direction){
+
+	}
+
+	public void translateWorld (Vector3 offset){
+		terrain.transform.position += offset;
+	}
+
+	public void translateLocal (Vector3 offset){
+		terrain.transform.localPosition += offset;
+	}
+
+	public DynamicTerrain (int size, int linearResolution, Material material) {
+		SIZE = size;
+		LINEAR_RESOLUTION = linearResolution;
+		TERRAIN_MATERIAL = material;
+		InitializeParams ();
+		Vector3[] vertexArray = createUniformVertexArray(LINEAR_RESOLUTION);
+		Vector2[] uvArray = createUniformUVArray (LINEAR_RESOLUTION);
+		int[] trianglesArray = createSquareArrayTriangles(LINEAR_RESOLUTION);
+		terrain = createTerrain (vertexArray, uvArray, trianglesArray);
+	}
 
 	void InitializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values
 		if (SIZE == 0)
 			SIZE = 10;
 		if (LINEAR_RESOLUTION == 0)
 			LINEAR_RESOLUTION = 100;
-		if (terrainMat == null) {
+		if (TERRAIN_MATERIAL == null) {
 			Debug.LogError ("No material given for terrain.");
 		}
 	}
@@ -98,21 +121,8 @@ public class TerrainGeneration : MonoBehaviour {
 		terrain.GetComponent<MeshFilter> ().mesh = mesh;
 
 		//mesh renderer stuff
-		terrain.GetComponent<MeshRenderer> ().material = terrainMat;
+		terrain.GetComponent<MeshRenderer> ().material = TERRAIN_MATERIAL;
 
 		return terrain;
-	}
-
-
-	void Start () {
-		InitializeParams ();
-		Vector3[] vertexArray = createUniformVertexArray(LINEAR_RESOLUTION);
-		Vector2[] uvArray = createUniformUVArray (LINEAR_RESOLUTION);
-		int[] trianglesArray = createSquareArrayTriangles(LINEAR_RESOLUTION);
-		terrain = createTerrain (vertexArray, uvArray, trianglesArray);
-	}
-
-	void Update () {
-	
 	}
 }
