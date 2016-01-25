@@ -947,28 +947,14 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 898432915}
-  - 114: {fileID: 898432914}
+  - 114: {fileID: 898432916}
   m_Layer: 0
-  m_Name: Terrain Generator
+  m_Name: Terrain Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &898432914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 898432913}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 494a770b6899f0449a786610ac5f31a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SIZE: 0
-  LINEAR_RESOLUTION: 0
-  terrainMat: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &898432915
 Transform:
   m_ObjectHideFlags: 0
@@ -981,6 +967,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+--- !u!114 &898432916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 898432913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b53d5902a4ee1844cbe5b89078d8cac6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SIZE: 0
+  LINEAR_RESOLUTION: 0
+  TERRAIN_MATERIAL: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &955283042
 GameObject:
   m_ObjectHideFlags: 0
