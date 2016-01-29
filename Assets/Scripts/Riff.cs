@@ -12,33 +12,44 @@ public class Riff {
 	};
 
 	List<Note> notes = new List<Note>();
-	public boolean play = true; // if note is playing at certain points
-	public boolean pause = true; // if player is looping the riff or just want silent
+	 
+	public bool pause = true; // if player is looping the riff or just want silent
+	public MusicManager.Key currentKey = MusicManager.Key.CMajor;
 				
-	public static void Sounds(Key currentInstrument, Key currentKey){
+	void Sounds(Instrument currentInstrument, MusicManager.Key currentKey){
 		switch (currentInstrument) {
-		case Drums:
+		case Instrument.Drums:
 
-			for (int i = 0; i < numSounds; i++) {
-				notes<i> = soundList [0, i];
+			for (int i = 0; i < Note.numSounds; i++) {
+				notes.Add(Note.soundList [0, i]);
+
 			}
 
 
 			break;
-		case Guitar:
+		case Instrument.Guitar:
 
 
 			break;
-		case Bass:
+		case Instrument.Bass:
 			
 			break;
 			
 		}
 	}
+
+	public void playnote(){
+
+	}
+
+	public void playriff(){
 	
-	public static void checkPlay(boolean select){
-		if(select)
+	}
+	
+	public static void checkPlay(bool select){
+		if (select) {
 
 		}
+	}
 }
 
