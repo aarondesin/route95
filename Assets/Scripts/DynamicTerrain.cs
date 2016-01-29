@@ -78,35 +78,37 @@ public class DynamicTerrain {
 		int i = 0; //index into triangleArray (next two are the sibling vertices for its triangle, add 3 to jump to next triangle)
 		for (int vert = 0; vert < numVertices - vertexSize; vert++) {
 			/* Make these types of triangles
-			 * 1---2
+			 * 3---2
 			 * *\**|
 			 * **\*|
 			 * ***\|
-			 * ****3
+			 * ****1
 			 */
 			if (((vert + 1) % vertexSize) != 0) { //if vertex is not on the right edge
-				triangleArray [i] = vert; //vertex 1
+				triangleArray [i] = vert + vertexSize; //vertex 1
 				triangleArray [i + 1] = vert + 1; //vertex 2
-				triangleArray [i + 2] = vert + vertexSize; //vertex 3
+				triangleArray [i + 2] = vert; //vertex 3
 				i = i + 3; //jump to next triangle
 			}
 
 			/* Make these types of triangles
-			 * ****1 
+			 * ****3 
 			 * ***7|
 			 * **7*|
 			 * *7**|
-			 * 3---2
+			 * 1---2
 			 */
 			if ((vert % vertexSize) != 0) { //if vertex is not on the left edge
-				triangleArray [i] = vert; //vertex 1
+				triangleArray [i] = vert + vertexSize - 1; //vertex 1
 				triangleArray [i + 1] = vert + vertexSize; //vertex 2
-				triangleArray [i + 2] = vert + vertexSize - 1; //vertex 3
+				triangleArray [i + 2] = vert; //vertex 3
 				i = i + 3; //jump to next triangle
 			}
 		}
 		return triangleArray;
 	}
+
+
 		
 	//create terrain gameobject with mesh
 	GameObject createTerrain (Vector3[] vertices, Vector2[] UVcoords, int[] triangles) {
@@ -118,6 +120,8 @@ public class DynamicTerrain {
 		mesh.vertices = vertices;
 		mesh.uv = UVcoords;
 		mesh.triangles = triangles;
+		mesh.RecalculateNormals ();
+		mesh.RecalculateBounds ();
 		terrain.GetComponent<MeshFilter> ().mesh = mesh;
 
 		//mesh renderer stuff
