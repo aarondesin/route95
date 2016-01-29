@@ -23,7 +23,7 @@ public class DynamicTerrain {
 		terrain.transform.localPosition += offset;
 	}
 
-	public DynamicTerrain (int size, int linearResolution, Material material) {
+	public DynamicTerrain (int size, int linearResolution, Material material){
 		SIZE = size;
 		LINEAR_RESOLUTION = linearResolution;
 		TERRAIN_MATERIAL = material;
