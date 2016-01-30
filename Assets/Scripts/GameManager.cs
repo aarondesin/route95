@@ -11,6 +11,12 @@ public enum Menu {
 	RiffEdit
 };
 
+public enum Mode {
+	Setup,
+	Live,
+	Postplay
+};
+
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
@@ -30,6 +36,7 @@ public class GameManager : MonoBehaviour {
 	public Dictionary<Menu, GameObject> menus; 
 		
 	public Menu currentMenu = Menu.None;
+	public Mode currentMode = Mode.Setup;
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
@@ -48,8 +55,8 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.SongArrange]);
 		DisableMenu(menus[Menu.RiffEdit]);
 		SwitchToMenu(Menu.Main);
-
 	}
+
 
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
 	public void SwitchToMenu (Menu menu) {
@@ -63,6 +70,11 @@ public class GameManager : MonoBehaviour {
 		if (currentMenu != Menu.None) DisableMenu (menus[currentMenu]);
 		EnableMenu (menus[(Menu)menu]);
 		currentMenu = (Menu)menu;
+	}
+
+	// Swtich from setup to live mode
+	public void SwitchToLive () {
+		currentMode = Mode.Live;
 	}
 
 	// Toggle visibility of system buttons

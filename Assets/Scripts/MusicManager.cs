@@ -1,31 +1,35 @@
-using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
-
-public class MusicManager{
-	public enum Key{
-		CMajor,
-		CSharp,
-		DMajor,
-		DSharp,
-		EMajor
-
+@@ -11,12 +11,11 @@ public class Riff {
+		
 	};
 
-	public Key currentkey;
+	List<Note> notes = new List<Note>(); // contains notes
+	List<Note> notes = new List<Note>();
+	 
+	public bool pause = true; // if player is looping the riff or just want silent
+	public MusicManager.Key currentKey = MusicManager.Key.EMajor;
+	public static int drumRiffIndex = 0;
 
-	/*public static void Searchkey(Key currentkey){
-		for(int i = 0; i <= 4; i++){
-			if(currentkey == Key.i) // doesn't work but trying to go through index of Key
-		}*/
+	public MusicManager.Key currentKey = MusicManager.Key.CMajor;
+				
+	void Sounds(Instrument currentInstrument, MusicManager.Key currentKey){
+		switch (currentInstrument) {
+		case Instrument.Drums:
+@@ -41,17 +40,9 @@ public class Riff {
+
+
+
+	public void playriff(int pos){ // plays all the notes within the sequencer aka the riff 
+		notes[drumRiffIndex].Play(pos);
+	public void playriff(){
 	
-	List<Riff>Riffs = new List<Riff>();
-	List<List<Riff>>song = new List<List<Riff>>();
-
+	}
 
 	
-
-	public static float tempo = 120f;
-	private float beattimer;
-
-}
+	/*public void Play (int pos) {
+		foreach (Instrument hit in riff[pos]) {
+			MusicManager.PlayPercussion (hit);
+		}
+	}*/
+	
+	public static void checkPlay(bool select){
+		if (select) {
