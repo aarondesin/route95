@@ -4,16 +4,28 @@ using System.Collections;
 using System.Collections.Generic;// need for using lists
 
 
-public class Note{
-	public static Audiosource Kick;
-	public static AudioSource Tom;
-	public static AudioSource Snare;
-	public static AudioSource Hat;
+public class Note {
 	
 	public AudioClip sound;
-	
-	
-	public static int numInst = 3;
+	float duration;
+	float volume;
+
+	// FIX ME!!
+	public void PlayNote () {
+		// AudioSource.clip = sound;
+		// AudioSource.Play();
+		// sound.Play();
+	}
+}
+
+/*
+
+public static Audiosource Kick;
+public static AudioSource Tom;
+public static AudioSource Snare;
+public static AudioSource Hat;
+
+public static int numInst = 3;
 	public static int numSounds = 4;
 	//public AudioSource [,] soundList = new AudioSource[numInst , numSounds];
 	
@@ -31,20 +43,16 @@ public class Note{
 		soundList [0 ,1] = Tom;
 		soundList [0 ,2] = Snare;
 		soundList [0 ,3] = Hat;
-		soundList [0 ,3] = Hat;*/
-		//Percussion
-		soundList [0] = Kick;
-		soundList [1] = Tom;
-		soundList [2] = Snare;
-		soundList [3] = Hat;
-		
-		
-	}
-	
-	
-	
-	public void playnote(int sound){ // plays a single note when called
-		soundList[sound].Play();
-		
-	}
-	
+		soundList [0 ,3] = Hat;
+//Percussion
+soundList [0] = Kick;
+soundList [1] = Tom;
+soundList [2] = Snare;
+soundList [3] = Hat;
+
+public void playnote(int sound){ // plays a single note when called
+	soundList[sound].Play();
+
+}
+
+*/

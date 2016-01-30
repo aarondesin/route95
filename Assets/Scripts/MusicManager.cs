@@ -15,12 +15,10 @@ public class MusicManager : MonoBehaviour {
 		
 	};
 	
-	
-	
 	public Key currentKey = Key.EMajor;
-	public Riff.Instrument currentInstrument = Riff.Instrument.Drums;// value will be passed from key button
-	
-	List<List<Note>> notes = new List<List<Note>>();
+	public Instrument currentInstrument = Instrument.Drums;// value will be passed from key button
+
+}
 	
 	
 	/*public void Play (int pos) {
@@ -45,4 +43,4 @@ public class MusicManager : MonoBehaviour {
 			break;
 		}
 	}*/
-	\ No newline at end of file
+	// No newline at end of file

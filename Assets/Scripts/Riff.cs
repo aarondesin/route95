@@ -3,34 +3,50 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 
+public enum Instrument {
+	Drums,
+	Guitar
+};
+
 public class Riff {
-	
-	
-	
-	List<Note> notes = new List<Note>(); // contains notes
-	
-	
+
+	Instrument currentInstrument; // instrument used for this riff
+	List<List<Note>> notes = new List<List<Note>>(); // contains notes
+
 	public bool pause = true; // if player is looping the riff or just want silent
-	public MusicManager.Key currentKey = MusicManager.Key.EMajor;
-	public static int drumRiffIndex = 0;
-	
-	public MusicManager.Key currentKey = MusicManager.Key.CMajor;
-	
-	void Sounds(Instrument currentInstrument, MusicManager.Key currentKey){
-		switch (currentInstrument) {
-		case Instrument.Drums:
-			
-			break;
-			
+
+	public void SetInstrument (Instrument inst) {
+		currentInstrument = inst;
+	}
+
+	public void Toggle (Note newNote, int pos) {
+		// Lookup
+		foreach (Note note in notes[pos]) {
+			if (newNote.sound == note.sound) {
+				// Note with same sound is already there
+				notes [pos].Remove (note);
+				return;
+			}
+		}
+		// Note not already there
+		notes [pos].Add (newNote);
+	}
+
+	public void PlayRiff (int pos){ // plays all the notes at pos
+		foreach (Note note in notes[pos]) {
+			note.PlayNote();
 		}
 	}
 	
-	
-	
-	
-	public void playriff(int pos){ // plays all the notes within the sequencer aka the riff 
-		notes [drumRiffIndex].Play (pos);
-		
+}
+
+/* To filter all notes into keys
+void Sounds(Instrument currentInstrument, MusicManager.Key currentKey){
+	switch (currentInstrument) {
+	case Instrument.Drums:
+
+		break;
+
 	}
-	
-};
+}
+*/
