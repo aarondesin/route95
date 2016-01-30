@@ -27,7 +27,9 @@ public class Note{
 		soundList [0 ,3] = Hat;
 	}
 
-
+	public void playnote(){
+		
+	}
 
 	
 
