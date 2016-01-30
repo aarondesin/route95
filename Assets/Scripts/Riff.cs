@@ -21,7 +21,7 @@ public class Riff {
 		case Instrument.Drums:
 
 			for (int i = 0; i < Note.numSounds; i++) {
-				//notes.Add(Note.soundList [0, i]);
+				notes.Add(Note.soundList [0, i]);
 
 			}
 
@@ -38,7 +38,9 @@ public class Riff {
 		}
 	}
 
+	public void playnote(){
 
+	}
 
 	public void playriff(){
 	

@@ -12,21 +12,7 @@ public class MusicManager{
 
 	};
 
-	public class MusicRiff {
-		
-		public static int MIN_NUMSUBDIVS = 1;
-		public static int DEFAULT_NUMSUBDIVS = 1;
-		public static int MAX_NUMSUBDIVS = 3;
-		
-		public static int MIN_NUMBARS = 1;
-		public static int DEFAULT_NUMBARS = 1;
-		public static int MAX_NUMBARS = 1;
-		
-		
-		public int subdivs; // 1: 4/4, 2: 8/8, 3: 16/16
-		public int bars; // number of bars
-		
-	}
+
 
 	public Key currentKey = Key.CMajor;
 	public Riff.Instrument currentInstrument = Riff.Instrument.Drums;// value will be passed from key button
