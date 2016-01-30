@@ -1,35 +1,48 @@
-@@ -11,12 +11,11 @@ public class Riff {
+
+using UnityEditor;
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;// need for using lists
+
+public class MusicManager : MonoBehaviour {
+	
+	public enum Key{
+		DFlat,
+		DMajor,
+		EFlat,
+		EMajor,
+		FMajor
 		
 	};
-
-	List<Note> notes = new List<Note>(); // contains notes
-	List<Note> notes = new List<Note>();
-	 
-	public bool pause = true; // if player is looping the riff or just want silent
-	public MusicManager.Key currentKey = MusicManager.Key.EMajor;
-	public static int drumRiffIndex = 0;
-
-	public MusicManager.Key currentKey = MusicManager.Key.CMajor;
-				
-	void Sounds(Instrument currentInstrument, MusicManager.Key currentKey){
-		switch (currentInstrument) {
-		case Instrument.Drums:
-@@ -41,17 +40,9 @@ public class Riff {
-
-
-
-	public void playriff(int pos){ // plays all the notes within the sequencer aka the riff 
-		notes[drumRiffIndex].Play(pos);
-	public void playriff(){
 	
-	}
-
+	
+	
+	public Key currentKey = Key.EMajor;
+	public Riff.Instrument currentInstrument = Riff.Instrument.Drums;// value will be passed from key button
+	
+	List<List<Note>> notes = new List<List<Note>>();
+	
 	
 	/*public void Play (int pos) {
-		foreach (Instrument hit in riff[pos]) {
-			MusicManager.PlayPercussion (hit);
+	//foreach (MusicManager.Key hit in riff[pos]) {
+	//MusicManager.PlayInstrument (hit);
+	//}
+}*/
+	
+	/*public static void PlayInstrument (Riffs hit) {
+		switch (hit) {
+		case Percussion.Kick:
+			kick.Play();
+			break;
+		case Percussion.Tom:
+			tom.Play();
+			break;
+		case Percussion.Snare:
+			snare.Play();
+			break;
+		case Percussion.Hat:
+			hat.Play();
+			break;
 		}
 	}*/
-	
-	public static void checkPlay(bool select){
-		if (select) {
+	\ No newline at end of file
