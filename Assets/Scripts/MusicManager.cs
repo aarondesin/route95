@@ -1,20 +1,21 @@
 using UnityEditor;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 
-public class MusicManager{
+public class MusicManager : MonoBehaviour {
 	public enum Key{
-		CMajor,
-		CSharp,
+		DFlat,
 		DMajor,
-		DSharp,
-		EMajor
+		EMajor,
+		EFlat,
+		FMajor
 
 	};
 
 
 
-	public Key currentKey = Key.CMajor;
+	public Key currentKey = Key.EMajor;
 	public Riff.Instrument currentInstrument = Riff.Instrument.Drums;// value will be passed from key button
 
 	/*public static void Searchkey(Key currentkey){
@@ -32,25 +33,3 @@ public class MusicManager{
 }
 
 
-/*public void Play (int pos) {
-	//foreach (MusicManager.Key hit in riff[pos]) {
-	//MusicManager.PlayInstrument (hit);
-	//}
-}*/
-
-	/*public static void PlayInstrument (Riffs hit) {
-		switch (hit) {
-		case Percussion.Kick:
-			kick.Play();
-			break;
-		case Percussion.Tom:
-			tom.Play();
-			break;
-		case Percussion.Snare:
-			snare.Play();
-			break;
-		case Percussion.Hat:
-			hat.Play();
-			break;
-		}
-	}*/
