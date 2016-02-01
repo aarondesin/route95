@@ -10,6 +10,15 @@ public class Note {
 	float duration;
 	float volume;
 
+	public Note (AudioClip newSound) {
+		if (Sounds.Kick == null) Debug.LogError("failed to load kick");
+		if (newSound == null)
+			Debug.LogError ("sound is null");
+		sound = newSound;
+		duration = 1f;
+		volume = 1f;
+	}
+
 	// FIX ME!!
 	public void PlayNote () {
 		// AudioSource.clip = sound;

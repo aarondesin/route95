@@ -4,20 +4,44 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 
+public enum PercussionInstrument {
+	Drums
+};
+
+public enum MelodicInstrument {
+	ElectricGuitar
+};
+
+public enum Instrument {
+	Drums,
+	ElectricGuitar
+};
+
+public enum Key{
+	DFlat,
+	DMajor,
+	EFlat,
+	EMajor,
+	FMajor
+
+};
+
+
 public class MusicManager : MonoBehaviour {
 	
-	public enum Key{
-		DFlat,
-		DMajor,
-		EFlat,
-		EMajor,
-		FMajor
-		
-	};
-	
-	public Key currentKey = Key.EMajor;
-	public Instrument currentInstrument = Instrument.Drums;// value will be passed from key button
+	public static Key currentKey = Key.EMajor;
+	public static Instrument currentInstrument = Instrument.Drums;// value will be passed from key button
+	List<Riff> riffs = new List<Riff>();
 
+	public void AddRiff () {
+		Riff temp = new Riff ();
+		InstrumentSetup.currentRiff = temp;
+		riffs.Add (temp);
+	}
+
+	void Start () {
+		Sounds.Load ();
+	}
 }
 	
 	
