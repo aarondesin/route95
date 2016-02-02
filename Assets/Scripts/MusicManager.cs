@@ -44,10 +44,19 @@ public class MusicManager : MonoBehaviour {
 
 	// List of all sound paths to load
 	List<string> soundsToLoad = new List<string>() {
-		"Audio/Instruments/Percussion/Kick",
-		"Audio/Instruments/Percussion/Snare",
-		"Audio/Instruments/Percussion/Tom",
-		"Audio/Instruments/Percussion/Hat",
+		// Melodic.ElectricGuitar
+		"Audio/Instruments/Melodic/ElectricGuitar_E2",
+		"Audio/Instruments/Melodic/ElectricGuitar_F#2",
+		"Audio/Instruments/Melodic/ElectricGuitar_G#2",
+		"Audio/Instruments/Melodic/ElectricGuitar_A2",
+		"Audio/Instruments/Melodic/ElectricGuitar_B2",
+		"Audio/Instruments/Melodic/ElectricGuitar_C#3",
+		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
+		// Percussion.RockDrums
+		"Audio/Instruments/Percussion/RockDrums_Kick",
+		"Audio/Instruments/Percussion/RockDrums_Snare",
+		"Audio/Instruments/Percussion/RockDrums_Tom",
+		"Audio/Instruments/Percussion/RockDrums_Hat"
 	};
 
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
