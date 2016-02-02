@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
+		//Sounds.Load();
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {

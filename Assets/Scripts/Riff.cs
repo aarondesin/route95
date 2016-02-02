@@ -34,9 +34,7 @@ public class Riff {
 		}
 		// Note not already there
 		notes [pos].Add (newNote);
-		AudioSource shit = new AudioSource ();
-		shit.clip = newNote.sound;
-		shit.Play ();
+		newNote.PlayNote();
 		Debug.Log ("added note");
 	}
 

@@ -1,8 +1,8 @@
-
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
+using System.IO; // need for path operations
 
 public enum PercussionInstrument {
 	Drums
@@ -33,6 +33,31 @@ public class MusicManager : MonoBehaviour {
 	public static Instrument currentInstrument = Instrument.Drums;// value will be passed from key button
 	List<Riff> riffs = new List<Riff>();
 
+	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>();
+
+	List<string> soundsToLoad = new List<string>() {
+		"Audio/Instruments/Percussion/Kick",
+		"Audio/Instruments/Percussion/Snare",
+		"Audio/Instruments/Percussion/Tom",
+		"Audio/Instruments/Percussion/Hat",
+	};
+
+	public void LoadAllAudioClips (List<string> paths) {
+		foreach (string path in paths) {
+			LoadAudioClip  (path);
+		}
+	}
+
+	static void LoadAudioClip (string path) {
+		AudioClip sound = (AudioClip) Resources.Load (path);
+		if (sound == null) {
+			Debug.LogError("Failed to load AudioClip at "+path);
+		} else {
+			Debug.Log("Loaded AudioClip at "+path);
+			Sounds.Add (Path.GetFileNameWithoutExtension (path), sound);
+		}
+	}
+
 	public void AddRiff () {
 		Riff temp = new Riff ();
 		InstrumentSetup.currentRiff = temp;
@@ -40,7 +65,7 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	void Start () {
-		Sounds.Load ();
+		LoadAllAudioClips (soundsToLoad);
 	}
 }
 	
