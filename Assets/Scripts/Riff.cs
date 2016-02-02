@@ -34,8 +34,8 @@ public class Riff {
 		}
 		// Note not already there
 		notes [pos].Add (newNote);
-		newNote.PlayNote();
-		Debug.Log ("added note");
+		MusicManager.instance.PlayOneShot(newNote.sound);
+		//Debug.Log ("added note");
 	}
 
 	public void PlayRiff (int pos){ // plays all the notes at pos
