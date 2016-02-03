@@ -28,7 +28,7 @@ public class Riff {
 			if (newNote.sound == note.sound) {
 				// Note with same sound is already there
 				notes [pos].Remove (note);
-				Debug.Log ("removed note");
+				//Debug.Log ("removed note");
 				return;
 			}
 		}
