@@ -36,7 +36,7 @@ public class MusicManager : MonoBehaviour {
 
 	// --Global Music Properties-- //
 	public static Key currentKey = Key.EMajor; // value will be passed from key button
-	public static Instrument currentInstrument = Instrument.ElectricGuitar;
+	public static Instrument currentInstrument = Instrument.RockDrums;
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds

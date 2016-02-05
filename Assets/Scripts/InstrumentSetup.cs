@@ -79,11 +79,13 @@ public class InstrumentSetup : MonoBehaviour {
 		icon.AddComponent<Image>();
 		icon.GetComponent<Image>().sprite = iconGraphic;
 		icon.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		icon.GetComponent<RectTransform>().sizeDelta = new Vector2 (64f, 32f);
+		float buttonWidth = GetComponent<RectTransform>().rect.height/(1.5f*numRows);
+		icon.GetComponent<RectTransform>().sizeDelta = new Vector2 (buttonWidth, buttonWidth);
+		icon.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 		icon.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 		icon.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
 		icon.GetComponent<RectTransform>().anchoredPosition = new Vector2 (GetComponent<RectTransform>().sizeDelta.x/(2f*(float)(array.Length+1)),
-			(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)numRows));
+			(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
 		for (int i=0; i<array.Length; i++) {
 			GameObject bt = new GameObject();
 			bt.name = title+"_"+i;
@@ -93,13 +95,13 @@ public class InstrumentSetup : MonoBehaviour {
 			bt.GetComponent<Image>().sprite = percussionEmpty;
 			bt.AddComponent<Button>();
 			bt.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(64f, 64f);
+			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(buttonWidth, buttonWidth);
 			bt.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 			bt.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
 			bt.GetComponent<RectTransform>().anchoredPosition = 
 				new Vector2 (
 					((float)(2*i+3)*GetComponent<RectTransform>().sizeDelta.x/(2f*(float)(array.Length+1))), 
-					(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)numRows)
+					(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows))
 				);
 			//if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
@@ -119,13 +121,16 @@ public class InstrumentSetup : MonoBehaviour {
 		GameObject text = new GameObject();
 		text.name = title+"Text";
 		text.AddComponent<RectTransform>();
+		text.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
+		float buttonWidth = GetComponent<RectTransform>().rect.height/(1.5f*numRows);
+		text.GetComponent<RectTransform>().sizeDelta = new Vector2 (buttonWidth, buttonWidth);
+		text.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 		text.AddComponent<CanvasRenderer>();
 		text.AddComponent<Text>();
 		text.GetComponent<Text>().text = title;
-		text.GetComponent<Text>().fontSize = 18;
+		text.GetComponent<Text>().fontSize = 36;
 		text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-		text.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		text.GetComponent<RectTransform>().sizeDelta = new Vector2 (64f, 32f);
+		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
 		text.GetComponent<RectTransform>().anchoredPosition = new Vector2 (GetComponent<RectTransform>().sizeDelta.x/(2f*(float)(array.Length+1)),
