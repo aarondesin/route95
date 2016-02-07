@@ -37,11 +37,28 @@ public class Riff {
 		MusicManager.instance.PlayOneShot(newNote.sound);
 		//Debug.Log ("added note");
 	}
+	public void PlayRiffLoop (AudioClip clip) {
+		MusicManager.instance.LoopRiff.Stop();
+		MusicManager.instance.LoopRiff.clip = clip;
+		MusicManager.instance.LoopRiff.loop = true;
+	}
 
 	public void PlayRiff (int pos){ // plays all the notes at pos
+		Debug.Log ("before for loop");
+
+
 		foreach (Note note in notes[pos]) {
+			Debug.Log("inside for loop " + pos);
 			note.PlayNote();
+
+			//MusicManager.instance.PlayOneShot(note.sound);
+			//MusicManager.instance.PlayRiffLoop(note.sound);
+			//yield return new WaitForSeconds(1);
+
+
 		}
+
+		
 	}
 	
 }

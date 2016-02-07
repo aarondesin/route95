@@ -60,6 +60,12 @@ public class MusicManager : MonoBehaviour {
 	};
 
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
+	public AudioSource LoopRiff;
+
+	public static float tempo = 120f; // tempo in BPM
+	private float BeatTimer;
+	private int beat;
+
 
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
@@ -68,6 +74,22 @@ public class MusicManager : MonoBehaviour {
 		OneShot = gameObject.AddComponent<AudioSource>();
 		LoadAllAudioClips (soundsToLoad);
 	}
+
+	void Update(){
+		if (BeatTimer <= 0f) {
+			InstrumentSetup.currentRiff.PlayRiff(beat++);
+			//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
+			//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
+			if(beat >= 4)
+				beat = 0;
+				BeatTimer = 3600f/tempo;// 3600f = 60 fps * 60 seconds 
+
+		} else {
+			BeatTimer--;
+		}
+
+	}
+
 
 	// Adds a new riff
 	public void AddRiff () {
@@ -83,12 +105,15 @@ public class MusicManager : MonoBehaviour {
 		OneShot.Play();
 	}
 
+
 	// Loads all audio clip paths in soundsToLoad
 	void LoadAllAudioClips (List<string> paths) {
 		foreach (string path in paths) {
 			LoadAudioClip  (path);
 		}
 	}
+	
+
 
 	// Loads a single audio clip
 	void LoadAudioClip (string path) {
