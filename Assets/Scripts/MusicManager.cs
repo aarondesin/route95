@@ -40,7 +40,11 @@ public class MusicManager : MonoBehaviour {
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds
-	List<Riff> riffs = new List<Riff>(); // all riffs
+	//public List<Riff> riffs = new List<Riff>(); // all riffs
+	public List<Riff> riffs = new List<Riff> () {
+		new Riff () { currentInstrument = Instrument.ElectricGuitar },
+		new Riff () { currentInstrument = Instrument.RockDrums }
+	};
 
 	// List of all sound paths to load
 	List<string> soundsToLoad = new List<string>() {
@@ -52,6 +56,7 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Melodic/ElectricGuitar_B2",
 		"Audio/Instruments/Melodic/ElectricGuitar_C#3",
 		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
+
 		// Percussion.RockDrums
 		"Audio/Instruments/Percussion/RockDrums_Kick",
 		"Audio/Instruments/Percussion/RockDrums_Snare",
@@ -59,6 +64,11 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Percussion/RockDrums_Hat"
 	};
 
+	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
+		{ Instrument.ElectricGuitar, "Electric Guitar" },
+		{ Instrument.RockDrums, "Rock Drums" },
+	};
+		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
 
 	void Start () {
