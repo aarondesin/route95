@@ -5,9 +5,10 @@ using System.Collections.Generic;// need for using lists
 
 public class Riff {
 
-	Instrument currentInstrument; // instrument used for this riff
+	public Instrument currentInstrument; // instrument used for this riff
 	List<List<Note>> notes = new List<List<Note>>(); // contains notes
 	public int subdivs; // 0 = 4ths, 1 = 8ths, 2 = 16ths
+	public string name; // user-defined name of the riff
 
 	public bool pause = true; // if player is looping the riff or just want silent
 
