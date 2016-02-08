@@ -3459,13 +3459,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df0c0bcc057f3f42818b120188a7663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SIZE: 0
-  LINEAR_RESOLUTION: 0
-  TERRAIN_MATERIAL: {fileID: 0}
-  TIME_SCALE: 0
-  LIGHT_X_SCALE: 0
-  LIGHT_Y_SCALE: 0
-  LIGHT_Z_SCALE: 0
+  CHUNK_SIZE: 2
+  CHUNK_RESOLUTION: 10
+  LOADED_CHUNK_RADIUS: 8
+  TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
+  TIME_SCALE: 0.4
+  LIGHT_X_SCALE: 999999
+  LIGHT_Y_SCALE: 999999
+  LIGHT_Z_SCALE: 999999
+  player: {fileID: 371512236}
 --- !u!1 &955283042
 GameObject:
   m_ObjectHideFlags: 0
