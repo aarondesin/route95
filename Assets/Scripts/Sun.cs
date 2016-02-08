@@ -56,7 +56,6 @@ public class Sun : MonoBehaviour {
 		float newX = xScale * Mathf.Cos(dayTime);
 		float newY = yScale * Mathf.Sin(dayTime);
 		float newZ = -zScale * Mathf.Cos(dayTime + Mathf.PI/5);
-		Debug.Log (newX);
 		this.transform.position = new Vector3(newX, newY, newZ);
 
 		//float deltaDegrees = 360 * Time.deltaTime / (2 * Mathf.PI);
