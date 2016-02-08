@@ -14,7 +14,7 @@ public class Moon : MonoBehaviour {
 	private Color NOON = new Color (0.5f, 0.5f, 1f, 1f);
 	private Color DAWN = Color.blue;
 	private Color DUSK = Color.blue;
-	private Color MIDNIGHT = Color.blue;
+	private Color MIDNIGHT = Color.black;
 
 	private Vector3 sunTarget = new Vector3 (0f, 0f, 0f); // target for the sun to point at: the car or the origin
 
@@ -37,11 +37,11 @@ public class Moon : MonoBehaviour {
 		} else if ((dayTime >= (Mathf.PI / 2)) && (dayTime < Mathf.PI)) {
 			float lerpValue = (dayTime - Mathf.PI / 2) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (NOON, DUSK, lerpValue);
-		} else if ((dayTime >= Mathf.PI) && (dayTime < ((3/2) * Mathf.PI))){
+		} else if ((dayTime >= Mathf.PI) && (dayTime < ((3f/2f) * Mathf.PI))){
 			float lerpValue = (dayTime - Mathf.PI) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (DUSK, MIDNIGHT, lerpValue);
-		} else if ((dayTime >= ((3/2) * Mathf.PI)) && (dayTime < (2 * Mathf.PI))){
-			float lerpValue = (dayTime - ((3/2) * Mathf.PI)) / (Mathf.PI / 2);
+		} else if ((dayTime >= ((3f/2f) * Mathf.PI)) && (dayTime < (2 * Mathf.PI))){
+			float lerpValue = (dayTime - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (MIDNIGHT, DAWN, lerpValue);
 		}
 	}

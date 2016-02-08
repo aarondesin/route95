@@ -14,7 +14,7 @@ public class Sun : MonoBehaviour {
 	private Color NOON = Color.yellow;
 	private Color DAWN = Color.red;
 	private Color DUSK = Color.red;
-	private Color MIDNIGHT = Color.blue;
+	private Color MIDNIGHT = Color.black;
 
 	private Vector3 sunTarget = new Vector3 (0f, 0f, 0f); // target for the sun to point at: the car or the origin
 
@@ -30,29 +30,24 @@ public class Sun : MonoBehaviour {
 
 	private void updateColor() {
 		Light light = this.GetComponent<Light>();
-
 		if ((dayTime >= 0) && (dayTime < (Mathf.PI / 2))) {
 			float lerpValue = dayTime / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (DAWN, NOON, lerpValue);
-			Debug.Log ("Dawn");
 		} else if ((dayTime >= (Mathf.PI / 2)) && (dayTime < Mathf.PI)) {
 			float lerpValue = (dayTime - Mathf.PI / 2) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (NOON, DUSK, lerpValue);
-			Debug.Log ("NooN");
-		} else if ((dayTime >= Mathf.PI) && (dayTime < ((3/2) * (Mathf.PI / 2)))){
+		} else if ((dayTime >= Mathf.PI) && (dayTime < ((3f/2f) * Mathf.PI))){
 			float lerpValue = (dayTime - Mathf.PI) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (DUSK, MIDNIGHT, lerpValue);
-			Debug.Log ("Dusk");
-		} else if ((dayTime >= ((3/2) * Mathf.PI)) && (dayTime < (2 * Mathf.PI))){
-			float lerpValue = (dayTime - ((3/2) * Mathf.PI)) / (Mathf.PI / 2);
+		} else if ((dayTime >= ((3f/2f) * Mathf.PI)) && (dayTime < (2 * Mathf.PI))){
+			float lerpValue = (dayTime - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (MIDNIGHT, DAWN, lerpValue);
-			Debug.Log ("Midnight");
 		}
 	}
 
 	private void updateTime() {
 		dayTime += timeScale * Time.deltaTime;
-		while (dayTime > 2 * Mathf.PI) { //clamp dayTime between 0 and 2PI)
+		while (dayTime > (2 * Mathf.PI)) { //clamp dayTime between 0 and 2PI)
 			dayTime -= 2 * Mathf.PI;
 		}
 	}
@@ -61,6 +56,7 @@ public class Sun : MonoBehaviour {
 		float newX = xScale * Mathf.Cos(dayTime);
 		float newY = yScale * Mathf.Sin(dayTime);
 		float newZ = -zScale * Mathf.Cos(dayTime + Mathf.PI/5);
+		Debug.Log (newX);
 		this.transform.position = new Vector3(newX, newY, newZ);
 
 		//float deltaDegrees = 360 * Time.deltaTime / (2 * Mathf.PI);
