@@ -2,14 +2,17 @@
 using System.Collections;
 
 public class WorldManager : MonoBehaviour {
-	public int SIZE;
-	public int LINEAR_RESOLUTION;
+	public float CHUNK_SIZE;
+	public int CHUNK_RESOLUTION;
+	public int LOADED_CHUNK_RADIUS;
 	public Material TERRAIN_MATERIAL;
 
 	public float TIME_SCALE;
-	public float LIGHT_X_SCALE = 200;
-	public float LIGHT_Y_SCALE = 200;
-	public float LIGHT_Z_SCALE = 200;
+	public float LIGHT_X_SCALE;
+	public float LIGHT_Y_SCALE;
+	public float LIGHT_Z_SCALE;
+
+	public GameObject player;
 
 	private DynamicTerrain terrain;
 	private GameObject sun;
@@ -17,7 +20,7 @@ public class WorldManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		terrain = new DynamicTerrain (SIZE, LINEAR_RESOLUTION, TERRAIN_MATERIAL);
+		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS);
 
 		sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
