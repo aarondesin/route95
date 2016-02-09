@@ -12,6 +12,7 @@ public class Riff {
 
 	public bool pause = true; // if player is looping the riff or just want silent
 
+	// Default constructor makes an empty 4-beat riff
 	public Riff () {
 		notes.Add (new List<Note> ());
 		notes.Add (new List<Note> ());
@@ -23,6 +24,7 @@ public class Riff {
 		currentInstrument = inst;
 	}
 
+	// Adds or removes a note at pos
 	public void Toggle (Note newNote, int pos) {
 		// Lookup
 		foreach (Note note in notes[pos]) {
@@ -44,24 +46,27 @@ public class Riff {
 		MusicManager.instance.LoopRiff.loop = true;
 	}
 
-	public void PlayRiff (int pos){ // plays all the notes at pos
-		Debug.Log ("before for loop");
+	// Plays all the notes at pos
+	public void PlayRiff (int pos) { 
+		//Debug.Log ("before for loop");
 
 
 		foreach (Note note in notes[pos]) {
-			Debug.Log("inside for loop " + pos);
+			//Debug.Log("inside for loop " + pos);
 			note.PlayNote();
-
-			//MusicManager.instance.PlayOneShot(note.sound);
-			//MusicManager.instance.PlayRiffLoop(note.sound);
-			//yield return new WaitForSeconds(1);
-
 
 		}
 
 		
 	}
-	
+
+	/*
+	// Returns true if two riffs are the same (used for lookup)
+	public bool Compare (Riff other) {
+		bool result = true;
+		foreach (List<Note> beat in notes) {
+			foreach (
+	*/
 }
 
 /* To filter all notes into keys

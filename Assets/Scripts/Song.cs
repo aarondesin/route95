@@ -4,14 +4,33 @@ using System.Collections.Generic;
 
 public class Song {
 
-	List<SongPiece> songPieces = new List<SongPiece>();
+	public List<SongPiece> songPieces = new List<SongPiece>();
 	//List<List<Riff>> compiledSong = new List<List<Riff>> ();
+
+	// Default constructor creates a song of 4 1-measure song pieces
+	public Song () {
+		songPieces = new List<SongPiece>() {
+			new SongPiece(), new SongPiece(), new SongPiece(), new SongPiece()
+		};
+	}
 
 	public void PlaySong (int pos) {
 		int totalMeasures = NumMeasures ();
 		foreach (SongPiece songPiece in songPieces) {
 			int measure = pos / 4;
 		}
+	}
+
+	public void ToggleRiff (Riff newRiff, int pos) {
+		foreach (Riff riff in songPieces[pos].riffs[0]) {
+			if (newRiff == riff) {
+				// Riff is already there
+				songPieces[pos].riffs[0].Remove (newRiff);
+				return;
+			}
+		}
+		// Riff not already there
+		songPieces[pos].riffs[0].Add (newRiff);
 	}
 
 	// Combine all song pieces into one 2-dimensional list

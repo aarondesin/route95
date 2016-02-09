@@ -37,13 +37,14 @@ public class MusicManager : MonoBehaviour {
 	// --Global Music Properties-- //
 	public static Key currentKey = Key.EMajor; // value will be passed from key button
 	public static Instrument currentInstrument = Instrument.RockDrums;
+	public static Song currentSong = new Song();
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds
 	//public List<Riff> riffs = new List<Riff>(); // all riffs
 	public List<Riff> riffs = new List<Riff> () {
-		new Riff () { currentInstrument = Instrument.ElectricGuitar },
-		new Riff () { currentInstrument = Instrument.RockDrums }
+		new Riff () { name = "Guitar Riff", currentInstrument = Instrument.ElectricGuitar },
+		new Riff () { name = "Drum Beat", currentInstrument = Instrument.RockDrums }
 	};
 
 	// List of all sound paths to load
