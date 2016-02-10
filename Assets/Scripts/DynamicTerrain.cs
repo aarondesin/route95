@@ -11,6 +11,8 @@ public class DynamicTerrain {
 	private Material TERRAIN_MATERIAL; //the material to apply to the terrain
 	private int LOADED_CHUNK_RADIUS; //number of chunks from the player's chunk to load
 
+	private int MAX_DECORATIONS; // maximum number of decorations
+
 	private GameObject terrain;
 	private List<Chunk> activeChunks; //list of active chunks
 	private GameObject player;
@@ -49,8 +51,14 @@ public class DynamicTerrain {
 		return newChunk;
 	}
 
+
 	void deleteChunk(){
 
+	}
+
+	// Gives a random chunk (for decoration testing)
+	public Chunk RandomChunk () {
+		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
 	}
 
 	void InitializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values

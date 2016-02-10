@@ -3507,6 +3507,11 @@ MonoBehaviour:
   CHUNK_RESOLUTION: 10
   LOADED_CHUNK_RADIUS: 8
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
+  DO_DECORATE: 1
+  MAX_DECORATIONS: 100
+  decorationPaths:
+  - Prefabs/Decoration_Saguaro
+  decorations: []
   TIME_SCALE: 0.4
   LIGHT_X_SCALE: 999999
   LIGHT_Y_SCALE: 999999

@@ -36,6 +36,10 @@ public class Chunk{
 		return dMap;
 	}
 
+	public Vector2 getCoordinate() {
+		return new Vector2 (x, y);
+	}
+
 	void setDMap (Vector3[] newDMap){
 		for (int v = 0; v < dMap.Length; v++) {
 			chunk.GetComponent<Mesh> ().vertices [v] = chunk.GetComponent<Mesh> ().vertices [v] - dMap [v];
