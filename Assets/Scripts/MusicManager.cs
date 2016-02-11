@@ -76,6 +76,8 @@ public class MusicManager : MonoBehaviour {
 	public static float tempo = 120f; // tempo in BPM
 	private float BeatTimer;
 	private int beat;
+	public static bool loop = false;
+
 
 
 	void Start () {
@@ -86,18 +88,29 @@ public class MusicManager : MonoBehaviour {
 		LoadAllAudioClips (soundsToLoad);
 	}
 
-	void Update(){
-		if (BeatTimer <= 0f) {
-			InstrumentSetup.currentRiff.PlayRiff(beat++);
-			//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
-			//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
-			if(beat >= 4)
-				beat = 0;
-				BeatTimer = 3600f/tempo;// 3600f = 60 fps * 60 seconds 
-
-		} else {
-			BeatTimer--;
+	public void riffloop(){
+		if (loop) {
+			loop = false;
+			beat = 0;
 		}
+		else
+			loop = true;
+	}
+
+	void Update(){
+		if (loop) {
+			if (BeatTimer <= 0f) {
+				InstrumentSetup.currentRiff.PlayRiff (beat++);
+				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
+				//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
+				if (beat >= 4)
+					beat = 0;
+				BeatTimer = 3600f / tempo;// 3600f = 60 fps * 60 seconds 
+
+			} else {
+				BeatTimer--;
+			}
+		} 
 
 	}
 

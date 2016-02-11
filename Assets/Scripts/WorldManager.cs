@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldManager : MonoBehaviour {
+	public static WorldManager instance;
 	public float TERRAIN_SIZE; //length of a side of the terrain
 	public int TERRAIN_RESOLUTION; //number of chunks per side of terrain
 	public float CHUNK_SIZE; //derived from TERRAIN_SIZE/TERRAIN_RESOLUTION
@@ -31,6 +32,7 @@ public class WorldManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 		numDecorations = 0;
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);

@@ -29,9 +29,9 @@ public class CameraControl : MonoBehaviour {
 
 	void Update() {
 		if (Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position) != 0f) {
-			GetComponent<Transform>().position = Vector3.Slerp(_startPosition.position, _targetPosition.position, 
+			GetComponent<Transform>().position = Vector3.Lerp(_startPosition.position, _targetPosition.position, 
 				(Time.time-_sTime)*_speed*Time.deltaTime/Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position));
-			GetComponent<Transform>().rotation = Quaternion.Slerp(_startPosition.rotation, _targetPosition.rotation, 
+			GetComponent<Transform>().rotation = Quaternion.Lerp(_startPosition.rotation, _targetPosition.rotation, 
 				(Time.time-_sTime)*_speed*Time.deltaTime/Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position));
 		} else {
 			_startPosition = _targetPosition;

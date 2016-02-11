@@ -25,9 +25,9 @@ public class Decoration : MonoBehaviour {
 
 		// Randomize scale (width and height)
 		GetComponent<Transform>().localScale = new Vector3 (
-			Random.Range (widthRange[0], widthRange[1]),
-			Random.Range (heightRange[0], heightRange[1]),
-			Random.Range (widthRange[0], widthRange[1])
+			WorldManager.instance.CHUNK_SIZE*Random.Range (widthRange[0], widthRange[1]),
+			WorldManager.instance.CHUNK_SIZE*Random.Range (heightRange[0], heightRange[1]),
+			WorldManager.instance.CHUNK_SIZE*Random.Range (widthRange[0], widthRange[1])
 		);
 
 		// Randomize rotation
