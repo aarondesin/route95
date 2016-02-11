@@ -9,7 +9,7 @@ using System.Collections;
 
 public class Chunk{
 	private float CHUNK_SIZE; //size of side of chunk square
-	private int CHUNK_RESOLUTION;
+	private int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	private int x; //x position in chunk grid
 	private int y; //y position in chunk grid
 

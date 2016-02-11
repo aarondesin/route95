@@ -34,7 +34,7 @@ public class DynamicTerrain {
 		CHUNK_RESOLUTION = resolution;
 		TERRAIN_MATERIAL = material;
 		LOADED_CHUNK_RADIUS = chunkRadius;
-		InitializeParams ();
+		initializeParams ();
 		terrain = new GameObject ("terrain");
 		terrain.transform.position = player.transform.position;
 		activeChunks.Add (createChunk(0, 0));
@@ -61,7 +61,7 @@ public class DynamicTerrain {
 		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
 	}
 
-	void InitializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values
+	void initializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values
 		if (CHUNK_SIZE == 0)
 			CHUNK_SIZE = 10;
 		if (CHUNK_RESOLUTION == 0)
@@ -72,5 +72,9 @@ public class DynamicTerrain {
 		if (LOADED_CHUNK_RADIUS == 0) {
 			LOADED_CHUNK_RADIUS = 6;
 		}
+	}
+
+	public void update(){
+		updateChunks ();
 	}
 }

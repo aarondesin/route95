@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldManager : MonoBehaviour {
-	public float CHUNK_SIZE;
-	public int CHUNK_RESOLUTION;
-	public int LOADED_CHUNK_RADIUS;
-	public Material TERRAIN_MATERIAL;
+	public float TERRAIN_SIZE; //length of a side of the terrain
+	public int TERRAIN_RESOLUTION; //number of chunks per side of terrain
+	public float CHUNK_SIZE; //derived from TERRAIN_SIZE/TERRAIN_RESOLUTION
+	public int CHUNK_RESOLUTION; //number of vertices per side of chunk
+	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
+	public Material TERRAIN_MATERIAL; //material used for terrain
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
@@ -35,13 +37,7 @@ public class WorldManager : MonoBehaviour {
 		}
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS);
 
-		sun = new GameObject ("Sun");
-		sun.AddComponent<Light> ();
-		sun.AddComponent<Sun> ();
-		if (TIME_SCALE != 0) 
-			sun.GetComponent<Sun> ().setTimeScale (TIME_SCALE);
-		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
-		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
+		sun = createSun();
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -61,6 +57,18 @@ public class WorldManager : MonoBehaviour {
 		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
 			Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
 		}
+		terrain.update();
+	}
+
+	GameObject createSun(){
+		GameObject sun = new GameObject ("Sun");
+		sun.AddComponent<Light> ();
+		sun.AddComponent<Sun> ();
+		if (TIME_SCALE != 0) 
+			sun.GetComponent<Sun> ().setTimeScale (TIME_SCALE);
+		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
+		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
+		return sun;
 	}
 		
 	// Attempts to place a single decoration
