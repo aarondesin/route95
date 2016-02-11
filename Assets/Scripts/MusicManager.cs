@@ -96,6 +96,7 @@ public class MusicManager : MonoBehaviour {
 		else
 			loop = true;
 	}
+
 	void Update(){
 		if (loop) {
 			if (BeatTimer <= 0f) {
