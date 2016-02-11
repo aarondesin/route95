@@ -23,7 +23,7 @@ public class save_load : MonoBehaviour {
 	
 	public void Loadriff(){
 
-		if(File.Exists(Application.persistentDataPath + "/riffInfo.data", FileMode.Open){
+		if(File.Exists(Application.persistentDataPath + "/riffInfo.data")){
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open(Application.persistentDataPath + "/riffInfo.dat", FileMode.Open);
 		
