@@ -75,6 +75,7 @@ public class WorldManager : MonoBehaviour {
 			GameObject newDecoration = 
 				(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
 			newDecoration.GetComponent<Decoration>().Randomize();
+			newDecoration.transform.parent = chunk.chunk.transform;
 			numDecorations++;
 		}
 	}
