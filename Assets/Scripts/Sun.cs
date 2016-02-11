@@ -4,7 +4,7 @@ using System.Collections;
 public class Sun : MonoBehaviour {
 	// Use this for initialization
 
-	private float dayTime;
+	private static float dayTime;
 	private float timeScale = 1;
 
 	private float xScale = 10;
@@ -17,6 +17,10 @@ public class Sun : MonoBehaviour {
 	private Color MIDNIGHT = Color.black;
 
 	private Vector3 sunTarget = new Vector3 (0f, 0f, 0f); // target for the sun to point at: the car or the origin
+
+	public static float getDaytime() {
+		return dayTime;
+	}
 
 	public void setPosScales(float x = 1, float y = 1, float z = 1){
 		xScale = x;
