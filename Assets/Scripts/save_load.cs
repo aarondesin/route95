@@ -13,21 +13,24 @@ public class save_load : MonoBehaviour {
 		FileStream file = File.Open(Application.persistentDataPath + "/riffInfo.dat", FileMode.Open);
 
 		riffdata data = new riffdata ();
-		data.riffs = InstrumentSetup.currentRiff;
+		data.riff = InstrumentSetup.currentRiff;
 		bf.Serialize (file, data);
 		file.Close ();
+		Debug.Log ("we saved hopefully");
 
 	}
 
 	
 	public void Loadriff(){
-		BinaryFormatter bf = new BinaryFormatter ();
-		FileStream file = File.Open(Application.persistentDataPath + "/riffInfo.dat", FileMode.Open);
+
+		if(File.Exists(Application.persistentDataPath + "/riffInfo.data", FileMode.Open){
+			BinaryFormatter bf = new BinaryFormatter ();
+			FileStream file = File.Open(Application.persistentDataPath + "/riffInfo.dat", FileMode.Open);
 		
-		riffdata data = (riffdata)bf.Deserialize (file);
-		data.riffs = InstrumentSetup.currentRiff;
-		bf.Serialize (file, data);
-		file.Close ();
+			riffdata data = (riffdata)bf.Deserialize (file);
+			file.Close ();
+			Debug.Log ("we load hopefully");
+		}
 		
 	}
 	
@@ -36,8 +39,8 @@ public class save_load : MonoBehaviour {
  [Serializable]
 class riffdata{
 	
-	public List<Riff> riffs = new List<Riff> ();
-	private int beat;
+	public Riff riff;
+	public int beat;
 
 
 }
