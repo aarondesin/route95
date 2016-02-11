@@ -32,6 +32,14 @@ public class Chunk{
 		chunk.transform.position += new Vector3 (x * CHUNK_SIZE, 0f, y * CHUNK_SIZE);
 	}
 
+	public int getX () {
+		return x;
+	}
+
+	public int getY () {
+		return y;
+	}
+
 	Vector3[] getDMap(){
 		return dMap;
 	}

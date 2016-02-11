@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class WorldManager : MonoBehaviour {
 	public static WorldManager instance;
-	public float TERRAIN_SIZE; //length of a side of the terrain
-	public int TERRAIN_RESOLUTION; //number of chunks per side of terrain
 	public float CHUNK_SIZE; //derived from TERRAIN_SIZE/TERRAIN_RESOLUTION
 	public int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
@@ -56,10 +54,10 @@ public class WorldManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		terrain.update();
 		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
 			Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
 		}
-		terrain.update();
 	}
 
 	GameObject createSun(){
