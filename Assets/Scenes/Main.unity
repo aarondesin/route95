@@ -95,6 +95,7 @@ GameObject:
   - 224: {fileID: 5125172}
   - 222: {fileID: 5125174}
   - 114: {fileID: 5125173}
+  - 114: {fileID: 5125175}
   m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
@@ -152,6 +153,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 5125171}
+--- !u!114 &5125175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 5125171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 090e7ddbb58495e4a997704a8b689084, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &43767793
 GameObject:
   m_ObjectHideFlags: 0
@@ -1356,7 +1368,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1001 &348255996
 Prefab:
   m_ObjectHideFlags: 0
@@ -1587,7 +1599,7 @@ Transform:
   - {fileID: 295230414}
   - {fileID: 699857659}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
 --- !u!114 &371512238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2490,7 +2502,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
 --- !u!1 &632941291
 GameObject:
   m_ObjectHideFlags: 0
@@ -3125,7 +3137,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
 --- !u!114 &898432916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3144,6 +3156,7 @@ MonoBehaviour:
   DO_RANDOM_HEIGHT_MAPS: 0
   DO_DECORATE: 1
   MAX_DECORATIONS: 300
+  DECORATIONS_PER_STEP: 10
   decorationPaths:
   - Prefabs/Decoration_Saguaro
   decorations: []
@@ -3440,6 +3453,45 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_AreaSize: {x: 1, y: 1}
+--- !u!1 &1118047753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1118047755}
+  - 114: {fileID: 1118047754}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1118047754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1118047753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a300714b61ccf4f90fce550713f5f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1118047755
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1118047753}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!1 &1121296334
 GameObject:
   m_ObjectHideFlags: 0
@@ -3817,7 +3869,7 @@ RectTransform:
   - {fileID: 1469761353}
   - {fileID: 1803614118}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -4059,7 +4111,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
 --- !u!1 &1395232873
 GameObject:
   m_ObjectHideFlags: 0
@@ -4406,6 +4458,17 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1585738786}
         m_MethodName: Refresh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1585738786}
+        m_MethodName: SetValue
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5019,7 +5082,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
 --- !u!114 &1664068197
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -121,6 +121,7 @@ public class MusicManager : MonoBehaviour {
 	public void AddRiff () {
 		Riff temp = new Riff ();
 		InstrumentSetup.currentRiff = temp;
+		SongArrangeSetup.instance.selectedRiffIndex = riffs.Count;
 		riffs.Add (temp);
 	}
 

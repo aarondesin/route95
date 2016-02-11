@@ -12,6 +12,7 @@ public class WorldManager : MonoBehaviour {
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
+	public int DECORATIONS_PER_STEP;
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
 		"Prefabs/Decoration_Saguaro"
@@ -57,7 +58,9 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		terrain.update();
 		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
-			Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+			for (int i=0; i<DECORATIONS_PER_STEP; i++) {
+				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+			}
 		}
 	}
 

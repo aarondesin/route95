@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour {
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
 		currentMode = Mode.Live;
+		InputManager.instance.gameObject.SetActive(true);
+		DisableMenu(menus[Menu.SongArrange]);
 
 		//sets player to moving
 		TESTPlayerMovement.moving = true;

@@ -32,5 +32,10 @@ public class SongArrangeSetup : MonoBehaviour {
 		selectedRiffIndex = dropdown.value;
 		InstrumentSetup.currentRiff = MusicManager.instance.riffs[selectedRiffIndex];
 	}
+
+	public void SetValue () {
+		Debug.Log(selectedRiffIndex);
+		dropdown.value = selectedRiffIndex;
+	}
 				
 }
