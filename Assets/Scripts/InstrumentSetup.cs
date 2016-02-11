@@ -30,6 +30,7 @@ public class InstrumentSetup : MonoBehaviour {
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
 		Cleanup();
+		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
 		//switch (MusicManager.currentInstrument) {
 		switch (currentRiff.currentInstrument) {
 		case Instrument.RockDrums:

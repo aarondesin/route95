@@ -5,7 +5,7 @@ using System.Collections.Generic;// need for using lists
 
 public class Riff {
 
-	public Instrument currentInstrument; // instrument used for this riff
+	public Instrument currentInstrument = Instrument.RockDrums; // instrument used for this riff
 	List<List<Note>> notes = new List<List<Note>>(); // contains notes
 	public int subdivs; // 0 = 4ths, 1 = 8ths, 2 = 16ths
 	public string name; // user-defined name of the riff
