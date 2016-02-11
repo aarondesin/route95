@@ -27,22 +27,24 @@ public class DynamicTerrain {
 		terrain.transform.localPosition += offset;
 	}
 
-	public DynamicTerrain (GameObject player, float size, int resolution, Material material, int chunkRadius){
+	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius){
 		activeChunks = new List<Chunk>();
 		this.player = player;
-		CHUNK_SIZE = size;
-		CHUNK_RESOLUTION = resolution;
+		CHUNK_SIZE = chunkSize;
+		CHUNK_RESOLUTION = chunkResolution;
 		TERRAIN_MATERIAL = material;
 		LOADED_CHUNK_RADIUS = chunkRadius;
 		initializeParams ();
 		terrain = new GameObject ("terrain");
 		terrain.transform.position = player.transform.position;
-		activeChunks.Add (createChunk(0, 0));
-		activeChunks.Add (createChunk (0, 1));
 	}
 
 	void updateChunks(){
-
+		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
+		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
+		createChunkLists (xChunks, yChunks);
+		createChunks (xChunks, yChunks);
+		deleteChunks (xChunks, yChunks);
 	}
 
 	Chunk createChunk(int x, int y){
@@ -51,14 +53,61 @@ public class DynamicTerrain {
 		return newChunk;
 	}
 
-
-	void deleteChunk(){
-
-	}
-
 	// Gives a random chunk (for decoration testing)
 	public Chunk RandomChunk () {
 		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
+	}
+
+	//populates lists of chunk coords to be loaded
+	void createChunkLists(List<int> xChunks, List<int> yChunks){
+		int playerChunkX = (int)Math.Floor((player.transform.position.x - this.terrain.transform.position.x) / CHUNK_SIZE);
+		int playerChunkY = (int)Math.Floor((player.transform.position.z - this.terrain.transform.position.z) / CHUNK_SIZE);
+		xChunks.Add (playerChunkX);
+		yChunks.Add (playerChunkY);
+		for (int i = 1; i <= LOADED_CHUNK_RADIUS; i++){
+			//get player coords in chunk coords
+			xChunks.Add (playerChunkX + i);
+			xChunks.Add (playerChunkX - i);
+			yChunks.Add (playerChunkY + i);
+			yChunks.Add (playerChunkY - i);
+		}
+	}
+
+	void createChunks(List<int> xChunks, List<int> yChunks){
+		foreach (int x in xChunks) {
+			foreach (int y in yChunks) {
+				bool loaded = false;
+				foreach (Chunk chunk in activeChunks) {
+					if (x == chunk.getX() && y == chunk.getY()) {
+						loaded = true;
+						break;
+					}
+				}
+				if (!loaded) {
+					activeChunks.Add (createChunk(x, y));
+				}
+			}
+		}
+	}
+
+	void deleteChunk(Chunk chunk){
+		UnityEngine.Object.Destroy(chunk.chunk);
+		int numChildren = chunk.chunk.transform.childCount;
+		WorldManager.instance.DecNumDeco (numChildren);
+	}
+
+	void deleteChunks(List<int> xChunks, List<int> yChunks) {
+		List<Chunk> deletions = new List<Chunk> ();
+		foreach (Chunk chunk in activeChunks) {
+			//if chunk is not in chunks to be loaded
+			if (!(xChunks.Contains(chunk.getX()) && yChunks.Contains(chunk.getY()))) {
+				deleteChunk (chunk);
+				deletions.Add (chunk);
+			}
+		}
+		foreach (Chunk chunk in deletions) {
+			activeChunks.Remove (chunk);
+		}
 	}
 
 	void initializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values

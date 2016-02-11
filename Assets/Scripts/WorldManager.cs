@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 public class WorldManager : MonoBehaviour {
 	public static WorldManager instance;
-	public float TERRAIN_SIZE; //length of a side of the terrain
-	public int TERRAIN_RESOLUTION; //number of chunks per side of terrain
 	public float CHUNK_SIZE; //derived from TERRAIN_SIZE/TERRAIN_RESOLUTION
 	public int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
 	public Material TERRAIN_MATERIAL; //material used for terrain
+	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
@@ -53,13 +52,13 @@ public class WorldManager : MonoBehaviour {
 		moon.GetComponent<Light> ().shadows = LightShadows.Soft;
 		*/
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
+		terrain.update();
 		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
 			Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
 		}
-		terrain.update();
 	}
 
 	GameObject createSun(){
@@ -100,5 +99,7 @@ public class WorldManager : MonoBehaviour {
 		}
 	}
 
-		
+	public void DecNumDeco(int n) {
+		numDecorations -= n;
+	}
 }

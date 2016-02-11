@@ -76,6 +76,9 @@ public class GameManager : MonoBehaviour {
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
 		currentMode = Mode.Live;
+
+		//sets player to moving
+		TESTPlayerMovement.moving = true;
 	}
 
 	// Toggle visibility of system buttons

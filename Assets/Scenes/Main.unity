@@ -1054,7 +1054,7 @@ GameObject:
   - 4: {fileID: 295230414}
   - 108: {fileID: 295230415}
   m_Layer: 0
-  m_Name: Spotlight (1)
+  m_Name: HeadlightLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1082,9 +1082,9 @@ Light:
   serializedVersion: 6
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 20
-  m_SpotAngle: 85
+  m_Intensity: 2.54
+  m_Range: 200
+  m_SpotAngle: 56
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -1554,6 +1554,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 371512237}
+  - 114: {fileID: 371512238}
   m_Layer: 0
   m_Name: PlayerAvatar
   m_TagString: Untagged
@@ -1587,6 +1588,20 @@ Transform:
   - {fileID: 699857659}
   m_Father: {fileID: 0}
   m_RootOrder: 5
+--- !u!114 &371512238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371512236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5b1439b6fcbc524f993a59f8bb5f985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightRight: {fileID: 1080763591}
+  lightLeft: {fileID: 295230413}
+  velocity: 80
 --- !u!1 &387124028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3124,10 +3139,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CHUNK_SIZE: 100
   CHUNK_RESOLUTION: 10
-  LOADED_CHUNK_RADIUS: 8
+  LOADED_CHUNK_RADIUS: 9
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
+  DO_RANDOM_HEIGHT_MAPS: 0
   DO_DECORATE: 1
-  MAX_DECORATIONS: 100
+  MAX_DECORATIONS: 300
   decorationPaths:
   - Prefabs/Decoration_Saguaro
   decorations: []
@@ -3373,7 +3389,7 @@ GameObject:
   - 4: {fileID: 1080763592}
   - 108: {fileID: 1080763593}
   m_Layer: 0
-  m_Name: Spotlight
+  m_Name: HeadlightRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3401,9 +3417,9 @@ Light:
   serializedVersion: 6
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 20
-  m_SpotAngle: 85
+  m_Intensity: 2.54
+  m_Range: 200
+  m_SpotAngle: 56
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
