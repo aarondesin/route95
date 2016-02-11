@@ -30,6 +30,12 @@ public class Chunk{
 		chunk = createChunk (verts, uvs, triangles);
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
 		chunk.transform.position += new Vector3 (x * CHUNK_SIZE, 0f, y * CHUNK_SIZE);
+
+		//test for random height map
+		if (WorldManager.instance.DO_RANDOM_HEIGHT_MAPS) {
+			dMap = new Vector3[verts.Length];
+			setDMap (createRandomHMap (verts.Length));
+		}
 	}
 
 	public int getX () {
@@ -48,12 +54,48 @@ public class Chunk{
 		return new Vector2 (x, y);
 	}
 
-	void setDMap (Vector3[] newDMap){
-		for (int v = 0; v < dMap.Length; v++) {
-			chunk.GetComponent<Mesh> ().vertices [v] = chunk.GetComponent<Mesh> ().vertices [v] - dMap [v];
-			chunk.GetComponent<Mesh> ().vertices [v] = chunk.GetComponent<Mesh> ().vertices [v] + newDMap [v];
+	Vector3[] createRandomDMap(int size) {
+		Vector3[] dmap = new Vector3[size];
+		for (int i = 0; i < size; i++) {
+			float scale = 1f;
+			float xDisplacement = Random.Range(0f, scale);
+			float yDisplacement = Random.Range(0f, scale);
+			float zDisplacement = Random.Range(0f, scale);
+			dmap[i] = new Vector3 (xDisplacement, yDisplacement, zDisplacement);
 		}
-		dMap = newDMap;
+		return dmap;
+	}
+
+	Vector3[] createRandomHMap(int size) {
+		Vector3[] dmap = new Vector3[size];
+		for (int i = 0; i < size; i++) {
+			float scale = 2f;
+			float yDisplacement = Random.Range(0f, scale);
+			dmap[i] = new Vector3 (0f, yDisplacement, 0f);
+		}
+		return dmap;
+	}
+
+	void setDMap (Vector3[] newDMap){
+		if (newDMap != null) {
+			Vector3[] newVertices = new Vector3[newDMap.Length];
+			for (int v = 0; v < dMap.Length; v++) {
+				chunk.GetComponent<MeshFilter> ().mesh.vertices [v] -= dMap [v];
+				if (v == 0) {
+					Debug.Log ("old: " + chunk.GetComponent<MeshFilter> ().mesh.vertices [v]);
+					Debug.Log ("old d: " + dMap [v]);
+				}
+				newVertices[v] = chunk.GetComponent<MeshFilter> ().mesh.vertices [v] + newDMap [v];
+				if (v == 0) {
+					Debug.Log ("new: " + chunk.GetComponent<MeshFilter> ().mesh.vertices [v]);
+					Debug.Log ("new d: " + newDMap [v]);
+				}
+			}
+			chunk.GetComponent<MeshFilter> ().mesh.vertices = newVertices;
+			chunk.GetComponent<MeshFilter> ().mesh.RecalculateNormals ();
+			chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds ();
+			dMap = newDMap;
+		}
 	}
 
 	Vector3[] createUniformVertexArray(int vertexSize){ 

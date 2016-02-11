@@ -8,6 +8,7 @@ public class WorldManager : MonoBehaviour {
 	public int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
 	public Material TERRAIN_MATERIAL; //material used for terrain
+	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
