@@ -14,7 +14,7 @@ public class Note {
 
 		if (newSound == null) Debug.LogError ("Note(): was passed null sound!");
 		sound = newSound;
-		Debug.Log("note exist?" + newSound);
+		//Debug.Log("note exist?" + newSound);
 		
 		duration = 1f;
 		volume = 1f;
@@ -22,7 +22,7 @@ public class Note {
 
 	// FIX ME!!
 	public void PlayNote () {
-		Debug.Log ("do nothing");
+		//Debug.Log ("do nothing");
 		MusicManager.instance.OneShot.PlayOneShot(sound,1f);
 		//AudioSource.clip = Note.sound;
 		// AudioSource.Play();

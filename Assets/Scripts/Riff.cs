@@ -24,17 +24,28 @@ public class Riff {
 		currentInstrument = inst;
 	}
 
+	// Returns true is a note is found at a position
+	public bool Lookup (Note newNote, int pos) {
+		//return notes[pos].Contains(newNote);
+		foreach (Note note in notes[pos]) {
+			if (note.sound == newNote.sound) return true;
+		}
+		return false;
+	}
+
 	// Adds or removes a note at pos
 	public void Toggle (Note newNote, int pos) {
 		// Lookup
-		foreach (Note note in notes[pos]) {
-			if (newNote.sound == note.sound) {
+		//foreach (Note note in notes[pos]) {
+			//if (newNote.sound == note.sound) {
+		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
-				notes [pos].Remove (note);
-				//Debug.Log ("removed note");
+				//notes [pos].Remove (note);
+			notes[pos].Remove(newNote);
+			Debug.Log("removed note");
 				return;
 			}
-		}
+		//}
 		// Note not already there
 		notes [pos].Add (newNote);
 		MusicManager.instance.PlayOneShot(newNote.sound);
