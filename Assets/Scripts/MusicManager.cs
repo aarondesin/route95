@@ -108,7 +108,9 @@ public class MusicManager : MonoBehaviour {
 				BeatTimer = 3600f / tempo;// 3600f = 60 fps * 60 seconds 
 
 			} else {
-				BeatTimer--;
+				//BeatTimer--;
+				BeatTimer -= Time.deltaTime * 100f;
+				Debug.Log (BeatTimer);
 			}
 		} 
 
