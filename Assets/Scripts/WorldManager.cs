@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class WorldManager : MonoBehaviour {
+	public static WorldManager instance;
+
 	public float CHUNK_SIZE;
 	public int CHUNK_RESOLUTION;
 	public int LOADED_CHUNK_RADIUS;
@@ -29,6 +31,7 @@ public class WorldManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 		numDecorations = 0;
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
