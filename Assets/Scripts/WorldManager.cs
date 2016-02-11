@@ -51,7 +51,7 @@ public class WorldManager : MonoBehaviour {
 		moon.GetComponent<Light> ().shadows = LightShadows.Soft;
 		*/
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		terrain.update();
@@ -98,5 +98,7 @@ public class WorldManager : MonoBehaviour {
 		}
 	}
 
-		
+	public void DecNumDeco(int n) {
+		numDecorations -= n;
+	}
 }

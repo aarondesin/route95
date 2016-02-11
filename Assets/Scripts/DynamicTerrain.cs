@@ -44,17 +44,13 @@ public class DynamicTerrain {
 		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
 		createChunkLists (xChunks, yChunks);
 		createChunks (xChunks, yChunks);
+		deleteChunks (xChunks, yChunks);
 	}
 
 	Chunk createChunk(int x, int y){
 		Chunk newChunk = new Chunk(x, y, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL);
 		newChunk.chunk.transform.parent = terrain.transform;
 		return newChunk;
-	}
-
-
-	void deleteChunk(){
-
 	}
 
 	// Gives a random chunk (for decoration testing)
@@ -94,8 +90,24 @@ public class DynamicTerrain {
 		}
 	}
 
-	void deleteChunks(List<int> xChunks, List<int> yChunks) {
+	void deleteChunk(Chunk chunk){
+		UnityEngine.Object.Destroy(chunk.chunk);
+		int numChildren = chunk.chunk.transform.childCount;
+		WorldManager.instance.DecNumDeco (numChildren);
+	}
 
+	void deleteChunks(List<int> xChunks, List<int> yChunks) {
+		List<Chunk> deletions = new List<Chunk> ();
+		foreach (Chunk chunk in activeChunks) {
+			//if chunk is not in chunks to be loaded
+			if (!(xChunks.Contains(chunk.getX()) && yChunks.Contains(chunk.getY()))) {
+				deleteChunk (chunk);
+				deletions.Add (chunk);
+			}
+		}
+		foreach (Chunk chunk in deletions) {
+			activeChunks.Remove (chunk);
+		}
 	}
 
 	void initializeParams () { //if given defaults of 0 for SIZE and LINEAR RESOLUTION, set to working values
