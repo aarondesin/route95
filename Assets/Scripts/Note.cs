@@ -10,14 +10,19 @@ public class Note {
 	float duration;
 	float volume;
 
+	public Note () {
+		duration = 1f;
+		volume = 1f;
+	}
+
 	public Note (AudioClip newSound) {
 
 		if (newSound == null) Debug.LogError ("Note(): was passed null sound!");
 		sound = newSound;
 		//Debug.Log("note exist?" + newSound);
-		
 		duration = 1f;
 		volume = 1f;
+
 	}
 
 	// FIX ME!!
@@ -27,6 +32,11 @@ public class Note {
 		//AudioSource.clip = Note.sound;
 		// AudioSource.Play();
 		// sound.Play();
+	}
+
+	// Play note on a specific AudioSource
+	public void PlayNote (AudioSource source) {
+		source.PlayOneShot(sound, 1f);
 	}
 }
 

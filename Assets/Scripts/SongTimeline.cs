@@ -39,8 +39,8 @@ public class SongTimeline : MonoBehaviour {
 			int num = i; // avoid pointer problems
 			column.AddComponent<Button>();
 			column.GetComponent<Button>().onClick.AddListener(()=>{
-				MusicManager.currentSong.ToggleRiff(MusicManager.instance.riffs[SongArrangeSetup.instance.selectedRiffIndex], num);
-				RefreshColumn (column, MusicManager.currentSong.songPieces[num]);
+				MusicManager.instance.currentSong.ToggleRiff(MusicManager.instance.riffs[SongArrangeSetup.instance.selectedRiffIndex], num);
+				RefreshColumn (column, MusicManager.instance.currentSong.songPieces[num]);
 			});
 
 			column.AddComponent<Image>();

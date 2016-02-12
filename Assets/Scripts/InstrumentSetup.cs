@@ -161,12 +161,18 @@ public class InstrumentSetup : MonoBehaviour {
 		text.GetComponent<RectTransform>().anchoredPosition = new Vector2 (GetComponent<RectTransform>().sizeDelta.x/10f,
 			(float)(2*numRows-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
 		for (int i=0; i<4; i++) {
+			int num = i;
 			GameObject bt = new GameObject();
 			bt.name = title+"_"+i;
 			bt.AddComponent<RectTransform>();
 			bt.AddComponent<CanvasRenderer>();
 			bt.AddComponent<Image>();
-			bt.GetComponent<Image>().sprite = melodicEmpty;
+			if (currentRiff.Lookup(note, num)) {
+				bt.GetComponent<Image>().sprite = melodicFilled;
+				//Debug.Log("kobe");
+			} else {
+				bt.GetComponent<Image>().sprite = melodicEmpty;
+			}
 			bt.AddComponent<Button>();
 			bt.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
 			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(164f, 63.5f);
@@ -185,7 +191,6 @@ public class InstrumentSetup : MonoBehaviour {
 			} else if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-1 == 0 || i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 			}*/
-			int num = i;
 			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(note, num);});
 			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
 			buttons.Add(bt);

@@ -54,7 +54,7 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void SwitchInstrument (Instrument instrument) {
-		MusicManager.currentInstrument = instrument;
+		MusicManager.instance.currentInstrument = instrument;
 		InstrumentDisplay.instance.Refresh();
 	}
 }

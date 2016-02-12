@@ -6,6 +6,8 @@ public class Song {
 
 	public List<SongPiece> songPieces = new List<SongPiece>();
 	//List<List<Riff>> compiledSong = new List<List<Riff>> ();
+	public int measures;
+	public int beats;
 
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
@@ -15,9 +17,13 @@ public class Song {
 	}
 
 	public void PlaySong (int pos) {
-		int totalMeasures = NumMeasures ();
+		/*int totalMeasures = NumMeasures ();
 		foreach (SongPiece songPiece in songPieces) {
 			int measure = pos / 4;
+		}*/
+		// For now, all song pieces are assumed to be one measure long
+		foreach (Riff riff in songPieces[pos/4].riffs[0]) {
+			riff.PlayRiff(pos%4);
 		}
 	}
 
@@ -44,6 +50,11 @@ public class Song {
 			temp += songPiece.measures;
 		}
 		return temp;
+	}
+
+	public void CompileSong() {
+		measures = NumMeasures();
+		beats = measures*4;
 	}
 
 }

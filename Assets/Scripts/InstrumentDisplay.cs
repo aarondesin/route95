@@ -17,7 +17,7 @@ public class InstrumentDisplay : MonoBehaviour {
 	}
 
 	public void Refresh () {
-		GetComponent<Image>().sprite = instrumentIcons[MusicManager.currentInstrument];
+		GetComponent<Image>().sprite = instrumentIcons[MusicManager.instance.currentInstrument];
 	}
 	
 }

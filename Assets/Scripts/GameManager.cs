@@ -80,9 +80,15 @@ public class GameManager : MonoBehaviour {
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);
 		DisableMenu(menus[Menu.SongArrange]);
+		MusicManager.instance.currentSong.CompileSong();
 
 		//sets player to moving
 		TESTPlayerMovement.moving = true;
+	}
+
+	// Switch from live mode to postplay
+	public void SwitchToPostplay () {
+		MusicManager.instance.StopPlaying();
 	}
 
 	// Toggle visibility of system buttons

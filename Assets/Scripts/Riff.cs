@@ -5,10 +5,11 @@ using System.Collections.Generic;// need for using lists
 
 public class Riff {
 
-	public Instrument currentInstrument = Instrument.RockDrums; // instrument used for this riff
-	List<List<Note>> notes = new List<List<Note>>(); // contains notes
+	public Instrument currentInstrument; // instrument used for this riff
+	public List<List<Note>> notes = new List<List<Note>>(); // contains notes
 	public int subdivs; // 0 = 4ths, 1 = 8ths, 2 = 16ths
 	public string name; // user-defined name of the riff
+	public bool cutSelf = true; // if true, sounds will cut themselves off
 
 	public bool pause = true; // if player is looping the riff or just want silent
 
@@ -33,6 +34,15 @@ public class Riff {
 		return false;
 	}
 
+	public void RemoveNote (Note newNote, int pos) {
+		foreach (Note note in notes[pos]) {
+			if (note.sound == newNote.sound) {
+				notes[pos].Remove(note);
+				return;
+			}
+		}
+	}
+
 	// Adds or removes a note at pos
 	public void Toggle (Note newNote, int pos) {
 		// Lookup
@@ -41,8 +51,9 @@ public class Riff {
 		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
 				//notes [pos].Remove (note);
-			notes[pos].Remove(newNote);
-			Debug.Log("removed note");
+			//notes[pos].Remove(newNote);
+			RemoveNote (newNote, pos);
+			//Debug.Log("removed note");
 				return;
 			}
 		//}
@@ -64,7 +75,11 @@ public class Riff {
 
 		foreach (Note note in notes[pos]) {
 			//Debug.Log("inside for loop " + pos);
-			note.PlayNote();
+			if (cutSelf) 
+				//MusicManager.instance.OneShot.Stop();
+				MusicManager.instance.instrumentAudioSources[currentInstrument].Stop();
+			//if (MusicManager.instance.instrumentAudioSources[currentInstrument] == null) Debug.Log("shit");
+			note.PlayNote(MusicManager.instance.instrumentAudioSources[currentInstrument]);
 
 		}
 
