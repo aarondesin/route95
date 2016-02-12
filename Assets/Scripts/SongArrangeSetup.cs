@@ -21,7 +21,7 @@ public class SongArrangeSetup : MonoBehaviour {
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
 		foreach (Riff riff in MusicManager.instance.riffs) {
-			Dropdown.OptionData option = new Dropdown.OptionData (riff.name);
+			Dropdown.OptionData option = new Dropdown.OptionData (riff.name, InstrumentDisplay.instrumentIcons[riff.currentInstrument]);
 			//Dropdown.OptionData option = new Dropdown.OptionData (MusicManager.instToString[riff.currentInstrument]);
 			options.Add (option);
 		}
