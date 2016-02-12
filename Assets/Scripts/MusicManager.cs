@@ -111,7 +111,6 @@ public class MusicManager : MonoBehaviour {
 			} else {
 				//BeatTimer--;
 				BeatTimer -= Time.deltaTime * 100f;
-				Debug.Log (BeatTimer);
 			}
 		} 
 

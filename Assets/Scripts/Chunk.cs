@@ -70,7 +70,9 @@ public class Chunk{
 		Vector3[] dmap = new Vector3[size];
 		for (int i = 0; i < size; i++) {
 			float scale = 2f;
-			float yDisplacement = Random.Range(0f, scale);
+			//float yDisplacement = Random.Range(0f, scale);
+			float yDisplacement = Mathf.PerlinNoise (x*CHUNK_SIZE + i%CHUNK_RESOLUTION, y*CHUNK_SIZE + i/CHUNK_RESOLUTION);
+			yDisplacement = yDisplacement * scale;
 			dmap[i] = new Vector3 (0f, yDisplacement, 0f);
 		}
 		return dmap;
@@ -81,15 +83,7 @@ public class Chunk{
 			Vector3[] newVertices = new Vector3[newDMap.Length];
 			for (int v = 0; v < dMap.Length; v++) {
 				chunk.GetComponent<MeshFilter> ().mesh.vertices [v] -= dMap [v];
-				if (v == 0) {
-					Debug.Log ("old: " + chunk.GetComponent<MeshFilter> ().mesh.vertices [v]);
-					Debug.Log ("old d: " + dMap [v]);
-				}
 				newVertices[v] = chunk.GetComponent<MeshFilter> ().mesh.vertices [v] + newDMap [v];
-				if (v == 0) {
-					Debug.Log ("new: " + chunk.GetComponent<MeshFilter> ().mesh.vertices [v]);
-					Debug.Log ("new d: " + newDMap [v]);
-				}
 			}
 			chunk.GetComponent<MeshFilter> ().mesh.vertices = newVertices;
 			chunk.GetComponent<MeshFilter> ().mesh.RecalculateNormals ();
