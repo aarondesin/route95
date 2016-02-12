@@ -1,44 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum View {
+	OutsideCar,
+	Driving,
+	Radio,
+	Chase
+};
+
 public class CameraControl : MonoBehaviour {
+	public static CameraControl instance;
 
-	public Transform _initialPosition;
+	public Transform initialPosition;
 
-	Transform _startPosition;
-	Transform _targetPosition;
-	public float _speed;
-	float _sTime;
+	Transform startPosition;
+	Transform targetPosition;
+	public float speed;
+	float sTime;
 
 	public void SetSpeed (float newSpeed) {
-		_speed = newSpeed;
+		speed = newSpeed;
 	}
 
 	public void SnapToPosition (Transform newPosition) {
-		_startPosition = newPosition;
-		_targetPosition = newPosition;
+		startPosition = newPosition;
+		targetPosition = newPosition;
 		GetComponent<Transform>().position = newPosition.position;
 		GetComponent<Transform>().rotation = newPosition.rotation;
 	}
 
 	public void MoveToPosition (Transform newPosition) {
-		_startPosition = GetComponent<Transform>();
-		_sTime = Time.time;
-		_targetPosition = newPosition;
+		startPosition = GetComponent<Transform>();
+		sTime = Time.time;
+		targetPosition = newPosition;
 	}
 
 	void Update() {
-		if (Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position) != 0f) {
-			GetComponent<Transform>().position = Vector3.Lerp(_startPosition.position, _targetPosition.position, 
-				(Time.time-_sTime)*_speed*Time.deltaTime/Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position));
-			GetComponent<Transform>().rotation = Quaternion.Lerp(_startPosition.rotation, _targetPosition.rotation, 
-				(Time.time-_sTime)*_speed*Time.deltaTime/Vector3.Distance(_startPosition.GetComponent<Transform>().position, _targetPosition.GetComponent<Transform>().position));
+		if (Vector3.Distance(startPosition.GetComponent<Transform>().position, targetPosition.GetComponent<Transform>().position) != 0f) {
+			GetComponent<Transform>().position = Vector3.Lerp(startPosition.position, targetPosition.position, 
+				(Time.time-sTime)*speed*Time.deltaTime/Vector3.Distance(startPosition.GetComponent<Transform>().position, targetPosition.GetComponent<Transform>().position));
+			GetComponent<Transform>().rotation = Quaternion.Lerp(startPosition.rotation, targetPosition.rotation, 
+				(Time.time-sTime)*speed*Time.deltaTime/Vector3.Distance(startPosition.GetComponent<Transform>().position, targetPosition.GetComponent<Transform>().position));
 		} else {
-			_startPosition = _targetPosition;
+			startPosition = targetPosition;
 		}
 	}
 
 	void Start() {
-		SnapToPosition (_initialPosition);
+		instance = this;
+		SnapToPosition (initialPosition);
 	}
 }

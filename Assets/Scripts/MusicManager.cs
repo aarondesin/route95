@@ -17,7 +17,8 @@ public enum MelodicInstrument {
 // All instruments (melodic and percussion) for use by MusicManager
 public enum Instrument {
 	RockDrums,
-	ElectricGuitar
+	ElectricGuitar,
+	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
 
@@ -118,11 +119,12 @@ public class MusicManager : MonoBehaviour {
 
 
 	// Adds a new riff
-	public void AddRiff () {
+	public Riff AddRiff () {
 		Riff temp = new Riff ();
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = riffs.Count;
 		riffs.Add (temp);
+		return temp;
 	}
 
 	// Plays a single sound effect through OneShot AudioSource

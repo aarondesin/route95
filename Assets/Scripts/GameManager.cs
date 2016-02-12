@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject keySelectMenu;
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
+	public GameObject addRiffPrompt;
 
 	// Parent objects for universal system buttons
 	public GameObject systemButtons;
@@ -55,6 +56,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.KeySelect]);
 		DisableMenu(menus[Menu.SongArrange]);
 		DisableMenu(menus[Menu.RiffEdit]);
+		DisableMenu(addRiffPrompt);
 		SwitchToMenu(Menu.Main);
 	}
 
@@ -97,6 +99,10 @@ public class GameManager : MonoBehaviour {
 	public void DisableKeySelectConfirmButton () {
 		keySelectConfirmButton.SetActive(false);
 	} 
+
+	public void DisableAddRiffPrompt() {
+		addRiffPrompt.SetActive(false);
+	}
 
 	void EnableMenu (GameObject menuObject) {
 		menuObject.SetActive(true);
