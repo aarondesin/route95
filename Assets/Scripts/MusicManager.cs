@@ -93,6 +93,7 @@ public class MusicManager : MonoBehaviour {
 		if (loop) {
 			loop = false;
 			beat = 0;
+			OneShot.Stop();
 		}
 		else
 			loop = true;

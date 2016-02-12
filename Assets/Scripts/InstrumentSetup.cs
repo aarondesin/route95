@@ -27,10 +27,17 @@ public class InstrumentSetup : MonoBehaviour {
 
 	List<GameObject> buttons = new List<GameObject>();
 
+	public InputField nameInputField;
+
+	void Start () {
+		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
+	}
+
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
 		Cleanup();
 		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
+		nameInputField.text = currentRiff.name;
 		//switch (MusicManager.currentInstrument) {
 		switch (currentRiff.currentInstrument) {
 		case Instrument.RockDrums:
