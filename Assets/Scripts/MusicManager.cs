@@ -11,13 +11,16 @@ public enum PercussionInstrument {
 
 // All melodic instruments
 public enum MelodicInstrument {
-	ElectricGuitar
+	ElectricGuitar,
+	BassGuitar
+
 };
 
 // All instruments (melodic and percussion) for use by MusicManager
 public enum Instrument {
 	RockDrums,
 	ElectricGuitar,
+	BassGuitar,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
@@ -57,6 +60,16 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Melodic/ElectricGuitar_C#3",
 		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
 
+		//Melodic.Bass_guitar
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarE3",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarF#3",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarG#3",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarA3",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarB3",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarC#4",
+		"Audio/Instruments/Melodic/Bass_guitar/bassguitarD#4",
+
+
 		// Percussion.RockDrums
 		"Audio/Instruments/Percussion/RockDrums_Kick",
 		"Audio/Instruments/Percussion/RockDrums_Snare",
@@ -67,6 +80,7 @@ public class MusicManager : MonoBehaviour {
 	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
 		{ Instrument.ElectricGuitar, "Electric Guitar" },
 		{ Instrument.RockDrums, "Rock Drums" },
+		{ Instrument.BassGuitar, "Bass Guitar" },
 	};
 		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
@@ -207,6 +221,16 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_G#2"] }},
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_F#2"] }},
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }}
+			}
+		});
+		riffs.Add( new Riff () {
+			name = "Example Bass Riff",
+			currentInstrument = Instrument.BassGuitar,
+			notes = new List<List<Note>>() {
+				new List<Note> () { new Note() { sound = Sounds["bassguitarE3"] }},
+				new List<Note> () { new Note() { sound = Sounds["bassguitarG#3"] }},
+				new List<Note> () { new Note() { sound = Sounds["bassguitarB3"] }},
+				new List<Note> () { new Note () {sound = Sounds["bassguitarC#4"] }}
 			}
 		});
 		riffs.Add( new Riff () {
