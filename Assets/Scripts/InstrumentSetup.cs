@@ -24,6 +24,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public static float baseButtonScale = 1f; // base button sizes
 	public static int MAX_NUMNOTES = 8; // maximum number of notes (rows)
 	public static int numRows;
+	public static int subdivsShown = 2; // number of subdivisions to show
 
 	List<GameObject> buttons = new List<GameObject>();
 
@@ -46,8 +47,8 @@ public class InstrumentSetup : MonoBehaviour {
 		case Instrument.ElectricGuitar:
 			InitializeMelodicSetup (MelodicInstrument.ElectricGuitar);
 			break;
-		case Instrument.BassGuitar:
-			InitializeMelodicSetup (MelodicInstrument.BassGuitar);
+		case Instrument.ElectricBass:
+			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
 		}
 
@@ -89,7 +90,7 @@ public class InstrumentSetup : MonoBehaviour {
 			MakeMelodicButtons ("D#3", 6, new Note (MusicManager.Sounds["ElectricGuitar_D#3"]));
 			break;
 
-			case MelodicInstrument.BassGuitar: 
+			case MelodicInstrument.ElectricBass: 
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
 			MakeMelodicButtons ("E3", 0, new Note (MusicManager.Sounds ["bassguitarE3"]));
@@ -105,6 +106,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, Note note, Sprite iconGraphic) {
+		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 		// Make icon for note
 		GameObject icon = new GameObject();
 		icon.name = title+"Icon";
@@ -113,14 +115,16 @@ public class InstrumentSetup : MonoBehaviour {
 		icon.AddComponent<Image>();
 		icon.GetComponent<Image>().sprite = iconGraphic;
 		icon.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		float buttonWidth = GetComponent<RectTransform>().rect.height/(1.5f*numRows);
+		float buttonWidth = GetComponent<RectTransform>().rect.height/(2f*numRows);
 		icon.GetComponent<RectTransform>().sizeDelta = new Vector2 (buttonWidth, buttonWidth);
 		icon.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 		icon.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 		icon.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-		icon.GetComponent<RectTransform>().anchoredPosition = new Vector2 (GetComponent<RectTransform>().sizeDelta.x/10f,
+		icon.GetComponent<RectTransform>().anchoredPosition = new Vector2 (
+			GetComponent<RectTransform>().sizeDelta.x/numButtons,
 			(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
-		for (int i=0; i<4; i++) {
+		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
+			
 			int num = i;
 			GameObject bt = new GameObject();
 			bt.name = title+"_"+i;
@@ -140,16 +144,16 @@ public class InstrumentSetup : MonoBehaviour {
 			bt.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
 			bt.GetComponent<RectTransform>().anchoredPosition = 
 				new Vector2 (
-					((float)(2*i+3)*GetComponent<RectTransform>().sizeDelta.x/(2f*(float)5)), 
+					((float)(2*i+5)*GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+3)))), 
 					(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows))
 				);
-			//if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4 == 0) {
+			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			/*} else if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-2 == 0) {
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			} else if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-1 == 0 || i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-3 == 0) {
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-			}*/
+			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(note, num);});
 			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
 			buttons.Add(bt);
@@ -158,6 +162,7 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void MakeMelodicButtons (string title, int row, Note note) {
+		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 		GameObject text = new GameObject();
 		text.name = title+"Text";
 		text.AddComponent<RectTransform>();
@@ -173,9 +178,11 @@ public class InstrumentSetup : MonoBehaviour {
 		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-		text.GetComponent<RectTransform>().anchoredPosition = new Vector2 (GetComponent<RectTransform>().sizeDelta.x/10f,
+		text.GetComponent<RectTransform>().anchoredPosition = new Vector2 (
+			GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+1))),
 			(float)(2*numRows-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
-		for (int i=0; i<4; i++) {
+		
+		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
 			int num = i;
 			GameObject bt = new GameObject();
 			bt.name = title+"_"+i;
@@ -190,22 +197,21 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.AddComponent<Button>();
 			bt.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(164f, 63.5f);
+			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(96f, 64f);
 			bt.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
 			bt.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
 			bt.GetComponent<RectTransform>().anchoredPosition = 
 				new Vector2 (
-					((float)(2*i+3)*GetComponent<RectTransform>().sizeDelta.x/10f), 
+					((float)(2*i+3)*GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+1)))), 
 					(float)(2*numRows-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows))
 				);
-			//bt.GetComponent<RectTransform>().anchoredPosition = new Vector2 (((float)i*par.sizeDelta.x/((float)array.Length))+par.sizeDelta.y/2f, 0.0f);
-			//if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4 == 0) {
-			bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			/*} else if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-2 == 0) {
+			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
+				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			} else if (i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-1 == 0 || i%(4*MusicRiff.MAX_NUMSUBDIVS)%4-3 == 0) {
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-			}*/
+			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(note, num);});
 			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
 			buttons.Add(bt);
@@ -225,5 +231,20 @@ public class InstrumentSetup : MonoBehaviour {
 			button.GetComponent<Image>().sprite = percussionEmpty;
 		}
 	}
+
+	public void IncreaseSubdivisions () {
+		if (subdivsShown < Riff.MAX_SUBDIVS) {
+			subdivsShown++;
+			Initialize();
+		}
+	}
+
+	public void DecreaseSubdivisions () {
+		if (subdivsShown > 0) {
+			subdivsShown--;
+			Initialize();
+		}
+	}
+
 		
 }

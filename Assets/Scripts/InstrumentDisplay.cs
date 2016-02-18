@@ -12,7 +12,7 @@ public class InstrumentDisplay : MonoBehaviour {
 		instance = this;
 		instrumentIcons = new Dictionary<Instrument, Sprite>() {
 			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar") },
-			{ Instrument.BassGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricBass") },
+			{ Instrument.ElectricBass, Resources.Load<Sprite>("UI/Instrument_ElectricBass") },
 			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums") }
 		};
 	}

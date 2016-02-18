@@ -12,15 +12,14 @@ public enum PercussionInstrument {
 // All melodic instruments
 public enum MelodicInstrument {
 	ElectricGuitar,
-	BassGuitar
-
+	ElectricBass
 };
 
 // All instruments (melodic and percussion) for use by MusicManager
 public enum Instrument {
 	RockDrums,
 	ElectricGuitar,
-	BassGuitar,
+	ElectricBass,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
@@ -60,7 +59,7 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Melodic/ElectricGuitar_C#3",
 		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
 
-		//Melodic.Bass_guitar
+		//Melodic.ElectricBass
 		"Audio/Instruments/Melodic/Bass_guitar/bassguitarE3",
 		"Audio/Instruments/Melodic/Bass_guitar/bassguitarF#3",
 		"Audio/Instruments/Melodic/Bass_guitar/bassguitarG#3",
@@ -80,7 +79,7 @@ public class MusicManager : MonoBehaviour {
 	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
 		{ Instrument.ElectricGuitar, "Electric Guitar" },
 		{ Instrument.RockDrums, "Rock Drums" },
-		{ Instrument.BassGuitar, "Bass Guitar" },
+		{ Instrument.ElectricBass, "Electric Bass" },
 	};
 		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
@@ -93,7 +92,7 @@ public class MusicManager : MonoBehaviour {
 	public static bool playing = false;
 	public static bool loop = false;
 
-
+	public int maxBeats; // max beats in riff, after subdivisions
 
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
@@ -109,7 +108,10 @@ public class MusicManager : MonoBehaviour {
 		}
 		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
 
+		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+
 		SetupExampleRiffs();
+
 	}
 
 	public void PlayRiffLoop(){
@@ -134,7 +136,7 @@ public class MusicManager : MonoBehaviour {
 				switch (GameManager.instance.currentMode) {
 				case Mode.Setup:
 					InstrumentSetup.currentRiff.PlayRiff (beat++);
-					if (beat >= 4 && loop)
+					if (beat >= maxBeats && loop)
 						beat = 0;
 					break;
 				case Mode.Live:
@@ -151,7 +153,7 @@ public class MusicManager : MonoBehaviour {
 				}
 				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
 				//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
-				BeatTimer = 3600f / tempo;// 3600f = 60 fps * 60 seconds 
+				BeatTimer = 3600f / (float) (maxBeats/4) / tempo;// 3600f = 60 fps * 60 seconds 
 
 			} else {
 				//BeatTimer--;
@@ -218,29 +220,66 @@ public class MusicManager : MonoBehaviour {
 			currentInstrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_E2"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_G#2"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_F#2"] }},
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }}
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> ()
 			}
 		});
 		riffs.Add( new Riff () {
 			name = "Example Bass Riff",
-			currentInstrument = Instrument.BassGuitar,
+			currentInstrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
 				new List<Note> () { new Note() { sound = Sounds["bassguitarE3"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () { new Note() { sound = Sounds["bassguitarG#3"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () { new Note() { sound = Sounds["bassguitarB3"] }},
-				new List<Note> () { new Note () {sound = Sounds["bassguitarC#4"] }}
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> () { new Note () {sound = Sounds["bassguitarC#4"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> ()
 			}
 		});
 		riffs.Add( new Riff () {
 			name = "Example Drum Beat",
 			currentInstrument = Instrument.RockDrums,
+			cutSelf = false,
 			notes = new List<List<Note>>() {
 				new List<Note> () { new Note() { sound = Sounds["RockDrums_Kick"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () { new Note() { sound = Sounds["RockDrums_Hat"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
 				new List<Note> () { new Note() { sound = Sounds["RockDrums_Snare"] }},
-				new List<Note> () { new Note () {sound = Sounds["RockDrums_Hat"] }}
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> () { new Note () {sound = Sounds["RockDrums_Hat"] }},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> ()
 			}
 		});
 	}

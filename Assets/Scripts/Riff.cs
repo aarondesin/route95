@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;// need for using lists
 
 public class Riff {
+	public static int MAX_SUBDIVS = 2;
 
 	public Instrument currentInstrument; // instrument used for this riff
 	public List<List<Note>> notes = new List<List<Note>>(); // contains notes
@@ -15,14 +16,17 @@ public class Riff {
 
 	// Default constructor makes an empty 4-beat riff
 	public Riff () {
-		notes.Add (new List<Note> ());
-		notes.Add (new List<Note> ());
-		notes.Add (new List<Note> ());
-		notes.Add (new List<Note> ());
+		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++) {
+			notes.Add (new List<Note> ());
+		}
 	}
 
 	public void SetInstrument (Instrument inst) {
 		currentInstrument = inst;
+	}
+
+	public int GetLength () {
+		return notes.Count;
 	}
 
 	// Returns true is a note is found at a position
