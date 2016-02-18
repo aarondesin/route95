@@ -23,6 +23,8 @@ public class InputManager : MonoBehaviour {
 
 	public static List<KeyCode> mappedLicks = new List<KeyCode>() {
 		KeyCode.Q
+		//KeyCode.W,
+		//KeyCode.E
 	};
 
 	void Start () {
@@ -38,20 +40,33 @@ public class InputManager : MonoBehaviour {
 			// Check for playing lick
 			foreach (KeyCode key2 in mappedLicks) {
 				if (Input.GetKeyDown(key2)) {
-					if (MusicManager.instance.licks[MusicManager.instance.currentInstrument][keyToLick[key2]] != null)
-						PlayLick (MusicManager.instance.licks[MusicManager.instance.currentInstrument][keyToLick[key2]]);
+					if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
+						PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
+					else {
+						Debug.Log ("none available");
+					}
 				}
+
 			}
 			if (keyToLick == null) {
+				
 				keyToLick = new Dictionary<KeyCode, int>() {
+					
 					{ KeyCode.Q, 0 }
+					//{ KeyCode.W, 1 },
+					//{ KeyCode.E, 2 }
+
+
 				};
+				Debug.Log(keyToLick.Count);
+				Debug.Log (MusicManager.instance.licks.Count);
 			}
 		}
 	}
 
 	void SwitchInstrument (Instrument instrument) {
 		MusicManager.instance.currentInstrument = instrument;
+		Debug.Log (MusicManager.instance.currentInstrument);
 		InstrumentDisplay.instance.Refresh();
 	}
 

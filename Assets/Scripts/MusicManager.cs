@@ -119,6 +119,9 @@ public class MusicManager : MonoBehaviour {
 
 		SetupExampleRiffs();
 		SetupExampleLicks();
+		//Debug.Log ("set up done" , licks.Count);
+
+
 	}
 
 	public void PlayRiffLoop(){
@@ -147,7 +150,7 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 					break;
 				case Mode.Live:
-					Debug.Log(beat);
+					//Debug.Log(beat);
 					currentSong.PlaySong(beat++);
 					//Debug.Log(lickQueue.Count);
 					if (lickQueue.Count > 0) {
@@ -191,8 +194,9 @@ public class MusicManager : MonoBehaviour {
 		lickQueue.Clear();
 		foreach (List<Note> beat in lick.notes) {
 			lickQueue.Add(beat);
+			Debug.Log ("test");
 		}
-		//Debug.Log("queued "+lickQueue.Count);
+		Debug.Log("queued "+lickQueue.Count);
 	}
 
 	public void PopLickQueue () {
@@ -224,7 +228,7 @@ public class MusicManager : MonoBehaviour {
 		if (sound == null) {
 			Debug.LogError("Failed to load AudioClip at "+path);
 		} else {
-			Debug.Log("Loaded "+path);
+			//Debug.Log("Loaded "+path);
 			Sounds.Add (Path.GetFileNameWithoutExtension (path), sound);
 		}
 	}
@@ -323,6 +327,30 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () ,
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }},
 				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_B2"] }}
+			}
+		});
+
+		licks[Instrument.ElectricBass].Add (new Riff () {
+			name = "Example Bass Lick",
+			currentInstrument = Instrument.ElectricBass,
+			notes = new List<List<Note>>() {
+				new List<Note> () {new Note() { sound = Sounds["bassguitarF#3"] }},
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () {new Note() { sound = Sounds["bassguitarA3"] }},
+				new List<Note> () {new Note() { sound = Sounds["bassguitarC#4"] }}
+			}
+		});
+
+		licks[Instrument.RockDrums].Add (new Riff () {
+			name = "Example Drums Lick",
+			currentInstrument = Instrument.RockDrums,
+			notes = new List<List<Note>>() {
+				new List<Note> () {new Note() { sound = Sounds["RockDrums_Snare"] }},
+				new List<Note> () {new Note() { sound = Sounds["RockDrums_Snare"] }},
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () { new Note() { sound = Sounds["RockDrums_Hat"] }},
 			}
 		});
 	}
