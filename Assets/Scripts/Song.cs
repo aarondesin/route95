@@ -22,8 +22,8 @@ public class Song {
 			int measure = pos / 4;
 		}*/
 		// For now, all song pieces are assumed to be one measure long
-		foreach (Riff riff in songPieces[pos/4].riffs[0]) {
-			riff.PlayRiff(pos%4);
+		foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
+			riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
 		}
 	}
 
@@ -54,7 +54,7 @@ public class Song {
 
 	public void CompileSong() {
 		measures = NumMeasures();
-		beats = measures*4;
+		beats = measures*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 	}
 
 }

@@ -39,7 +39,7 @@ public class MusicManager : MonoBehaviour {
 
 	// --Global Music Properties-- //
 	public Key currentKey = Key.EMajor; // value will be passed from key button
-	public Instrument currentInstrument = Instrument.RockDrums;
+	public Instrument currentInstrument = Instrument.ElectricGuitar;
 	public Song currentSong = new Song();
 	public bool loopSong = false; // loop song in live mode?
 
@@ -47,6 +47,13 @@ public class MusicManager : MonoBehaviour {
 	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds
 	//public List<Riff> riffs = new List<Riff>(); // all riffs
 	public List<Riff> riffs = new List<Riff> ();
+	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
+		{ Instrument.ElectricBass, new List <Riff> () },
+		{ Instrument.ElectricGuitar, new List <Riff> () },
+		{ Instrument.RockDrums, new List <Riff> () }
+	};
+	// All lick notes waiting to be played
+	List<List<Note>> lickQueue = new List<List<Note>>();
 
 	// List of all sound paths to load
 	List<string> soundsToLoad = new List<string>() {
@@ -111,7 +118,7 @@ public class MusicManager : MonoBehaviour {
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
 		SetupExampleRiffs();
-
+		SetupExampleLicks();
 	}
 
 	public void PlayRiffLoop(){
@@ -140,10 +147,16 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 					break;
 				case Mode.Live:
-					//Debug.Log(beat);
+					Debug.Log(beat);
 					currentSong.PlaySong(beat++);
+					//Debug.Log(lickQueue.Count);
+					if (lickQueue.Count > 0) {
+						//Debug.Log("dick");
+						PopLickQueue();
+					}
 					if (beat >= currentSong.beats) {
 						if (loopSong) {
+							Debug.Log(lickQueue.Count);
 							beat = 0;
 						} else {
 							GameManager.instance.SwitchToPostplay();
@@ -171,6 +184,23 @@ public class MusicManager : MonoBehaviour {
 		SongArrangeSetup.instance.selectedRiffIndex = riffs.Count;
 		riffs.Add (temp);
 		return temp;
+	}
+
+	public void QueueLick (Riff lick) {
+		if (lick == null) return;
+		lickQueue.Clear();
+		foreach (List<Note> beat in lick.notes) {
+			lickQueue.Add(beat);
+		}
+		//Debug.Log("queued "+lickQueue.Count);
+	}
+
+	public void PopLickQueue () {
+		//Debug.Log("play");
+		foreach (Note note in lickQueue[0]) {
+			note.PlayNote(instrumentAudioSources[currentInstrument], true);
+		}
+		lickQueue.RemoveAt(0);
 	}
 
 	// Plays a single sound effect through OneShot AudioSource
@@ -280,6 +310,19 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
+			}
+		});
+	}
+
+	public void SetupExampleLicks () {
+		licks[Instrument.ElectricGuitar].Add (new Riff () {
+			name = "Example Guitar Lick",
+			currentInstrument = Instrument.ElectricGuitar,
+			notes = new List<List<Note>>() {
+				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_E2"] }},
+				new List<Note> () ,
+				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }},
+				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_B2"] }}
 			}
 		});
 	}

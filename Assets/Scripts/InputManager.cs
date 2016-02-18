@@ -6,10 +6,23 @@ public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
 
-	public static Dictionary<string, Instrument> keyToInstrument = new Dictionary<string, Instrument>() {
-		{ "Alpha1", Instrument.RockDrums },
-		{ "Alpha2", Instrument.ElectricGuitar },
-		{ "Alpha3", Instrument.ElectricBass }
+	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
+		{ KeyCode.Alpha1, Instrument.RockDrums },
+		{ KeyCode.Alpha2, Instrument.ElectricGuitar },
+		{ KeyCode.Alpha3, Instrument.ElectricBass }
+	};
+
+	// List of mapped keys for instruments, so that the program knows what to check for
+	public static List<KeyCode> mappedInstruments = new List<KeyCode>() {
+		KeyCode.Alpha1,
+		KeyCode.Alpha2,
+		KeyCode.Alpha3
+	};
+
+	public static Dictionary<KeyCode, int> keyToLick;
+
+	public static List<KeyCode> mappedLicks = new List<KeyCode>() {
+		KeyCode.Q
 	};
 
 	void Start () {
@@ -17,17 +30,32 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.Alpha1)) {
-			SwitchInstrument(keyToInstrument["Alpha1"]);
-		} else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-			SwitchInstrument(keyToInstrument["Alpha2"]);
-		} else if (Input.GetKeyDown(KeyCode.Alpha3)) {
-			SwitchInstrument(keyToInstrument["Alpha3"]);
+		if (GameManager.instance.currentMode == Mode.Live) {
+			// Check for instruments switch
+			foreach (KeyCode key in mappedInstruments) {
+				if (Input.GetKeyDown(key)) SwitchInstrument(keyToInstrument[key]);
+			}
+			// Check for playing lick
+			foreach (KeyCode key2 in mappedLicks) {
+				if (Input.GetKeyDown(key2)) {
+					if (MusicManager.instance.licks[MusicManager.instance.currentInstrument][keyToLick[key2]] != null)
+						PlayLick (MusicManager.instance.licks[MusicManager.instance.currentInstrument][keyToLick[key2]]);
+				}
+			}
+			if (keyToLick == null) {
+				keyToLick = new Dictionary<KeyCode, int>() {
+					{ KeyCode.Q, 0 }
+				};
+			}
 		}
 	}
 
 	void SwitchInstrument (Instrument instrument) {
 		MusicManager.instance.currentInstrument = instrument;
 		InstrumentDisplay.instance.Refresh();
+	}
+
+	void PlayLick (Riff lick) {
+		MusicManager.instance.QueueLick(lick);
 	}
 }

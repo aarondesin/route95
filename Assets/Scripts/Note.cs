@@ -38,6 +38,12 @@ public class Note {
 	public void PlayNote (AudioSource source) {
 		source.PlayOneShot(sound, 1f);
 	}
+
+	// Play note on a specific AudioSource, cutting off?
+	public void PlayNote (AudioSource source, bool cutoff) {
+		if (cutoff) source.Stop();
+		source.PlayOneShot(sound, 1f);
+	}
 }
 
 /*

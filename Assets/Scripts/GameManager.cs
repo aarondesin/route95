@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour {
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);
 		DisableMenu(menus[Menu.SongArrange]);
+		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.currentSong.CompileSong();
 
 		//sets player to moving
