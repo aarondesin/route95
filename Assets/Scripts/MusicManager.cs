@@ -253,19 +253,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Guitar Riff",
 			currentInstrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_E2"] }},
+				new List<Note> () {new Note("ElectricGuitar_E2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_G#2"] }},
+				new List<Note> () {new Note("ElectricGuitar_G#2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_F#2"] }},
+				new List<Note> () {new Note("ElectricGuitar_F#2")},
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }},
+				new List<Note> () {new Note("ElectricGuitar_A2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
@@ -323,10 +323,10 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Guitar Lick",
 			currentInstrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_E2"] }},
+				new List<Note> () {new Note("ElectricGuitar_E2") },
 				new List<Note> () ,
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_A2"] }},
-				new List<Note> () {new Note() { sound = Sounds["ElectricGuitar_B2"] }}
+				new List<Note> () {new Note("ElectricGuitar_A2") },
+				new List<Note> () {new Note("ElectricGuitar_B2") }
 			}
 		});
 

@@ -82,6 +82,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.SongArrange]);
 		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.currentSong.CompileSong();
+		Debug.Log (MusicManager.instance.currentSong.ToString ());
 
 		//sets player to moving
 		TESTPlayerMovement.moving = true;

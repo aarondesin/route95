@@ -7,9 +7,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class save_load : MonoBehaviour {
+	char saveSeparator = '$';
+	char itemSeparator = '#';
 
 	public void Saveriff(){
-		BinaryFormatter bf = new BinaryFormatter ();
+		/*BinaryFormatter bf = new BinaryFormatter ();
 		FileStream file = File.Open(Application.persistentDataPath + "/riffInfo.dat", FileMode.Open);
 
 		riffdata data = new riffdata ();
@@ -17,7 +19,7 @@ public class save_load : MonoBehaviour {
 		bf.Serialize (file, data);
 		file.Close ();
 		Debug.Log ("we saved hopefully");
-
+*/
 	}
 
 	
@@ -31,7 +33,36 @@ public class save_load : MonoBehaviour {
 			file.Close ();
 			Debug.Log ("we load hopefully");
 		}
-		
+
+	}
+
+	public void SaveSong () {
+		string output = "";
+
+		// save all riffs
+		foreach (Riff riff in MusicManager.instance.riffs) {
+			output += riff.ToString () + itemSeparator;
+		}
+
+		// separate riff/songpiece saving
+		output += saveSeparator;
+
+		// save all song pieces
+		foreach (SongPiece songPiece in MusicManager.instance.currentSong.songPieces) {
+			output += songPiece.ToString () + itemSeparator;
+		}
+
+		// separate songpiece/song saving
+		output += saveSeparator;
+
+		// save song
+		/*foreach (SongPiece songPiece in MusicManager.instance.currentSong.songPieces) {
+			output += songPiece.name + "#";
+		}*/
+		output += MusicManager.instance.currentSong.ToString ();
+
+		Debug.Log("SaveString():" +output);
+		//return output;
 	}
 	
 }

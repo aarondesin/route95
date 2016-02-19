@@ -1,18 +1,16 @@
 using UnityEditor;
 using UnityEngine;
+using System; // for enum stuff
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 
 public class Riff {
 	public static int MAX_SUBDIVS = 2;
 
+	public string name; // user-defined name of the riff
 	public Instrument currentInstrument; // instrument used for this riff
 	public List<List<Note>> notes = new List<List<Note>>(); // contains notes
-	public int subdivs; // 0 = 4ths, 1 = 8ths, 2 = 16ths
-	public string name; // user-defined name of the riff
 	public bool cutSelf = true; // if true, sounds will cut themselves off
-
-	public bool pause = true; // if player is looping the riff or just want silent
 
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
 	public Riff () {
@@ -26,6 +24,11 @@ public class Riff {
 		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
 			notes.Add (new List<Note>());
 		}
+	}
+
+	// Loading from a string
+	public Riff (string instrumentString) {
+		currentInstrument = (Instrument)Enum.Parse (typeof(Instrument), instrumentString);
 	}
 
 	public void SetInstrument (Instrument inst) {
@@ -75,6 +78,8 @@ public class Riff {
 		//}
 		// Note not already there
 		notes [pos].Add (newNote);
+		//Debug.Log (newNote.ToString());
+		//Debug.Log(this.ToString());
 		MusicManager.instance.PlayOneShot(newNote.sound);
 		//Debug.Log ("added note");
 	}
@@ -100,6 +105,20 @@ public class Riff {
 		}
 
 		
+	}
+
+	public string ToString () {
+		string result = "";
+		result += name + "#";
+		result += Enum.GetName (typeof(Instrument), (int)currentInstrument);
+		for (int i = 0; i < notes.Count; i++) {
+			result += i+"#";
+			foreach (Note note in notes[i]) {
+				result += note.ToString () + ",";
+			}
+		}
+		result += cutSelf.ToString ();
+		return result;
 	}
 
 	/*

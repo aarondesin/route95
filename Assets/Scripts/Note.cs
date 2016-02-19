@@ -7,10 +7,18 @@ using System.Collections.Generic;// need for using lists
 public class Note {
 	
 	public AudioClip sound;
+	public string filename; // name of audio clip
 	float duration;
 	float volume;
 
 	public Note () {
+		duration = 1f;
+		volume = 1f;
+	}
+
+	public Note (string fileName) {
+		filename = fileName;
+		sound = MusicManager.Sounds [fileName];
 		duration = 1f;
 		volume = 1f;
 	}
@@ -43,6 +51,10 @@ public class Note {
 	public void PlayNote (AudioSource source, bool cutoff) {
 		if (cutoff) source.Stop();
 		source.PlayOneShot(sound, 1f);
+	}
+
+	public string ToString () {
+		return filename;
 	}
 }
 

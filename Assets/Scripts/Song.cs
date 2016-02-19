@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class Song {
 
+	public string name;
 	public List<SongPiece> songPieces = new List<SongPiece>();
 	//List<List<Riff>> compiledSong = new List<List<Riff>> ();
 	public int measures;
@@ -12,7 +13,7 @@ public class Song {
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
 		songPieces = new List<SongPiece>() {
-			new SongPiece(), new SongPiece(), new SongPiece(), new SongPiece()
+			new SongPiece("SongPiece1"), new SongPiece("SongPiece2"), new SongPiece("SongPiece3"), new SongPiece("SongPiece4")
 		};
 	}
 
@@ -57,4 +58,12 @@ public class Song {
 		beats = measures*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 	}
 
+	public string ToString () {
+		string result = "";
+		result += name + "#";
+		foreach (SongPiece songPiece in songPieces) {
+			result += songPiece.name + ",";
+		}
+		return result;
+	}
 }

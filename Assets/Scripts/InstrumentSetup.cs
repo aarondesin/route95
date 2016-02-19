@@ -67,10 +67,10 @@ public class InstrumentSetup : MonoBehaviour {
 		case PercussionInstrument.RockDrums:
 			// Make rows of buttons for drums
 			numRows = 4;
-			MakePercussionButtons ("Kick", 0, new Note (MusicManager.Sounds["RockDrums_Kick"]), kickIcon);
-			MakePercussionButtons ("Snare", 1, new Note (MusicManager.Sounds["RockDrums_Snare"]), snareIcon);
-			MakePercussionButtons ("Tom", 2, new Note (MusicManager.Sounds["RockDrums_Tom"]), tomIcon);
-			MakePercussionButtons ("Hat", 3, new Note (MusicManager.Sounds["RockDrums_Hat"]), hatIcon);
+			MakePercussionButtons ("Kick", 0, new Note ("RockDrums_Kick"), kickIcon);
+			MakePercussionButtons ("Snare", 1, new Note ("RockDrums_Snare"), snareIcon);
+			MakePercussionButtons ("Tom", 2, new Note ("RockDrums_Tom"), tomIcon);
+			MakePercussionButtons ("Hat", 3, new Note ("RockDrums_Hat"), hatIcon);
 			break;
 		}
 	}
@@ -81,13 +81,13 @@ public class InstrumentSetup : MonoBehaviour {
 			case MelodicInstrument.ElectricGuitar:
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
-			MakeMelodicButtons ("E2", 0, new Note (MusicManager.Sounds["ElectricGuitar_E2"]));
-			MakeMelodicButtons ("F#2", 1, new Note (MusicManager.Sounds["ElectricGuitar_F#2"]));
-			MakeMelodicButtons ("G#2", 2, new Note (MusicManager.Sounds["ElectricGuitar_G#2"]));
-			MakeMelodicButtons ("A2", 3, new Note (MusicManager.Sounds["ElectricGuitar_A2"]));
-			MakeMelodicButtons ("B2", 4, new Note (MusicManager.Sounds["ElectricGuitar_B2"]));
-			MakeMelodicButtons ("C#3", 5, new Note (MusicManager.Sounds["ElectricGuitar_C#3"]));
-			MakeMelodicButtons ("D#3", 6, new Note (MusicManager.Sounds["ElectricGuitar_D#3"]));
+			MakeMelodicButtons ("E2", 0, new Note ("ElectricGuitar_E2"));
+			MakeMelodicButtons ("F#2", 1, new Note ("ElectricGuitar_F#2"));
+			MakeMelodicButtons ("G#2", 2, new Note ("ElectricGuitar_G#2"));
+			MakeMelodicButtons ("A2", 3, new Note ("ElectricGuitar_A2"));
+			MakeMelodicButtons ("B2", 4, new Note ("ElectricGuitar_B2"));
+			MakeMelodicButtons ("C#3", 5, new Note ("ElectricGuitar_C#3"));
+			MakeMelodicButtons ("D#3", 6, new Note ("ElectricGuitar_D#3"));
 			break;
 
 			case MelodicInstrument.ElectricBass: 
