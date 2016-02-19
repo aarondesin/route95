@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Song {
 
-	public string name;
+	public string name = "New Song";
 	public List<SongPiece> songPieces = new List<SongPiece>();
 	//List<List<Riff>> compiledSong = new List<List<Riff>> ();
 	public int measures;
