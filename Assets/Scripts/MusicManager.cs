@@ -190,7 +190,7 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void QueueLick (Riff lick) {
-		if (lick == null) return;
+		if (lick == null || lickQueue.Count != 0) return;
 		lickQueue.Clear();
 		foreach (List<Note> beat in lick.notes) {
 			lickQueue.Add(beat);

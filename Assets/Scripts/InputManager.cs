@@ -39,7 +39,7 @@ public class InputManager : MonoBehaviour {
 			}
 			// Check for playing lick
 			foreach (KeyCode key2 in mappedLicks) {
-				if (Input.GetKeyDown(key2)) {
+				if (Input.GetKey(key2)) {
 					if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
 						PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
 					else {
