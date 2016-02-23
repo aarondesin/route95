@@ -109,10 +109,10 @@ public class Riff {
 
 	public string ToString () {
 		string result = "";
-		result += name + "#";
-		result += Enum.GetName (typeof(Instrument), (int)currentInstrument);
+		result += name + "@";
+		result += Enum.GetName (typeof(Instrument), (int)currentInstrument) + '@';
 		for (int i = 0; i < notes.Count; i++) {
-			result += i+"#";
+			result += i+"@";
 			foreach (Note note in notes[i]) {
 				result += note.ToString () + ",";
 			}

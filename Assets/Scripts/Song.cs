@@ -13,7 +13,7 @@ public class Song {
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
 		songPieces = new List<SongPiece>() {
-			new SongPiece("SongPiece1"), new SongPiece("SongPiece2"), new SongPiece("SongPiece3"), new SongPiece("SongPiece4")
+			new SongPiece("SongPieceOne"), new SongPiece("SongPieceTwo"), new SongPiece("SongPieceThree"), new SongPiece("SongPieceFour")
 		};
 	}
 

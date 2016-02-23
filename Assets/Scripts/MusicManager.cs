@@ -56,7 +56,7 @@ public class MusicManager : MonoBehaviour {
 	List<List<Note>> lickQueue = new List<List<Note>>();
 
 	// List of all sound paths to load
-	List<string> soundsToLoad = new List<string>() {
+	List<string> soundsToLoad = new List<string>() {// maybe use dict for efficiency
 		// Melodic.ElectricGuitar
 		"Audio/Instruments/Melodic/ElectricGuitar_E2",
 		"Audio/Instruments/Melodic/ElectricGuitar_F#2",
@@ -187,6 +187,11 @@ public class MusicManager : MonoBehaviour {
 		SongArrangeSetup.instance.selectedRiffIndex = riffs.Count;
 		riffs.Add (temp);
 		return temp;
+	}
+
+	public void AddRiff (Riff riff) {
+		riffs.Add (riff);
+		SongArrangeSetup.instance.Refresh();
 	}
 
 	public void QueueLick (Riff lick) {

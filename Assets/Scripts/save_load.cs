@@ -5,10 +5,13 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Linq;
 
 public class save_load : MonoBehaviour {
 	char saveSeparator = '$';
-	char itemSeparator = '#';
+	char itemSeparator = '@';
+	char riffSeparator = '%';
+	//char[] separators = { '$', ',', '#', '%' };
 
 	public void Saveriff(){
 		Debug.Log (SaveSong ());
@@ -30,43 +33,86 @@ public class save_load : MonoBehaviour {
 		//data.pos = InstrumentSetup.currentRiff.intPos;
 		data.songData = SaveSong();
 		bf.Serialize (file, data);
-		//Debug.Log ("Note Name: " + data.noteName);
-		//Debug.Log ("Riff Name: " + data.riffName);
-		//Debug.Log ("List of Positions: " + data.pos);
-		//Debug.Log ("Beat: " + data.beat);
+
 		file.Close ();
 		Debug.Log ("we saved hopefully");
 
 	}
 
 	
-	/*public void Loadriff(){
-		string path = Application.persistentDataPath + "/" + InstrumentSetup.currentRiff.name;
-		Debug.Log ("load is being called");
-		Debug.Log (path);
-		if (File.Exists (path + "/riffInfo.data")) {
+	public void Loadriff(){
+		string directoryPath = Application.persistentDataPath + "/";
+		//string filePath = directoryPath + MusicManager.instance.currentSong.name + ".dat";
+		string filePath = directoryPath + "New Song.dat";
+		Debug.Log (directoryPath);
+		if (File.Exists (filePath)) {
 			BinaryFormatter bf = new BinaryFormatter ();
-			FileStream file = File.Open (path + "/riffInfo.dat", FileMode.Open);
+			FileStream file = File.Open (filePath, FileMode.Open);
 
 			riffdata data = (riffdata)bf.Deserialize (file);
-			Debug.Log ("Note Name: " + data.noteName);
-			Debug.Log ("Riff Name: " + data.riffName);
-			Debug.Log ("List of Positions: " + data.pos);
-			Debug.Log ("Beat: " + data.beat);
+			Debug.Log (data.songData);
 			file.Close ();
-			Debug.Log ("we load hopefully");
+			//Debug.Log ("we load hopefully");
+			string[] words = data.songData.Split('$');
+			LoadRiffs (words [0]);
+			LoadSongPieces (words [1]);
+			LoadSong (words [2]);
+			/*foreach (string s in words) {
+				string[] elements = s.Split ('@');
+				foreach (string word in elements) {
+					Debug.Log(word);
+				}
+			}*/
 		} else
 			Debug.Log ("file doesn't exist");
 
-	}*/
+	}
+
+	public void LoadRiffs (string riffString) {
+		string[] riffs = riffString.Split (riffSeparator);
+		foreach (string riff in riffs) {
+			string[] strings = riffString.Split (itemSeparator);
+			Riff newRiff = new Riff ();
+			newRiff.name = strings [0];
+			newRiff.currentInstrument = (Instrument)Enum.Parse (typeof(Instrument), strings [1]);
+			int currentBeat = 0; // current beat being loaded in
+			for (int i=2; i<strings.Length; i++) {
+				string item = strings [i];
+				Debug.Log (item);
+				if (Int32.Parse(item) == null) { // riff
+					newRiff.notes [currentBeat].Add (new Note (item));
+				} else {
+					int itemval;
+					bool beat = int.TryParse (item,out itemval);
+					if (beat == false) {
+						Debug.Log (item + "not a number");
+					} else {
+						currentBeat = Int32.Parse (item);
+					}
+				}
+			}
+			MusicManager.instance.AddRiff (newRiff);
+		}
+	}
+
+	public void LoadSongPieces (string songPieceString) {
+		
+	}
+
+	public void LoadSong (string songString) {
+	}
+		
 
 	public string SaveSong () {
 		string output = "";
 
+
+		output += InstrumentSetup.currentRiff.ToString() + riffSeparator;
+		Debug.Log(output);
 		// save all riffs
-		foreach (Riff riff in MusicManager.instance.riffs) {
-			output += riff.ToString () + itemSeparator;
-		}
+		//foreach (Riff riff in MusicManager.instance.riffs) {
+		//	output += riff.ToString () + riffSeparator;
+		//}
 
 		// separate riff/songpiece saving
 		output += saveSeparator;
@@ -87,6 +133,10 @@ public class save_load : MonoBehaviour {
 
 		Debug.Log("SaveString():" +output);
 		return output;
+	}
+
+	public void LoadSong(){
+
 	}
 	
 }

@@ -35,9 +35,9 @@ public class SongPiece {
 
 	public string ToString () {
 		string result = "";
-		result += name + "#";
+		result += name + "@";
 		for (int i = 0; i < riffs.Count; i++) {
-			result += i + "#";
+			result += i + "@";
 			foreach (Riff riff in riffs[i]) {
 				result += riff.name + ",";
 			}
