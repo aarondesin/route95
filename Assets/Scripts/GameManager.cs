@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour {
 
 	public string savePath; 
 
+	bool initialized = false;
+
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
@@ -57,6 +59,10 @@ public class GameManager : MonoBehaviour {
 			{ Menu.RiffEdit, riffEditMenu }
 		};
 
+
+	}
+
+	void Initialize () {
 		// Hide all menus and display default menu (main)
 		DisableMenu(menus[Menu.KeySelect]);
 		DisableMenu(menus[Menu.SongArrange]);
@@ -64,6 +70,11 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(addRiffPrompt);
 		DisableMenu(loadProjectPrompt);
 		SwitchToMenu(Menu.Main);
+		initialized = true;
+	}
+
+	void Update () {
+		if (!initialized) Initialize();
 	}
 
 
