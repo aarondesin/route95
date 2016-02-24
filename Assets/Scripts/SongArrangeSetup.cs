@@ -10,14 +10,18 @@ public class SongArrangeSetup : MonoBehaviour {
 	public int selectedRiffIndex; // index of currently selected riff
 
 	public Dropdown dropdown;
+	public InputField songNameInputField;
 
 	void Start () {
 		instance = this;
 		dropdown.onValueChanged.AddListener (delegate { UpdateValue(); });
+		songNameInputField.onEndEdit.AddListener (delegate { MusicManager.instance.currentSong.name = songNameInputField.text;});
 	}
 
-	// Update the options in the dropdown to include all riffs
+	// Refresh all elements on the Song Arrangement UI
 	public void Refresh () {
+
+		// Update the options in the dropdown to include all riffs
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
 		foreach (Riff riff in MusicManager.instance.riffs) {
@@ -27,6 +31,9 @@ public class SongArrangeSetup : MonoBehaviour {
 			options.Add (option);
 		}
 		dropdown.AddOptions (options);
+
+		// Refresh song name input field
+		songNameInputField.text = MusicManager.instance.currentSong.name;
 	}
 
 	public void UpdateValue () {
@@ -41,6 +48,15 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	public void HideDropdown () {
 		dropdown.Hide();
+	}
+
+	public void EnableLoadProjectPrompt () {
+		LoadProjectPrompt.instance.gameObject.SetActive(true);
+		LoadProjectPrompt.instance.PopulateList();
+	}
+
+	public void DisableLoadProjectPrompt () {
+		LoadProjectPrompt.instance.gameObject.SetActive(false);
 	}
 				
 }

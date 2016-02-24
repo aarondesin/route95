@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public enum Menu {
 	None,
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
 	public GameObject addRiffPrompt;
+	public GameObject loadProjectPrompt;
 
 	// Parent objects for universal system buttons
 	public GameObject systemButtons;
@@ -39,9 +41,12 @@ public class GameManager : MonoBehaviour {
 	public Menu currentMenu = Menu.None;
 	public Mode currentMode = Mode.Setup;
 
+	public string savePath; 
+
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
+		savePath = Application.persistentDataPath;
 		//Sounds.Load();
 
 		// Initialize set of all menus
@@ -57,6 +62,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.SongArrange]);
 		DisableMenu(menus[Menu.RiffEdit]);
 		DisableMenu(addRiffPrompt);
+		DisableMenu(loadProjectPrompt);
 		SwitchToMenu(Menu.Main);
 	}
 

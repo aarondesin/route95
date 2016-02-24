@@ -3,15 +3,18 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using System;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Linq;
 
 public class save_load : MonoBehaviour {
-	char saveSeparator = '$';
-	char itemSeparator = '@';
-	char riffSeparator = '%';
+	public static char saveSeparator = '$';
+	public static char itemSeparator = '@';
+	public static char riffSeparator = '%';
 	//char[] separators = { '$', ',', '#', '%' };
+
+	public static string saveExtension = ".r95";
 
 	public void Saveriff(){
 		Debug.Log (SaveSong ());
@@ -19,7 +22,7 @@ public class save_load : MonoBehaviour {
 
 		//string path = Application.persistentDataPath + "/" + InstrumentSetup.currentRiff.name;
 		string directoryPath = Application.persistentDataPath + "/";
-		string filePath = directoryPath + MusicManager.instance.currentSong.name + ".dat";
+		string filePath = directoryPath + MusicManager.instance.currentSong.name + saveExtension;
 		Debug.Log (directoryPath);
 		Debug.Log (filePath);
 		Directory.CreateDirectory (directoryPath);
@@ -68,8 +71,66 @@ public class save_load : MonoBehaviour {
 
 	}
 
-	public void LoadRiffs (string riffString) {
+	public static void SaveFile (string path) {
+		BinaryFormatter bf = new BinaryFormatter ();
+
+		//string path = Application.persistentDataPath + "/" + InstrumentSetup.currentRiff.name;
+		string directoryPath = Application.persistentDataPath + "/";
+		string filePath = directoryPath + MusicManager.instance.currentSong.name + saveExtension;
+		Debug.Log (directoryPath);
+		Debug.Log (filePath);
+		Directory.CreateDirectory (directoryPath);
+		FileStream file = File.Open(filePath, FileMode.Create);
+		//string test = SaveToString ();
+		//Debug.Log (test);
+
+		riffdata data = new riffdata ();
+		//data.riff = InstrumentSetup.currentRiff;
+		//data.riffName = InstrumentSetup.currentRiff.name;
+		//data.pos = InstrumentSetup.currentRiff.intPos;
+		data.songData = SaveSong();
+		bf.Serialize (file, data);
+
+		file.Close ();
+	}
+
+	public static void LoadFile (string path) {
+		if (File.Exists (path)) {
+			BinaryFormatter bf = new BinaryFormatter ();
+			FileStream file = File.Open (path, FileMode.Open);
+
+			try {
+				riffdata data = (riffdata)bf.Deserialize (file);
+				Debug.Log (data.songData);
+				file.Close ();
+
+				// Split file into input for all three load processes
+				string[] words = data.songData.Split(saveSeparator);
+				LoadRiffs (words [0]);
+				LoadSongPieces (words [1]);
+				LoadSong (words [2]);
+			} catch (SerializationException) {
+				Debug.LogError ("save_load.LoadFile(): Failed to deserialize file, probably empty.");
+			} catch (EndOfStreamException) {
+				Debug.LogError ("save_load.LoadFile(): Attempted to read past end of stream, file is wrong format?");
+			}
+			/*foreach (string s in words) {
+				string[] elements = s.Split ('@');
+				foreach (string word in elements) {
+					Debug.Log(word);
+				}
+			}*/
+		} else
+			Debug.LogError ("save_load.LoadFile(): File \'"+path+"\' doesn't exist.");
+		
+	}
+
+	public static void LoadRiffs (string riffString) {
 		string[] riffs = riffString.Split (riffSeparator);
+		if (riffs.Length == 0) {
+			Debug.LogError("save_load.LoadRiffs(): No riffs found");
+			return;
+		}
 		foreach (string riff in riffs) {
 			string[] strings = riffString.Split (itemSeparator);
 			Riff newRiff = new Riff ();
@@ -95,24 +156,24 @@ public class save_load : MonoBehaviour {
 		}
 	}
 
-	public void LoadSongPieces (string songPieceString) {
+	public static void LoadSongPieces (string songPieceString) {
 		
 	}
 
-	public void LoadSong (string songString) {
+	public static void LoadSong (string songString) {
 	}
 		
 
-	public string SaveSong () {
+	public static string SaveSong () {
 		string output = "";
 
 
-		output += InstrumentSetup.currentRiff.ToString() + riffSeparator;
+		//output += InstrumentSetup.currentRiff.ToString() + riffSeparator;
 		Debug.Log(output);
 		// save all riffs
-		//foreach (Riff riff in MusicManager.instance.riffs) {
-		//	output += riff.ToString () + riffSeparator;
-		//}
+		foreach (Riff riff in MusicManager.instance.riffs) {
+			output += riff.ToString () + riffSeparator;
+		}
 
 		// separate riff/songpiece saving
 		output += saveSeparator;
