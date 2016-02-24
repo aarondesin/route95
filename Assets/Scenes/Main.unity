@@ -4079,9 +4079,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 160500, guid: fae4a60f97e8a7245b7a503fe765caf0, type: 2}
   numberOfObjects: 200
-  radius: 40
+  radius: 1000
   cubes: []
-  scale: 400
+  scale: 50
 --- !u!1 &743299136
 GameObject:
   m_ObjectHideFlags: 0
@@ -5182,6 +5182,7 @@ MonoBehaviour:
   CHUNK_SIZE: 100
   CHUNK_RESOLUTION: 10
   LOADED_CHUNK_RADIUS: 8
+  VERT_UPDATE_DISTANCE: 600
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
   FREQ_ARRAY_SIZE: 256
@@ -7127,7 +7128,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 1000
+  far clip plane: 1200
   field of view: 60
   orthographic: 0
   orthographic size: 5

@@ -24,12 +24,12 @@ public class Spectrum : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float[] freqDataArray = new float[256];
+		float[] freqDataArray = new float[128];
 		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
 		LinInt spectrum = new LinInt (freqDataArray);
 		for (int i = 0; i < numberOfObjects; i++) {
 			Vector3 previousScale = cubes [i].transform.localScale;
-			previousScale.y = spectrum.getDataPoint ((float)i / numberOfObjects) * scale;
+			previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
 			cubes [i].transform.localScale = previousScale;
 		}
 	}

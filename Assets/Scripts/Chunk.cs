@@ -8,12 +8,14 @@ using System.Collections;
  */
 
 public class Chunk{
+	private float HEIGHT_SCALE = 400f; //scales the heights of the vertices from the LinInt data
 	private float CHUNK_SIZE; //size of side of chunk square
 	private int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	private int x; //x position in chunk grid
 	private int y; //y position in chunk grid
 
 	public GameObject chunk;
+	private bool[] vertLocked; //if vertex in mesh.vertices has had its height set
 	private Vector3[] dMap; //displacement map, displaces each vertex by a Vector3
 	private Material terrainMaterial;
 
@@ -25,6 +27,7 @@ public class Chunk{
 		terrainMaterial = terrMat;
 
 		Vector3[] verts = createUniformVertexArray (CHUNK_RESOLUTION);
+		vertLocked = new bool[verts.Length];
 		Vector2[] uvs = createUniformUVArray (CHUNK_RESOLUTION);
 		int[] triangles = createSquareArrayTriangles (CHUNK_RESOLUTION);
 		chunk = createChunk (verts, uvs, triangles);
@@ -174,5 +177,37 @@ public class Chunk{
 
 		return chunk;
 	}
-}
 
+	private bool checkDist (float dist, float updateDist, float margin) {
+		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
+	}
+
+	private void updateVerts(GameObject player, float updateDist, LinInt freqData) {
+		float margin = CHUNK_SIZE / 2;
+		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
+		for (int v = 0; v < vertices.Length; v++) {
+			if (!vertLocked [v]) {
+				Vector3 vertPos = chunk.transform.position + vertices [v];
+				float distance = Vector3.Distance (vertPos, player.transform.position);
+				if (checkDist (distance, updateDist, margin)) {
+					Vector3 angleVector = vertPos - player.transform.position;
+					float angle = Vector3.Angle (Vector3.right, angleVector);
+					float linIntInput = angle / 360f;
+					float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
+					vertices [v].y = newY;
+					vertLocked [v] = true;
+				}
+			}
+		}
+		chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
+		chunk.GetComponent<MeshFilter> ().mesh.RecalculateNormals();
+		chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds();
+	}
+	public void update (GameObject player, float updateDist, LinInt freqData){
+		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (CHUNK_SIZE / 2, 0f, CHUNK_SIZE / 2);
+		float distance = Vector3.Distance (player.transform.position, centerOfChunk);
+		if (checkDist(distance, updateDist, CHUNK_SIZE)) {
+			updateVerts (player, updateDist, freqData);
+		}
+	}
+}
