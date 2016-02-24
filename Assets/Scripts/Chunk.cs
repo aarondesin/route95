@@ -8,7 +8,7 @@ using System.Collections;
  */
 
 public class Chunk{
-	private float HEIGHT_SCALE = 400f; //scales the heights of the vertices from the LinInt data
+	private float HEIGHT_SCALE; //scales the heights of the vertices from the LinInt data
 	private float CHUNK_SIZE; //size of side of chunk square
 	private int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	private int x; //x position in chunk grid
@@ -19,7 +19,7 @@ public class Chunk{
 	private Vector3[] dMap; //displacement map, displaces each vertex by a Vector3
 	private Material terrainMaterial;
 
-	public Chunk (int x, int y, float chunkSize, int chunkResolution, Material terrMat) {
+	public Chunk (int x, int y, float chunkSize, int chunkResolution, Material terrMat, float heightScale) {
 		this.x = x;
 		this.y = y;
 		CHUNK_SIZE = chunkSize;
@@ -39,6 +39,7 @@ public class Chunk{
 			dMap = new Vector3[verts.Length];
 			setDMap (createRandomHMap (verts.Length));
 		}
+		HEIGHT_SCALE = heightScale;
 	}
 
 	public int getX () {

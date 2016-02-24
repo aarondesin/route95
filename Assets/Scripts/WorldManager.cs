@@ -7,6 +7,7 @@ public class WorldManager : MonoBehaviour {
 	public float CHUNK_SIZE; //derived from TERRAIN_SIZE/TERRAIN_RESOLUTION
 	public int CHUNK_RESOLUTION; //number of vertices per side of chunk
 	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
+	public float VERT_HEIGHT_SCALE; //scales the heights of the vertices from the LinInt data
 	public float VERT_UPDATE_DISTANCE; //the distance at which vertices should update
 	public Material TERRAIN_MATERIAL; //material used for terrain
 	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
@@ -42,7 +43,7 @@ public class WorldManager : MonoBehaviour {
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
 		}
-		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE);
+		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE, VERT_HEIGHT_SCALE);
 
 		sun = createSun();
 		audioOut = camera.GetComponent<AudioListener> ();
