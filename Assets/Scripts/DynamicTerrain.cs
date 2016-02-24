@@ -39,7 +39,9 @@ public class DynamicTerrain {
 		terrain.transform.position = player.transform.position;
 	}
 
-	void updateChunks(){
+	void updateChunks(float[] freqDataArray){
+		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
+		LinInt freqData = new LinInt (freqDataArray);
 		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
 		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
 		createChunkLists (xChunks, yChunks);
@@ -123,7 +125,7 @@ public class DynamicTerrain {
 		}
 	}
 
-	public void update(){
-		updateChunks ();
+	public void update(float[] freqDataArray){
+		updateChunks (freqDataArray);
 	}
 }
