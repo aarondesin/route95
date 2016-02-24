@@ -6,10 +6,12 @@ using System.Collections.Generic;
 
 public class DynamicTerrain {
 
+	private float HEIGHT_SCALE; //scales the heights of the vertices from the LinInt data
 	private float CHUNK_SIZE; //the width of the terrain square in Unity distance units
 	private int CHUNK_RESOLUTION; //the number of vertices per row/column, minimum 2
 	private Material TERRAIN_MATERIAL; //the material to apply to the terrain
 	private int LOADED_CHUNK_RADIUS; //number of chunks from the player's chunk to load
+	private float VERT_UPDATE_DISTANCE;
 
 	private int MAX_DECORATIONS; // maximum number of decorations
 
@@ -27,7 +29,7 @@ public class DynamicTerrain {
 		terrain.transform.localPosition += offset;
 	}
 
-	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius){
+	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius, float vertUpdateDist, float heightScale){
 		activeChunks = new List<Chunk>();
 		this.player = player;
 		CHUNK_SIZE = chunkSize;
@@ -37,6 +39,8 @@ public class DynamicTerrain {
 		initializeParams ();
 		terrain = new GameObject ("terrain");
 		terrain.transform.position = player.transform.position;
+		VERT_UPDATE_DISTANCE = vertUpdateDist;
+		HEIGHT_SCALE = heightScale;
 	}
 
 	void updateChunks(float[] freqDataArray){
@@ -47,10 +51,13 @@ public class DynamicTerrain {
 		createChunkLists (xChunks, yChunks);
 		createChunks (xChunks, yChunks);
 		deleteChunks (xChunks, yChunks);
+		foreach (Chunk chunk in activeChunks) {
+			chunk.update(player, VERT_UPDATE_DISTANCE, freqData);
+		}
 	}
 
 	Chunk createChunk(int x, int y){
-		Chunk newChunk = new Chunk(x, y, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL);
+		Chunk newChunk = new Chunk(x, y, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, HEIGHT_SCALE);
 		newChunk.chunk.transform.parent = terrain.transform;
 		return newChunk;
 	}
