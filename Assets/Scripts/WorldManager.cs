@@ -16,6 +16,7 @@ public class WorldManager : MonoBehaviour {
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
 	public int DECORATIONS_PER_STEP;
+	[SerializeField]
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
 		"Prefabs/Decoration_Saguaro"
@@ -65,8 +66,8 @@ public class WorldManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		terrain.update(freqDataArray);
-		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
-			for (int i=0; i<DECORATIONS_PER_STEP; i++) {
+		if (DO_DECORATE) {
+			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
 			}
 		}
@@ -92,11 +93,13 @@ public class WorldManager : MonoBehaviour {
 			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
 		);
 		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-			GameObject newDecoration = 
-				(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
-			newDecoration.GetComponent<Decoration>().Randomize();
-			newDecoration.transform.parent = chunk.chunk.transform;
-			numDecorations++;
+			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+				GameObject newDecoration = 
+					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
+				newDecoration.GetComponent<Decoration>().Randomize();
+				newDecoration.transform.parent = chunk.chunk.transform;
+				numDecorations++;
+			}
 		}
 	}
 
@@ -112,5 +115,9 @@ public class WorldManager : MonoBehaviour {
 
 	public void DecNumDeco(int n) {
 		numDecorations -= n;
+	}
+
+	public bool Constrained (Vector3 pos) {
+		return (pos.x < 6f && pos.x > -6f);
 	}
 }

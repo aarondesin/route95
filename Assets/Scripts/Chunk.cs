@@ -187,7 +187,7 @@ public class Chunk{
 		float margin = CHUNK_SIZE / 2;
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		for (int v = 0; v < vertices.Length; v++) {
-			if (!vertLocked [v]) {
+			if (!vertLocked [v] && !Constrained(chunk.transform.position+ vertices[v])) {
 				Vector3 vertPos = chunk.transform.position + vertices [v];
 				float distance = Vector3.Distance (vertPos, player.transform.position);
 				if (checkDist (distance, updateDist, margin)) {
@@ -211,4 +211,8 @@ public class Chunk{
 			updateVerts (player, updateDist, freqData);
 		}
 	}
+	public bool Constrained (Vector3 vertex) {
+		return (vertex.x < 6f && vertex.x > -6f);
+	}
+
 }

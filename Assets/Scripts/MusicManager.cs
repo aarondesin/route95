@@ -342,8 +342,19 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note() { sound = Sounds["bassguitarF#3"] }},
 				new List<Note> () ,
 				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () {new Note() { sound = Sounds["bassguitarF#3"] }},
+				new List<Note> () ,
 				new List<Note> () {new Note() { sound = Sounds["bassguitarA3"] }},
-				new List<Note> () {new Note() { sound = Sounds["bassguitarC#4"] }}
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () {new Note() { sound = Sounds["bassguitarC#4"] }},
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> ()
 			}
 		});
 
