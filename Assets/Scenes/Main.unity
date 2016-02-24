@@ -5139,6 +5139,7 @@ MonoBehaviour:
   LOADED_CHUNK_RADIUS: 8
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
+  FREQ_ARRAY_SIZE: 256
   DO_DECORATE: 1
   MAX_DECORATIONS: 300
   DECORATIONS_PER_STEP: 10
@@ -5150,6 +5151,8 @@ MonoBehaviour:
   LIGHT_Y_SCALE: 999999
   LIGHT_Z_SCALE: 999999
   player: {fileID: 371512236}
+  camera: {fileID: 1334809314}
+  audioOut: {fileID: 0}
 --- !u!1 &935069149
 GameObject:
   m_ObjectHideFlags: 0

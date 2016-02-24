@@ -9,6 +9,7 @@ public class WorldManager : MonoBehaviour {
 	public int LOADED_CHUNK_RADIUS; //number of CHUNK_SIZEs a chunk can be to load or not be unloaded
 	public Material TERRAIN_MATERIAL; //material used for terrain
 	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
+	public int FREQ_ARRAY_SIZE; //must be a power of 2
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
@@ -25,8 +26,11 @@ public class WorldManager : MonoBehaviour {
 	public float LIGHT_Z_SCALE;
 
 	public GameObject player;
+	public GameObject camera;
+	public AudioListener audioOut;
 
 	private DynamicTerrain terrain;
+	private float[] freqDataArray;
 	private GameObject sun;
 	private GameObject moon;
 
@@ -40,6 +44,8 @@ public class WorldManager : MonoBehaviour {
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS);
 
 		sun = createSun();
+		audioOut = camera.GetComponent<AudioListener> ();
+		freqDataArray = new float[FREQ_ARRAY_SIZE];
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -56,7 +62,7 @@ public class WorldManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		terrain.update();
+		terrain.update(freqDataArray);
 		if (DO_DECORATE && numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP; i++) {
 				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
