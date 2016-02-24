@@ -12,6 +12,7 @@ public class save_load : MonoBehaviour {
 	public static char saveSeparator = '$';
 	public static char itemSeparator = '@';
 	public static char riffSeparator = '%';
+	public static char noteSeparator = ',';
 	//char[] separators = { '$', ',', '#', '%' };
 
 	public static string saveExtension = ".r95";
@@ -127,28 +128,40 @@ public class save_load : MonoBehaviour {
 
 	public static void LoadRiffs (string riffString) {
 		string[] riffs = riffString.Split (riffSeparator);
+
 		if (riffs.Length == 0) {
 			Debug.LogError("save_load.LoadRiffs(): No riffs found");
 			return;
 		}
 		foreach (string riff in riffs) {
-			string[] strings = riffString.Split (itemSeparator);
+			if (riff.Length == 0)
+				break;
+			string[] strings = riff.Split (new char[]{itemSeparator,noteSeparator});
 			Riff newRiff = new Riff ();
 			newRiff.name = strings [0];
+			Debug.Log ("Riff name: " +newRiff.name);
 			newRiff.currentInstrument = (Instrument)Enum.Parse (typeof(Instrument), strings [1]);
+			Debug.Log ("Instrument: " + (Instrument)Enum.Parse (typeof(Instrument), strings [1]));
+			newRiff.cutSelf = (strings [2] == "True" ? true : false);
+			Debug.Log ("cutSelf: " + newRiff.cutSelf.ToString ());
 			int currentBeat = 0; // current beat being loaded in
-			for (int i=2; i<strings.Length; i++) {
+			for (int i=3; i<strings.Length-1; i++) {
 				string item = strings [i];
-				Debug.Log (item);
-				if (Int32.Parse(item) == null) { // riff
+				Debug.Log ("Parsing " + item);
+				int itemval;
+				//Debug.Log (item);
+				//if (Int32.Parse(item) == null) { // riff
+				if (!int.TryParse(item, out itemval)) {
+					Debug.Log("Note "+item+" at "+currentBeat);
 					newRiff.notes [currentBeat].Add (new Note (item));
 				} else {
-					int itemval;
+					//int itemval;
 					bool beat = int.TryParse (item,out itemval);
 					if (beat == false) {
 						Debug.Log (item + "not a number");
 					} else {
-						currentBeat = Int32.Parse (item);
+						currentBeat = itemval;
+						Debug.Log ("Now on beat " + itemval);
 					}
 				}
 			}
@@ -169,7 +182,7 @@ public class save_load : MonoBehaviour {
 
 
 		//output += InstrumentSetup.currentRiff.ToString() + riffSeparator;
-		Debug.Log(output);
+		//Debug.Log(output);
 		// save all riffs
 		foreach (Riff riff in MusicManager.instance.riffs) {
 			output += riff.ToString () + riffSeparator;

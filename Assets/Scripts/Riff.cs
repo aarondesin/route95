@@ -111,13 +111,13 @@ public class Riff {
 		string result = "";
 		result += name + "@";
 		result += Enum.GetName (typeof(Instrument), (int)currentInstrument) + '@';
+		result += cutSelf.ToString ()+'@';
 		for (int i = 0; i < notes.Count; i++) {
 			result += i+"@";
 			foreach (Note note in notes[i]) {
 				result += note.ToString () + ",";
 			}
 		}
-		result += cutSelf.ToString ();
 		return result;
 	}
 
