@@ -60,6 +60,8 @@ public class GameManager : MonoBehaviour {
 			{ Menu.RiffEdit, riffEditMenu }
 		};
 
+		loadProjectPrompt.SetActive(true);
+
 
 	}
 

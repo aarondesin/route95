@@ -11,6 +11,9 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	public Dropdown dropdown;
 	public InputField songNameInputField;
+	public GameObject playRiffButton;
+	public Sprite play;
+	public Sprite pause;
 
 	void Start () {
 		instance = this;
@@ -31,6 +34,7 @@ public class SongArrangeSetup : MonoBehaviour {
 			options.Add (option);
 		}
 		dropdown.AddOptions (options);
+		InstrumentSetup.currentRiff = MusicManager.instance.riffs[0];
 
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;
@@ -58,5 +62,11 @@ public class SongArrangeSetup : MonoBehaviour {
 	public void DisableLoadProjectPrompt () {
 		LoadProjectPrompt.instance.gameObject.SetActive(false);
 	}
+
+	public void TogglePlayRiffButton () {
+		if (playRiffButton.GetComponent<Image>().sprite == play) playRiffButton.GetComponent<Image>().sprite = pause;
+		else playRiffButton.GetComponent<Image>().sprite = play;
+	}
+
 				
 }

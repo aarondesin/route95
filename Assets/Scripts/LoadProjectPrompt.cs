@@ -14,6 +14,8 @@ public class LoadProjectPrompt : MonoBehaviour {
 
 	List<GameObject> fileButtons;
 
+	public Sprite fillSprite;
+
 	static Vector2 fileListSize = new Vector2 (84f, 84f);
 
 	static float horizontalPadding = 8f;
@@ -45,7 +47,8 @@ public class LoadProjectPrompt : MonoBehaviour {
 			button.AddComponent<CanvasRenderer>();
 			button.AddComponent<RectTransform>();
 			button.GetComponent<RectTransform>().SetParent(fileList);
-			button.GetComponent<RectTransform>().sizeDelta = buttonSize;
+			float width = ((RectTransform)button.GetComponent<RectTransform>().parent.parent).rect.width;
+			button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, buttonSize.y);
 			button.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 			button.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
 			button.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
@@ -54,14 +57,33 @@ public class LoadProjectPrompt : MonoBehaviour {
 				((i == 0 ? 0f : verticalPadding) + button.GetComponent<RectTransform>().sizeDelta.y)*-(float)(i+1),
 				0f
 			);
-			button.GetComponent<Button>().onClick.AddListener(()=>{selectedPath = button.name; loadButton.GetComponent<Button>().interactable = true;});
+			button.AddComponent<Image>();
+			button.GetComponent<Image>().sprite = fillSprite;
+			button.GetComponent<Image>().color = new Color(1f,1f,1f,0f);
 
-			button.AddComponent<Text>();
-			button.GetComponent<Text>().text = filename;
-			button.GetComponent<Text>().fontSize = 8;
-			button.GetComponent<Text>().color = Color.white;
-			button.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-			button.GetComponent<Text>().alignment = TextAnchor.MiddleLeft;
+			GameObject text = new GameObject();
+			text.name = "Text";
+			text.AddComponent<CanvasRenderer>();
+			text.AddComponent<RectTransform>();
+			text.GetComponent<RectTransform>().SetParent(button.transform);
+			text.GetComponent<RectTransform>().sizeDelta = ((RectTransform)text.GetComponent<RectTransform>().parent).sizeDelta;
+			text.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
+			text.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.5f);
+			text.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.5f);
+			text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f,0f,0f);
+			text.AddComponent<Text>();
+			text.GetComponent<Text>().text = filename;
+			text.GetComponent<Text>().fontSize = 10;
+			text.GetComponent<Text>().color = Color.white;
+			text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+			text.GetComponent<Text>().alignment = TextAnchor.MiddleLeft;
+
+			button.GetComponent<Button>().onClick.AddListener(()=>{
+				ResetButtons();
+				selectedPath = button.name;
+				loadButton.GetComponent<Button>().interactable = true;
+				button.GetComponent<Image>().color = new Color(1f,1f,1f,0.5f);
+			});
 			fileButtons.Add(button);
 		}
 
@@ -74,5 +96,13 @@ public class LoadProjectPrompt : MonoBehaviour {
 		string fullPath = GameManager.instance.savePath+"/"+selectedPath+save_load.saveExtension;
 		Debug.Log("LoadProjectPrompt.LoadSelectedPath(): loading "+fullPath);
 		save_load.LoadFile (fullPath);
+	}
+
+	// Resets highlighting of all buttons
+	void ResetButtons () {
+		foreach (GameObject button in fileButtons) {
+			//button.GetComponent<Image>().sprite = null;
+			button.GetComponent<Image>().color = new Color (1f, 1f, 1f, 0f);
+		}
 	}
 }

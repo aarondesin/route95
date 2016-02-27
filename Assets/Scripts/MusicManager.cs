@@ -127,6 +127,7 @@ public class MusicManager : MonoBehaviour {
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
+			instrumentAudioSources[InstrumentSetup.currentRiff.currentInstrument].Stop();
 		} else {
 			playing = true;
 			loop = true;
