@@ -40,7 +40,7 @@ public class save_load : MonoBehaviour {
 
 		file.Close ();
 		Debug.Log ("we saved hopefully");
-
+		Prompt.instance.PromptMessage("Save Project", "Successfully saved project!", "Okay");
 	}
 
 	
@@ -93,10 +93,12 @@ public class save_load : MonoBehaviour {
 		bf.Serialize (file, data);
 
 		file.Close ();
+
 	}
 
 	public static void LoadFile (string path) {
 		if (File.Exists (path)) {
+			Debug.Log("wat");
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open (path, FileMode.Open);
 
@@ -110,10 +112,14 @@ public class save_load : MonoBehaviour {
 				LoadRiffs (words [0]);
 				LoadSongPieces (words [1]);
 				LoadSong (words [2]);
+
+				Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
 			} catch (SerializationException) {
 				Debug.LogError ("save_load.LoadFile(): Failed to deserialize file, probably empty.");
+				Prompt.instance.PromptMessage("Failed to load project", "File is empty.", "Okay");
 			} catch (EndOfStreamException) {
 				Debug.LogError ("save_load.LoadFile(): Attempted to read past end of stream, file is wrong format?");
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
 			}
 			/*foreach (string s in words) {
 				string[] elements = s.Split ('@');
@@ -121,8 +127,10 @@ public class save_load : MonoBehaviour {
 					Debug.Log(word);
 				}
 			}*/
-		} else
+		} else {
 			Debug.LogError ("save_load.LoadFile(): File \'"+path+"\' doesn't exist.");
+			Prompt.instance.PromptMessage("Failed to load project", "Could not find file.", "Okay");
+		}
 		
 	}
 

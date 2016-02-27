@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject riffEditMenu;
 	public GameObject addRiffPrompt;
 	public GameObject loadProjectPrompt;
+	public GameObject prompt;
 
 	// Parent objects for universal system buttons
 	public GameObject systemButtons;
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.RiffEdit]);
 		DisableMenu(addRiffPrompt);
 		DisableMenu(loadProjectPrompt);
+		DisableMenu(prompt);
 		SwitchToMenu(Menu.Main);
 		initialized = true;
 	}
