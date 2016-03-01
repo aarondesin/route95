@@ -40,7 +40,7 @@ public class MusicManager : MonoBehaviour {
 	// --Global Music Properties-- //
 	public Key currentKey = Key.EMajor; // value will be passed from key button
 	public Instrument currentInstrument = Instrument.ElectricGuitar;
-	public Song currentSong = new Song();
+	public Song currentSong;
 	public bool loopSong = false; // loop song in live mode?
 
 	// --Game Data Storage --//
@@ -164,6 +164,8 @@ public class MusicManager : MonoBehaviour {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
 
+		currentSong = new Song ();
+
 		OneShot = gameObject.AddComponent<AudioSource>();
 		LoadAllAudioClips (soundsToLoad);
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
@@ -222,9 +224,9 @@ public class MusicManager : MonoBehaviour {
 						PopLickQueue();
 					}
 					if (beat >= currentSong.beats) {
+						beat = 0;
 						if (loopSong) {
 							Debug.Log(lickQueue.Count);
-							beat = 0;
 						} else {
 							GameManager.instance.SwitchToPostplay();
 						}

@@ -73,6 +73,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(menus[Menu.KeySelect]);
 		DisableMenu(menus[Menu.SongArrange]);
 		DisableMenu(menus[Menu.RiffEdit]);
+		DisableMenu (menus [Menu.PostPlay]);
 		DisableMenu(addRiffPrompt);
 		DisableMenu(loadProjectPrompt);
 		DisableMenu(prompt);
@@ -116,11 +117,24 @@ public class GameManager : MonoBehaviour {
 	public void SwitchToPostplay () {
 		currentMode = Mode.Postplay;
 		MusicManager.instance.StopPlaying();
-		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
-		SwitchToMenu(Menu.SongArrange);
+		SwitchToMenu (Menu.PostPlay);
+		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		//SwitchToMenu(Menu.SongArrange);
 		TESTPlayerMovement.moving = false;
 	}
 
+	public void SwitchToSetup () {
+		currentMode = Mode.Setup;
+		SwitchToMenu (Menu.SongArrange);
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewRadio);
+	}
+
+	public void NewSong () {
+		currentMode = Mode.Setup;
+		SwitchToMenu (Menu.KeySelect);
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewOutsideCar);
+	}
+		
 	// Toggle visibility of system buttons
 	public void ToggleSystemButtons () {
 		systemButtons.SetActive(!systemButtons.activeSelf);
