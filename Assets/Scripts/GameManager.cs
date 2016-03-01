@@ -9,7 +9,8 @@ public enum Menu {
 	Main,
 	KeySelect,
 	SongArrange,
-	RiffEdit
+	RiffEdit,
+	PostPlay
 };
 
 public enum Mode {
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject keySelectMenu;
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
+	public GameObject postPlayMenu;
 	public GameObject addRiffPrompt;
 	public GameObject loadProjectPrompt;
 	public GameObject prompt;
@@ -57,7 +59,8 @@ public class GameManager : MonoBehaviour {
 			{ Menu.Main, mainMenu },
 			{ Menu.KeySelect, keySelectMenu },
 			{ Menu.SongArrange, songArrangeMenu },
-			{ Menu.RiffEdit, riffEditMenu }
+			{ Menu.RiffEdit, riffEditMenu },
+			{ Menu.PostPlay, postPlayMenu }
 		};
 
 		loadProjectPrompt.SetActive(true);
@@ -111,7 +114,11 @@ public class GameManager : MonoBehaviour {
 
 	// Switch from live mode to postplay
 	public void SwitchToPostplay () {
+		currentMode = Mode.Postplay;
 		MusicManager.instance.StopPlaying();
+		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		SwitchToMenu(Menu.SongArrange);
+		TESTPlayerMovement.moving = false;
 	}
 
 	// Toggle visibility of system buttons

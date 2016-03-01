@@ -45,8 +45,8 @@ public class MusicManager : MonoBehaviour {
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds
-	//public List<Riff> riffs = new List<Riff>(); // all riffs
 	public List<Riff> riffs = new List<Riff> ();
+	public List<SongPiece> songPieces = new List<SongPiece>();
 	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
@@ -190,7 +190,7 @@ public class MusicManager : MonoBehaviour {
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
-			instrumentAudioSources[InstrumentSetup.currentRiff.currentInstrument].Stop();
+			instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
 		} else {
 			playing = true;
 			loop = true;
@@ -255,8 +255,21 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void AddRiff (Riff riff) {
+		riff.copy = CopyNumber(riff.name);
 		riffs.Add (riff);
-		SongArrangeSetup.instance.Refresh();
+		//SongArrangeSetup.instance.Refresh();
+	}
+
+	public Riff RiffByString (string riffName) {
+		foreach (Riff riff in riffs) {
+			if (riffName == riff.name) return riff;
+		}
+		return null;
+	}
+
+	public void AddSongPiece (SongPiece songPiece) {
+		songPieces.Add(songPiece);
+		//SongArrangeSetup.instance.Refresh();
 	}
 
 	public void QueueLick (Riff lick) {
@@ -318,10 +331,34 @@ public class MusicManager : MonoBehaviour {
 		//loop = false;
 	}
 
+	// Returns true if there is a riff of a certain name already
+	public bool ContainsRiffNamed (string riffName) {
+		foreach (Riff riff in riffs) {
+			if (riff.name == riffName) return true;
+		}
+		return false;
+	}
+	public int CopyNumber (string riffName) {
+		Debug.Log("CopyNumber(): "+riffName);
+		int result = 0;
+		foreach (Riff riff in riffs) {
+			if (riff.name == riffName) {
+				result++;
+			}
+		}
+		return result;
+	}
+
+	// Clears song, songpiece, and riff data
+	public void Clear () {
+		riffs.Clear();
+		songPieces.Clear();
+	}
+
 	public void SetupExampleRiffs () {
 		riffs.Add( new Riff () {
 			name = "Example Guitar Riff",
-			currentInstrument = Instrument.ElectricGuitar,
+			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
 				new List<Note> () {new Note("ElectricGuitar_E2") },
 				new List<Note> (),
@@ -343,7 +380,7 @@ public class MusicManager : MonoBehaviour {
 		});
 		riffs.Add( new Riff () {
 			name = "Example Bass Riff",
-			currentInstrument = Instrument.ElectricBass,
+			instrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
 				new List<Note> () { new Note("ElectricBass_E1") },
 				new List<Note> (),
@@ -365,7 +402,7 @@ public class MusicManager : MonoBehaviour {
 		});
 		riffs.Add( new Riff () {
 			name = "Example Drum Beat",
-			currentInstrument = Instrument.RockDrums,
+			instrument = Instrument.RockDrums,
 			cutSelf = false,
 			notes = new List<List<Note>>() {
 				new List<Note> () { new Note("RockDrums_Kick") },
@@ -391,7 +428,7 @@ public class MusicManager : MonoBehaviour {
 	public void SetupExampleLicks () {
 		licks[Instrument.ElectricGuitar].Add (new Riff () {
 			name = "Example Guitar Lick",
-			currentInstrument = Instrument.ElectricGuitar,
+			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
 				new List<Note> () {new Note("ElectricGuitar_E2") },
 				new List<Note> () ,
@@ -406,7 +443,7 @@ public class MusicManager : MonoBehaviour {
 
 		licks[Instrument.ElectricBass].Add (new Riff () {
 			name = "Example Bass Lick",
-			currentInstrument = Instrument.ElectricBass,
+			instrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
 				new List<Note> () {new Note("ElectricBass_F#1") },
 				new List<Note> () ,
@@ -429,13 +466,13 @@ public class MusicManager : MonoBehaviour {
 
 		licks[Instrument.RockDrums].Add (new Riff () {
 			name = "Example Drums Lick",
-			currentInstrument = Instrument.RockDrums,
+			instrument = Instrument.RockDrums,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note() { sound = Sounds["RockDrums_Snare"] }},
-				new List<Note> () {new Note() { sound = Sounds["RockDrums_Snare"] }},
+				new List<Note> () {new Note("RockDrums_Snare")},
+				new List<Note> () {new Note("RockDrums_Snare")},
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () { new Note() { sound = Sounds["RockDrums_Hat"] }},
+				new List<Note> () { new Note("RockDrums_Hat")},
 			}
 		});
 	}

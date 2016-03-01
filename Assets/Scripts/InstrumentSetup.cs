@@ -40,7 +40,7 @@ public class InstrumentSetup : MonoBehaviour {
 		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
 		nameInputField.text = currentRiff.name;
 		//switch (MusicManager.currentInstrument) {
-		switch (currentRiff.currentInstrument) {
+		switch (currentRiff.instrument) {
 		case Instrument.RockDrums:
 			InitializePercussionSetup (PercussionInstrument.RockDrums);
 			break;

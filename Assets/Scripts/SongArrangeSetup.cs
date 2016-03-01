@@ -28,8 +28,8 @@ public class SongArrangeSetup : MonoBehaviour {
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
 		foreach (Riff riff in MusicManager.instance.riffs) {
-			Sprite sprite = InstrumentDisplay.instrumentIcons[riff.currentInstrument];
-			Dropdown.OptionData option = new Dropdown.OptionData (riff.name, sprite);
+			Sprite sprite = InstrumentDisplay.instrumentIcons[riff.instrument];
+			Dropdown.OptionData option = new Dropdown.OptionData (riff.name + (riff.copy !=0 ? " ("+riff.copy.ToString()+")" : ""), sprite);
 			//Dropdown.OptionData option = new Dropdown.OptionData (MusicManager.instToString[riff.currentInstrument]);
 			options.Add (option);
 		}

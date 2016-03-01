@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum View {
 	OutsideCar,
@@ -17,6 +18,11 @@ public class CameraControl : MonoBehaviour {
 	Transform targetPosition;
 	public float speed;
 	float sTime;
+
+	public Transform ViewOutsideCar;
+	public Transform ViewDriving;
+	public Transform ViewRadio;
+	public Transform ViewChase;
 
 	public void SetSpeed (float newSpeed) {
 		speed = newSpeed;

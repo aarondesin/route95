@@ -58,7 +58,7 @@ public class Song {
 		beats = measures*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 	}
 
-	public string ToString () {
+	public override string ToString () {
 		string result = "";
 		result += name + "#";
 		foreach (SongPiece songPiece in songPieces) {

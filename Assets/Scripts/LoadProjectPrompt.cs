@@ -9,6 +9,7 @@ public class LoadProjectPrompt : MonoBehaviour {
 
 	public RectTransform fileList; // Transform of the actual panel with all of the files listed
 	public GameObject loadButton;
+	public GameObject appendButton;
 
 	string selectedPath; // Currently selected path
 
@@ -82,6 +83,7 @@ public class LoadProjectPrompt : MonoBehaviour {
 				ResetButtons();
 				selectedPath = button.name;
 				loadButton.GetComponent<Button>().interactable = true;
+				appendButton.GetComponent<Button>().interactable = true;
 				button.GetComponent<Image>().color = new Color(1f,1f,1f,0.5f);
 			});
 			fileButtons.Add(button);

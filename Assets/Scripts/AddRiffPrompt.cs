@@ -39,7 +39,7 @@ public class AddRiffPrompt : MonoBehaviour {
 	// Creates a new riff with the filled in properties
 	public void AddRiff () {
 		Riff temp = MusicManager.instance.AddRiff ();
-		temp.currentInstrument = (Instrument)dropdown.value;
+		temp.instrument = (Instrument)dropdown.value;
 		temp.name = inputField.text;
 		GameManager.instance.DisableAddRiffPrompt();
 		GameManager.instance.SwitchToMenu ((int)Menu.RiffEdit);
