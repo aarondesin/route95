@@ -58,13 +58,44 @@ public class MusicManager : MonoBehaviour {
 	// List of all sound paths to load
 	List<string> soundsToLoad = new List<string>() {// maybe use dict for efficiency
 		// Melodic.ElectricGuitar
-		"Audio/Instruments/Melodic/ElectricGuitar_E2",
-		"Audio/Instruments/Melodic/ElectricGuitar_F#2",
-		"Audio/Instruments/Melodic/ElectricGuitar_G#2",
-		"Audio/Instruments/Melodic/ElectricGuitar_A2",
-		"Audio/Instruments/Melodic/ElectricGuitar_B2",
-		"Audio/Instruments/Melodic/ElectricGuitar_C#3",
-		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B2",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B3",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C4",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#4",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D4",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#4",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B5",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C6",
+		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#6",
+
+
+
+
 
 		//Melodic.ElectricBass
 		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E1",
@@ -142,7 +173,7 @@ public class MusicManager : MonoBehaviour {
 			//instrumentAudioSources.Add((Instrument)i, new AudioSource());
 			instrumentAudioSources.Add((Instrument)i, source);
 		}
-		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+		//instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
 		instrumentAudioSources[Instrument.RockDrums].volume = 0.8f;
 		//instrumentAudioSources [Instrument.ElectricBass].gameObject.AddComponent<AudioDistortionFilter> ();
 		//instrumentAudioSources[Instrument.ElectricBass].gameObject.GetComponent<AudioDistortionFilter> ().distortionLevel = 0.8f;
