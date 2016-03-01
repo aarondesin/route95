@@ -137,12 +137,15 @@ public class MusicManager : MonoBehaviour {
 		LoadAllAudioClips (soundsToLoad);
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<(int)Instrument.NUM_INSTRUMENTS;i++) {
-			AudioSource source = gameObject.AddComponent<AudioSource>();
+			GameObject obj = new GameObject ();
+			AudioSource source = obj.AddComponent<AudioSource>();
 			//instrumentAudioSources.Add((Instrument)i, new AudioSource());
 			instrumentAudioSources.Add((Instrument)i, source);
 		}
 		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
 		instrumentAudioSources[Instrument.RockDrums].volume = 0.8f;
+		//instrumentAudioSources [Instrument.ElectricBass].gameObject.AddComponent<AudioDistortionFilter> ();
+		//instrumentAudioSources[Instrument.ElectricBass].gameObject.GetComponent<AudioDistortionFilter> ().distortionLevel = 0.8f;
 
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
