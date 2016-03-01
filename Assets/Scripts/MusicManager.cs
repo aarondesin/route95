@@ -67,14 +67,42 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Melodic/ElectricGuitar_D#3",
 
 		//Melodic.ElectricBass
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarE3",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarF#3",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarG#3",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarA3",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarB3",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarC#4",
-		"Audio/Instruments/Melodic/Bass_guitar/bassguitarD#4",
-
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B1",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B2",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B3",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C4",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#4",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D4",
+		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#4",
 
 		// Percussion.RockDrums
 		"Audio/Instruments/Percussion/RockDrums_Kick",
@@ -114,6 +142,7 @@ public class MusicManager : MonoBehaviour {
 			instrumentAudioSources.Add((Instrument)i, source);
 		}
 		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+		instrumentAudioSources[Instrument.RockDrums].volume = 0.8f;
 
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
@@ -174,7 +203,8 @@ public class MusicManager : MonoBehaviour {
 
 			} else {
 				//BeatTimer--;
-				BeatTimer -= Time.deltaTime * 100f;
+				//BeatTimer -= Time.deltaTime * 100f;
+				BeatTimer -= 1.667f;
 			}
 		} 
 
@@ -234,7 +264,7 @@ public class MusicManager : MonoBehaviour {
 		if (sound == null) {
 			Debug.LogError("Failed to load AudioClip at "+path);
 		} else {
-			//Debug.Log("Loaded "+path);
+			Debug.Log("Loaded "+path);
 			Sounds.Add (Path.GetFileNameWithoutExtension (path), sound);
 		}
 	}
@@ -281,19 +311,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Bass Riff",
 			currentInstrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
-				new List<Note> () { new Note("bassguitarE3") },
+				new List<Note> () { new Note("ElectricBass_E1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("bassguitarG#3") },
+				new List<Note> () { new Note("ElectricBass_G#1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("bassguitarB3") },
+				new List<Note> () { new Note("ElectricBass_B1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note ("bassguitarC#4") },
+				new List<Note> () { new Note ("ElectricBass_C#2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
@@ -344,19 +374,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Bass Lick",
 			currentInstrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note("bassguitarF#3") },
+				new List<Note> () {new Note("ElectricBass_F#1") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () {new Note("bassguitarF#3") },
+				new List<Note> () {new Note("ElectricBass_F#1") },
 				new List<Note> () ,
-				new List<Note> () {new Note("bassguitarA3") },
-				new List<Note> () ,
-				new List<Note> () ,
+				new List<Note> () {new Note("ElectricBass_A1") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () {new Note("bassguitarC#4") },
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () {new Note("ElectricBass_C#2") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> ()

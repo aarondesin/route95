@@ -18,7 +18,12 @@ public class Note {
 
 	public Note (string fileName) {
 		filename = fileName;
-		sound = MusicManager.Sounds [fileName];
+		if (!MusicManager.Sounds.ContainsKey(filename)) {
+			Debug.LogError ("Note(): filename \"" + filename + "\" invalid!");
+			sound = null;
+		} else {
+			sound = MusicManager.Sounds [fileName];
+		}
 		duration = 1f;
 		volume = 1f;
 	}

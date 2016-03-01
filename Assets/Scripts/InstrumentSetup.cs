@@ -93,13 +93,13 @@ public class InstrumentSetup : MonoBehaviour {
 			case MelodicInstrument.ElectricBass: 
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
-			MakeMelodicButtons ("E3", 0, new Note (MusicManager.Sounds ["bassguitarE3"]));
-			MakeMelodicButtons ("F#3", 1, new Note (MusicManager.Sounds ["bassguitarF#3"]));
-			MakeMelodicButtons ("G#3", 2, new Note (MusicManager.Sounds ["bassguitarG#3"]));
-			MakeMelodicButtons ("A3", 3, new Note (MusicManager.Sounds ["bassguitarA3"]));
-			MakeMelodicButtons ("B3", 4, new Note (MusicManager.Sounds ["bassguitarB3"]));
-			MakeMelodicButtons ("C#4", 5, new Note (MusicManager.Sounds ["bassguitarC#4"]));
-			MakeMelodicButtons ("D#4", 6, new Note (MusicManager.Sounds ["bassguitarD#4"]));
+			MakeMelodicButtons ("E3", 0, new Note (MusicManager.Sounds ["ElectricBass_E1"]));
+			MakeMelodicButtons ("F#3", 1, new Note (MusicManager.Sounds ["ElectricBass_F#1"]));
+			MakeMelodicButtons ("G#3", 2, new Note (MusicManager.Sounds ["ElectricBass_G#1"]));
+			MakeMelodicButtons ("A3", 3, new Note (MusicManager.Sounds ["ElectricBass_A1"]));
+			MakeMelodicButtons ("B3", 4, new Note (MusicManager.Sounds ["ElectricBass_B1"]));
+			MakeMelodicButtons ("C#4", 5, new Note (MusicManager.Sounds ["ElectricBass_C#2"]));
+			MakeMelodicButtons ("D#4", 6, new Note (MusicManager.Sounds ["ElectricBass_D#2"]));
 			break;
 		}
 	}
