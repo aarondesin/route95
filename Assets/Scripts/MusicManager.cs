@@ -93,10 +93,6 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C6",
 		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#6",
 
-
-
-
-
 		//Melodic.ElectricBass
 		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E1",
 		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F1",
@@ -141,6 +137,17 @@ public class MusicManager : MonoBehaviour {
 		"Audio/Instruments/Percussion/RockDrums_Tom",
 		"Audio/Instruments/Percussion/RockDrums_Hat"
 	};
+
+	/*
+	 * Dictionary<Key, Dictionary<Instrument, Scale>> scales = new Dicto.... () {
+	 * 	{ Key.EMinor, new Dictionary<Instrument, Scale> () {
+	 * 		{ Instrument.ElectricGuitar, Scale.ElectricGuitarEMinor () }
+	 * 
+	 * 
+	 * 
+	 * 
+	 * scale = scales[MM.currentKey][riff.currentInstrument];
+	 * */
 
 	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
 		{ Instrument.ElectricGuitar, "Electric Guitar" },

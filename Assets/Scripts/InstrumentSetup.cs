@@ -81,13 +81,41 @@ public class InstrumentSetup : MonoBehaviour {
 			case MelodicInstrument.ElectricGuitar:
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
-			MakeMelodicButtons ("E2", 0, new Note ("ElectricGuitar_E2"));
+			MakeMelodicButtons ("E2", 0, new Note ("ElectricGuitar_E2")); // MakeMelodicButtons(Scale.root.name, 0, Scale.root.note)
 			MakeMelodicButtons ("F#2", 1, new Note ("ElectricGuitar_F#2"));
 			MakeMelodicButtons ("G#2", 2, new Note ("ElectricGuitar_G#2"));
 			MakeMelodicButtons ("A2", 3, new Note ("ElectricGuitar_A2"));
 			MakeMelodicButtons ("B2", 4, new Note ("ElectricGuitar_B2"));
 			MakeMelodicButtons ("C#3", 5, new Note ("ElectricGuitar_C#3"));
 			MakeMelodicButtons ("D#3", 6, new Note ("ElectricGuitar_D#3"));
+																		// MakeMelodicButtons(Key.octave, #, Key.octave.note
+
+			/* public class Scale {
+			 * public Note root;
+			 * public Note second;
+			 * ...
+			 * ...
+			}*/
+
+			/*
+			public static Scale EMinor = new Scale () {
+				root = MusicManager.Sound"...."
+					second1
+					...
+					octave2 = MuiscManager.Sound
+					second2
+			}
+				switch (MusicManager.currentKey) {
+					case Key.EMinor:
+				switch (riff.currentInstrument) {
+					case Electrci
+					..
+						..
+				public static Scale EMinor_ElectricGuitar = new Scale();
+				
+
+				scales[MusicManager.currentKey][currentInstrument];
+			*/
 			break;
 
 			case MelodicInstrument.ElectricBass: 
