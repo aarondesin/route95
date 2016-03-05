@@ -34,7 +34,8 @@ public class SongArrangeSetup : MonoBehaviour {
 			options.Add (option);
 		}
 		dropdown.AddOptions (options);
-		InstrumentSetup.currentRiff = MusicManager.instance.riffs[0];
+		InstrumentSetup.currentRiff = 
+			MusicManager.instance.riffs.Count != 0 ? MusicManager.instance.riffs[0] : null;
 
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;

@@ -44,9 +44,10 @@ public class MusicManager : MonoBehaviour {
 	public bool loopSong = false; // loop song in live mode?
 
 	// --Game Data Storage --//
-	public static Dictionary<string, AudioClip> Sounds = new Dictionary<string, AudioClip>(); // holds all loaded sounds
+	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
 	public List<Riff> riffs = new List<Riff> ();
 	public List<SongPiece> songPieces = new List<SongPiece>();
+	//public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
 	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
@@ -54,89 +55,7 @@ public class MusicManager : MonoBehaviour {
 	};
 	// All lick notes waiting to be played
 	List<List<Note>> lickQueue = new List<List<Note>>();
-
-	// List of all sound paths to load
-	List<string> soundsToLoad = new List<string>() {// maybe use dict for efficiency
-		// Melodic.ElectricGuitar
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B2",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B3",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C4",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#4",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D4",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#4",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B5",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C6",
-		"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#6",
-
-		//Melodic.ElectricBass
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B1",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B2",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_E3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_A#3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_B3",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C4",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#4",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D4",
-		"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#4",
-
-		// Percussion.RockDrums
-		"Audio/Instruments/Percussion/RockDrums_Kick",
-		"Audio/Instruments/Percussion/RockDrums_Snare",
-		"Audio/Instruments/Percussion/RockDrums_Tom",
-		"Audio/Instruments/Percussion/RockDrums_Hat"
-	};
+	bool lickPlaying = false;
 
 	/*
 	 * Dictionary<Key, Dictionary<Instrument, Scale>> scales = new Dicto.... () {
@@ -174,25 +93,47 @@ public class MusicManager : MonoBehaviour {
 		currentSong = new Song ();
 
 		OneShot = gameObject.AddComponent<AudioSource>();
-		LoadAllAudioClips (soundsToLoad);
+
+
+		//instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+		//instrumentAudioSources[Instrument.RockDrums].volume = 0.8f;
+		//instrumentAudioSources [Instrument.ElectricBass].gameObject.AddComponent<AudioDistortionFilter> ();
+		//instrumentAudioSources[Instrument.ElectricBass].gameObject.GetComponent<AudioDistortionFilter> ().distortionLevel = 0.8f;
+
+		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+
+
+		//Debug.Log ("set up done" , licks.Count);
+
+	}
+
+	public void Load() {
+		float sTime = Time.time;
+		LoadAllAudioClips (Sounds.soundsToLoad);
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<(int)Instrument.NUM_INSTRUMENTS;i++) {
 			GameObject obj = new GameObject ();
 			AudioSource source = obj.AddComponent<AudioSource>();
 			//instrumentAudioSources.Add((Instrument)i, new AudioSource());
 			instrumentAudioSources.Add((Instrument)i, source);
+			obj.AddComponent<AudioReverbFilter>();
+			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
+			obj.GetComponent<AudioReverbFilter>().room = GetComponent<AudioReverbFilter>().room;
+			obj.GetComponent<AudioReverbFilter>().roomHF = GetComponent<AudioReverbFilter>().roomHF;
+			obj.GetComponent<AudioReverbFilter>().roomLF = GetComponent<AudioReverbFilter>().roomLF;
+			obj.GetComponent<AudioReverbFilter>().decayTime = GetComponent<AudioReverbFilter>().decayTime;
+			obj.GetComponent<AudioReverbFilter>().decayHFRatio = GetComponent<AudioReverbFilter>().decayHFRatio;
+			obj.GetComponent<AudioReverbFilter>().reflectionsLevel = GetComponent<AudioReverbFilter>().reflectionsLevel;
+			obj.GetComponent<AudioReverbFilter>().reflectionsDelay = GetComponent<AudioReverbFilter>().reflectionsDelay;
+			obj.GetComponent<AudioReverbFilter>().reverbLevel = GetComponent<AudioReverbFilter>().reverbLevel;
+			obj.GetComponent<AudioReverbFilter>().hfReference = GetComponent<AudioReverbFilter>().hfReference;
+			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
+			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
+			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
 		}
-		//instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
-		instrumentAudioSources[Instrument.RockDrums].volume = 0.8f;
-		//instrumentAudioSources [Instrument.ElectricBass].gameObject.AddComponent<AudioDistortionFilter> ();
-		//instrumentAudioSources[Instrument.ElectricBass].gameObject.GetComponent<AudioDistortionFilter> ().distortionLevel = 0.8f;
-
-		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
-
 		SetupExampleRiffs();
 		SetupExampleLicks();
-		//Debug.Log ("set up done" , licks.Count);
-
+		Debug.Log("MusicManager.Load(): finished in "+(Time.time-sTime).ToString("0.0000")+" seconds.");
 	}
 
 	public void PlayRiffLoop(){
@@ -222,21 +163,35 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 					break;
 				case Mode.Live:
-					//Debug.Log(beat);
-					currentSong.PlaySong(beat++);
+					
+
 					//Debug.Log(lickQueue.Count);
-					if (lickQueue.Count > 0) {
-						//Debug.Log("dick");
-						PopLickQueue();
-					}
+
+
+					//Debug.Log("shit");
 					if (beat >= currentSong.beats) {
+						//Debug.Log("shit");
 						beat = 0;
 						if (loopSong) {
-							Debug.Log(lickQueue.Count);
+							//Debug.Log(lickQueue.Count);
 						} else {
 							GameManager.instance.SwitchToPostplay();
 						}
 					}
+					if (lickQueue.Count > 0){
+						if (IsDownBeat(beat)) {
+							//Debug.Log("dick");
+							lickPlaying = true;
+						}
+						if (lickPlaying) {
+							PopLickQueue();
+						}
+					} else {
+						lickPlaying = false;
+					}
+					currentSong.PlaySong(beat);
+					Debug.Log(beat);
+					beat++;
 					break;
 				}
 				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
@@ -285,14 +240,30 @@ public class MusicManager : MonoBehaviour {
 		lickQueue.Clear();
 		foreach (List<Note> beat in lick.notes) {
 			lickQueue.Add(beat);
-			Debug.Log ("test");
+			//Debug.Log ("test");
 		}
-		Debug.Log("queued "+lickQueue.Count);
+		lickPlaying = false;
+		//Debug.Log("queued "+lickQueue.Count);
+	}
+
+	/*public void QueueLick (Riff lick) {
+		if (lick == null) return;
+		int nextDownBeat = (beat % 4 == 0 ? beat :
+			beat+1 % 4 == 0 ? beat+1 :
+			beat+2 % 4 == 0 ? beat+1 :
+			beat+3 % 4 == 0 ? beat+3 :
+		);
+		for (int i=nextDownBeat) 
+	}*/
+
+	bool IsDownBeat(int pos) {
+		return pos%4 == 0;
 	}
 
 	public void PopLickQueue () {
 		//Debug.Log("play");
 		foreach (Note note in lickQueue[0]) {
+			MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
 			note.PlayNote(instrumentAudioSources[currentInstrument], true);
 		}
 		lickQueue.RemoveAt(0);
@@ -320,7 +291,7 @@ public class MusicManager : MonoBehaviour {
 			Debug.LogError("Failed to load AudioClip at "+path);
 		} else {
 			Debug.Log("Loaded "+path);
-			Sounds.Add (Path.GetFileNameWithoutExtension (path), sound);
+			SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
 		}
 	}
 

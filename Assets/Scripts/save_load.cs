@@ -8,6 +8,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Linq;
 
+[Serializable]
+public class FailedToLoadException: ApplicationException {
+	public FailedToLoadException (string info, Exception standard): base(info, standard) {}
+	public FailedToLoadException (string info): base(info) {}
+	public FailedToLoadException() {}
+}
+
 public class save_load : MonoBehaviour {
 	public static char saveSeparator = '$'; // separates riffs, songpieces, song
 	public static char itemSeparator = '@';
@@ -51,13 +58,20 @@ public class save_load : MonoBehaviour {
 			try {
 				riffdata data = (riffdata)bf.Deserialize (file);
 				Debug.Log (data.songData);
-				file.Close ();
+
 
 				// Split file into input for all three load processes
 				string[] words = data.songData.Split(saveSeparator);
-				LoadRiffs (words [0]);
-				LoadSongPieces (words [1]);
-				LoadSong (words [2]);
+				List<Riff> tempRiffs = LoadRiffs (words [0]);
+				List<SongPiece> tempSongPieces = LoadSongPieces (words [1]);
+				Song tempSong = LoadSong (words [2]);
+
+				//MusicManager.instance.riffs.AddRange(tempRiffs);
+				foreach (Riff riff in tempRiffs) {
+					MusicManager.instance.AddRiff(riff);
+				}
+				MusicManager.instance.songPieces.AddRange(tempSongPieces);
+				MusicManager.instance.currentSong = tempSong;
 
 				SongArrangeSetup.instance.Refresh();
 
@@ -68,6 +82,11 @@ public class save_load : MonoBehaviour {
 			} catch (EndOfStreamException) {
 				Debug.LogError ("save_load.LoadFile(): Attempted to read past end of stream, file is wrong format?");
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} catch (FailedToLoadException f) {
+				Debug.LogError("FailedToLoadException: "+f);
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} finally {
+				file.Close ();
 			}
 		} else {
 			Debug.LogError ("save_load.LoadFile(): File \'"+path+"\' doesn't exist.");
@@ -76,30 +95,48 @@ public class save_load : MonoBehaviour {
 		
 	}
 
-	public static void LoadRiffs (string riffString) {
+	public static List<Riff> LoadRiffs (string riffString) {
 		string[] riffs = riffString.Split (riffSeparator);
 
 		if (riffs.Length == 0) {
-			Debug.LogError("save_load.LoadRiffs(): No riffs found");
-			return;
+			//Debug.LogError("save_load.LoadRiffs(): No riffs found");
+			throw new FailedToLoadException("No riffs found.");
 		}
 
+		List<Riff> temp = new List<Riff>();
+
+		int loadedRiffsCounter = 0;
 		foreach (string riff in riffs) {
 			if (riff.Length == 0)
 				break;
-			MusicManager.instance.AddRiff (new Riff(riff));
+			temp.Add (new Riff(riff));
+			loadedRiffsCounter++;
 		}
+		Debug.Log("Loaded "+loadedRiffsCounter+" riffs.");
+		return temp;
 	}
 
-	public static void LoadSongPieces (string songPieceString) {
+	public static List<SongPiece> LoadSongPieces (string songPieceString) {
+		if (songPieceString.Length == 0) {
+			throw new FailedToLoadException("No song pieces found.");
+		}
 		string[] songPieces = songPieceString.Split(itemSeparator);
+
+		List<SongPiece> temp = new List<SongPiece>();
+		int loadedSongPiecesCounter = 0;
 		foreach (string songPiece in songPieces) {
 			if (songPiece.Length == 0) break;
-			MusicManager.instance.AddSongPiece (new SongPiece(songPiece));
+			loadedSongPiecesCounter++;
+			temp.Add(new SongPiece(songPiece));
+			//MusicManager.instance.AddSongPiece (new SongPiece(songPiece));
 		}
+		Debug.Log("Loaded "+loadedSongPiecesCounter+" song pieces.");
+		return temp;
 	}
 
-	public static void LoadSong (string songString) {
+	public static Song LoadSong (string songString) {
+		//MusicManager.instance.currentSong = new Song(songString);
+		return new Song(songString);
 	}
 		
 

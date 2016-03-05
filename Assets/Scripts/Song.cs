@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -20,22 +21,59 @@ public class Song {
 		};
 	}
 
+	public Song (string loadFile) {
+		if (loadFile.Length == 0) {
+			//Debug.LogError("Failed to load song.");
+			throw new FailedToLoadException("Song() given an empty string.");
+			return;
+		}
+
+		try {
+			string[] vars = loadFile.Split(save_load.itemSeparator);
+			name = vars[0];
+			string[] pieces = vars[1].Split(save_load.noteSeparator);
+			foreach (string songPiece in pieces) {
+			}
+		} catch (IndexOutOfRangeException) {
+			//Debug.LogError("Failed to load song.");
+			throw new FailedToLoadException("Song() given an invalid input.");
+			return;
+		}
+	}
+
 	public void PlaySong (int pos) {
 		/*int totalMeasures = NumMeasures ();
 		foreach (SongPiece songPiece in songPieces) {
 			int measure = pos / 4;
 		}*/
-		// For now, all song pieces are assumed to be one measure long
+		try {
+			// For now, all song pieces are assumed to be one measure long
+			foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
+				riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
+			}
+		} catch (ArgumentOutOfRangeException) {
+			Debug.LogError ("Song.PlaySong(): index out of range! "+pos);
+		}
+	}
+
+	public void RemoveAt (int pos, Instrument inst) {
 		foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
-			riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
+			if (riff.instrument == inst) {
+				riff.notes[pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].Clear();
+			}
 		}
 	}
 
 	public void ToggleRiff (Riff newRiff, int pos) {
 		foreach (Riff riff in songPieces[pos].riffs[0]) {
-			if (newRiff == riff) {
-				// Riff is already there
-				songPieces[pos].riffs[0].Remove (newRiff);
+			if (riff.instrument == newRiff.instrument) {
+				if (newRiff == riff) {
+					// Riff is already there
+					songPieces[pos].riffs[0].Remove (newRiff);
+				} else {
+					songPieces[pos].riffs[0].Remove (riff);
+					songPieces[pos].riffs[0].Add (newRiff);
+				}
 				return;
 			}
 		}
@@ -59,13 +97,14 @@ public class Song {
 	public void CompileSong() {
 		measures = NumMeasures();
 		beats = measures*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+		Debug.Log("Song.CompileSong(): beats: "+beats+ " measures: "+measures);
 	}
 
 	public override string ToString () {
 		string result = "";
-		result += name + "#";
+		result += name + save_load.itemSeparator;
 		foreach (SongPiece songPiece in songPieces) {
-			result += songPiece.name + ",";
+			result += songPiece.name + save_load.noteSeparator;
 		}
 		return result;
 	}

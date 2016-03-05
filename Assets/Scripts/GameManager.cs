@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour {
 	public GameObject systemButtons; // "Settings" and "Exit"
 	public Image livePlayQuitPrompt; // "Exit"
 
+	public GameObject loadingScreen;
+
 	public Dictionary<Menu, GameObject> menus; 
 		
 	public Menu currentMenu = Menu.None;
@@ -92,7 +94,16 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(prompt);
 		DisableMenu(pauseMenu);
 		SwitchToMenu(Menu.Main);
+		Load();
 		initialized = true;
+	}
+
+	void Load () {
+		float sTime = Time.time;
+		loadingScreen.SetActive(true);
+		MusicManager.instance.Load();
+		loadingScreen.SetActive(false);
+		Debug.Log("Completed initial load in "+(Time.time-sTime).ToString("0.0000")+" seconds.");
 	}
 
 	void Update () {

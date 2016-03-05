@@ -187,6 +187,10 @@ public class Riff {
 		
 	}
 
+	public int Length () {
+		return notes.Count;
+	}
+
 	public override string ToString () {
 		string result = name;
 		if (copy != 0) result += " (" + copy.ToString() + ")";

@@ -55,13 +55,13 @@ public class Note {
 		// Set filename
 		//result.filename = vars[0];
 		filename = vars[0];
-		if (!MusicManager.Sounds.ContainsKey(filename)) {
+		if (!MusicManager.SoundClips.ContainsKey(filename)) {
 			Debug.LogError ("Note.Note(): filename \"" + filename + "\" invalid!");
 			//result.sound = null;
 			sound = null;
 		} else {
 			//result.sound = MusicManager.Sounds [filename];
-			sound = MusicManager.Sounds [filename];
+			sound = MusicManager.SoundClips [filename];
 		}
 
 		if (vars.Length == 1) {
