@@ -39,7 +39,7 @@ public class SongArrangeSetup : MonoBehaviour {
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;
 
-		playRiffButton.GetComponent<Image>().sprite = pause;
+		playRiffButton.GetComponent<Image>().sprite = play;
 	}
 
 	public void UpdateValue () {
