@@ -33,33 +33,37 @@ public class InputManager : MonoBehaviour {
 
 	void Update () {
 		if (GameManager.instance.currentMode == Mode.Live) {
-			// Check for instruments switch
-			foreach (KeyCode key in mappedInstruments) {
-				if (Input.GetKeyDown(key)) SwitchInstrument(keyToInstrument[key]);
-			}
-			// Check for playing lick
-			foreach (KeyCode key2 in mappedLicks) {
-				if (Input.GetKey(key2)) {
-					if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
-						PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
-					else {
-						Debug.Log ("none available");
-					}
+			if (Input.GetKeyDown(KeyCode.Escape)) {
+				GameManager.instance.TogglePause();
+			} else {
+				// Check for instruments switch
+				foreach (KeyCode key in mappedInstruments) {
+					if (Input.GetKeyDown(key)) SwitchInstrument(keyToInstrument[key]);
 				}
+				// Check for playing lick
+				foreach (KeyCode key2 in mappedLicks) {
+					if (Input.GetKey(key2)) {
+						if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
+							PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
+						else {
+							Debug.Log ("none available");
+						}
+					}
 
-			}
-			if (keyToLick == null) {
-				
-				keyToLick = new Dictionary<KeyCode, int>() {
+				}
+				if (keyToLick == null) {
 					
-					{ KeyCode.Q, 0 }
-					//{ KeyCode.W, 1 },
-					//{ KeyCode.E, 2 }
+					keyToLick = new Dictionary<KeyCode, int>() {
+						
+						{ KeyCode.Q, 0 }
+						//{ KeyCode.W, 1 },
+						//{ KeyCode.E, 2 }
 
 
-				};
-				Debug.Log(keyToLick.Count);
-				Debug.Log (MusicManager.instance.licks.Count);
+					};
+					Debug.Log(keyToLick.Count);
+					Debug.Log (MusicManager.instance.licks.Count);
+				}
 			}
 		}
 	}

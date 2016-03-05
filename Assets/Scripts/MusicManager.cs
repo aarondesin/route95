@@ -193,7 +193,6 @@ public class MusicManager : MonoBehaviour {
 		SetupExampleLicks();
 		//Debug.Log ("set up done" , licks.Count);
 
-
 	}
 
 	public void PlayRiffLoop(){
@@ -214,7 +213,7 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	void Update(){
-		if (playing) {
+		if (playing && !GameManager.instance.paused) {
 			if (BeatTimer <= 0f) {
 				switch (GameManager.instance.currentMode) {
 				case Mode.Setup:
@@ -337,6 +336,7 @@ public class MusicManager : MonoBehaviour {
 
 	public void StopPlaying () {
 		playing = false;
+		beat = 0;
 		//loop = false;
 	}
 

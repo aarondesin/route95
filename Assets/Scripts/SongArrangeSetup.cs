@@ -38,6 +38,8 @@ public class SongArrangeSetup : MonoBehaviour {
 
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;
+
+		playRiffButton.GetComponent<Image>().sprite = pause;
 	}
 
 	public void UpdateValue () {

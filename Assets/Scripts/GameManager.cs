@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,23 +30,36 @@ public class GameManager : MonoBehaviour {
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
 	public GameObject postPlayMenu;
-	public GameObject addRiffPrompt;
-	public GameObject loadProjectPrompt;
-	public GameObject prompt;
+	public GameObject pauseMenu;
+
+	// Pop-up menu prompts
+	public GameObject addRiffPrompt; // "Add Riff"
+	public GameObject loadProjectPrompt; // "Load Project"
+	public GameObject prompt; // Generic pop-up prompt
+	public GameObject confirmExitPrompt; // "Would you like to exit..."
+
+	// Menu-specific buttons
+	public GameObject keySelectConfirmButton;
 
 	// Parent objects for universal system buttons
-	public GameObject systemButtons;
-
-	// Key selection menu confirm button
-	public GameObject keySelectConfirmButton;
+	public GameObject systemButtons; // "Settings" and "Exit"
+	public Image livePlayQuitPrompt; // "Exit"
 
 	public Dictionary<Menu, GameObject> menus; 
 		
 	public Menu currentMenu = Menu.None;
 	public Mode currentMode = Mode.Setup;
 
+	// Global save path
 	public string savePath; 
 
+	// Icon fading vars
+	public float fadeWaitTime;
+	public float fadeSpeed;
+	float fadeTimer;
+	Vector3 prevMouse = new Vector3 (0f,0f,0f);
+
+	public bool paused = false;
 	bool initialized = false;
 
 	void Start () {
@@ -64,11 +78,10 @@ public class GameManager : MonoBehaviour {
 		};
 
 		loadProjectPrompt.SetActive(true);
-
-
 	}
 
 	void Initialize () {
+		
 		// Hide all menus and display default menu (main)
 		DisableMenu(menus[Menu.KeySelect]);
 		DisableMenu(menus[Menu.SongArrange]);
@@ -77,15 +90,37 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(addRiffPrompt);
 		DisableMenu(loadProjectPrompt);
 		DisableMenu(prompt);
+		DisableMenu(pauseMenu);
 		SwitchToMenu(Menu.Main);
 		initialized = true;
 	}
 
 	void Update () {
 		if (!initialized) Initialize();
+
+		// Fade exit icon
+		if (currentMode == Mode.Live) {
+			if (!paused) {
+				Color temp = livePlayQuitPrompt.color;
+				if (prevMouse != Input.mousePosition) {
+					temp.a = 1f;
+					livePlayQuitPrompt.color = temp;
+					fadeTimer = fadeWaitTime;
+					prevMouse = Input.mousePosition;
+				} else {
+					if (fadeTimer <= 0f) {
+						temp.a -= fadeSpeed;
+						livePlayQuitPrompt.color = temp;
+					} else {
+						fadeTimer--;
+					}
+				}
+			}
+		} else {
+			livePlayQuitPrompt.color = Color.white;
+		}
 	}
-
-
+		
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
 	public void SwitchToMenu (Menu menu) {
 		if (currentMenu != Menu.None) DisableMenu (menus[currentMenu]);
@@ -102,6 +137,7 @@ public class GameManager : MonoBehaviour {
 
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
+		paused = false;
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);
 		DisableMenu(menus[Menu.SongArrange]);
@@ -115,24 +151,34 @@ public class GameManager : MonoBehaviour {
 
 	// Switch from live mode to postplay
 	public void SwitchToPostplay () {
+		paused = false;
 		currentMode = Mode.Postplay;
 		MusicManager.instance.StopPlaying();
 		SwitchToMenu (Menu.PostPlay);
 		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
 		//SwitchToMenu(Menu.SongArrange);
 		TESTPlayerMovement.moving = false;
+		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 	}
 
+	// Returns to song arrangement
 	public void SwitchToSetup () {
+		paused = false;
+		MusicManager.instance.StopPlaying();
 		currentMode = Mode.Setup;
 		SwitchToMenu (Menu.SongArrange);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewRadio);
+		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 	}
 
+	// Returns to key selection
 	public void NewSong () {
+		paused = false;
+		MusicManager.instance.StopPlaying();
 		currentMode = Mode.Setup;
 		SwitchToMenu (Menu.KeySelect);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewOutsideCar);
+		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 	}
 		
 	// Toggle visibility of system buttons
@@ -150,16 +196,49 @@ public class GameManager : MonoBehaviour {
 		keySelectConfirmButton.SetActive(false);
 	} 
 
+	// Hides "Add Riff" prompt
 	public void DisableAddRiffPrompt() {
 		addRiffPrompt.SetActive(false);
 	}
 
+	// Shows a menu
 	void EnableMenu (GameObject menuObject) {
 		menuObject.SetActive(true);
 	}
 
+	// Hides a menu
 	void DisableMenu (GameObject menuObject) {
 		menuObject.SetActive(false);
+	}
+
+	public void AttemptExit () {
+		switch (currentMode) {
+		case Mode.Setup: case Mode.Postplay:
+			confirmExitPrompt.SetActive(true);
+			break;
+		case Mode.Live:
+			Pause();
+			break;
+		}
+	}
+
+	public void TogglePause () {
+		if (paused) Unpause();
+		else Pause();
+	}
+
+	public void Pause () {
+		paused = true;
+		pauseMenu.SetActive(true);
+	}
+
+	public void Unpause () {
+		paused = false;
+		pauseMenu.SetActive(false);
+	}
+
+	public void Exit () {
+		Application.Quit();
 	}
 		
 }
