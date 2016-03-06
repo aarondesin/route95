@@ -12,6 +12,7 @@ public class SongArrangeSetup : MonoBehaviour {
 	public Dropdown dropdown;
 	public InputField songNameInputField;
 	public GameObject playRiffButton;
+	public GameObject editRiffButton;
 	public Sprite play;
 	public Sprite pause;
 
@@ -34,8 +35,14 @@ public class SongArrangeSetup : MonoBehaviour {
 			options.Add (option);
 		}
 		dropdown.AddOptions (options);
-		InstrumentSetup.currentRiff = 
-			MusicManager.instance.riffs.Count != 0 ? MusicManager.instance.riffs[0] : null;
+
+		if (MusicManager.instance.riffs.Count == 0) {
+			InstrumentSetup.currentRiff = null;
+			editRiffButton.GetComponent<Button>().interactable = false;
+		} else {
+			InstrumentSetup.currentRiff = MusicManager.instance.riffs[0];
+			editRiffButton.GetComponent<Button>().interactable = true;
+		}
 
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;

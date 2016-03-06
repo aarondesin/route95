@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour {
 
 		loadProjectPrompt.SetActive(true);
 		loadingScreen.SetActive(true);
+		prompt.SetActive(true);
 	}
 
 	void Initialize () {

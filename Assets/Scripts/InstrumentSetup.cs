@@ -28,7 +28,19 @@ public class InstrumentSetup : MonoBehaviour {
 
 	List<GameObject> buttons = new List<GameObject>();
 
+	public Scrollbar scrollBarH;
+	public Scrollbar scrollBarV;
+
 	public InputField nameInputField;
+
+	public GameObject playRiffButton;
+	public Sprite play;
+	public Sprite pause;
+
+	public GameObject beatsText;
+
+	float buttonWidth = 128f;
+	float buttonSpacing = 8f;
 
 	void Start () {
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
@@ -39,6 +51,7 @@ public class InstrumentSetup : MonoBehaviour {
 		Cleanup();
 		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
 		nameInputField.text = currentRiff.name;
+		MakeBeatNumbers ();
 		//switch (MusicManager.currentInstrument) {
 		switch (currentRiff.instrument) {
 		case Instrument.RockDrums:
@@ -51,7 +64,10 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
 		}
-
+		scrollBarH.value = 0f;
+		scrollBarV.value = 1f;
+		playRiffButton.GetComponent<Image>().sprite = play;
+		UpdateBeatsText();
 	}
 
 	// Removes all existing buttons
@@ -61,30 +77,27 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
-
-	/*
-	public static Scale EMinor = new Scale () {
-		root = MusicManager.Sound"...."
-			second1
-			...
-			octave2 = MuiscManager.Sound
-			second2
+	public void MakeBeatNumbers () {
+		for (int i=0; i<currentRiff.beatsShown; i++) {
+			buttons.Add(MakeText((i+1).ToString(), GetComponent<RectTransform>(),
+				new Vector2 (48f, 48f),
+				new Vector2 (
+					buttonWidth*2f + (buttonWidth+buttonSpacing)*(i*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS)),
+					-0.5f*buttonWidth
+				)));
 		}
-
-
-			scales[MusicManager.currentKey][currentInstrument];
-			*/
-
+	}
+		
 	// Initializes a percussion setup menu
 	void InitializePercussionSetup (PercussionInstrument percInst) {
 		switch (percInst) {
 		case PercussionInstrument.RockDrums:
 			// Make rows of buttons for drums
 			numRows = 4;
-			MakePercussionButtons ("Kick", 0, new Note ("RockDrums_Kick"), kickIcon);
-			MakePercussionButtons ("Snare", 1, new Note ("RockDrums_Snare"), snareIcon);
-			MakePercussionButtons ("Tom", 2, new Note ("RockDrums_Tom"), tomIcon);
-			MakePercussionButtons ("Hat", 3, new Note ("RockDrums_Hat"), hatIcon);
+			MakePercussionButtons ("Kick", 0, "RockDrums_Kick", kickIcon);
+			MakePercussionButtons ("Snare", 1, "RockDrums_Snare", snareIcon);
+			MakePercussionButtons ("Tom", 2, "RockDrums_Tom", tomIcon);
+			MakePercussionButtons ("Hat", 3, "RockDrums_Hat", hatIcon);
 			break;
 		}
 	}
@@ -95,170 +108,163 @@ public class InstrumentSetup : MonoBehaviour {
 			case MelodicInstrument.ElectricGuitar:
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
-			MakeMelodicButtons ("E2", 0, new Note ("ElectricGuitar_E2")); // MakeMelodicButtons(Scale.root.name, 0, Scale.root.note)
-			MakeMelodicButtons ("F#2", 1, new Note ("ElectricGuitar_F#2"));
-			MakeMelodicButtons ("G#2", 2, new Note ("ElectricGuitar_G#2"));
-			MakeMelodicButtons ("A2", 3, new Note ("ElectricGuitar_A2"));
-			MakeMelodicButtons ("B2", 4, new Note ("ElectricGuitar_B2"));
-			MakeMelodicButtons ("C#3", 5, new Note ("ElectricGuitar_C#3"));
-			MakeMelodicButtons ("D#3", 6, new Note ("ElectricGuitar_D#3"));
-																		// MakeMelodicButtons(Key.octave, #, Key.octave.note
-
-			/* public class Scale {
-			 * public Note root;
-			 * public Note second;
-			 * ...
-			 * ...
-			}*/
-
-			/*
-			public static Scale EMinor = new Scale () {
-				root = MusicManager.Sound"...."
-					second1
-					...
-					octave2 = MuiscManager.Sound
-					second2
-			}
-				switch (MusicManager.currentKey) {
-					case Key.EMinor:
-				switch (riff.currentInstrument) {
-					case Electrci
-					..
-						..
-				public static Scale EMinor_ElectricGuitar = new Scale();
-				
-
-				scales[MusicManager.currentKey][currentInstrument];
-			*/
+			MakeMelodicButtons ("E2", 0, "ElectricGuitar_E2"); 
+			MakeMelodicButtons ("F#2", 1, "ElectricGuitar_F#2");
+			MakeMelodicButtons ("G#2", 2, "ElectricGuitar_G#2");
+			MakeMelodicButtons ("A2", 3, "ElectricGuitar_A2");
+			MakeMelodicButtons ("B2", 4, "ElectricGuitar_B2");
+			MakeMelodicButtons ("C#3", 5, "ElectricGuitar_C#3");
+			MakeMelodicButtons ("D#3", 6, "ElectricGuitar_D#3");
 			break;
 
 			case MelodicInstrument.ElectricBass: 
 			// Make rows of buttons for notes (in a grid)
 			numRows = 7;
-			MakeMelodicButtons ("E3", 0, new Note (MusicManager.SoundClips ["ElectricBass_E1"]));
-					MakeMelodicButtons ("F#3", 1, new Note (MusicManager.SoundClips ["ElectricBass_F#1"]));
-					MakeMelodicButtons ("G#3", 2, new Note (MusicManager.SoundClips ["ElectricBass_G#1"]));
-					MakeMelodicButtons ("A3", 3, new Note (MusicManager.SoundClips ["ElectricBass_A1"]));
-					MakeMelodicButtons ("B3", 4, new Note (MusicManager.SoundClips ["ElectricBass_B1"]));
-					MakeMelodicButtons ("C#4", 5, new Note (MusicManager.SoundClips ["ElectricBass_C#2"]));
-					MakeMelodicButtons ("D#4", 6, new Note (MusicManager.SoundClips ["ElectricBass_D#2"]));
+			MakeMelodicButtons ("E3", 0, "ElectricBass_E1");
+			MakeMelodicButtons ("F#3", 1, "ElectricBass_F#1");
+			MakeMelodicButtons ("G#3", 2, "ElectricBass_G#1");
+			MakeMelodicButtons ("A3", 3, "ElectricBass_A1");
+			MakeMelodicButtons ("B3", 4, "ElectricBass_B1");
+			MakeMelodicButtons ("C#4", 5, "ElectricBass_C#2");
+			MakeMelodicButtons ("D#4", 6, "ElectricBass_D#2");
 			break;
 		}
 	}
 
 	// Creates all buttons for percussion setup
-	void MakePercussionButtons (string title, int row, Note note, Sprite iconGraphic) {
-		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
+		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
+			(row+2)*buttonWidth + row*buttonSpacing
+		);
+
 		// Make icon for note
-		GameObject icon = new GameObject();
-		icon.name = title+"Icon";
-		icon.AddComponent<RectTransform>();
-		icon.AddComponent<CanvasRenderer>();
-		icon.AddComponent<Image>();
-		icon.GetComponent<Image>().sprite = iconGraphic;
-		icon.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		float buttonWidth = GetComponent<RectTransform>().rect.height/(2f*numRows);
-		icon.GetComponent<RectTransform>().sizeDelta = new Vector2 (buttonWidth, buttonWidth);
-		icon.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-		icon.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
-		icon.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-		icon.GetComponent<RectTransform>().anchoredPosition = new Vector2 (
-			GetComponent<RectTransform>().sizeDelta.x/numButtons,
-			(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
-		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
+		buttons.Add(MakeIcon (title, iconGraphic, 
+			GetComponent<RectTransform>(), new Vector2 (0.75f*buttonWidth, 0.75f*buttonWidth),
+			new Vector2 (
+				buttonWidth,
+				-buttonWidth - (buttonWidth+buttonSpacing)*row
+			))
+		);
 			
+		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
 			int num = i;
-			GameObject bt = new GameObject();
-			bt.name = title+"_"+i;
-			bt.AddComponent<RectTransform>();
-			bt.AddComponent<CanvasRenderer>();
-			bt.AddComponent<Image>();
-			if (currentRiff.Lookup(note, num)) {
-				bt.GetComponent<Image>().sprite = percussionFilled;
-				//Debug.Log("kobe");
-			} else {
-				bt.GetComponent<Image>().sprite = percussionEmpty;
-			}
-			bt.AddComponent<Button>();
-			bt.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(buttonWidth, buttonWidth);
-			bt.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
-			bt.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-			bt.GetComponent<RectTransform>().anchoredPosition = 
+			GameObject bt = MakeButton(title+"_"+i, 
+				(currentRiff.Lookup(soundName, num) ? percussionFilled : percussionEmpty),
+				GetComponent<RectTransform>(),
+				new Vector2 (buttonWidth*0.75f, buttonWidth*0.75f),
 				new Vector2 (
-					((float)(2*i+5)*GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+3)))), 
-					(float)(MAX_NUMNOTES-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows))
-				);
+					2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
+					-buttonWidth - (buttonWidth+buttonSpacing)*row
+				)
+			);
+			float vol = 1f;
 			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
+				vol = 0.85f;
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
+				vol = 0.7f;
 			}
-			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(note, num);});
+			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);});
 			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
 			buttons.Add(bt);
 		}
-		buttons.Add(icon);
+	}
+		
+	void MakeMelodicButtons (string title, int row, string fileName) {
+		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
+		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
+			(row+2)*buttonWidth + row*buttonSpacing
+		);
+
+		buttons.Add(MakeText (title,
+			GetComponent<RectTransform>(),
+			new Vector2 (buttonWidth, buttonWidth),
+			new Vector2 (
+				buttonWidth,
+				-buttonWidth - (buttonWidth+buttonSpacing)*row
+			)
+		));
+			
+		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
+			int num = i;
+			GameObject bt = MakeButton(title+"_"+i,
+				(currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty),
+				GetComponent<RectTransform>(),
+					new Vector2(buttonWidth, buttonWidth/2f),
+					new Vector2 (
+						2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
+						-buttonWidth - (buttonWidth+buttonSpacing)*row
+			));
+			float vol = 1f;
+			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
+				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
+				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
+				vol = 0.85f;
+			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
+				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
+				vol = 0.7f;
+			}
+			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);});
+			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
+			buttons.Add(bt);
+		}
 	}
 
-	void MakeMelodicButtons (string title, int row, Note note) {
-		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+	GameObject MakeButton (string title, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
+		GameObject button = new GameObject();
+		button.name = title+"Text";
+		button.AddComponent<RectTransform>();
+		button.AddComponent<CanvasRenderer>();
+		button.AddComponent<Image>();
+		button.GetComponent<Image>().sprite = image;
+		button.AddComponent<Button>();
+		button.GetComponent<RectTransform>().SetParent(parent);
+		button.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
+		button.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
+		button.GetComponent<RectTransform>().sizeDelta = sizeD;
+		button.GetComponent<RectTransform>().anchoredPosition = pos;
+		return button;
+	}
+
+	GameObject MakeText (string title, RectTransform parent, Vector2 sizeD, Vector2 pos) {
 		GameObject text = new GameObject();
-		text.name = title+"Text";
-		text.AddComponent<RectTransform>();
-		text.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		float buttonWidth = GetComponent<RectTransform>().rect.height/(1.5f*numRows);
-		text.GetComponent<RectTransform>().sizeDelta = new Vector2 (buttonWidth, buttonWidth);
-		text.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 		text.AddComponent<CanvasRenderer>();
+		text.AddComponent<RectTransform>();
+		text.GetComponent<RectTransform>().SetParent(parent);
+		text.GetComponent<RectTransform>().sizeDelta = sizeD;
+		text.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 		text.AddComponent<Text>();
 		text.GetComponent<Text>().text = title;
 		text.GetComponent<Text>().fontSize = 36;
 		text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
 		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
-		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
-		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-		text.GetComponent<RectTransform>().anchoredPosition = new Vector2 (
-			GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+1))),
-			(float)(2*numRows-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows)));
-		
-		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
-			int num = i;
-			GameObject bt = new GameObject();
-			bt.name = title+"_"+i;
-			bt.AddComponent<RectTransform>();
-			bt.AddComponent<CanvasRenderer>();
-			bt.AddComponent<Image>();
-			if (currentRiff.Lookup(note, num)) {
-				bt.GetComponent<Image>().sprite = melodicFilled;
-				//Debug.Log("kobe");
-			} else {
-				bt.GetComponent<Image>().sprite = melodicEmpty;
-			}
-			bt.AddComponent<Button>();
-			bt.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-			bt.GetComponent<RectTransform>().sizeDelta = new Vector2(96f, 64f);
-			bt.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0.0f);
-			bt.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0.0f);
-			bt.GetComponent<RectTransform>().anchoredPosition = 
-				new Vector2 (
-					((float)(2*i+3)*GetComponent<RectTransform>().sizeDelta.x/((float)(2*(numButtons+1)))), 
-					(float)(2*numRows-(2*row+1))*(GetComponent<RectTransform>().offsetMax.y-GetComponent<RectTransform>().offsetMin.y)/((float)(2*numRows))
-				);
-			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-			}
-			bt.GetComponent<Button>().onClick.AddListener(()=>{InstrumentSetup.currentRiff.Toggle(note, num);});
-			bt.GetComponent<Button>().onClick.AddListener(()=>{Toggle(bt.GetComponent<Button>());});
-			buttons.Add(bt);
-		}
-		buttons.Add(text);
+		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
+		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
+		text.GetComponent<RectTransform>().anchoredPosition = pos;
+		return text;
+	}
+
+	GameObject MakeIcon (string title, Sprite graphic, RectTransform parent, Vector2 sizeD, Vector2 pos) {
+		GameObject icon = new GameObject();
+		icon.name = title+"Icon";
+		icon.AddComponent<RectTransform>();
+		icon.AddComponent<CanvasRenderer>();
+		icon.AddComponent<Image>();
+		icon.GetComponent<Image>().sprite = graphic;
+		icon.GetComponent<RectTransform>().SetParent(parent);
+		icon.GetComponent<RectTransform>().sizeDelta = sizeD;
+		icon.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
+		icon.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
+		icon.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
+		icon.GetComponent<RectTransform>().anchoredPosition = pos;
+		return icon;
 	}
 
 	// Flips button art
@@ -288,5 +294,23 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
-		
+	public void IncreaseBeatsShown () {
+		currentRiff.ShowMore();
+		Initialize();
+
+	}
+
+	public void DecreaseBeatsShown () {
+		currentRiff.ShowLess();
+		Initialize();
+	}
+
+	public void TogglePlayRiffButton () {
+		if (playRiffButton.GetComponent<Image>().sprite == play) playRiffButton.GetComponent<Image>().sprite = pause;
+		else playRiffButton.GetComponent<Image>().sprite = play;
+	}
+
+	void UpdateBeatsText() {
+		beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
+	}
 }
