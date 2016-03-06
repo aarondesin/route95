@@ -86,6 +86,10 @@ public class MusicManager : MonoBehaviour {
 
 	public int maxBeats; // max beats in riff, after subdivisions
 
+	float startLoadTime;
+	bool loadedSounds = false;
+	bool loadedInstruments = false;
+
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
@@ -108,10 +112,24 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void Load() {
-		float sTime = Time.time;
-		LoadAllAudioClips (Sounds.soundsToLoad);
+		startLoadTime = Time.realtimeSinceStartup;
+		StartCoroutine("LoadAllAudioClips", Sounds.soundsToLoad);
+		StartCoroutine("DoLoad");
+	}
+
+	public IEnumerator DoLoad() {
+		
+		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+		//LoadAllAudioClips (Sounds.soundsToLoad);
+
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
-		for (int i=0; i<(int)Instrument.NUM_INSTRUMENTS;i++) {
+		int i=0;
+		//while (i<(int)Instrument.NUM_INSTRUMENTS) {
+		while (true) {
+			if (i>=(int)Instrument.NUM_INSTRUMENTS) {
+				loadedInstruments = true;
+				yield return NotifyDone();
+			}
 			GameObject obj = new GameObject ();
 			AudioSource source = obj.AddComponent<AudioSource>();
 			//instrumentAudioSources.Add((Instrument)i, new AudioSource());
@@ -130,10 +148,31 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
 			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
+			GameManager.instance.IncrementLoadProgress();
+			i++;
+			//yield return new WaitForEndOfFrame();
+
 		}
-		SetupExampleRiffs();
-		SetupExampleLicks();
-		Debug.Log("MusicManager.Load(): finished in "+(Time.time-sTime).ToString("0.0000")+" seconds.");
+		//yield return NotifyDone();
+		//SetupExampleRiffs();
+
+		//SetupExampleLicks();
+
+		//if (SoundClips.Count == Sounds.soundsToLoad.Count) yield return NotifyDone();
+		/*else*/ //yield return NotifyDone();
+		//yield return new WaitForSeconds(2.0f);
+	}
+
+	IEnumerator NotifyDone() {
+		if (loadedInstruments && loadedSounds) {
+			Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+			GameManager.instance.LoadNext();
+			StopCoroutine("LoadAllAudioClips");
+			StopCoroutine("DoLoad");
+			StopCoroutine("LoadExampleRiffs");
+			StopCoroutine("LoadExampleLicks");
+			yield return null;
+		}
 	}
 
 	public void PlayRiffLoop(){
@@ -190,7 +229,7 @@ public class MusicManager : MonoBehaviour {
 						lickPlaying = false;
 					}
 					currentSong.PlaySong(beat);
-					Debug.Log(beat);
+					//Debug.Log(beat);
 					beat++;
 					break;
 				}
@@ -278,10 +317,21 @@ public class MusicManager : MonoBehaviour {
 
 
 	// Loads all audio clip paths in soundsToLoad
-	void LoadAllAudioClips (List<string> paths) {
-		foreach (string path in paths) {
-			LoadAudioClip  (path);
+	IEnumerator LoadAllAudioClips(List<string> paths) {
+	//void LoadAllAudioClips (List<string> paths) {
+		//foreach (string path in paths) {
+		int i=0;
+		while (i<Sounds.soundsToLoad.Count) {
+			for (int j=0; j<GameManager.instance.loadingSpeed && i+j<Sounds.soundsToLoad.Count; j++) {
+				LoadAudioClip(paths[i+j]);
+			}
+			i+=GameManager.instance.loadingSpeed ;
+			yield return null;
 		}
+		//foreach (string path in Sounds.soundsToLoad) {
+			//LoadAudioClip  (path);
+			
+		yield return StartCoroutine("SetupExampleRiffs");
 	}
 
 	// Loads a single audio clip
@@ -292,6 +342,7 @@ public class MusicManager : MonoBehaviour {
 		} else {
 			Debug.Log("Loaded "+path);
 			SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
+			GameManager.instance.IncrementLoadProgress();
 		}
 	}
 
@@ -335,7 +386,8 @@ public class MusicManager : MonoBehaviour {
 		songPieces.Clear();
 	}
 
-	public void SetupExampleRiffs () {
+	//public void SetupExampleRiffs () {
+	IEnumerator SetupExampleRiffs() {
 		riffs.Add( new Riff () {
 			name = "Example Guitar Riff",
 			instrument = Instrument.ElectricGuitar,
@@ -403,9 +455,11 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> ()
 			}
 		});
+		yield return StartCoroutine("SetupExampleLicks");
 	}
 
-	public void SetupExampleLicks () {
+	//public void SetupExampleLicks () {
+	IEnumerator SetupExampleLicks() {
 		licks[Instrument.ElectricGuitar].Add (new Riff () {
 			name = "Example Guitar Lick",
 			instrument = Instrument.ElectricGuitar,
@@ -455,6 +509,8 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () { new Note("RockDrums_Hat")},
 			}
 		});
+		loadedSounds = true;
+		yield return NotifyDone();
 	}
 }
 	

@@ -45,7 +45,10 @@ public class GameManager : MonoBehaviour {
 	public GameObject systemButtons; // "Settings" and "Exit"
 	public Image livePlayQuitPrompt; // "Exit"
 
+	public int loadingSpeed;
 	public GameObject loadingScreen;
+	public GameObject loadingBar;
+	public GameObject loadingMessage;
 
 	public Dictionary<Menu, GameObject> menus; 
 		
@@ -63,6 +66,10 @@ public class GameManager : MonoBehaviour {
 
 	public bool paused = false;
 	bool initialized = false;
+	int loadPhase = 0;
+	float startLoadTime;
+	public int loadProgress = 0;
+	int loadValue = 0;
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
@@ -80,6 +87,7 @@ public class GameManager : MonoBehaviour {
 		};
 
 		loadProjectPrompt.SetActive(true);
+		loadingScreen.SetActive(true);
 	}
 
 	void Initialize () {
@@ -95,15 +103,54 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(pauseMenu);
 		SwitchToMenu(Menu.Main);
 		Load();
+		//StartCoroutine("Load");
 		initialized = true;
 	}
 
 	void Load () {
-		float sTime = Time.time;
+	//IEnumerator Load () {
+		startLoadTime = Time.realtimeSinceStartup;
+		loadValue = (int)Instrument.NUM_INSTRUMENTS+
+			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
+			WorldManager.instance.MAX_DECORATIONS;
+
+
 		loadingScreen.SetActive(true);
-		MusicManager.instance.Load();
+		LoadNext();
+		//startLoadTime = Time.realtimeSinceStartup;
+
+		//loadingScreen.SetActive(false);
+
+	}
+
+	public void LoadNext() {
+		switch (loadPhase) {
+		case 0:
+			MusicManager.instance.Load();
+			break;
+		case 1:
+			WorldManager.instance.Load();
+			break;
+		case 2:
+			//Debug.Log("dick");
+			FinishLoading();
+			break;
+		}
+		loadPhase++;
+	}
+		
+	public void IncrementLoadProgress() {
+		loadProgress++;
+		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadValue;
+	}
+
+	void FinishLoading() {
+		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 		loadingScreen.SetActive(false);
-		Debug.Log("Completed initial load in "+(Time.time-sTime).ToString("0.0000")+" seconds.");
+	}
+
+	public void ChangeLoadingMessage (string message) {
+		loadingMessage.GetComponent<Text>().text = message;
 	}
 
 	void Update () {

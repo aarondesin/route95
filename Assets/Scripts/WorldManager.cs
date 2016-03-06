@@ -37,13 +37,15 @@ public class WorldManager : MonoBehaviour {
 	private GameObject sun;
 	private GameObject moon;
 
+	float startLoadTime;
+	bool loadedDecorations = false;
+	bool decorated = false;
+
 	// Use this for initialization
 	void Start () {
 		instance = this;
 		numDecorations = 0;
-		foreach (string path in decorationPaths) {
-			LoadDecoration (path);
-		}
+
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE, VERT_HEIGHT_SCALE);
 
 		sun = createSun();
@@ -63,12 +65,67 @@ public class WorldManager : MonoBehaviour {
 		*/
 	}
 
-	// Update is called once per frame
-	void Update () {
+	public void Load () {
+		startLoadTime = Time.realtimeSinceStartup;
+		GameManager.instance.ChangeLoadingMessage("Loading world...");
 		terrain.update(freqDataArray);
 		if (DO_DECORATE) {
+			StartCoroutine("LoadDecorations");
+			StartCoroutine("DoDecorate");
+		}
+	}
+
+	IEnumerator LoadDecorations () {
+		foreach (string path in decorationPaths) {
+			LoadDecoration (path);
+			GameManager.instance.IncrementLoadProgress();
+			yield return null;
+		}
+		if (decorations.Count == decorationPaths.Count) {
+			loadedDecorations = true;
+			yield return null;
+		}
+	}
+
+	IEnumerator DoDecorate () {
+		
+
+		while (numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
+					//Debug.Log("dick");
 				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+				GameManager.instance.IncrementLoadProgress();
+				//yield return null;
+			}
+			yield return null;
+
+		}
+				
+		if (numDecorations >= MAX_DECORATIONS) {
+			decorated = true;
+			yield return NotifyLoadingDone();
+		} else {
+			yield return null;
+		}
+	}
+
+	IEnumerator NotifyLoadingDone () {
+		if (loadedDecorations && decorated) {
+			Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+			GameManager.instance.LoadNext();
+			StopCoroutine("DoLoad");
+			yield return null;
+		}
+	}
+
+	// Update is called once per frame
+	void Update () {
+		if (loadedDecorations && decorated) {
+			terrain.update(freqDataArray);
+			if (DO_DECORATE) {
+				for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
+					Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+				}
 			}
 		}
 	}
@@ -110,6 +167,7 @@ public class WorldManager : MonoBehaviour {
 		} else {
 			Debug.Log("Loaded "+path);
 			decorations.Add(decoration);
+			GameManager.instance.IncrementLoadProgress();
 		}
 	}
 

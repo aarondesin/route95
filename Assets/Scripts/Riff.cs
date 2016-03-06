@@ -169,16 +169,18 @@ public class Riff {
 	public void PlayRiff (int pos) { 
 		//Debug.Log ("before for loop");
 		try {
+			if (notes[pos].Count != 0) {
+				if (cutSelf) MusicManager.instance.instrumentAudioSources[instrument].Stop();
 
+				foreach (Note note in notes[pos]) {
+					//Debug.Log("inside for loop " + pos);
 
-			foreach (Note note in notes[pos]) {
-				//Debug.Log("inside for loop " + pos);
-				if (cutSelf) 
-					//MusicManager.instance.OneShot.Stop();
-					MusicManager.instance.instrumentAudioSources[instrument].Stop();
-				//if (MusicManager.instance.instrumentAudioSources[currentInstrument] == null) Debug.Log("shit");
-				note.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
+						//MusicManager.instance.OneShot.Stop();
 
+					//if (MusicManager.instance.instrumentAudioSources[currentInstrument] == null) Debug.Log("shit");
+					note.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
+
+				}
 			}
 		} catch (ArgumentOutOfRangeException) {
 			Debug.LogError("Tried to play out of range of song! Pos: "+pos);
