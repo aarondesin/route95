@@ -61,6 +61,20 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
+
+	/*
+	public static Scale EMinor = new Scale () {
+		root = MusicManager.Sound"...."
+			second1
+			...
+			octave2 = MuiscManager.Sound
+			second2
+		}
+
+
+			scales[MusicManager.currentKey][currentInstrument];
+			*/
+
 	// Initializes a percussion setup menu
 	void InitializePercussionSetup (PercussionInstrument percInst) {
 		switch (percInst) {

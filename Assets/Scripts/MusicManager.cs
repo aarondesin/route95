@@ -30,6 +30,7 @@ public enum Key{
 	DMajor,
 	EFlat,
 	EMajor,
+	Eminor,
 	FMajor
 };
 
@@ -57,16 +58,6 @@ public class MusicManager : MonoBehaviour {
 	List<List<Note>> lickQueue = new List<List<Note>>();
 	bool lickPlaying = false;
 
-	/*
-	 * Dictionary<Key, Dictionary<Instrument, Scale>> scales = new Dicto.... () {
-	 * 	{ Key.EMinor, new Dictionary<Instrument, Scale> () {
-	 * 		{ Instrument.ElectricGuitar, Scale.ElectricGuitarEMinor () }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * scale = scales[MM.currentKey][riff.currentInstrument];
-	 * */
 
 	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
 		{ Instrument.ElectricGuitar, "Electric Guitar" },
