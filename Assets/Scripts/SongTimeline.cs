@@ -2,26 +2,42 @@
 using UnityEngine.UI;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SongTimeline : MonoBehaviour {
+
+	public static SongTimeline instance;
 
 	static int NUM_COLUMNS = 4; // number of columns shown on timeline
 
 	public Sprite graphic;
+	public Sprite addGraphic;
+
+	List<GameObject> columns;
+
+	public GameObject scrollbar;
 
 	void Start () {
-		MakeColumns();
+		instance = this;
+		columns = new List<GameObject>();
 	}
 
-	void MakeColumns () {
-		for (int i=0; i<NUM_COLUMNS; i++) {
+	public void MakeColumns () {
+		columns.Clear();
+
+		float columnWidth = GetComponent<RectTransform>().rect.width/(float)NUM_COLUMNS;
+		float columnHeight = GetComponent<RectTransform>().rect.height;
+
+		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+			(MusicManager.instance.currentSong.songPieces.Count+1)*columnWidth,
+			columnHeight
+		);
+		for (int i=0; i<MusicManager.instance.currentSong.songPieces.Count; i++) {
 			GameObject column = new GameObject();
 			column.name = "Column"+i;
 
 			column.AddComponent<CanvasRenderer>();
 
-			float columnWidth = GetComponent<RectTransform>().rect.width/(float)NUM_COLUMNS;
-			float columnHeight = GetComponent<RectTransform>().rect.height;
 			column.AddComponent<RectTransform>();
 			column.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
 			column.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth, columnHeight);
@@ -32,7 +48,7 @@ public class SongTimeline : MonoBehaviour {
 			//	GetComponent<RectTransform>().offsetMin.x+(float)(i/NUM_COLUMNS)*columnWidth, 0f
 			//);
 			column.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-				columnWidth/2f+(float)i*GetComponent<RectTransform>().sizeDelta.x/(float)NUM_COLUMNS,
+				columnWidth/2f+i*columnWidth,
 				//GetComponent<RectTransform>().offsetMin.x+((float)i/(float)NUM_COLUMNS)*4f*columnWidth,
 				columnHeight/2f,
 				0f
@@ -49,7 +65,44 @@ public class SongTimeline : MonoBehaviour {
 			column.AddComponent<Image>();
 			//column.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
 			column.GetComponent<Image>().sprite = graphic;
+			columns.Add(column);
 		}
+		GameObject addColumnButton = new GameObject();
+		addColumnButton.name = "AddColumnButton";
+		addColumnButton.AddComponent<CanvasRenderer>();
+
+		addColumnButton.AddComponent<RectTransform>();
+		addColumnButton.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
+		addColumnButton.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth/2f, columnHeight/2f);
+		addColumnButton.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
+		addColumnButton.GetComponent<RectTransform>().anchorMin = new Vector2 (1f, 0f);
+		addColumnButton.GetComponent<RectTransform>().anchorMax = new Vector2 (1f, 0f);
+		addColumnButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
+			-columnWidth/2f,
+			//GetComponent<RectTransform>().offsetMin.x+((float)i/(float)NUM_COLUMNS)*4f*columnWidth,
+			columnHeight/2f,
+			0f
+		);
+			
+		addColumnButton.AddComponent<Button>();
+		addColumnButton.GetComponent<Button>().onClick.AddListener(()=>{
+			MusicManager.instance.AddSongPieceToSong();
+			RefreshTimeline();
+		});
+
+		addColumnButton.AddComponent<Image>();
+		//column.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+		addColumnButton.GetComponent<Image>().sprite = addGraphic;
+		columns.Add(addColumnButton);
+	}
+
+	void RefreshTimeline () {
+		while (columns.Count != 0) {
+			GameObject temp = columns[0];
+			Destroy(temp);
+			columns.RemoveAt(0);
+		}
+		MakeColumns();
 	}
 
 	void RefreshColumn (GameObject column, SongPiece songpiece) {

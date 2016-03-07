@@ -92,6 +92,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Initialize () {
+		SongTimeline.instance.MakeColumns();
+		SongTimeline.instance.scrollbar.GetComponent<Scrollbar>().value = 0f;
 		
 		// Hide all menus and display default menu (main)
 		DisableMenu(menus[Menu.KeySelect]);

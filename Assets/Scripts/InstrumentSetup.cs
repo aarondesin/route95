@@ -117,7 +117,7 @@ public class InstrumentSetup : MonoBehaviour {
 			MakeMelodicButtons ("C#3", 5, "ElectricGuitar_C#3");
 			MakeMelodicButtons ("D#3", 6, "ElectricGuitar_D#3");*/
 
-			foreach (string note in KeyManager.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].allNotes) {
+			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].allNotes) {
 				MakeMelodicButtons (note.Split ('_') [1], i, note);
 				i++;
 			}
@@ -125,7 +125,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 		case MelodicInstrument.ElectricBass: 
 			// Make rows of buttons for notes (in a grid)
-			foreach (string note in KeyManager.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].allNotes) {
+			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].allNotes) {
 				if (note == null)
 					Debug.Log ("dick");
 				MakeMelodicButtons (note.Split ('_') [1], i, note);

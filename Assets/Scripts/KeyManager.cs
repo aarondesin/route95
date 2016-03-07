@@ -3,72 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class ScaleInfo {
-	public int rootIndex;
-	public int secondIndex;
-	public int thirdIndex;
-	public int fourthIndex;
-	public int fifthIndex;
-	public int sixthIndex;
-	public int seventhIndex;
-
-	public static ScaleInfo Minor = new ScaleInfo () {
-		secondIndex = 2,
-		thirdIndex = 1,
-		fourthIndex = 2,
-		fifthIndex = 2,
-		sixthIndex = 1,
-		seventhIndex = 2,
-		rootIndex = 2
-	};
-
-}
-
-public class Scale {
-	public List<string> root;
-	public List<string> second;
-	public List<string> third;
-	public List<string> fourth;
-	public List<string> fifth;
-	public List<string> sixth;
-	public List<string> seventh;
-
-	public List<string> allNotes;
-
-	public Scale () {
-		root = new List<string> ();
-		second = new List<string> ();
-		third = new List<string> ();
-		fourth = new List<string> ();
-		fifth = new List<string> ();
-		sixth = new List<string> ();
-		seventh = new List<string> ();
-
-		allNotes = new List<string> ();
-	}
-}
-
 public class KeyManager : MonoBehaviour {
 
 	public static KeyManager instance;
 
-	public Key selectedkey = MusicManager.instance.currentKey;
-	public static Dictionary<Key, Dictionary<Instrument, Scale>> scales;
+	public Dictionary<Key, Dictionary<Instrument, Scale>> scales;
 
 	void Start () {
-		try {
-			instance = this;
-			scales = new Dictionary<Key, Dictionary<Instrument, Scale>> () { 
-				{ Key.Eminor, new Dictionary<Instrument,Scale> () {
-						//{ Instrument.ElectricGuitar, ElectricGuitarEminor }
-						{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 0 ) },
-						{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 0) }
-					}
+		instance = this;
+		scales = new Dictionary<Key, Dictionary<Instrument, Scale>> () { 
+			{ Key.Eminor, new Dictionary<Instrument,Scale> () {
+					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 0 ) },
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 0) }
 				}
-			};
-		} catch (ArgumentOutOfRangeException) {
-			//Debug.LogError ("dicksauce");
-		}
+			}
+		};
 	}
 
 	public static Scale BuildScale (List<string> soundFiles, ScaleInfo scale, int startIndex) {

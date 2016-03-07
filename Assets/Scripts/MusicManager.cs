@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 using System.IO; // need for path operations
@@ -117,12 +118,13 @@ public class MusicManager : MonoBehaviour {
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		int i=0;
 		//while (i<(int)Instrument.NUM_INSTRUMENTS) {
-		while (true) {
-			if (i>=(int)Instrument.NUM_INSTRUMENTS) {
+		while (i<(int)Instrument.NUM_INSTRUMENTS) {
+			/*if (i>=()-1) {
 				loadedInstruments = true;
 				yield return NotifyDone();
-			}
+			}*/
 			GameObject obj = new GameObject ();
+			obj.name = (string)Enum.GetName (typeof(Instrument), i);
 			AudioSource source = obj.AddComponent<AudioSource>();
 			//instrumentAudioSources.Add((Instrument)i, new AudioSource());
 			instrumentAudioSources.Add((Instrument)i, source);
@@ -143,8 +145,10 @@ public class MusicManager : MonoBehaviour {
 			GameManager.instance.IncrementLoadProgress();
 			i++;
 			//yield return new WaitForEndOfFrame();
-
+			yield return 0;
 		}
+		loadedInstruments = true;
+		yield return NotifyDone();
 		//yield return NotifyDone();
 		//SetupExampleRiffs();
 
@@ -268,6 +272,12 @@ public class MusicManager : MonoBehaviour {
 	public void AddSongPiece (SongPiece songPiece) {
 		songPieces.Add(songPiece);
 		//SongArrangeSetup.instance.Refresh();
+	}
+
+	public void AddSongPieceToSong () {
+		SongPiece temp = new SongPiece();
+		songPieces.Add(temp);
+		currentSong.songPieces.Add(temp);
 	}
 
 	public void QueueLick (Riff lick) {
