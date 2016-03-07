@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public class CaseLibrary{
 	
-	public static List<Riff> rhythmcases = new List<Riff> ();
-	public static List<Riff> melodycases = new List<Riff> ();
+	public static List<Riff> cases = new List<Riff> ();
 
+	////needs changing to strings for rhythm
 	public void initializecases(){
-		rhythmcases.Add (new Riff () {
+		cases.Add (new Riff () {
 			name = "test",
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>> () {
