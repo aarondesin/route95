@@ -103,6 +103,7 @@ public class Song {
 	public override string ToString () {
 		string result = "";
 		result += name + save_load.itemSeparator;
+		result += Enum.GetName(typeof (Key), MusicManager.instance.currentKey) + save_load.itemSeparator;
 		foreach (SongPiece songPiece in songPieces) {
 			result += songPiece.name + save_load.noteSeparator;
 		}

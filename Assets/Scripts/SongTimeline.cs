@@ -67,6 +67,8 @@ public class SongTimeline : MonoBehaviour {
 			column.GetComponent<Image>().sprite = graphic;
 			columns.Add(column);
 		}
+		for (int i=0; i<columns.Count; i++) RefreshColumn (columns[i], MusicManager.instance.currentSong.songPieces[i]);
+
 		GameObject addColumnButton = new GameObject();
 		addColumnButton.name = "AddColumnButton";
 		addColumnButton.AddComponent<CanvasRenderer>();
