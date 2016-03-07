@@ -98,6 +98,7 @@ public class MusicManager : MonoBehaviour {
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
 
+
 		//Debug.Log ("set up done" , licks.Count);
 
 	}
@@ -189,7 +190,7 @@ public class MusicManager : MonoBehaviour {
 				switch (GameManager.instance.currentMode) {
 				case Mode.Setup:
 					InstrumentSetup.currentRiff.PlayRiff (beat++);
-					if (beat >= maxBeats && loop)
+					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
 						beat = 0;
 					break;
 				case Mode.Live:
@@ -292,8 +293,8 @@ public class MusicManager : MonoBehaviour {
 
 	public void PopLickQueue () {
 		//Debug.Log("play");
+		MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
 		foreach (Note note in lickQueue[0]) {
-			MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
 			note.PlayNote(instrumentAudioSources[currentInstrument], true);
 		}
 		lickQueue.RemoveAt(0);

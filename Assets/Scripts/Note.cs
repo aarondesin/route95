@@ -92,6 +92,20 @@ public class Note {
 
 		//return result;
 	}
+
+	public Note (string fileName, float vol, float dur) {
+		filename = fileName;
+		if (!MusicManager.SoundClips.ContainsKey(fileName)) {
+			Debug.LogError ("Note.Note(): filename \"" + filename + "\" invalid!");
+			//result.sound = null;
+			sound = null;
+		} else {
+			//result.sound = MusicManager.Sounds [filename];
+			sound = MusicManager.SoundClips [filename];
+		}
+		volume = vol;
+		duration = dur;
+	}
 		
 	public Note (AudioClip newSound) {
 

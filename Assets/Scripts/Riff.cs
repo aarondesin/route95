@@ -7,6 +7,7 @@ using System.Linq;
 
 public class Riff {
 	public static int MAX_SUBDIVS = 2;
+	public static int MAX_BEATS = 32;
 
 	//
 	// VARIABLES SAVED IN PROJECT
@@ -16,6 +17,7 @@ public class Riff {
 	public Instrument instrument; // instrument used for this riff
 	public List<List<Note>> notes = new List<List<Note>>(); // contains notes
 	public bool cutSelf = true; // if true, sounds will cut themselves off
+	public int beatsShown = 4;
 
 	//
 	// VARIABLES NOT SAVED IN PROJECT
@@ -57,6 +59,9 @@ public class Riff {
 		//Debug.Log ("Instrument: " + (string)Enum.GetName (typeof(Instrument), (int)instrument));
 		cutSelf = (vars [2] == "True" ? true : false);
 		//Debug.Log ("cutSelf: " + cutSelf.ToString ());
+		if (!int.TryParse(vars[3], out beatsShown)) {
+			throw new FailedToLoadException ("Riff.beatsShown invalid");
+		}
 		int currentBeat = 0; // current beat being loaded in
 		for (int i=3; i<vars.Length && vars[i] != ""; i++) {
 			//Debug.Log ("Parsing " + vars[i]);
@@ -115,13 +120,23 @@ public class Riff {
 		return notes.Count;
 	}
 
+	public bool Lookup (string filename, int pos) {
+		Note temp = new Note(filename);
+		return Lookup (temp, pos);
+	}
+
 	// Returns true is a note is found at a position
 	public bool Lookup (Note newNote, int pos) {
-		//return notes[pos].Contains(newNote);
-		foreach (Note note in notes[pos]) {
-			if (note.sound == newNote.sound) return true;
+		try {
+			//return notes[pos].Contains(newNote);
+			foreach (Note note in notes[pos]) {
+				if (note.sound == newNote.sound) return true;
+			}
+			return false;
+		} catch (ArgumentOutOfRangeException) {
+			Debug.LogError("Tried to access pos "+pos+" in "+notes.Count+"-long riff!");
+			return false;
 		}
-		return false;
 	}
 
 	public void RemoveNote (Note newNote, int pos) {
@@ -193,12 +208,31 @@ public class Riff {
 		return notes.Count;
 	}
 
+	public void ShowMore () {
+		if (beatsShown < MAX_BEATS) {
+			beatsShown += 4;
+			if (beatsShown > notes.Count/(int)Mathf.Pow(2f, MAX_SUBDIVS)) {
+				for (int i=0; i<4*(int)Mathf.Pow(2f, MAX_SUBDIVS); i++) notes.Add(new List<Note>());
+			}
+		}
+		//Debug.Log("bap");
+	}
+
+	public void ShowLess () {
+		if (beatsShown > 4) {
+			beatsShown -= 4;
+		}
+	}
+
+	// FORMAT:
+	// name@instrument@cutSelf@beatsShown@beat@notesatbeat@otherbeat@notesatotherbeat@othernotesatotherbeat
 	public override string ToString () {
 		string result = name;
 		if (copy != 0) result += " (" + copy.ToString() + ")";
 		result += save_load.itemSeparator;
 		result += (string)Enum.GetName (typeof(Instrument), (int)instrument) + save_load.itemSeparator;
-		result += cutSelf.ToString ()+save_load.itemSeparator;
+		result += cutSelf.ToString () + save_load.itemSeparator;
+		result += beatsShown.ToString() + save_load.itemSeparator;
 		for (int i = 0; i < notes.Count; i++) {
 			result += i.ToString() + save_load.itemSeparator;
 			foreach (Note note in notes[i]) {
