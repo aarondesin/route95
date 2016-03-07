@@ -167,6 +167,10 @@ public class MusicManager : MonoBehaviour {
 		}
 	}
 
+	public void SetKey (int key) {
+		currentKey = (Key)key;
+	}
+
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
@@ -309,20 +313,21 @@ public class MusicManager : MonoBehaviour {
 
 
 	// Loads all audio clip paths in soundsToLoad
-	IEnumerator LoadAllAudioClips(List<string> paths) {
+	IEnumerator LoadAllAudioClips(Dictionary<string, List<string>> paths) {
 	//void LoadAllAudioClips (List<string> paths) {
 		//foreach (string path in paths) {
-		int i=0;
-		while (i<Sounds.soundsToLoad.Count) {
-			for (int j=0; j<GameManager.instance.loadingSpeed && i+j<Sounds.soundsToLoad.Count; j++) {
-				LoadAudioClip(paths[i+j]);
+		foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
+			int i=0;
+			while (i<list.Value.Count) {
+				for (int j=0; j<GameManager.instance.loadingSpeed && i+j<list.Value.Count; j++) {
+					LoadAudioClip(list.Value[i+j]);
+				}
+				i+=GameManager.instance.loadingSpeed ;
+				yield return null;
 			}
-			i+=GameManager.instance.loadingSpeed ;
-			yield return null;
+			//foreach (string path in Sounds.soundsToLoad) {
+				//LoadAudioClip  (path);
 		}
-		//foreach (string path in Sounds.soundsToLoad) {
-			//LoadAudioClip  (path);
-			
 		yield return StartCoroutine("SetupExampleRiffs");
 	}
 
@@ -333,7 +338,8 @@ public class MusicManager : MonoBehaviour {
 			Debug.LogError("Failed to load AudioClip at "+path);
 		} else {
 			Debug.Log("Loaded "+path);
-			SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
+			//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
+			SoundClips.Add (path, sound);
 			GameManager.instance.IncrementLoadProgress();
 		}
 	}
@@ -384,19 +390,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Guitar Riff",
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note("ElectricGuitar_E2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note("ElectricGuitar_G#2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note("ElectricGuitar_F#2")},
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#2")},
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () {new Note("ElectricGuitar_A2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
@@ -406,19 +412,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Bass Riff",
 			instrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
-				new List<Note> () { new Note("ElectricBass_E1") },
+				new List<Note> () { new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_E1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("ElectricBass_G#1") },
+				new List<Note> () { new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_G#1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("ElectricBass_B1") },
+				new List<Note> () { new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_B1") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note ("ElectricBass_C#2") },
+				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#2") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
@@ -429,19 +435,19 @@ public class MusicManager : MonoBehaviour {
 			instrument = Instrument.RockDrums,
 			cutSelf = false,
 			notes = new List<List<Note>>() {
-				new List<Note> () { new Note("RockDrums_Kick") },
+				new List<Note> () { new Note("Audio/Instruments/Percussion/RockDrums_Kick") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("RockDrums_Hat") },
+				new List<Note> () { new Note("Audio/Instruments/Percussion/RockDrums_Hat") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note("RockDrums_Snare") },
+				new List<Note> () { new Note("Audio/Instruments/Percussion/RockDrums_Snare") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note ("RockDrums_Hat") },
+				new List<Note> () { new Note ("Audio/Instruments/Percussion/RockDrums_Hat") },
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> ()
@@ -456,13 +462,13 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Guitar Lick",
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note("ElectricGuitar_E2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E2") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () {new Note("ElectricGuitar_A2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
 				new List<Note> () ,
-				new List<Note> () {new Note("ElectricGuitar_B2") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B2") },
 				new List<Note> ()
 			}
 		});
@@ -471,19 +477,19 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Bass Lick",
 			instrument = Instrument.ElectricBass,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note("ElectricBass_F#1") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#1") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () {new Note("ElectricBass_F#1") },
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_F#1") },
 				new List<Note> () ,
-				new List<Note> () {new Note("ElectricBass_A1") },
-				new List<Note> () ,
-				new List<Note> () ,
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_A1") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () {new Note("ElectricBass_C#2") },
+				new List<Note> () ,
+				new List<Note> () ,
+				new List<Note> () {new Note("Audio/Instruments/Melodic/ElectricBass/ElectricBass_C#2") },
 				new List<Note> () ,
 				new List<Note> () ,
 				new List<Note> ()
@@ -494,11 +500,11 @@ public class MusicManager : MonoBehaviour {
 			name = "Example Drums Lick",
 			instrument = Instrument.RockDrums,
 			notes = new List<List<Note>>() {
-				new List<Note> () {new Note("RockDrums_Snare")},
-				new List<Note> () {new Note("RockDrums_Snare")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
 				new List<Note> () ,
 				new List<Note> () ,
-				new List<Note> () { new Note("RockDrums_Hat")},
+				new List<Note> () { new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
 			}
 		});
 		loadedSounds = true;

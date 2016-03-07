@@ -104,29 +104,33 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Initializes a melodic setup menu
 	void InitializeMelodicSetup (MelodicInstrument meloInst) {
+		int i = 0;
 		switch (meloInst) {
-			case MelodicInstrument.ElectricGuitar:
+		case MelodicInstrument.ElectricGuitar:
 			// Make rows of buttons for notes (in a grid)
-			numRows = 7;
+			/*numRows = 7;
 			MakeMelodicButtons ("E2", 0, "ElectricGuitar_E2"); 
 			MakeMelodicButtons ("F#2", 1, "ElectricGuitar_F#2");
 			MakeMelodicButtons ("G#2", 2, "ElectricGuitar_G#2");
 			MakeMelodicButtons ("A2", 3, "ElectricGuitar_A2");
 			MakeMelodicButtons ("B2", 4, "ElectricGuitar_B2");
 			MakeMelodicButtons ("C#3", 5, "ElectricGuitar_C#3");
-			MakeMelodicButtons ("D#3", 6, "ElectricGuitar_D#3");
+			MakeMelodicButtons ("D#3", 6, "ElectricGuitar_D#3");*/
+
+			foreach (string note in KeyManager.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].allNotes) {
+				MakeMelodicButtons (note.Split ('_') [1], i, note);
+				i++;
+			}
 			break;
 
-			case MelodicInstrument.ElectricBass: 
+		case MelodicInstrument.ElectricBass: 
 			// Make rows of buttons for notes (in a grid)
-			numRows = 7;
-			MakeMelodicButtons ("E3", 0, "ElectricBass_E1");
-			MakeMelodicButtons ("F#3", 1, "ElectricBass_F#1");
-			MakeMelodicButtons ("G#3", 2, "ElectricBass_G#1");
-			MakeMelodicButtons ("A3", 3, "ElectricBass_A1");
-			MakeMelodicButtons ("B3", 4, "ElectricBass_B1");
-			MakeMelodicButtons ("C#4", 5, "ElectricBass_C#2");
-			MakeMelodicButtons ("D#4", 6, "ElectricBass_D#2");
+			foreach (string note in KeyManager.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].allNotes) {
+				if (note == null)
+					Debug.Log ("dick");
+				MakeMelodicButtons (note.Split ('_') [1], i, note);
+				i++;
+			}
 			break;
 		}
 	}
