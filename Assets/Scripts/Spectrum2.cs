@@ -31,6 +31,10 @@ public class Spectrum2 : MonoBehaviour {
 		//AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
 		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Hanning);
 		LinInt spectrum = new LinInt (freqDataArray);
+		//add the keypoint again, but in reverse order
+		for (int i = freqDataArray.Length - 1; i >= 0; i--) {
+			spectrum.addKeyPoint (freqDataArray [i]);
+		}
 		for (int i=0; i<numberOfObjects; i++) {
 			//Vector3 previousScale = points[i].GetComponent<Transform>().localScale;
 			//previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;

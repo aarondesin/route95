@@ -58,11 +58,11 @@ public class LinInt {
 		}
 		float startData = keyPoints [bucket];
 		if (bucket == 0) { //if first bucket, set startData to averaged data
-			startData = averagedEnds;
+			//startData = averagedEnds;
 		}
 		float endData = keyPoints [bucket + 1];
 		if (bucket == (keyPoints.Count - 2)) { //if last bucket, set endData to averaged data
-			endData = averagedEnds;
+			//endData = averagedEnds;
 		}
 		float bucketPos = pos % bucketWidth;
 		float DataDifference = endData - startData;

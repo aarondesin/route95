@@ -227,12 +227,12 @@ public class MusicManager : MonoBehaviour {
 				}
 				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
 				//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
-				BeatTimer = 3600f / (float) (maxBeats/4) / tempo;// 3600f = 60 fps * 60 seconds 
+				BeatTimer = (3600f / (float) (maxBeats/4) / tempo) + BeatTimer - (Time.deltaTime * 100f);// 3600f = 60 fps * 60 seconds 
 
 			} else {
 				//BeatTimer--;
-				//BeatTimer -= Time.deltaTime * 100f;
-				BeatTimer -= 1.667f;
+				BeatTimer -= Time.deltaTime * 100f;
+				//BeatTimer -= 1.667f;
 			}
 		} 
 

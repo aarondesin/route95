@@ -8,7 +8,7 @@ public class Spectrum : MonoBehaviour {
 	public int numberOfObjects = 20;
 	public float radius = 5f;
 	public GameObject[]cubes;
-	public float scale = 20f;
+	public float scale = 20000f;
 
 	void Start () {
 		for (int i = 0; i < numberOfObjects; i++) {
@@ -24,12 +24,17 @@ public class Spectrum : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float[] freqDataArray = new float[128];
-		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
+		float[] freqDataArray = new float[64];
+		AudioListener.GetSpectrumData(freqDataArray, 0, FFTWindow.Hanning);
 		LinInt spectrum = new LinInt (freqDataArray);
+		//add the keypoint again, but in reverse order to mirror
+		for (int i = freqDataArray.Length - 1; i >= 0; i--) {
+			spectrum.addKeyPoint (freqDataArray [i]);
+		}
 		for (int i = 0; i < numberOfObjects; i++) {
 			Vector3 previousScale = cubes [i].transform.localScale;
-			previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
+			//previousScale.y = Mathf.Log(Mathf.Abs(spectrum.getDataPoint (i / numberOfObjects)) + 1f) * scale;
+			previousScale.y = spectrum.getDataPoint((float)i/numberOfObjects) * scale;
 			cubes [i].transform.localScale = previousScale;
 		}
 	}
