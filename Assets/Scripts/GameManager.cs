@@ -283,6 +283,15 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	public void EnableLoadProjectPrompt () {
+		LoadProjectPrompt.instance.gameObject.SetActive(true);
+		LoadProjectPrompt.instance.PopulateList();
+	}
+
+	public void DisableLoadProjectPrompt () {
+		LoadProjectPrompt.instance.gameObject.SetActive(false);
+	}
+
 	public void TogglePause () {
 		if (paused) Unpause();
 		else Pause();

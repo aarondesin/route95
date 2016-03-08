@@ -64,15 +64,6 @@ public class SongArrangeSetup : MonoBehaviour {
 		dropdown.Hide();
 	}
 
-	public void EnableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(true);
-		LoadProjectPrompt.instance.PopulateList();
-	}
-
-	public void DisableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(false);
-	}
-
 	public void TogglePlayRiffButton () {
 		if (playRiffButton.GetComponent<Image>().sprite == play) playRiffButton.GetComponent<Image>().sprite = pause;
 		else playRiffButton.GetComponent<Image>().sprite = play;

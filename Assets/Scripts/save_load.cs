@@ -55,7 +55,14 @@ public class save_load : MonoBehaviour {
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open (path, FileMode.Open);
 
+			Song backupSong = MusicManager.instance.currentSong;
+			List<Riff> backupRiffs = MusicManager.instance.riffs;
+			List<SongPiece> backupSongPieces = MusicManager.instance.songPieces;
+			Dictionary<string, SongPiece> backupSongPiecesByName = MusicManager.instance.songPiecesByName;
+
 			try {
+				
+
 				riffdata data = (riffdata)bf.Deserialize (file);
 				Debug.Log (data.songData);
 
@@ -64,9 +71,12 @@ public class save_load : MonoBehaviour {
 				string[] words = data.songData.Split(saveSeparator);
 
 				List<Riff> tempRiffs = LoadRiffs (words [0]);
+				MusicManager.instance.riffs = new List<Riff>();
 				foreach (Riff riff in tempRiffs) MusicManager.instance.AddRiff(riff);
 
 				List<SongPiece> tempSongPieces = LoadSongPieces (words [1]);
+				MusicManager.instance.songPieces = new List<SongPiece>();
+				MusicManager.instance.songPiecesByName = new Dictionary<string, SongPiece>();
 				foreach (SongPiece songPiece in tempSongPieces) MusicManager.instance.AddSongPiece(songPiece);
 					
 				MusicManager.instance.currentSong = LoadSong (words [2]);
@@ -75,6 +85,9 @@ public class save_load : MonoBehaviour {
 				SongTimeline.instance.RefreshTimeline();
 
 				Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
+
+				//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+				GameManager.instance.SwitchToSetup();
 			} catch (SerializationException) {
 				Debug.LogError ("save_load.LoadFile(): Failed to deserialize file, probably empty.");
 				Prompt.instance.PromptMessage("Failed to load project", "File is empty.", "Okay");
@@ -83,6 +96,10 @@ public class save_load : MonoBehaviour {
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
 			} catch (FailedToLoadException f) {
 				Debug.LogError("FailedToLoadException: "+f);
+				MusicManager.instance.currentSong = backupSong;
+				MusicManager.instance.riffs = backupRiffs;
+				MusicManager.instance.songPieces = backupSongPieces;
+				MusicManager.instance.songPiecesByName = backupSongPiecesByName;
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
 			} finally {
 				file.Close ();

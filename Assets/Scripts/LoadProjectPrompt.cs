@@ -21,7 +21,7 @@ public class LoadProjectPrompt : MonoBehaviour {
 
 	static float horizontalPadding = 8f;
 	static float verticalPadding = 4f;
-	static Vector2 buttonSize = new Vector2 (64f, 16f);
+	static Vector2 buttonSize = new Vector2 (360f, 72f);
 
 	void Start () {
 		fileButtons = new List<GameObject>();
@@ -74,9 +74,10 @@ public class LoadProjectPrompt : MonoBehaviour {
 			text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f,0f,0f);
 			text.AddComponent<Text>();
 			text.GetComponent<Text>().text = filename;
-			text.GetComponent<Text>().fontSize = 10;
+			text.GetComponent<Text>().fontSize = 36;
 			text.GetComponent<Text>().color = Color.white;
 			text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+			text.GetComponent<Text>().fontStyle = FontStyle.Bold;
 			text.GetComponent<Text>().alignment = TextAnchor.MiddleLeft;
 
 			button.GetComponent<Button>().onClick.AddListener(()=>{
