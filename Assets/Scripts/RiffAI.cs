@@ -5,7 +5,7 @@ using System.Linq;
 
 public class RiffAI{
 
-	int minimumSimilarityValue = 4;
+	static int minimumSimilarityValue = 4;
 
 	//Compares the given riff to all of the cases in 
 	//melodyCaseList and RhtyhmCaseList, to find the case that
@@ -16,7 +16,7 @@ public class RiffAI{
 	//how similar a riff has to be to be considered similar at all.
 	//This is useful if none of the cases match very well, and you 
 	//want to only highlight hints if you have a good hint.
-	public Riff FindSimilarCase(Riff playerRiff){
+	public static Riff FindSimilarCase(Riff playerRiff){
 		Dictionary<Riff, int> SimilarityDicitonary = new Dictionary<Riff, int>();
 		foreach(Riff caseRiff in CaseLibrary.cases) {
 			//Compare riff in each case to the given riff,
@@ -69,16 +69,23 @@ public class RiffAI{
 	//Then loops forward from that position in the closest case,
 	//until it finds a non-empty note. This non-empty note is the hint
 	//for the next note the player should play.
-	public Note FindHintPosition(Riff closestCase, Riff playerRiff){
+	public static int FindHintPosition(Riff closestCase, Riff playerRiff){
 		int playerPosition = -1;
 		//int i = 16;
 		//foreach(Note note in playerRiff[i]){
-		for (int i = playerRiff.beatsShown*4; i > 0; --i){
+		for (int i = playerRiff.beatsShown*4-1; i >= 0; --i){
 			if (playerRiff.notes[i].Any() == true){
 				playerPosition = i;
 				break;
 			}
 		}
+		return playerPosition;
+	}
+
+	public static Note FindHintPosition (Riff playerRiff) {
+		Riff closestCase = FindSimilarCase(playerRiff);
+		int playerPosition = FindHintPosition (closestCase, playerRiff);
+		return closestCase.notes[playerPosition][0];
 		for (; playerPosition < closestCase.beatsShown*4; ++playerPosition){// replace 16 with a dynamic value from riff class
 			if (closestCase.notes[playerPosition].Any() == true){
 				return closestCase.notes[playerPosition][0];// return note at a specific position still broken

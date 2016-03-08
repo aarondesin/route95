@@ -5026,7 +5026,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &597597303
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10199,8 +10199,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   percussionEmpty: {fileID: 21300000, guid: d48fa44c2cefb824fbecd9abfd4fb125, type: 3}
   percussionFilled: {fileID: 21300000, guid: aa6d2396bd3be5d4792ed1e3d2428bdc, type: 3}
+  percussionSuggested: {fileID: 21300000, guid: 1672d6125f25ee64e8eacb38690d8c62,
+    type: 3}
   melodicEmpty: {fileID: 21300000, guid: f5582dee6883d8c4ab0d378d6e27ac2c, type: 3}
   melodicFilled: {fileID: 21300000, guid: 6fdc995343e68a547886c4a275b9f764, type: 3}
+  melodicSuggested: {fileID: 21300000, guid: 9bea3d96f6e7dc84ea4f43b4b70493cb, type: 3}
   kickIcon: {fileID: 21300000, guid: f5356593675f3fe43b2e4c8c32fd08a2, type: 3}
   snareIcon: {fileID: 21300000, guid: 76b89dab56508d24fb7ece95fd19fecb, type: 3}
   tomIcon: {fileID: 21300000, guid: 63e252b73320a6a49912622d3af5d2c9, type: 3}
