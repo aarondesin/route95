@@ -20,7 +20,8 @@ public class TESTPlayerMovement : MonoBehaviour {
 	void Update () {
 		if (moving)
 			this.transform.Translate (transform.forward * Time.deltaTime * velocity);
-		lights = (Sun.getDaytime() > (Mathf.PI * (7f/8f)) || Sun.getDaytime() <= Mathf.PI * (1f/8f));
+		lights = (Sun.instance.getDaytime() > (Mathf.PI * (7f/8f)) 
+			|| Sun.instance.getDaytime() <= Mathf.PI * (1f/8f));
 		lightRight.GetComponent<Light> ().enabled = lights;
 		lightLeft.GetComponent<Light> ().enabled = lights;
 	}

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Spectrum2 : MonoBehaviour {
+	public static Spectrum2 instance;
 
 	// Use this for initialization
 	public int numberOfObjects = 20;
@@ -12,6 +13,7 @@ public class Spectrum2 : MonoBehaviour {
 	public float scale = 20f;
 
 	void Start () {
+		instance = this;
 
 		points = new Vector3[numberOfObjects];
 		for (int i=0; i<numberOfObjects; i++) {

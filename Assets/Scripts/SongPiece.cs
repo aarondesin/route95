@@ -12,10 +12,12 @@ public class SongPiece {
 
 	// Default constructor makes an empty 1-measure SongPiece
 	public SongPiece () {
+		name = MusicManager.instance.songPieces.Count.ToString();
 		riffs = new List<List<Riff>> () {
 			new List<Riff>()
 		};
 		measures = DEFAULT_MEASURES;
+		//MusicManager.instance.AddSongPieceToSong(this);
 	}
 
 	/*public SongPiece (string newName) {

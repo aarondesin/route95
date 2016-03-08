@@ -285,6 +285,11 @@ public class MusicManager : MonoBehaviour {
 		songPiecesByName.Add(temp.name, temp);
 	}
 
+	public void AddSongPieceToSong (SongPiece songPiece) {
+		AddSongPiece(songPiece);
+		currentSong.songPieces.Add(songPiece);
+	}
+
 	public void QueueLick (Riff lick) {
 		if (lick == null || lickQueue.Count != 0) return;
 		lickQueue.Clear();

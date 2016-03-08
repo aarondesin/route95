@@ -2,9 +2,11 @@
 using System.Collections;
 
 public class Sun : MonoBehaviour {
+	public static Sun instance;
 	// Use this for initialization
 
-	private static float dayTime;
+	[SerializeField]
+	private float dayTime;
 	private float timeScale = 1;
 
 	private float xScale = 10;
@@ -14,11 +16,11 @@ public class Sun : MonoBehaviour {
 	private Color NOON = Color.yellow;
 	private Color DAWN = Color.red;
 	private Color DUSK = Color.red;
-	private Color MIDNIGHT = Color.black;
+	private Color MIDNIGHT = Color.blue;
 
 	private Vector3 sunTarget = new Vector3 (0f, 0f, 0f); // target for the sun to point at: the car or the origin
 
-	public static float getDaytime() {
+	public float getDaytime() {
 		return dayTime;
 	}
 
@@ -47,6 +49,7 @@ public class Sun : MonoBehaviour {
 			float lerpValue = (dayTime - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (MIDNIGHT, DAWN, lerpValue);
 		}
+		Spectrum2.instance.GetComponent<LineRenderer>().material.color = GetComponent<Light>().color;
 	}
 
 	private void updateTime() {
@@ -68,7 +71,8 @@ public class Sun : MonoBehaviour {
 	}
 
 	void Start() {
-		dayTime = 0f;
+		instance = this;
+		dayTime = Random.Range(0, 2*Mathf.PI);
 		this.GetComponent<Light> ().range = 100f;
 		this.GetComponent<Light> ().type = LightType.Directional;
 	}
