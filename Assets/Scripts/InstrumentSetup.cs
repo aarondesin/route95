@@ -94,10 +94,10 @@ public class InstrumentSetup : MonoBehaviour {
 		case PercussionInstrument.RockDrums:
 			// Make rows of buttons for drums
 			numRows = 4;
-			MakePercussionButtons ("Kick", 0, "RockDrums_Kick", kickIcon);
-			MakePercussionButtons ("Snare", 1, "RockDrums_Snare", snareIcon);
-			MakePercussionButtons ("Tom", 2, "RockDrums_Tom", tomIcon);
-			MakePercussionButtons ("Hat", 3, "RockDrums_Hat", hatIcon);
+			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
+			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
+			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
+			MakePercussionButtons ("Hat", 3, "Audio/Instruments/Percussion/RockDrums_Hat", hatIcon);
 			break;
 		}
 	}

@@ -14,10 +14,6 @@ public class Song {
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
 		songPieces = new List<SongPiece>() {
-			new SongPiece() { name = "SongPieceOne" }, 
-			new SongPiece() { name = "SongPieceTwo" }, 
-			new SongPiece() { name = "SongPieceThree" },  
-			new SongPiece() { name = "SongPieceFour" }
 		};
 	}
 
@@ -31,12 +27,19 @@ public class Song {
 		try {
 			string[] vars = loadFile.Split(save_load.itemSeparator);
 			name = vars[0];
-			string[] pieces = vars[1].Split(save_load.noteSeparator);
+			MusicManager.instance.currentKey = (Key)Enum.Parse(typeof (Key), vars[1]);
+			string[] pieces = vars[2].Split(save_load.noteSeparator);
 			foreach (string songPiece in pieces) {
+				if (songPiece.Length == 0) continue;
+				Debug.Log("Finding songpiece "+songPiece+".");
+				songPieces.Add(MusicManager.instance.songPiecesByName[songPiece]);
 			}
 		} catch (IndexOutOfRangeException) {
 			//Debug.LogError("Failed to load song.");
 			throw new FailedToLoadException("Song() given an invalid input.");
+			return;
+		} catch (KeyNotFoundException k) {
+			throw new FailedToLoadException("Song.Song(): unable to find songpiece");
 			return;
 		}
 	}

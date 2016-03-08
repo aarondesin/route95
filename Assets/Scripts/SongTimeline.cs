@@ -17,21 +17,24 @@ public class SongTimeline : MonoBehaviour {
 
 	public GameObject scrollbar;
 
+	float columnWidth;
+	float columnHeight;
+
 	void Start () {
 		instance = this;
 		columns = new List<GameObject>();
+		columnWidth = GetComponent<RectTransform>().rect.width/(float)NUM_COLUMNS;
+		columnHeight = GetComponent<RectTransform>().rect.height;
 	}
 
 	public void MakeColumns () {
 		columns.Clear();
 
-		float columnWidth = GetComponent<RectTransform>().rect.width/(float)NUM_COLUMNS;
-		float columnHeight = GetComponent<RectTransform>().rect.height;
-
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(MusicManager.instance.currentSong.songPieces.Count+1)*columnWidth,
 			columnHeight
 		);
+			
 		for (int i=0; i<MusicManager.instance.currentSong.songPieces.Count; i++) {
 			GameObject column = new GameObject();
 			column.name = "Column"+i;
@@ -98,7 +101,7 @@ public class SongTimeline : MonoBehaviour {
 		columns.Add(addColumnButton);
 	}
 
-	void RefreshTimeline () {
+	public void RefreshTimeline () {
 		while (columns.Count != 0) {
 			GameObject temp = columns[0];
 			Destroy(temp);

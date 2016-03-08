@@ -49,7 +49,7 @@ public class MusicManager : MonoBehaviour {
 	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
 	public List<Riff> riffs = new List<Riff> ();
 	public List<SongPiece> songPieces = new List<SongPiece>();
-	//public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
+	public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
 	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
@@ -271,13 +271,18 @@ public class MusicManager : MonoBehaviour {
 
 	public void AddSongPiece (SongPiece songPiece) {
 		songPieces.Add(songPiece);
+		songPiecesByName.Add(songPiece.name, songPiece);
+		Debug.Log("Loaded songpiece "+songPiece.name);
 		//SongArrangeSetup.instance.Refresh();
 	}
 
 	public void AddSongPieceToSong () {
-		SongPiece temp = new SongPiece();
+		SongPiece temp = new SongPiece() {
+			name = "SongPiece"+songPieces.Count
+		};
 		songPieces.Add(temp);
 		currentSong.songPieces.Add(temp);
+		songPiecesByName.Add(temp.name, temp);
 	}
 
 	public void QueueLick (Riff lick) {
@@ -392,6 +397,7 @@ public class MusicManager : MonoBehaviour {
 	public void Clear () {
 		riffs.Clear();
 		songPieces.Clear();
+		songPiecesByName.Clear();
 	}
 
 	//public void SetupExampleRiffs () {

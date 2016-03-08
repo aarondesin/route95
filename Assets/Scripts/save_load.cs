@@ -62,18 +62,17 @@ public class save_load : MonoBehaviour {
 
 				// Split file into input for all three load processes
 				string[] words = data.songData.Split(saveSeparator);
-				List<Riff> tempRiffs = LoadRiffs (words [0]);
-				List<SongPiece> tempSongPieces = LoadSongPieces (words [1]);
-				Song tempSong = LoadSong (words [2]);
 
-				//MusicManager.instance.riffs.AddRange(tempRiffs);
-				foreach (Riff riff in tempRiffs) {
-					MusicManager.instance.AddRiff(riff);
-				}
-				MusicManager.instance.songPieces.AddRange(tempSongPieces);
-				MusicManager.instance.currentSong = tempSong;
+				List<Riff> tempRiffs = LoadRiffs (words [0]);
+				foreach (Riff riff in tempRiffs) MusicManager.instance.AddRiff(riff);
+
+				List<SongPiece> tempSongPieces = LoadSongPieces (words [1]);
+				foreach (SongPiece songPiece in tempSongPieces) MusicManager.instance.AddSongPiece(songPiece);
+					
+				MusicManager.instance.currentSong = LoadSong (words [2]);
 
 				SongArrangeSetup.instance.Refresh();
+				SongTimeline.instance.RefreshTimeline();
 
 				Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
 			} catch (SerializationException) {
@@ -125,10 +124,10 @@ public class save_load : MonoBehaviour {
 		List<SongPiece> temp = new List<SongPiece>();
 		int loadedSongPiecesCounter = 0;
 		foreach (string songPiece in songPieces) {
-			if (songPiece.Length == 0) break;
+			if (songPiece.Length == 0 || songPiece == "") break;
 			loadedSongPiecesCounter++;
-			temp.Add(new SongPiece(songPiece));
-			//MusicManager.instance.AddSongPiece (new SongPiece(songPiece));
+			SongPiece sp = new SongPiece(songPiece);
+			temp.Add(sp);
 		}
 		Debug.Log("Loaded "+loadedSongPiecesCounter+" song pieces.");
 		return temp;
