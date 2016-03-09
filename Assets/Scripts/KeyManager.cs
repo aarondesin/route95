@@ -11,6 +11,10 @@ public class KeyManager : MonoBehaviour {
 
 	void Start () {
 		instance = this;
+
+	}
+
+	public void BuildScales () {
 		scales = new Dictionary<Key, Dictionary<Instrument, Scale>> () { 
 			{ Key.Eminor, new Dictionary<Instrument,Scale> () {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 0 ) },
@@ -28,43 +32,43 @@ public class KeyManager : MonoBehaviour {
 				// Add root/octave
 				result.root.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add second
 				i += scale.secondIndex;
 				result.second.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add third
 				i += scale.thirdIndex;
 				result.third.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add fourth
 				i += scale.fourthIndex;
 				result.fourth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add fifth
 				i += scale.fifthIndex;
 				result.fifth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add sixth
 				i += scale.sixthIndex;
 				result.sixth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add seventh
 				i += scale.seventhIndex;
 				result.seventh.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				Debug.Log("Adding "+soundFiles[i]);
+				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Go to next octave
 				i += scale.rootIndex;

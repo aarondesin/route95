@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour {
 
 	public bool paused = false;
 	bool initialized = false;
-	int loadPhase = 0;
+	int loadPhase = -1;
 	float startLoadTime;
 	public int loadProgress = 0;
 	int loadValue = 0;
@@ -127,6 +127,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void LoadNext() {
+		loadPhase++;
 		switch (loadPhase) {
 		case 0:
 			MusicManager.instance.Load();
@@ -139,7 +140,6 @@ public class GameManager : MonoBehaviour {
 			FinishLoading();
 			break;
 		}
-		loadPhase++;
 	}
 		
 	public void IncrementLoadProgress() {
