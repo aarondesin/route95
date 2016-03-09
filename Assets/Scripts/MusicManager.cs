@@ -166,7 +166,7 @@ public class MusicManager : MonoBehaviour {
 		OneShot.Stop();
 	}
 
-	void Update(){
+	void FixedUpdate(){
 		if (playing && !GameManager.instance.paused) {
 			if (BeatTimer <= 0f) {
 				switch (GameManager.instance.currentMode) {
