@@ -12,6 +12,8 @@ public class InputManager : MonoBehaviour {
 		{ KeyCode.Alpha3, Instrument.ElectricBass }
 	};
 
+	public Dictionary<Instrument, AudioClip> instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>();
+
 	// List of mapped keys for instruments, so that the program knows what to check for
 	public static List<KeyCode> mappedInstruments = new List<KeyCode>() {
 		KeyCode.Alpha1,
@@ -29,6 +31,11 @@ public class InputManager : MonoBehaviour {
 
 	void Start () {
 		instance = this;
+		instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>() {
+			{Instrument.RockDrums, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums")},
+			{Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
+			{Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
+		};
 	}
 
 	void Update () {
@@ -72,9 +79,12 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void SwitchInstrument (Instrument instrument) {
-		MusicManager.instance.currentInstrument = instrument;
-		Debug.Log (MusicManager.instance.currentInstrument);
-		InstrumentDisplay.instance.Refresh();
+		if (instrument != MusicManager.instance.currentInstrument) {
+			MusicManager.instance.currentInstrument = instrument;
+			MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(instrumentSwitchSounds[instrument]);
+			Debug.Log (MusicManager.instance.currentInstrument);
+			InstrumentDisplay.instance.Refresh();
+		}
 	}
 
 	void PlayLick (Riff lick) {

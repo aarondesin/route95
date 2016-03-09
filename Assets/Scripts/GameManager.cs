@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
+	public Font font;
+
 	// Parent objects for all menu UI objects
 	public GameObject mainMenu;
 	public GameObject keySelectMenu;
@@ -48,6 +50,8 @@ public class GameManager : MonoBehaviour {
 	public GameObject systemButtons; // "Settings" and "Exit"
 	public Image livePlayQuitPrompt; // "Exit"
 	public GameObject liveIcons;
+	public GameObject songProgressBar;
+	public GameObject loopIcon;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject loadingMessage;
 
 	public GameObject tooltip;
+	public float tooltipDistance;
 
 	public Dictionary<Menu, GameObject> menus; 
 		
@@ -78,8 +83,7 @@ public class GameManager : MonoBehaviour {
 	public int loadProgress = 0;
 	int loadValue = 0;
 
-	Vector2 tooltipFlipZoneMin = new Vector2 (-800f, -500f);
-	Vector2 tooltipFlipZoneMax = new Vector2 (800f, 500f);
+	bool hasShownLiveHelp = false;
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
@@ -116,6 +120,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(pauseMenu);
 		DisableMenu(liveIcons);
 		DisableMenu(tooltip);
+		DisableMenu(songProgressBar);
 		SwitchToMenu(Menu.Main);
 		Load();
 		//StartCoroutine("Load");
@@ -180,24 +185,32 @@ public class GameManager : MonoBehaviour {
 					//fadeTimer = fadeWaitTime;
 					WakeLiveUI();
 					prevMouse = Input.mousePosition;
-				} else if (fadeTimer <= 0f) {
-						temp.a -= fadeSpeed;
 				} else {
-						fadeTimer--;
-				}
-				livePlayQuitPrompt.color = temp;
-				foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
-					image.color = temp;
-					image.GetComponentInChildren<Text>().color = temp;
+						if (fadeTimer <= 0f) {
+							temp.a -= fadeSpeed;
+					} else {
+							fadeTimer--;
+					}
+					livePlayQuitPrompt.color = temp;
+					foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
+						image.color = temp;
+						if(image.GetComponentInChildren<Text>())
+							image.GetComponentInChildren<Text>().color = temp;
+					}
 				}
 			}
 		} else {
 			if (tooltip.activeSelf) {
-				//Debug.Log(Input.mousePosition.x);
-				tooltip.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-					(Input.mousePosition.x > tooltipFlipZoneMax.x ? 
-						tooltipFlipZoneMax.x : (Input.mousePosition.x < tooltipFlipZoneMin.x ? tooltipFlipZoneMin.x : Input.mousePosition.x)),
-					(Input.mousePosition.y > tooltipFlipZoneMax.y ? tooltipFlipZoneMax.y : (Input.mousePosition.y < tooltipFlipZoneMin.y ? tooltipFlipZoneMin.y : Input.mousePosition.y)),
+				RectTransform tr = tooltip.GetComponent<RectTransform>();
+				Vector2 realPosition = new Vector2 (
+					Input.mousePosition.x / Screen.width * ((RectTransform)tr.parent).rect.width, 
+					Input.mousePosition.y / Screen.height * ((RectTransform)tr.parent).rect.height
+				);
+				tr.anchoredPosition3D = new Vector3 (
+					(realPosition.x > 0.5f*Screen.width ?
+						realPosition.x-tr.rect.width/2f-tooltipDistance : realPosition.x+tr.rect.width/2f+tooltipDistance),
+					(realPosition.y > 0.5f*Screen.height ? 
+						realPosition.y-tr.rect.height/2f-tooltipDistance : realPosition.x+tr.rect.height/2f+tooltipDistance),
 					0f
 				);
 			}
@@ -230,6 +243,14 @@ public class GameManager : MonoBehaviour {
 		MusicManager.instance.currentSong.CompileSong();
 		Debug.Log (MusicManager.instance.currentSong.ToString ());
 		EnableMenu(liveIcons);
+		EnableMenu(songProgressBar);
+		if (MusicManager.instance.loopSong) EnableMenu(loopIcon);
+		else DisableMenu(loopIcon);
+
+		if (!hasShownLiveHelp) {
+			ShowLiveHelp();
+			hasShownLiveHelp = true;
+		}
 
 		//sets player to moving
 		TESTPlayerMovement.moving = true;
@@ -255,6 +276,8 @@ public class GameManager : MonoBehaviour {
 		SwitchToMenu (Menu.SongArrange);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewRadio);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
+		TESTPlayerMovement.moving = false;
+		DisableMenu(loopIcon);
 	}
 
 	// Returns to key selection
@@ -265,6 +288,8 @@ public class GameManager : MonoBehaviour {
 		SwitchToMenu (Menu.KeySelect);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewOutsideCar);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
+		TESTPlayerMovement.moving = false;
+		DisableMenu(loopIcon);
 	}
 		
 	// Toggle visibility of system buttons
@@ -289,10 +314,13 @@ public class GameManager : MonoBehaviour {
 
 	public void WakeLiveUI () {
 		fadeTimer = fadeWaitTime;
-		livePlayQuitPrompt.color = Color.white;
+		Color color = Color.white;
+		color.a = 1f;
+		livePlayQuitPrompt.color = color;
 		foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
-			image.color = Color.white;
-			image.GetComponentInChildren<Text>().color = Color.white;
+			image.color = color;
+			if (image.GetComponentInChildren<Text>())
+				image.GetComponentInChildren<Text>().color = color;
 		}
 	}
 
@@ -352,6 +380,11 @@ public class GameManager : MonoBehaviour {
 
 	public void Exit () {
 		Application.Quit();
+	}
+
+	public void ShowLiveHelp() {
+		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys Q to play with those instruments (more in the final version!)", "Okay");
+		Pause();
 	}
 		
 }

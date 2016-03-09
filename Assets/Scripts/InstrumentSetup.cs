@@ -250,7 +250,8 @@ public class InstrumentSetup : MonoBehaviour {
 		text.AddComponent<Text>();
 		text.GetComponent<Text>().text = title;
 		text.GetComponent<Text>().fontSize = 36;
-		text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+		text.GetComponent<Text>().font = GameManager.instance.font;
+		text.GetComponent<Text>().fontStyle = FontStyle.Normal;
 		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
 		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);

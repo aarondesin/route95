@@ -81,7 +81,7 @@ public class SongTimeline : MonoBehaviour {
 
 		addColumnButton.AddComponent<RectTransform>();
 		addColumnButton.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		addColumnButton.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth/2f, columnHeight/2f);
+		addColumnButton.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth/3f, columnHeight/3f);
 		addColumnButton.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 		addColumnButton.GetComponent<RectTransform>().anchorMin = new Vector2 (1f, 0f);
 		addColumnButton.GetComponent<RectTransform>().anchorMax = new Vector2 (1f, 0f);
@@ -132,9 +132,9 @@ public class SongTimeline : MonoBehaviour {
 			label.AddComponent<Text>();
 			label.GetComponent<Text>().text = riff.name;
 			label.GetComponent<Text>().color = Color.white;
-			label.GetComponent<Text>().fontStyle = FontStyle.Bold;
-			label.GetComponent<Text>().fontSize = 4;
-			label.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+			label.GetComponent<Text>().fontStyle = FontStyle.Normal;
+			label.GetComponent<Text>().fontSize = 5;
+			label.GetComponent<Text>().font = GameManager.instance.font;
 			label.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
 			label.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.0f);
 			label.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.0f);
