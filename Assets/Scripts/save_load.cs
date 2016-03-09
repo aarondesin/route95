@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEditor;
 using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [Serializable]
 public class FailedToLoadException: ApplicationException {

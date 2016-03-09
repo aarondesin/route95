@@ -1,9 +1,11 @@
-using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class Note {
 	static float DEFAULT_VOLUME = 1f;

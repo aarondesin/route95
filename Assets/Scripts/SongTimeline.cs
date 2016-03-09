@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class SongTimeline : MonoBehaviour {
 

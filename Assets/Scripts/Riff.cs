@@ -1,9 +1,12 @@
-using UnityEditor;
 using UnityEngine;
 using System; // for enum stuff
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class Riff {
 	public static int MAX_SUBDIVS = 2;

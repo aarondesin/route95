@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public enum Menu {
 	None,

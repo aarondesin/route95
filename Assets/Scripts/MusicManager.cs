@@ -1,9 +1,12 @@
-using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 using System.IO; // need for path operations
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // All percussion instruments
 public enum PercussionInstrument {
