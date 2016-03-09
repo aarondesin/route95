@@ -17,6 +17,7 @@ public class SongPiece {
 			new List<Riff>()
 		};
 		measures = DEFAULT_MEASURES;
+		MusicManager.instance.AddSongPiece(this);
 		//MusicManager.instance.AddSongPieceToSong(this);
 	}
 

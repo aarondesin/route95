@@ -94,6 +94,9 @@ public class save_load : MonoBehaviour {
 			} catch (EndOfStreamException) {
 				Debug.LogError ("save_load.LoadFile(): Attempted to read past end of stream, file is wrong format?");
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} catch (ArgumentException) {
+				Debug.LogError ("save_load.LoadFile(): Failed to load a riff or song piece. Already exists?");
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
 			} catch (FailedToLoadException f) {
 				Debug.LogError("FailedToLoadException: "+f);
 				MusicManager.instance.currentSong = backupSong;

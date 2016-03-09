@@ -270,9 +270,10 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void AddSongPiece (SongPiece songPiece) {
+		//Debug.Log("Adding "+songPiece.name);
 		songPieces.Add(songPiece);
 		songPiecesByName.Add(songPiece.name, songPiece);
-		Debug.Log("Loaded songpiece "+songPiece.name);
+		//Debug.Log("Loaded songpiece "+songPiece.name);
 		//SongArrangeSetup.instance.Refresh();
 	}
 
