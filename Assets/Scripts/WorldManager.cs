@@ -29,7 +29,6 @@ public class WorldManager : MonoBehaviour {
 	public float LIGHT_Z_SCALE;
 
 	public GameObject player;
-	public GameObject camera;
 	public AudioListener audioOut;
 
 	private DynamicTerrain terrain;
@@ -48,8 +47,8 @@ public class WorldManager : MonoBehaviour {
 
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE, VERT_HEIGHT_SCALE);
 
-		sun = createSun();
-		audioOut = camera.GetComponent<AudioListener> ();
+		createSun();
+		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
@@ -130,7 +129,7 @@ public class WorldManager : MonoBehaviour {
 		}
 	}
 
-	GameObject createSun(){
+	void createSun(){
 		GameObject sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
 		sun.AddComponent<Sun> ();
@@ -138,7 +137,6 @@ public class WorldManager : MonoBehaviour {
 			sun.GetComponent<Sun> ().setTimeScale (TIME_SCALE);
 		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
-		return sun;
 	}
 		
 	// Attempts to place a single decoration

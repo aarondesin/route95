@@ -38,7 +38,10 @@ public class InputManager : MonoBehaviour {
 			} else {
 				// Check for instruments switch
 				foreach (KeyCode key in mappedInstruments) {
-					if (Input.GetKeyDown(key)) SwitchInstrument(keyToInstrument[key]);
+					if (Input.GetKeyDown(key)) {
+						SwitchInstrument(keyToInstrument[key]);
+						GameManager.instance.WakeLiveUI();
+					}
 				}
 				// Check for playing lick
 				foreach (KeyCode key2 in mappedLicks) {

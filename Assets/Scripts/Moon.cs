@@ -29,7 +29,7 @@ public class Moon : MonoBehaviour {
 	}
 
 	private void updateColor() {
-		Light light = this.GetComponent<Light>();
+		//Light light = this.GetComponent<Light>();
 
 		if ((dayTime >= 0) && (dayTime < (Mathf.PI / 2))) {
 			float lerpValue = dayTime / (Mathf.PI / 2);

@@ -87,7 +87,7 @@ public class TerrainGeneration : MonoBehaviour {
 		
 	//create terrain gameobject with mesh
 	GameObject createTerrain (Vector3[] vertices, Vector2[] UVcoords, int[] triangles) {
-		GameObject terrain = new GameObject ("terrain", typeof(MeshFilter), typeof(MeshRenderer));
+		terrain = new GameObject ("terrain", typeof(MeshFilter), typeof(MeshRenderer));
 		terrain.transform.position = new Vector3 (-SIZE/2, 0, -SIZE/2);
 
 		//mesh filter stuff

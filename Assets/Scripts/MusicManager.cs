@@ -89,8 +89,6 @@ public class MusicManager : MonoBehaviour {
 
 		currentSong = new Song ();
 
-		OneShot = gameObject.AddComponent<AudioSource>();
-
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 	}
 
@@ -166,7 +164,8 @@ public class MusicManager : MonoBehaviour {
 		playing = false;
 		loop = false;
 		beat = 0;
-		OneShot.Stop();
+		instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
+		//OneShot.Stop();
 	}
 
 	void FixedUpdate(){

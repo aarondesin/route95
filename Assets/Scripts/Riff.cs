@@ -174,7 +174,7 @@ public class Riff {
 		notes [pos].Add (newNote);
 		//Debug.Log (newNote.ToString());
 		//Debug.Log(this.ToString());
-		MusicManager.instance.PlayOneShot(newNote.sound);
+		MusicManager.instance.instrumentAudioSources[instrument].PlayOneShot(newNote.sound);
 		//Debug.Log ("added note");
 	}
 	public void PlayRiffLoop (AudioClip clip) {

@@ -85,7 +85,7 @@ public class RiffAI{
 	public static Note FindHintPosition (Riff playerRiff) {
 		Riff closestCase = FindSimilarCase(playerRiff);
 		int playerPosition = FindHintPosition (closestCase, playerRiff);
-		return closestCase.notes[playerPosition][0];
+		//return closestCase.notes[playerPosition][0];
 		for (; playerPosition < closestCase.beatsShown*4; ++playerPosition){// replace 16 with a dynamic value from riff class
 			if (closestCase.notes[playerPosition].Any() == true){
 				return closestCase.notes[playerPosition][0];// return note at a specific position still broken

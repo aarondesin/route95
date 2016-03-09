@@ -47,11 +47,14 @@ public class GameManager : MonoBehaviour {
 	// Parent objects for universal system buttons
 	public GameObject systemButtons; // "Settings" and "Exit"
 	public Image livePlayQuitPrompt; // "Exit"
+	public GameObject liveIcons;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;
 	public GameObject loadingBar;
 	public GameObject loadingMessage;
+
+	public GameObject tooltip;
 
 	public Dictionary<Menu, GameObject> menus; 
 		
@@ -64,6 +67,7 @@ public class GameManager : MonoBehaviour {
 	// Icon fading vars
 	public float fadeWaitTime;
 	public float fadeSpeed;
+	[SerializeField]
 	float fadeTimer;
 	Vector3 prevMouse = new Vector3 (0f,0f,0f);
 
@@ -73,6 +77,9 @@ public class GameManager : MonoBehaviour {
 	float startLoadTime;
 	public int loadProgress = 0;
 	int loadValue = 0;
+
+	Vector2 tooltipFlipZoneMin = new Vector2 (-800f, -500f);
+	Vector2 tooltipFlipZoneMax = new Vector2 (800f, 500f);
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
@@ -107,6 +114,8 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(loadProjectPrompt);
 		DisableMenu(prompt);
 		DisableMenu(pauseMenu);
+		DisableMenu(liveIcons);
+		DisableMenu(tooltip);
 		SwitchToMenu(Menu.Main);
 		Load();
 		//StartCoroutine("Load");
@@ -167,21 +176,33 @@ public class GameManager : MonoBehaviour {
 			if (!paused) {
 				Color temp = livePlayQuitPrompt.color;
 				if (prevMouse != Input.mousePosition) {
-					temp.a = 1f;
-					livePlayQuitPrompt.color = temp;
-					fadeTimer = fadeWaitTime;
+					//temp.a = 1f;
+					//fadeTimer = fadeWaitTime;
+					WakeLiveUI();
 					prevMouse = Input.mousePosition;
-				} else {
-					if (fadeTimer <= 0f) {
+				} else if (fadeTimer <= 0f) {
 						temp.a -= fadeSpeed;
-						livePlayQuitPrompt.color = temp;
-					} else {
+				} else {
 						fadeTimer--;
-					}
+				}
+				livePlayQuitPrompt.color = temp;
+				foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
+					image.color = temp;
+					image.GetComponentInChildren<Text>().color = temp;
 				}
 			}
 		} else {
+			if (tooltip.activeSelf) {
+				//Debug.Log(Input.mousePosition.x);
+				tooltip.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
+					(Input.mousePosition.x > tooltipFlipZoneMax.x ? 
+						tooltipFlipZoneMax.x : (Input.mousePosition.x < tooltipFlipZoneMin.x ? tooltipFlipZoneMin.x : Input.mousePosition.x)),
+					(Input.mousePosition.y > tooltipFlipZoneMax.y ? tooltipFlipZoneMax.y : (Input.mousePosition.y < tooltipFlipZoneMin.y ? tooltipFlipZoneMin.y : Input.mousePosition.y)),
+					0f
+				);
+			}
 			livePlayQuitPrompt.color = Color.white;
+			//livePlayQuitPrompt.color = Color.white;
 		}
 	}
 		
@@ -208,6 +229,7 @@ public class GameManager : MonoBehaviour {
 		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.currentSong.CompileSong();
 		Debug.Log (MusicManager.instance.currentSong.ToString ());
+		EnableMenu(liveIcons);
 
 		//sets player to moving
 		TESTPlayerMovement.moving = true;
@@ -265,6 +287,15 @@ public class GameManager : MonoBehaviour {
 		addRiffPrompt.SetActive(false);
 	}
 
+	public void WakeLiveUI () {
+		fadeTimer = fadeWaitTime;
+		livePlayQuitPrompt.color = Color.white;
+		foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
+			image.color = Color.white;
+			image.GetComponentInChildren<Text>().color = Color.white;
+		}
+	}
+
 	// Shows a menu
 	void EnableMenu (GameObject menuObject) {
 		menuObject.SetActive(true);
@@ -284,6 +315,15 @@ public class GameManager : MonoBehaviour {
 			Pause();
 			break;
 		}
+	}
+
+	public void ShowTooltip (string message) {
+		tooltip.SetActive(true);
+		tooltip.GetComponent<Text>().text = message;
+	}
+
+	public void HideTooltip () {
+		tooltip.SetActive(false);
 	}
 
 	public void EnableLoadProjectPrompt () {

@@ -35,7 +35,7 @@ public class Sun : MonoBehaviour {
 	}
 
 	private void updateColor() {
-		Light light = this.GetComponent<Light>();
+		//Light light = this.GetComponent<Light>();
 		if ((dayTime >= 0) && (dayTime < (Mathf.PI / 2))) {
 			float lerpValue = dayTime / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (DAWN, NOON, lerpValue);

@@ -49,7 +49,7 @@ public class LinInt {
 		float data = 0f;
 		int bucket = 0;
 		float bucketWidth = 1f / (keyPoints.Count - 1);
-		float step = 0f;
+		//float step = 0f;
 
 		//get appropriate bucket
 		bucket = (int)Mathf.Floor(pos/bucketWidth);

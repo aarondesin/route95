@@ -25,7 +25,6 @@ public class Song {
 		if (loadFile.Length == 0) {
 			//Debug.LogError("Failed to load song.");
 			throw new FailedToLoadException("Song() given an empty string.");
-			return;
 		}
 
 		try {
@@ -41,10 +40,8 @@ public class Song {
 		} catch (IndexOutOfRangeException) {
 			//Debug.LogError("Failed to load song.");
 			throw new FailedToLoadException("Song() given an invalid input.");
-			return;
-		} catch (KeyNotFoundException k) {
+		} catch (KeyNotFoundException) {
 			throw new FailedToLoadException("Song.Song(): unable to find songpiece");
-			return;
 		}
 	}
 
