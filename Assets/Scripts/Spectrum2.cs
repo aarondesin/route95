@@ -11,6 +11,7 @@ public class Spectrum2 : MonoBehaviour {
 	public float radius;
 	public Vector3[] points;
 	public float scale = 20f;
+	public float opacity;
 
 	void Start () {
 		instance = this;

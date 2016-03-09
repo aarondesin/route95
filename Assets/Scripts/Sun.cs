@@ -49,7 +49,9 @@ public class Sun : MonoBehaviour {
 			float lerpValue = (dayTime - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
 			this.GetComponent<Light> ().color = Color.Lerp (MIDNIGHT, DAWN, lerpValue);
 		}
-		Spectrum2.instance.GetComponent<LineRenderer>().material.color = GetComponent<Light>().color;
+		Color temp = new Color (this.GetComponent<Light> ().color.r, this.GetComponent<Light> ().color.g, this.GetComponent<Light> ().color.b, Spectrum2.instance.opacity);
+		Spectrum2.instance.GetComponent<LineRenderer>().SetColors( temp, temp);
+		Spectrum2.instance.GetComponent<LineRenderer>().material.color = temp;
 	}
 
 	private void updateTime() {

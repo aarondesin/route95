@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -66,8 +67,8 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
 		}
-		scrollBarH.value = 0f;
-		scrollBarV.value = 1f;
+		scrollBarH.value = 0.01f;
+		scrollBarV.value = 0.99f;
 		playRiffButton.GetComponent<Image>().sprite = play;
 		UpdateBeatsText();
 	}
@@ -77,6 +78,7 @@ public class InstrumentSetup : MonoBehaviour {
 		foreach (GameObject button in buttons) {
 			Destroy(button);
 		}
+		buttons.Clear();
 	}
 
 	public void MakeBeatNumbers () {
@@ -96,7 +98,6 @@ public class InstrumentSetup : MonoBehaviour {
 		switch (percInst) {
 		case PercussionInstrument.RockDrums:
 			// Make rows of buttons for drums
-			numRows = 4;
 			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
 			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
 			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
@@ -133,7 +134,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
-		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
@@ -332,13 +333,16 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void Suggest (GameObject button) {
-		//if (button == null) Debug.Log("fuck", button);
-		//if (button.GetComponent<Image>() == null) Debug.Log("fuck", button);
-		Sprite img = button.GetComponent<Image>().sprite;
-		if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
-			button.GetComponent<Image>().sprite = percussionSuggested;
-		} else if (img != melodicFilled) {
-			button.GetComponent<Image>().sprite  = melodicSuggested;
+		try {
+			Sprite img = button.GetComponent<Image>().sprite;
+			if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
+				button.GetComponent<Image>().sprite = percussionSuggested;
+			} else if (currentRiff.instrument != Instrument.RockDrums && img != melodicFilled) {
+				button.GetComponent<Image>().sprite  = melodicSuggested;
+			}
+		} catch (NullReferenceException) {
+			Debug.LogError("Suggestion threw an NRE.");
+			return;
 		}
 	}
 }
