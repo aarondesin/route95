@@ -176,7 +176,7 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);
-				Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
+				// (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
@@ -221,7 +221,7 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
-				Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
+				//Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);

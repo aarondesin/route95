@@ -466,6 +466,21 @@ public class MusicManager : MonoBehaviour {
 				}
 			});
 
+			licks[Instrument.ElectricGuitar].Add (new Riff () {
+				name = "Example Guitar Lick2",
+				instrument = Instrument.ElectricGuitar,
+				notes = new List<List<Note>>() {
+					new List<Note> () { new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].third[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].third[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].fifth[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].fifth[0]) },
+					new List<Note> () { new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].sixth[0]) },
+					new List<Note> ()
+				}
+			});
 			licks[Instrument.ElectricBass].Add (new Riff () {
 				name = "Example Bass Lick",
 				instrument = Instrument.ElectricBass,
@@ -489,6 +504,30 @@ public class MusicManager : MonoBehaviour {
 				}
 			});
 
+			licks[Instrument.ElectricBass].Add (new Riff () {
+				name = "Example Bass Lick2",
+				instrument = Instrument.ElectricBass,
+				notes = new List<List<Note>>() {
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].root[1]) },
+					new List<Note> () ,
+					new List<Note> () ,
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].sixth[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].sixth[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].sixth[0]) },
+					new List<Note> () ,
+					new List<Note> () ,
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].sixth[0]) },
+					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].third[0]) },
+					new List<Note> ()
+				}
+			});
+
+
 			licks[Instrument.RockDrums].Add (new Riff () {
 				name = "Example Drums Lick",
 				instrument = Instrument.RockDrums,
@@ -501,6 +540,24 @@ public class MusicManager : MonoBehaviour {
 					new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Tom")},
 					new List<Note> () { new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
 					new List<Note>()
+				}
+			});
+
+			licks[Instrument.RockDrums].Add (new Riff () {
+				name = "Example Drums Lick2",
+				instrument = Instrument.RockDrums,
+				notes = new List<List<Note>>() {
+					new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
+					new List<Note> (){new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
+					new List<Note> ()  ,
+					new List<Note> () ,
+					new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Tom")},
+					new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Tom")},
+					new List<Note> () ,
+					new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+					new List<Note> () ,
+					new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Hat")}
+
 				}
 			});
 			loadedExamples = true;
