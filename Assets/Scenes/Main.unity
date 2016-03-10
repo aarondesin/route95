@@ -3722,7 +3722,8 @@ AudioSource:
   m_GameObject: {fileID: 371512236}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24351584, guid: 2dbea7de93a125d47923dff86540da43,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: fd0da689c8d373e498b592126e9b7575, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3
@@ -11870,7 +11871,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.500061, y: -8.5}
+  m_AnchoredPosition: {x: -849, y: -431}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -11904,7 +11905,7 @@ MonoBehaviour:
   play: {fileID: 21300000, guid: 5a63a9880030c94469da624501f0a408, type: 3}
   pause: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
   beatsText: {fileID: 872671699}
-  tempoText: {fileID: 23320237}
+  tempoText: {fileID: 0}
 --- !u!1 &1277712144
 GameObject:
   m_ObjectHideFlags: 0
@@ -15928,6 +15929,7 @@ MonoBehaviour:
   currentKey: 3
   currentInstrument: 0
   loopSong: 0
+  mixer: {fileID: 24100000, guid: 2dbea7de93a125d47923dff86540da43, type: 2}
   OneShot: {fileID: 0}
   LoopRiff: {fileID: 0}
   tempo: 0
