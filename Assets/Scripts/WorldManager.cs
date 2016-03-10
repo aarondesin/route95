@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityStandardAssets.ImageEffects;
 
 public class WorldManager : MonoBehaviour {
 	public static WorldManager instance;
@@ -137,6 +138,7 @@ public class WorldManager : MonoBehaviour {
 			sun.GetComponent<Sun> ().setTimeScale (TIME_SCALE);
 		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
+		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 	}
 		
 	// Attempts to place a single decoration
