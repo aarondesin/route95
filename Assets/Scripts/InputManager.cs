@@ -40,8 +40,12 @@ public class InputManager : MonoBehaviour {
 
 	void Update () {
 		if (GameManager.instance.currentMode == Mode.Live) {
-			if (Input.GetKeyDown(KeyCode.Escape)) {
-				GameManager.instance.TogglePause();
+			if (Input.GetKeyDown (KeyCode.Escape)) {
+				GameManager.instance.TogglePause ();
+			} else if (Input.GetKeyDown (KeyCode.UpArrow)) {
+				MusicManager.instance.IncreaseTempo ();
+			} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
+				MusicManager.instance.DecreaseTempo ();
 			} else {
 				// Check for instruments switch
 				foreach (KeyCode key in mappedInstruments) {
