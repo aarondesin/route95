@@ -18,11 +18,13 @@ public class TESTPlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (moving && !GameManager.instance.paused)
-			this.transform.Translate (transform.forward * Time.deltaTime * velocity);
-		lights = (Sun.instance.getDaytime() > (Mathf.PI * (7f/8f)) 
-			|| Sun.instance.getDaytime() <= Mathf.PI * (1f/8f));
-		lightRight.GetComponent<Light> ().enabled = lights;
-		lightLeft.GetComponent<Light> ().enabled = lights;
+		if (Sun.instance != null) {
+			if (moving && !GameManager.instance.paused && Sun.instance != null)
+				this.transform.Translate (transform.forward * Time.deltaTime * velocity);
+			lights = (Sun.instance.getDaytime () > (Mathf.PI * (7f / 8f))
+			|| Sun.instance.getDaytime () <= Mathf.PI * (1f / 8f));
+			lightRight.GetComponent<Light> ().enabled = lights;
+			lightLeft.GetComponent<Light> ().enabled = lights;
+		}
 	}
 }
