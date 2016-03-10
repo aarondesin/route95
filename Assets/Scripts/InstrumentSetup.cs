@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class InstrumentSetup : MonoBehaviour {
+
+	public RiffAI riffai;
+	public bool DICKSAUCE;
 
 	// Icons for percussion setup buttons
 	public Sprite percussionEmpty;
@@ -47,6 +49,8 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void Start () {
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
+		riffai = new RiffAI ();
+		DICKSAUCE = true;
 	}
 
 	// Calls appropriate Setup() function based on current instrument
@@ -67,8 +71,8 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
 		}
-		scrollBarH.value = 0.01f;
-		scrollBarV.value = 0.99f;
+		scrollBarH.value = 0f;
+		scrollBarV.value = 1f;
 		playRiffButton.GetComponent<Image>().sprite = play;
 		UpdateBeatsText();
 	}
@@ -78,7 +82,6 @@ public class InstrumentSetup : MonoBehaviour {
 		foreach (GameObject button in buttons) {
 			Destroy(button);
 		}
-		buttons.Clear();
 	}
 
 	public void MakeBeatNumbers () {
@@ -92,12 +95,13 @@ public class InstrumentSetup : MonoBehaviour {
 			));
 		}
 	}
-		
+
 	// Initializes a percussion setup menu
 	void InitializePercussionSetup (PercussionInstrument percInst) {
 		switch (percInst) {
 		case PercussionInstrument.RockDrums:
 			// Make rows of buttons for drums
+			numRows = 4;
 			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
 			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
 			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
@@ -111,7 +115,7 @@ public class InstrumentSetup : MonoBehaviour {
 		int i = 0;
 		switch (meloInst) {
 		case MelodicInstrument.ElectricGuitar:
-			
+
 			// Make rows of buttons for notes (in a grid)
 			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].allNotes) {
 				MakeMelodicButtons (note.Split ('_') [1], i, note);
@@ -120,11 +124,11 @@ public class InstrumentSetup : MonoBehaviour {
 			break;
 
 		case MelodicInstrument.ElectricBass: 
-			
+
 			// Make rows of buttons for notes (in a grid)
 			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].allNotes) {
 				//if (note == null)
-					//Debug.Log ("dick");
+				//Debug.Log ("dick");
 				MakeMelodicButtons (note.Split ('_') [1], i, note);
 				i++;
 			}
@@ -134,7 +138,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
-		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
+		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
@@ -148,7 +152,7 @@ public class InstrumentSetup : MonoBehaviour {
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			))
 		);
-			
+
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
 			int num = i;
 			GameObject bt = MakeButton(title+"_"+i, 
@@ -172,13 +176,13 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);
-				Suggest (RiffAI.FindHintPosition(RiffAI.FindSimilarCase (currentRiff), currentRiff));
+				Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
 		}
 	}
-		
+
 	void MakeMelodicButtons (string title, int row, string fileName) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
@@ -194,17 +198,17 @@ public class InstrumentSetup : MonoBehaviour {
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			)
 		));
-			
+
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
 			int num = i;
 			GameObject bt = MakeButton(title+"_"+i,
 				(currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty),
 				GetComponent<RectTransform>(),
-					new Vector2(buttonWidth, buttonWidth/2f),
-					new Vector2 (
-						2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
-						-buttonWidth - (buttonWidth+buttonSpacing)*row
-			));
+				new Vector2(buttonWidth, buttonWidth/2f),
+				new Vector2 (
+					2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
+					-buttonWidth - (buttonWidth+buttonSpacing)*row
+				));
 			float vol = 1f;
 			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
@@ -217,7 +221,7 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
-				Suggest (RiffAI.FindHintPosition(RiffAI.FindSimilarCase (currentRiff), currentRiff));
+				Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
@@ -329,21 +333,27 @@ public class InstrumentSetup : MonoBehaviour {
 			return;
 		} else {
 			Debug.Log("Suggesting "+pos);
-			Suggest (buttons[pos+1]);
+			Debug.Log ("curr key " + MusicManager.instance.currentKey);
+			Debug.Log (" curr inst " +InstrumentSetup.currentRiff.instrument);
+			Debug.Log (" guitar " + Instrument.ElectricGuitar);
+			//FOR TESTING PURPOSES
+
+			//if (DICKSAUCE) {
+			//CaseLibrary.initializecases ();
+			//DICKSAUCE = false;
+			//}
+			Suggest (buttons[riffai.FindHintYPosition(currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [InstrumentSetup.currentRiff.instrument])*subdivsShown + pos+1]);
 		}
 	}
 
 	void Suggest (GameObject button) {
-		try {
-			Sprite img = button.GetComponent<Image>().sprite;
-			if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
-				button.GetComponent<Image>().sprite = percussionSuggested;
-			} else if (currentRiff.instrument != Instrument.RockDrums && img != melodicFilled) {
-				button.GetComponent<Image>().sprite  = melodicSuggested;
-			}
-		} catch (NullReferenceException) {
-			Debug.LogError("Suggestion threw an NRE.");
-			return;
+		//if (button == null) Debug.Log("fuck", button);
+		//if (button.GetComponent<Image>() == null) Debug.Log("fuck", button);
+		Sprite img = button.GetComponent<Image>().sprite;
+		if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
+			button.GetComponent<Image>().sprite = percussionSuggested;
+		} else if (img != melodicFilled) {
+			button.GetComponent<Image>().sprite  = melodicSuggested;
 		}
 	}
 }
