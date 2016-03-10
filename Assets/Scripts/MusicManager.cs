@@ -40,14 +40,6 @@ public enum Key{
 	FMajor
 };
 
-public enum Tempo {
-	Slowest,
-	Slow,
-	Medium,
-	Fast,
-	Fastest,
-	NUM_TEMPOS
-};
 
 public class MusicManager : MonoBehaviour {
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
@@ -64,7 +56,11 @@ public class MusicManager : MonoBehaviour {
 	public List<Riff> riffs = new List<Riff> ();
 	public List<SongPiece> songPieces = new List<SongPiece>();
 	public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
-	public Dictionary<Instrument, List<Riff>> licks;
+	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
+		{ Instrument.ElectricBass, new List <Riff> () },
+		{ Instrument.ElectricGuitar, new List <Riff> () },
+		{ Instrument.RockDrums, new List <Riff> () }
+	};
 	// All lick notes waiting to be played
 	List<List<Note>> lickQueue = new List<List<Note>>();
 	bool lickPlaying = false;
@@ -80,28 +76,17 @@ public class MusicManager : MonoBehaviour {
 	public AudioSource LoopRiff;
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources;
 
-	//public static float tempo = 120f; // tempo in BPM
-	public Tempo tempo;
+	public static float tempo = 120f; // tempo in BPM
 	private float BeatTimer;
 	private int beat;
 	public static bool playing = false;
 	public static bool loop = false;
-
-	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
-		{ Tempo.Slowest, 70f },
-		{ Tempo.Slow, 90f },
-		{ Tempo.Medium, 110f },
-		{ Tempo.Fast, 130f },
-		{ Tempo.Fastest, 150f }
-	};
 
 	public int maxBeats; // max beats in riff, after subdivisions
 
 	float startLoadTime;
 
 	bool loadedExamples = false;
-
-
 
 	Instrument lickInstrument;
 
@@ -112,8 +97,6 @@ public class MusicManager : MonoBehaviour {
 		currentSong = new Song ();
 
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
-
-		tempo = Tempo.Medium;
 	}
 
 	public void Load() {
@@ -122,6 +105,7 @@ public class MusicManager : MonoBehaviour {
 		LoadInstruments();
 		LoadScales();
 		//LoadExampleRiffs();
+		//LoadExampleLicks();
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 		GameManager.instance.LoadNext();
 	}
@@ -163,12 +147,6 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
 			GameManager.instance.IncrementLoadProgress();
 		}
-
-		//instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
-		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.5f;
-		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
-		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
-		instrumentAudioSources[Instrument.RockDrums].volume = 0.9f;
 	}
 
 	void LoadScales () {
@@ -178,7 +156,6 @@ public class MusicManager : MonoBehaviour {
 
 	public void SetKey (int key) {
 		currentKey = (Key)key;
-		LoadExampleLicks();
 	}
 
 	public void PlayRiffLoop(){
@@ -238,16 +215,16 @@ public class MusicManager : MonoBehaviour {
 					if (!lickPlaying) currentSong.PlaySong(beat);
 						else currentSong.PlaySongExceptFor(beat, lickInstrument);
 					//Debug.Log(beat);
-					float songTotalTime = currentSong.beats*3600f / (float) (maxBeats/4) / tempoToFloat[tempo];
-					float songCurrentTime = (beat*3600f / (float) (maxBeats/4) / tempoToFloat[tempo]) + (3600f / (float) (maxBeats/4) / tempoToFloat[tempo])-BeatTimer;
+					float songTotalTime = currentSong.beats*3600f / (float) (maxBeats/4) / tempo;
+					float songCurrentTime = (beat*3600f / (float) (maxBeats/4) / tempo) + (3600f / (float) (maxBeats/4) / tempo)-BeatTimer;
 					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 					beat++;
 					break;
 				}
 				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
 				//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
-				//BeatTimer = 3600f / (float) (maxBeats/4) / tempoToFloat[tempo];// 3600f = 60 fps * 60 seconds 
-				BeatTimer = 7200f / tempoToFloat[tempo] /4f;
+				BeatTimer = 3600f / (float) (maxBeats/4) / tempo;// 3600f = 60 fps * 60 seconds 
+
 			} else {
 				//BeatTimer--;
 				//BeatTimer -= Time.deltaTime * 100f;
@@ -401,20 +378,6 @@ public class MusicManager : MonoBehaviour {
 		songPieces.Clear();
 		songPiecesByName.Clear();
 	}
-
-	public void IncreaseTempo () {
-		if ((int)tempo < (int)Tempo.NUM_TEMPOS-1) {
-			tempo = (Tempo)((int)tempo+1);
-			InstrumentSetup.instance.UpdateTempoText();
-		}
-	}
-
-	public void DecreaseTempo () {
-		if ((int)tempo > 0) {
-			tempo = (Tempo)((int)tempo-1);
-			InstrumentSetup.instance.UpdateTempoText();
-		}
-	}
 		
 	public void LoadExampleRiffs() {
 		if (!loadedExamples) {
@@ -486,22 +449,11 @@ public class MusicManager : MonoBehaviour {
 				}
 			});
 			SongArrangeSetup.instance.Refresh();
-			loadedExamples = true;
 		}
 	}
 		
 	public void LoadExampleLicks() {
-			Debug.Log("Loading");
-		if (licks != null) {
-			licks.Clear();
-		} else {
-			licks = new Dictionary<Instrument, List<Riff>>() {
-				{ Instrument.ElectricGuitar, new List<Riff>() },
-				{ Instrument.ElectricBass, new List<Riff>() },
-				{ Instrument.RockDrums, new List<Riff>() }
-			};
-		}
-			if (licks[Instrument.ElectricGuitar] == null) Debug.LogError("shit");
+		if (!loadedExamples) {
 			licks[Instrument.ElectricGuitar].Add (new Riff () {
 				name = "Example Guitar Lick",
 				instrument = Instrument.ElectricGuitar,
@@ -593,7 +545,13 @@ public class MusicManager : MonoBehaviour {
 					new List<Note>()
 				}
 			});
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> refs/remotes/origin/master
 
 			licks[Instrument.RockDrums].Add (new Riff () {
 				name = "Example Drums Lick2",
@@ -614,6 +572,14 @@ public class MusicManager : MonoBehaviour {
 			});
 			loadedExamples = true;
 		}
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
+=======
+			loadedExamples = true;
+		}
+>>>>>>> parent of 151dc6d... Misc Fixes
+>>>>>>> refs/remotes/origin/master
 	}
 
 	
