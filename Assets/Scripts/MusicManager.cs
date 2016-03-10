@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
@@ -50,6 +51,7 @@ public enum Tempo {
 
 public class MusicManager : MonoBehaviour {
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
+	public AudioMixer mixer;
 
 	// --Global Music Properties-- //
 	public Key currentKey = Key.EMajor; // value will be passed from key button
@@ -146,6 +148,7 @@ public class MusicManager : MonoBehaviour {
 			GameObject obj = new GameObject ();
 			obj.name = (string)Enum.GetName (typeof(Instrument), (Instrument)i);
 			AudioSource source = obj.AddComponent<AudioSource>();
+			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
 			instrumentAudioSources.Add((Instrument)i, source);
 			obj.AddComponent<AudioReverbFilter>();
 			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;

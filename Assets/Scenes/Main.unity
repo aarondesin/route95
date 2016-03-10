@@ -3587,7 +3587,8 @@ AudioSource:
   m_GameObject: {fileID: 371512236}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24307416, guid: f67c1c84114f8a843bf10b57f49b6c12,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: fd0da689c8d373e498b592126e9b7575, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3
@@ -11781,7 +11782,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -849, y: -430.99997}
+  m_AnchoredPosition: {x: -8.5, y: -8.5}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -15475,7 +15476,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 1
-  m_Size: 0.9899882
+  m_Size: 0.98998827
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15903,6 +15904,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65bdab0f780371d4c8315c6b1c7d5e4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mixer: {fileID: 24100000, guid: f67c1c84114f8a843bf10b57f49b6c12, type: 2}
   currentKey: 3
   currentInstrument: 0
   loopSong: 0
