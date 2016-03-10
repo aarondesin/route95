@@ -39,6 +39,14 @@ public enum Key{
 	FMajor
 };
 
+public enum Tempo {
+	Slowest,
+	Slow,
+	Medium,
+	Fast,
+	Fastest,
+	NUM_TEMPOS
+};
 
 public class MusicManager : MonoBehaviour {
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
@@ -74,11 +82,20 @@ public class MusicManager : MonoBehaviour {
 	public AudioSource LoopRiff;
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources;
 
-	public static float tempo = 120f; // tempo in BPM
+	//public static float tempo = 120f; // tempo in BPM
+	public Tempo tempo;
 	private float BeatTimer;
 	private int beat;
 	public static bool playing = false;
 	public static bool loop = false;
+
+	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
+		{ Tempo.Slowest, 70f },
+		{ Tempo.Slow, 90f },
+		{ Tempo.Medium, 110f },
+		{ Tempo.Fast, 130f },
+		{ Tempo.Fastest, 150f }
+	};
 
 	public int maxBeats; // max beats in riff, after subdivisions
 
@@ -95,6 +112,8 @@ public class MusicManager : MonoBehaviour {
 		currentSong = new Song ();
 
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+
+		tempo = Tempo.Medium;
 	}
 
 	public void Load() {
@@ -143,6 +162,10 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
 			GameManager.instance.IncrementLoadProgress();
+
+			instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+			instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
+			instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 		}
 	}
 
@@ -153,6 +176,7 @@ public class MusicManager : MonoBehaviour {
 
 	public void SetKey (int key) {
 		currentKey = (Key)key;
+		LoadExampleLicks();
 	}
 
 	public void PlayRiffLoop(){
@@ -212,15 +236,13 @@ public class MusicManager : MonoBehaviour {
 					if (!lickPlaying) currentSong.PlaySong(beat);
 						else currentSong.PlaySongExceptFor(beat, lickInstrument);
 					//Debug.Log(beat);
-					float songTotalTime = currentSong.beats*3600f / (float) (maxBeats/4) / tempo;
-					float songCurrentTime = (beat*3600f / (float) (maxBeats/4) / tempo) + (3600f / (float) (maxBeats/4) / tempo)-BeatTimer;
+					float songTotalTime = currentSong.beats*7200f/tempoToFloat[tempo]/4f;
+					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
 					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 					beat++;
 					break;
 				}
-				//if (beat >= (int)Mathf.Pow(2f,(drumRiffs[drumRiffIndex].subdivs+1))) beat = 0;
-				//BeatTimer = 3600f/tempo/drumRiffs[drumRiffIndex].subdivs;
-				BeatTimer = 3600f / (float) (maxBeats/4) / tempo;// 3600f = 60 fps * 60 seconds 
+				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds 
 
 			} else {
 				//BeatTimer--;
@@ -229,6 +251,20 @@ public class MusicManager : MonoBehaviour {
 			}
 		} 
 
+	}
+
+	public void IncreaseTempo () {
+		if ((int)tempo < (int)Tempo.NUM_TEMPOS-1) {
+			tempo = (Tempo)((int)tempo+1);
+			InstrumentSetup.instance.UpdateTempoText();
+		}
+	}
+
+	public void DecreaseTempo () {
+		if ((int)tempo > 0) {
+			tempo = (Tempo)((int)tempo-1);
+			InstrumentSetup.instance.UpdateTempoText();
+		}
 	}
 
 
@@ -445,12 +481,13 @@ public class MusicManager : MonoBehaviour {
 					new List<Note> ()
 				}
 			});
+			loadedExamples = true;
 			SongArrangeSetup.instance.Refresh();
 		}
 	}
 		
 	public void LoadExampleLicks() {
-		if (!loadedExamples) {
+			licks.Clear();
 			licks[Instrument.ElectricGuitar].Add (new Riff () {
 				name = "Example Guitar Lick",
 				instrument = Instrument.ElectricGuitar,
@@ -559,8 +596,6 @@ public class MusicManager : MonoBehaviour {
 
 				}
 			});
-			loadedExamples = true;
-		}
 	}
 }
 	

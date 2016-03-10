@@ -268,6 +268,7 @@ public class GameManager : MonoBehaviour {
 		//SwitchToMenu(Menu.SongArrange);
 		TESTPlayerMovement.moving = false;
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
+		DisableMenu(liveIcons);
 	}
 
 	// Returns to song arrangement
@@ -280,6 +281,7 @@ public class GameManager : MonoBehaviour {
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		TESTPlayerMovement.moving = false;
 		DisableMenu(loopIcon);
+		DisableMenu(liveIcons);
 	}
 
 	// Returns to key selection

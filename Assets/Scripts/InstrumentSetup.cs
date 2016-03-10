@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class InstrumentSetup : MonoBehaviour {
 
+	public static InstrumentSetup instance;
+
 	public RiffAI riffai;
 	public bool DICKSAUCE;
 
@@ -32,6 +34,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public static int subdivsShown = 1; // number of subdivisions to show
 
 	List<GameObject> buttons = new List<GameObject>();
+	List<List<GameObject>> buttonGrid = new List<List<GameObject>>();
 
 	public Scrollbar scrollBarH;
 	public Scrollbar scrollBarV;
@@ -43,11 +46,13 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite pause;
 
 	public GameObject beatsText;
+	public Text tempoText;
 
 	float buttonWidth = 128f;
 	float buttonSpacing = 8f;
 
 	void Start () {
+		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
 		riffai = new RiffAI ();
 		DICKSAUCE = true;
@@ -75,12 +80,17 @@ public class InstrumentSetup : MonoBehaviour {
 		scrollBarV.value = 1f;
 		playRiffButton.GetComponent<Image>().sprite = play;
 		UpdateBeatsText();
+		UpdateTempoText();
 	}
 
 	// Removes all existing buttons
 	public void Cleanup () {
 		foreach (GameObject button in buttons) {
 			Destroy(button);
+		}
+		buttons.Clear();
+		foreach (List<GameObject> list in buttonGrid) {
+			list.Clear();
 		}
 	}
 
@@ -169,10 +179,10 @@ public class InstrumentSetup : MonoBehaviour {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-				vol = 0.85f;
+				vol = 0.9f;
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-				vol = 0.7f;
+				vol = 0.8f;
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);
@@ -180,6 +190,7 @@ public class InstrumentSetup : MonoBehaviour {
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
+			buttonGrid[i].Add(bt);
 		}
 	}
 
@@ -214,10 +225,10 @@ public class InstrumentSetup : MonoBehaviour {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-				vol = 0.85f;
+				vol = 0.9f;
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-				vol = 0.7f;
+				vol = 0.8f;
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
@@ -225,6 +236,8 @@ public class InstrumentSetup : MonoBehaviour {
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
+			buttonGrid[i].Add(bt);
+
 		}
 	}
 
@@ -325,6 +338,10 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void UpdateBeatsText() {
 		beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
+	}
+
+	void UpdateTempoText () {
+		tempoText.text = MusicManager.instance.tempo.ToString();
 	}
 
 	void Suggest (int pos) {
