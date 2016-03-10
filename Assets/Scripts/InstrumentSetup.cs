@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class InstrumentSetup : MonoBehaviour {
+
+	public static InstrumentSetup instance;
 
 	public RiffAI riffai;
 	public bool DICKSAUCE;
@@ -44,10 +47,13 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public GameObject beatsText;
 
+	public Text tempoText;
+
 	float buttonWidth = 128f;
 	float buttonSpacing = 8f;
 
 	void Start () {
+		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
 		riffai = new RiffAI ();
 		DICKSAUCE = true;
@@ -75,6 +81,7 @@ public class InstrumentSetup : MonoBehaviour {
 		scrollBarV.value = 1f;
 		playRiffButton.GetComponent<Image>().sprite = play;
 		UpdateBeatsText();
+		UpdateTempoText();
 	}
 
 	// Removes all existing buttons
@@ -214,10 +221,10 @@ public class InstrumentSetup : MonoBehaviour {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-				vol = 0.85f;
+				vol = 0.9f;
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-				vol = 0.7f;
+				vol = 0.8f;
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
@@ -327,6 +334,10 @@ public class InstrumentSetup : MonoBehaviour {
 		beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
 	}
 
+	public void UpdateTempoText() {
+		tempoText.text = MusicManager.instance.tempo.ToString();
+	}
+
 	void Suggest (int pos) {
 		if (pos >= buttons.Count) {
 			Debug.LogError ("Suggestion out of bounds!");
@@ -342,11 +353,17 @@ public class InstrumentSetup : MonoBehaviour {
 			//CaseLibrary.initializecases ();
 			//DICKSAUCE = false;
 			//}
-			Suggest (buttons[riffai.FindHintYPosition(currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [InstrumentSetup.currentRiff.instrument])*subdivsShown + pos+1]);
+			try {
+				if (InstrumentSetup.currentRiff.instrument != Instrument.RockDrums)
+					Suggest (buttons[riffai.FindHintYPosition(currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [InstrumentSetup.currentRiff.instrument])*subdivsShown + pos+1]);
+			} catch (ArgumentOutOfRangeException) {
+				return;
+			}
 		}
 	}
 
 	void Suggest (GameObject button) {
+		if (button == null || button.GetComponent<Image>() == null) return;
 		//if (button == null) Debug.Log("fuck", button);
 		//if (button.GetComponent<Image>() == null) Debug.Log("fuck", button);
 		Sprite img = button.GetComponent<Image>().sprite;

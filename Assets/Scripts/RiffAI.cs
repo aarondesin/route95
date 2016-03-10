@@ -103,6 +103,7 @@ public class RiffAI : MonoBehaviour{
 		Debug.Log ("inside findhintY, below Note");
 		Debug.Log ("inside findhintY, closestCase " + (closestCase == null));
 
+		if (closestCase == null) return 0;
 		for (; playerPosition < closestCase.beatsShown*4-1; ++playerPosition){// replace 16 with a dynamic value from riff class
 			Debug.Log ("inside findhintY, in for, outside if ");
 			if (closestCase.notes[playerPosition].Any() == true){

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -36,6 +37,14 @@ public class InputManager : MonoBehaviour {
 			{Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
 			{Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
 		};
+		keyToLick = new Dictionary<KeyCode, int>() {
+
+				{ KeyCode.Q, 0 }
+				//{ KeyCode.W, 1 },
+				//{ KeyCode.E, 2 }
+
+		};
+
 	}
 
 	void Update () {
@@ -51,28 +60,20 @@ public class InputManager : MonoBehaviour {
 					}
 				}
 				// Check for playing lick
-				foreach (KeyCode key2 in mappedLicks) {
-					if (Input.GetKey(key2)) {
-						if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
-							PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
-						else {
-							Debug.Log ("none available");
+				try {
+					foreach (KeyCode key2 in mappedLicks) {
+						if (Input.GetKey(key2)) {
+							if (MusicManager.instance.licks == null) Debug.LogError("dick");
+							if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
+								PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
+							else {
+								Debug.Log ("none available");
+							}
 						}
+
 					}
-
-				}
-				if (keyToLick == null) {
-					
-					keyToLick = new Dictionary<KeyCode, int>() {
-						
-						{ KeyCode.Q, 0 }
-						//{ KeyCode.W, 1 },
-						//{ KeyCode.E, 2 }
-
-
-					};
-					Debug.Log(keyToLick.Count);
-					Debug.Log (MusicManager.instance.licks.Count);
+				} catch (ArgumentOutOfRangeException) {
+					Debug.LogError("damn");
 				}
 			}
 		}
