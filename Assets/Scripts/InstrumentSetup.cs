@@ -29,7 +29,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public static float baseButtonScale = 1f; // base button sizes
 	public static int MAX_NUMNOTES = 8; // maximum number of notes (rows)
 	public static int numRows;
-	public static int subdivsShown = 2; // number of subdivisions to show
+	public static int subdivsShown = 1; // number of subdivisions to show
 
 	List<GameObject> buttons = new List<GameObject>();
 
