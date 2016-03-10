@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,8 +48,11 @@ public class DynamicTerrain {
 	}
 
 	void updateChunks(float[] freqDataArray){
-		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
+		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Hanning);
 		LinInt freqData = new LinInt (freqDataArray);
+		for (int i = freqDataArray.Length - 2; i >= 0; i--){
+			freqData.addKeyPoint(freqDataArray[i]);
+		}
 		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
 		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
 		createChunkLists (xChunks, yChunks);

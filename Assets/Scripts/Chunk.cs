@@ -183,6 +183,27 @@ public class Chunk{
 		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
 	}
 
+	private float linIntInputModulate (string function, float input) {
+		float answer;
+		switch (function) {
+		case "sqrt":
+			answer = Mathf.Sqrt (input);
+			break;
+		case "loge":
+			answer = Mathf.Log (input + 1f);
+			answer = answer / Mathf.Log (2f);
+			break;
+		case "log10":
+			answer = Mathf.Log10 (input + 1f);
+			answer = answer / Mathf.Log10(2f);
+			break;
+		default:
+			answer = input;
+			break;
+		}
+		return answer;
+	}
+
 	private void updateVerts(GameObject player, float updateDist, LinInt freqData) {
 		float margin = CHUNK_SIZE / 2;
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
@@ -194,6 +215,7 @@ public class Chunk{
 					Vector3 angleVector = vertPos - player.transform.position;
 					float angle = Vector3.Angle (Vector3.right, angleVector);
 					float linIntInput = angle / 360f;
+					//linIntInput = linIntInputModulate ("sqrt", linIntInput);
 					float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
 					vertices [v].y = newY;
 					vertLocked [v] = true;

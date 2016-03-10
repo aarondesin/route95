@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
@@ -56,6 +57,7 @@ public class MusicManager : MonoBehaviour {
 	public Instrument currentInstrument = Instrument.ElectricGuitar;
 	public Song currentSong;
 	public bool loopSong = false; // loop song in live mode?
+	public AudioMixer mixer;
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
@@ -143,6 +145,7 @@ public class MusicManager : MonoBehaviour {
 			GameObject obj = new GameObject ();
 			obj.name = (string)Enum.GetName (typeof(Instrument), (Instrument)i);
 			AudioSource source = obj.AddComponent<AudioSource>();
+			source.outputAudioMixerGroup = mixer.FindMatchingGroups ("Instruments") [0];
 			instrumentAudioSources.Add((Instrument)i, source);
 			obj.AddComponent<AudioReverbFilter>();
 			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
@@ -590,8 +593,7 @@ public class MusicManager : MonoBehaviour {
 					new List<Note>()
 				}
 			});
-<<<<<<< HEAD
-=======
+
 
 			licks[Instrument.RockDrums].Add (new Riff () {
 				name = "Example Drums Lick2",
@@ -612,7 +614,6 @@ public class MusicManager : MonoBehaviour {
 			});
 			loadedExamples = true;
 		}
->>>>>>> origin/master
 	}
-}
+
 	
