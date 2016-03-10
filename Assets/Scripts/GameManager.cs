@@ -84,6 +84,8 @@ public class GameManager : MonoBehaviour {
 	int loadValue = 0;
 
 	bool hasShownLiveHelp = false;
+	bool hasShownSongArrangerHelp = false;
+	bool hasShownRiffEditorHelp = false;
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
@@ -390,5 +392,18 @@ public class GameManager : MonoBehaviour {
 		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys Q to play with those instruments (more in the final version!)", "Okay");
 		Pause();
 	}
+
+	public void ShowSongArrangerHelp() {
+		if (!hasShownSongArrangerHelp) {
+			Prompt.instance.PromptMessage("Song Arranger", "Here is where you arrange your song. The timeline in the middle of the screen is for placing your riffs at certain positions in the song.", "Got it");
+			hasShownSongArrangerHelp = true;
+		}
+	}
 		
+	public void ShowRiffEditorHelp() {
+		if (!hasShownRiffEditorHelp) {
+			Prompt.instance.PromptMessage("Riff Editor", "Here, you can edit your riff. Click a button to add note at that position in time.", "Alrighty");
+			hasShownRiffEditorHelp = true;
+		}
+	}
 }

@@ -60,7 +60,7 @@ public class InstrumentSetup : MonoBehaviour {
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
-		riffai = new RiffAI ();
+		//riffai = new RiffAI ();
 		DICKSAUCE = true;
 	}
 

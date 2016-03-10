@@ -168,7 +168,7 @@ public class MusicManager : MonoBehaviour {
 
 
 		}
-		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.3f;
+		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.2f;
 		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
 		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
