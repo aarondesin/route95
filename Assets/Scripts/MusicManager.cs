@@ -165,7 +165,7 @@ public class MusicManager : MonoBehaviour {
 
 
 		}
-		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.3f;
 		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
 		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
@@ -177,6 +177,11 @@ public class MusicManager : MonoBehaviour {
 
 	public void SetKey (int key) {
 		currentKey = (Key)key;
+		LoadExampleLicks();
+	}
+
+	public void SetKey (Key key) {
+		currentKey = key;
 		LoadExampleLicks();
 	}
 
@@ -488,7 +493,9 @@ public class MusicManager : MonoBehaviour {
 	}
 		
 	public void LoadExampleLicks() {
-			licks.Clear();
+		foreach (Instrument inst in licks.Keys) {
+			licks[inst].Clear();
+		}
 			licks[Instrument.ElectricGuitar].Add (new Riff () {
 				name = "Example Guitar Lick",
 				instrument = Instrument.ElectricGuitar,

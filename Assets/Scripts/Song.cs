@@ -30,7 +30,9 @@ public class Song {
 		try {
 			string[] vars = loadFile.Split(save_load.itemSeparator);
 			name = vars[0];
-			MusicManager.instance.currentKey = (Key)Enum.Parse(typeof (Key), vars[1]);
+			Debug.Log(vars[1]);
+			Key key = (Key)Enum.Parse(typeof (Key), vars[1]);
+			MusicManager.instance.SetKey( key );
 			MusicManager.instance.tempo = (Tempo)Enum.Parse(typeof (Tempo), vars[2]);
 			string[] pieces = vars[3].Split(save_load.noteSeparator);
 			foreach (string songPiece in pieces) {
@@ -41,9 +43,9 @@ public class Song {
 		} catch (IndexOutOfRangeException) {
 			//Debug.LogError("Failed to load song.");
 			throw new FailedToLoadException("Song() given an invalid input.");
-		} catch (KeyNotFoundException) {
-			throw new FailedToLoadException("Song.Song(): unable to find songpiece");
-		}
+		} //catch (KeyNotFoundException) {
+			//throw new FailedToLoadException("Song.Song(): unable to find songpiece");
+		//}
 	}
 
 	public void PlaySong (int pos) {

@@ -149,6 +149,10 @@ public class InstrumentSetup : MonoBehaviour {
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
 		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+		buttonGrid.Clear ();
+		for(int n = 0; n<numButtons; n++) {
+			buttonGrid.Add(new List<GameObject>());
+		}
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
@@ -196,6 +200,10 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void MakeMelodicButtons (string title, int row, string fileName) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
+		buttonGrid.Clear ();
+		for(int n = 0; n<numButtons; n++) {
+			buttonGrid.Add(new List<GameObject>());
+		}
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
@@ -372,5 +380,25 @@ public class InstrumentSetup : MonoBehaviour {
 		} else if (img != melodicFilled) {
 			button.GetComponent<Image>().sprite  = melodicSuggested;
 		}
+	}
+
+	void SuggestChords (GameObject button) {
+		int row = 0;
+		int column = 0;
+		for (; column < buttonGrid.Count; column++) {
+			for (; row < buttonGrid[column].Count; row++) {
+				if (buttonGrid[column][row] == button) break;
+			}
+		}
+
+	}
+
+	void SuggestMinorChord (GameObject button) {
+	}
+
+	void SuggestPowerChord (GameObject button) {
+	}
+
+	void SuggestOctave (GameObject button) {
 	}
 }
