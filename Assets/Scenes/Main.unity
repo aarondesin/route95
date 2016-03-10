@@ -11782,7 +11782,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.5, y: -8.5}
+  m_AnchoredPosition: {x: -8.500061, y: -8.5}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -11817,6 +11817,9 @@ MonoBehaviour:
   pause: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
   beatsText: {fileID: 872671699}
   tempoText: {fileID: 1008270403}
+  minorSuggestion: {fileID: 21300000, guid: 5f1905b9d814c49418ff13615e4483cd, type: 3}
+  powerSuggestion: {fileID: 21300000, guid: cf3c7b0d5c6d532439c186f11757376d, type: 3}
+  octaveSuggestion: {fileID: 21300000, guid: ac64ecdad9973d34d92241693d62f042, type: 3}
 --- !u!1 &1277712144
 GameObject:
   m_ObjectHideFlags: 0
