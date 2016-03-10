@@ -86,6 +86,8 @@ public class MusicManager : MonoBehaviour {
 
 	bool loadedExamples = false;
 
+	Instrument lickInstrument;
+
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
@@ -207,7 +209,8 @@ public class MusicManager : MonoBehaviour {
 					} else {
 						lickPlaying = false;
 					}
-					currentSong.PlaySong(beat);
+					if (!lickPlaying) currentSong.PlaySong(beat);
+						else currentSong.PlaySongExceptFor(beat, lickInstrument);
 					//Debug.Log(beat);
 					float songTotalTime = currentSong.beats*3600f / (float) (maxBeats/4) / tempo;
 					float songCurrentTime = (beat*3600f / (float) (maxBeats/4) / tempo) + (3600f / (float) (maxBeats/4) / tempo)-BeatTimer;
@@ -278,6 +281,7 @@ public class MusicManager : MonoBehaviour {
 	public void QueueLick (Riff lick) {
 		if (lick == null || lickQueue.Count != 0) return;
 		lickQueue.Clear();
+		lickInstrument = lick.instrument;
 		foreach (List<Note> beat in lick.notes) {
 			lickQueue.Add(beat);
 			//Debug.Log ("test");
@@ -302,11 +306,13 @@ public class MusicManager : MonoBehaviour {
 
 	public void PopLickQueue () {
 		//Debug.Log("play");
-		MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
+		//MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
 		foreach (Note note in lickQueue[0]) {
 			note.PlayNote(instrumentAudioSources[currentInstrument], true);
+			InstrumentDisplay.instance.WakeGlow();
 		}
 		lickQueue.RemoveAt(0);
+
 	}
 
 	// Plays a single sound effect through OneShot AudioSource

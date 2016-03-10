@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Blinking : MonoBehaviour {
+public class BlinkingIcon : MonoBehaviour {
 
 	public Color maxColor;
 	public float blinkInterval;

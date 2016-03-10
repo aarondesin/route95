@@ -60,6 +60,17 @@ public class Song {
 		}
 	}
 
+	public void PlaySongExceptFor (int pos, Instrument instrument) {
+		try {
+			// For now, all song pieces are assumed to be one measure long
+			foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
+				if (riff.instrument != instrument) riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
+			}
+		} catch (ArgumentOutOfRangeException) {
+			Debug.LogError ("Song.PlaySong(): index out of range! "+pos);
+		}
+	}
+
 	public void RemoveAt (int pos, Instrument inst) {
 		foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
 			if (riff.instrument == inst) {

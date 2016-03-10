@@ -112,7 +112,8 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1643627758}
   m_Father: {fileID: 699857659}
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -164,6 +165,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 090e7ddbb58495e4a997704a8b689084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  glow: {fileID: 1643627759}
+  fadeSpeed: 0.05
 --- !u!1 &18810276
 GameObject:
   m_ObjectHideFlags: 0
@@ -1914,6 +1917,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 388b201b2d1054b428cdc4707856f433, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
   m_IsPrefabParent: 0
@@ -11397,6 +11404,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca45f7a19e20eb04d940db2404ae8d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  riffai: {fileID: 0}
+  DICKSAUCE: 0
   percussionEmpty: {fileID: 21300000, guid: d48fa44c2cefb824fbecd9abfd4fb125, type: 3}
   percussionFilled: {fileID: 21300000, guid: aa6d2396bd3be5d4792ed1e3d2428bdc, type: 3}
   percussionSuggested: {fileID: 21300000, guid: 1672d6125f25ee64e8eacb38690d8c62,
@@ -13306,6 +13315,14 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f94f2450d8922a9449739388969a05d0, type: 2}
+    - target: {fileID: 100000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
   m_IsPrefabParent: 0
@@ -15179,6 +15196,73 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1636702200}
+--- !u!1 &1643627757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1643627758}
+  - 222: {fileID: 1643627760}
+  - 114: {fileID: 1643627759}
+  m_Layer: 0
+  m_Name: Glow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1643627758
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1643627757}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5125172}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1.5, y: 1.5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1643627759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1643627757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1643627760
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1643627757}
 --- !u!1 &1646935818
 GameObject:
   m_ObjectHideFlags: 0

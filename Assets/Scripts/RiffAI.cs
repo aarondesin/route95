@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class RiffAI :MonoBehaviour{
+public class RiffAI : MonoBehaviour{
 
 	//public RiffAI instance;
 	int minimumSimilarityValue = 0;
@@ -18,14 +18,22 @@ public class RiffAI :MonoBehaviour{
 	//This is useful if none of the cases match very well, and you 
 	//want to only highlight hints if you have a good hint.
 	public Riff FindSimilarCase(Riff playerRiff){
-		Dictionary<Riff, int> SimilarityDicitonary = new Dictionary<Riff, int>();
+		Dictionary<Riff, int> SimilarityDictionary = new Dictionary<Riff, int>();
 		foreach(Riff caseRiff in CaseLibrary.cases) {
+			SimilarityDictionary.Add(caseRiff, 0);
 			//Compare riff in each case to the given riff,
 			//adding points to that case's score in the dicitonary.
 			for (int i = 0; i < playerRiff.beatsShown*4; i++) {
-				if (playerRiff.notes [i] == caseRiff.notes[i]) {
-					SimilarityDicitonary [caseRiff] += playerRiff.notes[i].Count + 1;
+				if (playerRiff.notes[i].Count == caseRiff.notes[i].Count) {
+					SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
 				}
+				/*for (int j=0; j <playerRiff.notes[i].Count; j++) {
+					if (playerRiff.notes[i][j].Equals(caseRiff.notes[i][j])) {
+						Debug.Log(playerRiff.name);
+						Debug.Log(playerRiff.notes[i].Count);
+						SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
+					}
+				}*/
 			}
 		}
 
@@ -36,9 +44,9 @@ public class RiffAI :MonoBehaviour{
 		//int bestRhythmScore = -1;
 		//string bestRhythmCase = null;
 		//find best rhythm case
-		foreach (Riff key in SimilarityDicitonary.Keys) {
-			if (SimilarityDicitonary[key] > bestScore){
-				bestScore = SimilarityDicitonary[key];
+		foreach (Riff key in SimilarityDictionary.Keys) {
+			if (SimilarityDictionary[key] > bestScore){
+				bestScore = SimilarityDictionary[key];
 				bestCase = key;
 			}
 		}

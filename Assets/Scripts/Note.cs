@@ -139,6 +139,10 @@ public class Note {
 		source.PlayOneShot(sound, volume);
 	}
 
+	public bool Equals (Note other) {
+		return this.filename == other.filename || (this == null && other == null);
+	}
+
 	// Returns note in filename|duration|volume format
 	public override string ToString () {
 		string result = "";
