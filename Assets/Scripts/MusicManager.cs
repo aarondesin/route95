@@ -542,10 +542,6 @@ public class MusicManager : MonoBehaviour {
 					new List<Note>()
 				}
 			});
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
 			licks[Instrument.RockDrums].Add (new Riff () {
 				name = "Example Drums Lick2",
 				instrument = Instrument.RockDrums,
@@ -565,11 +561,6 @@ public class MusicManager : MonoBehaviour {
 			});
 			loadedExamples = true;
 		}
->>>>>>> origin/master
-=======
-			loadedExamples = true;
-		}
->>>>>>> parent of 151dc6d... Misc Fixes
 	}
 }
 	
