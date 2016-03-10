@@ -130,13 +130,13 @@ public class Note {
 
 	// Play note on a specific AudioSource
 	public void PlayNote (AudioSource source) {
-		source.PlayOneShot(sound, volume*source.volume);
+		source.PlayOneShot(sound, volume);
 	}
 
 	// Play note on a specific AudioSource, cutting off?
 	public void PlayNote (AudioSource source, bool cutoff) {
 		if (cutoff) source.Stop();
-		source.PlayOneShot(sound, volume*source.volume);
+		source.PlayOneShot(sound, volume);
 	}
 
 	public bool Equals (Note other) {

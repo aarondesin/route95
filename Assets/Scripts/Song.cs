@@ -30,9 +30,8 @@ public class Song {
 		try {
 			string[] vars = loadFile.Split(save_load.itemSeparator);
 			name = vars[0];
-			MusicManager.instance.SetKey((int)Enum.Parse(typeof (Key), vars[1]));
-			MusicManager.instance.tempo = (Tempo)Enum.Parse(typeof (Tempo), vars[2]);
-			string[] pieces = vars[3].Split(save_load.noteSeparator);
+			MusicManager.instance.currentKey = (Key)Enum.Parse(typeof (Key), vars[1]);
+			string[] pieces = vars[2].Split(save_load.noteSeparator);
 			foreach (string songPiece in pieces) {
 				if (songPiece.Length == 0) continue;
 				Debug.Log("Finding songpiece "+songPiece+".");
@@ -120,7 +119,6 @@ public class Song {
 		string result = "";
 		result += name + save_load.itemSeparator;
 		result += Enum.GetName(typeof (Key), MusicManager.instance.currentKey) + save_load.itemSeparator;
-		result += Enum.GetName(typeof (Tempo), MusicManager.instance.tempo) + save_load.itemSeparator;
 		foreach (SongPiece songPiece in songPieces) {
 			result += songPiece.name + save_load.noteSeparator;
 		}
