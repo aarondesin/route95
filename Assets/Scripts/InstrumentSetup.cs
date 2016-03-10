@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,6 +51,11 @@ public class InstrumentSetup : MonoBehaviour {
 
 	float buttonWidth = 128f;
 	float buttonSpacing = 8f;
+
+	List<GameObject> suggestions = new List<GameObject>();
+	public Sprite minorSuggestion;
+	public Sprite powerSuggestion;
+	public Sprite octaveSuggestion;
 
 	void Start () {
 		instance = this;
@@ -122,6 +128,10 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Initializes a melodic setup menu
 	void InitializeMelodicSetup (MelodicInstrument meloInst) {
+		buttonGrid.Clear();
+		for(int n = 0; n<(int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS); n++) {
+			buttonGrid.Add(new List<GameObject>());
+		}
 		int i = 0;
 		switch (meloInst) {
 		case MelodicInstrument.ElectricGuitar:
@@ -200,10 +210,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void MakeMelodicButtons (string title, int row, string fileName) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
-		buttonGrid.Clear ();
-		for(int n = 0; n<numButtons; n++) {
-			buttonGrid.Add(new List<GameObject>());
-		}
+		//buttonGrid.Clear ();
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
@@ -240,11 +247,15 @@ public class InstrumentSetup : MonoBehaviour {
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
+				if (InstrumentSetup.currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
+				else ClearSuggestions();
 				//Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
+				//SuggestChords(bt);
+				
 				Toggle(bt.GetComponent<Button>());
 			});
 			buttons.Add(bt);
-			buttonGrid[i].Add(bt);
+			buttonGrid[num].Add(bt);
 
 		}
 	}
@@ -372,8 +383,6 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void Suggest (GameObject button) {
-		//if (button == null) Debug.Log("fuck", button);
-		//if (button.GetComponent<Image>() == null) Debug.Log("fuck", button);
 		Sprite img = button.GetComponent<Image>().sprite;
 		if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
 			button.GetComponent<Image>().sprite = percussionSuggested;
@@ -382,23 +391,75 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
-	void SuggestChords (GameObject button) {
-		int row = 0;
-		int column = 0;
-		for (; column < buttonGrid.Count; column++) {
-			for (; row < buttonGrid[column].Count; row++) {
-				if (buttonGrid[column][row] == button) break;
-			}
-		}
+	void SuggestChords (int column, int row) {
+		ClearSuggestions();
+		if (row+2 < buttonGrid[0].Count)
+			SuggestMinorChord(buttonGrid[column][row+2]);
+		if (row+4 < buttonGrid[0].Count) 
+			SuggestPowerChord(buttonGrid[column][row+4]);
+		if (row+7 < buttonGrid[0].Count) 
+			SuggestOctave(buttonGrid[column][row+7]);
+	}
 
+	void ClearSuggestions () {
+		foreach (GameObject suggestion in suggestions) Destroy(suggestion);
+		suggestions.Clear();
 	}
 
 	void SuggestMinorChord (GameObject button) {
+		GameObject suggestion = MakeIcon (
+			"Minor", 
+			minorSuggestion, 
+			button.GetComponent<RectTransform>(), 
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.y,
+				button.GetComponent<RectTransform>().sizeDelta.y
+			),
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
+				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
+			)
+		);
+		suggestion.AddComponent<Tooltip>();
+		suggestion.GetComponent<Tooltip>().text = "Minor Chord (sad)";
+		suggestions.Add(suggestion);
 	}
 
 	void SuggestPowerChord (GameObject button) {
+		GameObject suggestion = MakeIcon (
+			"Power", 
+			powerSuggestion, 
+			button.GetComponent<RectTransform>(), 
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.y,
+				button.GetComponent<RectTransform>().sizeDelta.y
+			),
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
+				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
+			)
+		);
+		suggestion.AddComponent<Tooltip>();
+		suggestion.GetComponent<Tooltip>().text = "Power Chord (powerful)";
+		suggestions.Add(suggestion);
 	}
 
 	void SuggestOctave (GameObject button) {
+		GameObject suggestion = MakeIcon (
+			"Octave", 
+			octaveSuggestion, 
+			button.GetComponent<RectTransform>(), 
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.y,
+				button.GetComponent<RectTransform>().sizeDelta.y
+			),
+			new Vector2 (
+				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
+				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
+			)
+		);
+		suggestion.AddComponent<Tooltip>();
+		suggestion.GetComponent<Tooltip>().text = "Octave (neutral)";
+		suggestions.Add(suggestion);
 	}
 }
