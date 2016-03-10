@@ -25,8 +25,8 @@ public class InputManager : MonoBehaviour {
 	public static Dictionary<KeyCode, int> keyToLick;
 
 	public static List<KeyCode> mappedLicks = new List<KeyCode>() {
-		KeyCode.Q
-		//KeyCode.W,
+		KeyCode.Q,
+		KeyCode.W
 		//KeyCode.E
 	};
 
@@ -74,6 +74,19 @@ public class InputManager : MonoBehaviour {
 					}
 				} catch (ArgumentOutOfRangeException) {
 					Debug.LogError("damn");
+				}
+				if (keyToLick == null) {
+					
+					keyToLick = new Dictionary<KeyCode, int>() {
+						
+						{ KeyCode.Q, 0 },
+						{ KeyCode.W, 1 }
+						//{ KeyCode.E, 2 }
+
+
+					};
+					Debug.Log(keyToLick.Count);
+					Debug.Log (MusicManager.instance.licks.Count);
 				}
 			}
 		}
