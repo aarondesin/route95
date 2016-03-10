@@ -163,10 +163,11 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
 			GameManager.instance.IncrementLoadProgress();
 
-			instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
-			instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
-			instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
+
 		}
+		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.6f;
+		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
+		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
 
 	void LoadScales () {

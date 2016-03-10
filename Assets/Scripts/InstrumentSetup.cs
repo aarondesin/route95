@@ -340,7 +340,7 @@ public class InstrumentSetup : MonoBehaviour {
 		beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
 	}
 
-	void UpdateTempoText () {
+	public void UpdateTempoText () {
 		tempoText.text = MusicManager.instance.tempo.ToString();
 	}
 
