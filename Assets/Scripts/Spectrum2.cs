@@ -30,18 +30,31 @@ public class Spectrum2 : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		float[] freqDataArray = new float[256];
-		//AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
-		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Hanning);
-		LinInt spectrum = new LinInt (freqDataArray);
-		for (int i=0; i<numberOfObjects; i++) {
-			//Vector3 previousScale = points[i].GetComponent<Transform>().localScale;
-			//previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
-			//points [i].transform.localScale = previousScale;
-			//points[i] = GetComponent<Transform>().parent.position + new Vector3 (points[i].x, height + Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale, points[i].z);
-			points[i].y = height + Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
-			//Debug.DrawLine (points[i].transform.position, (i == 0 ? points[points.Count-1].transform.position : points[i-1].transform.position), Color.green, 0.02f, true);
+		//Debug.Log ("dikkudes");
+		//if (DynamicTerrain.instance == null) Debug.Log ("weehee");
+		if (GameManager.instance.currentMode == Mode.Live &&
+			DynamicTerrain.instance != null) {
+
+			//float[] freqDataArray = new float[256];
+			//LinInt spectrum = new LinInt (freqDataArray);
+
+			//LinInt spectrum = DynamicTerrain.instance.freqData;
+
+			for (int i = 0; i < numberOfObjects; i++) {
+				//Debug.Log("dick");
+				float y = height + Mathf.Log (DynamicTerrain.instance.freqData.getDataPoint ((float)i / numberOfObjects)) * scale;
+				//Debug.Log (y);
+				if (y != float.NaN) {
+				//Vector3 previousScale = points[i].GetComponent<Transform>().localScale;
+				//previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
+				//points [i].transform.localScale = previousScale;
+				//points[i] = GetComponent<Transform>().parent.position + new Vector3 (points[i].x, height + Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale, points[i].z);
+					points [i].y = y;
+				//Debug.DrawLine (points[i].transform.position, (i == 0 ? points[points.Count-1].transform.position : points[i-1].transform.position), Color.green, 0.02f, true);
+				}
+			}
+			GetComponent<LineRenderer> ().SetPositions (points);
 		}
-		GetComponent<LineRenderer>().SetPositions(points);
 	}
+
 }
