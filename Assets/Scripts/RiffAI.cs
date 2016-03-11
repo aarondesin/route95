@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +25,24 @@ public class RiffAI : MonoBehaviour{
 			//Compare riff in each case to the given riff,
 			//adding points to that case's score in the dicitonary.
 			for (int i = 0; i < playerRiff.beatsShown*4; i++) {
-				if (playerRiff.notes[i].Count == caseRiff.notes[i].Count) {
+				/*if (playerRiff.notes[i].Count == caseRiff.notes[i].Count) {
 					SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
 				}
-				/*for (int j=0; j <playerRiff.notes[i].Count; j++) {
+				*/
+				for (int j=0; j <playerRiff.notes[i].Count; j++) {
+					try {
+						var test_a = playerRiff.notes[i][j];
+						var test_b = caseRiff.notes[i][j];
+					}
+					catch {
+						break;
+					}
 					if (playerRiff.notes[i][j].Equals(caseRiff.notes[i][j])) {
-						Debug.Log(playerRiff.name);
-						Debug.Log(playerRiff.notes[i].Count);
+						//Debug.Log(playerRiff.name);
+						//Debug.Log(playerRiff.notes[i].Count);
 						SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
 					}
-				}*/
+				}
 			}
 		}
 
@@ -50,19 +59,10 @@ public class RiffAI : MonoBehaviour{
 				bestCase = key;
 			}
 		}
-		//find best melody case
-		//		if (!isPercussion) {
-		//			foreach (Riff key in melodySimilarityDicitonary.Keys) {
-		//				if (melodySimilarityDicitonary[key] > bestMelodyScore) {
-		//					bestMelodyScore = melodySimilarityDicitonary [key];
-		//					bestMelodyCase = key;
-		//				}
-		//			}
-		//		}
-
 		//if we have a good match, return it
-		Debug.Log ("inside similaeity, bestscore " + bestScore);
+		Debug.Log ("inside similarity, bestscore " + bestScore);
 		if (bestScore > minimumSimilarityValue){
+			//Debug.Log ("bestcase: " + bestCase.ToString());
 			return bestCase;
 		}
 		//else, return null
@@ -79,42 +79,83 @@ public class RiffAI : MonoBehaviour{
 	//Then loops forward from that position in the closest case,
 	//until it finds a non-empty note. This non-empty note is the hint
 	//for the next note the player should play.
-	public int FindHintXPosition(Riff closestCase, Riff playerRiff){
+	public int FindHintXPosition(Riff playerRiff, int subdivs){
 		int playerPosition = -1;
-		Debug.Log ("inside findhintX " );
+		Riff closestCase = FindSimilarCase(playerRiff);
+		if (closestCase == null) {
+			return -1;
+		}
+		int suggestionPosition = -1;
+		Debug.Log ("inside findhintX: " );
 		//int i = 16;
-		//foreach(Note note in playerRiff[i]){
-		for (int i = playerRiff.beatsShown*4-1; i >= 0; --i){
+		//foreach(Note note in playerRiff[i]){ 		*(int)(Math.Pow(2, subdivs))
+		for (int i = playerRiff.beatsShown*4 - 1; i >= 0; --i){
 			if (playerRiff.notes[i].Any() == true){
 				playerPosition = i;
 				break;
 			}
 		}
-		return playerPosition;
-	}
-
-	public int FindHintYPosition (Riff playerRiff, Scale scaleDude) {
-		//Debug.Log ("inside findhintY ");
-		Riff closestCase = FindSimilarCase(playerRiff);
-		int playerPosition = FindHintXPosition (closestCase, playerRiff);
-
-		Note caseNote = new Note();
+		Debug.Log ("inside findhintX: playerPosition = " + playerPosition);
+		//Note caseNote = new Note();
 		//caseNote = closestCase.notes[playerPosition][0];
-		Debug.Log ("inside findhintY, below Note");
-		Debug.Log ("inside findhintY, closestCase " + (closestCase == null));
-
-		for (; playerPosition < closestCase.beatsShown*4-1; ++playerPosition){// replace 16 with a dynamic value from riff class
-			Debug.Log ("inside findhintY, in for, outside if ");
-			if (closestCase.notes[playerPosition].Any() == true){
-				Debug.Log ("inside findhintY, in if ");
-				caseNote = closestCase.notes[playerPosition][0];// return note at a specific position still broken
+		for (int i = playerPosition + 1; i < closestCase.beatsShown*4; ++i){
+			//Debug.Log ("inside findhintY, in for, outside if ");
+			int q = 99;
+			switch (subdivs) {
+				case 2:
+					q = 0;
+					break;
+				case 1:
+					q = 1;
+					break;
+				case 0:
+					q = 3;
+					break;
+			}
+			Debug.Log ("q = " + q);
+			if (i + q >= closestCase.notes.Count) {
+				return -1;
+			}
+			if (closestCase.notes[i].Any() == true){
+				//Debug.Log ("inside findhintY, in if");
+				suggestionPosition = i;
+				Debug.Log ("inside findhintX, suggestedX = " + suggestionPosition);
+				break;
 			}
 		}
-		Debug.Log ("inside findhintY scale dude " + scaleDude.allNotes);
+		return suggestionPosition;
+	}
+
+	public int FindHintYPosition (Riff playerRiff, Scale scaleDude, int subdivs) {
+		//Debug.Log ("inside findhintY ");
+		Riff closestCase = FindSimilarCase(playerRiff);
+		if (closestCase == null) {
+			return -1;
+		}
+		int suggestedPosition = FindHintXPosition (playerRiff, subdivs);
+		Debug.Log ("inside findhintY, suggestedPosition = " + suggestedPosition);
+		if (suggestedPosition < 0) {
+			return -1;
+		}
+		Note caseNote = new Note();
+		//caseNote = closestCase.notes[playerPosition][0];
+		//Debug.Log ("inside findhintY, below Note");
+		Debug.Log ("inside findhintY, closestCase is null " + (closestCase == null));
+		caseNote = closestCase.notes[suggestedPosition][0];// return note at a specific position still broken
+		Debug.Log ("inside findhintY, casenote = " + caseNote.ToString());
+
+		//Debug.Log ("inside findhintY scale dude " + scaleDude.allNotes.ToString());
 		List<string> matchNotes = scaleDude.allNotes;
+		Debug.Log ("scaleDude.allnotes count = " + matchNotes.Count);
 		for (int i = 0; i < matchNotes.Count; i++) {
-			if (matchNotes [i] == caseNote.filename)
+			//Debug.Log ("scale[" + i + "] = " + matchNotes[i]);
+			if (matchNotes [i] == caseNote.filename) {
+				//int j = i - 1;
+				Debug.Log ("return findhintY: y = " + i);
+				Debug.Log ("caseNote.filename: " + caseNote.filename);
+				Debug.Log ("matchNotes [i]: " + matchNotes [i]);
 				return i;
+			}
 		}
 
 
