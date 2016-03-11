@@ -34,7 +34,7 @@ public class WorldManager : MonoBehaviour {
 
 	private DynamicTerrain terrain;
 	private float[] freqDataArray;
-	private GameObject road;
+	public GameObject road;
 	private GameObject sun;
 	private GameObject moon;
 
@@ -147,6 +147,7 @@ public class WorldManager : MonoBehaviour {
 	void createRoad(){
 		road = new GameObject ("Road");
 		road.AddComponent<MeshFilter> ();
+		road.AddComponent<MeshCollider> ();
 		road.AddComponent<Bezier> ();
 	}
 

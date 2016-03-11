@@ -34,9 +34,17 @@ public class Bezier : MonoBehaviour{
 	public bool flipped;
 
 	public void Reset () {
-		if (points == null) {
-			points = new Vector3[0];
-		}
+		points = new Vector3[4];
+		points [0] = WorldManager.instance.player.transform.position;
+		points [0].y = 2.227f;
+		points [1].z = points [0].z + 10f;
+		points [1].y = points [0].y;
+		points [2].z = points [1].z + 10f;
+		points [2].y = points [1].y;
+		points [3].z = points [2].z + 10f;
+		points [3].y = points [2].y;
+		points [3].x = points [2].x + 5f;
+		steps = 1;
 		modes = new BezierControlPointMode[points.Length / 2];
 		for (int i=0; i<modes.Length; i++) {
 			modes [i] = BezierControlPointMode.Free;
@@ -94,8 +102,8 @@ public class Bezier : MonoBehaviour{
 		float closestVal = Mathf.Infinity;
 		int closestInd = 0;
 		Vector3 sPt = points [0];
-		for (int i=1; i<= steps; i++) {
-			Vector3 ePt = GetPoint2(i/(float)steps);
+		for (int i=1; i<= CurveCount; i++) {
+			Vector3 ePt = GetPoint2(i/(float)CurveCount);
 			var segment = (ePt-sPt).normalized;
 			var dot = Mathf.Abs(Vector3.Dot (pt-sPt, segment));
 			if (dot <= closestVal) {
@@ -106,8 +114,8 @@ public class Bezier : MonoBehaviour{
 			}
 			sPt = ePt;
 		}
-		Debug.Log ("On segment " + closestInd + "-" + (closestInd + 1));
-		return ClosestPointOnLine(GetPoint2 (closestInd/(float)steps), GetPoint2 ((closestInd+1)/(float)steps), pt);
+		//Debug.Log ("On segment " + closestInd + "-" + (closestInd + 1));
+		return ClosestPointOnLine(GetPoint (closestInd/(float)CurveCount), GetPoint2 ((closestInd+1)/(float)CurveCount), pt);
 	}
 
 	
@@ -129,17 +137,19 @@ public class Bezier : MonoBehaviour{
 		} else {
 			point = WorldManager.instance.player.transform.position;
 		}
+		Vector3 direction = point - points [points.Length - 2];
 		Array.Resize (ref points, points.Length + 3);
-		point.x += 1f;
+		point += direction;
 		points [points.Length - 3] = point;
-		point.x += 1f;
+		point += direction;
 		points [points.Length - 2] = point;
-		point.x += 1f;
+		point += direction;
 		points [points.Length - 1] = point;
 
 		Array.Resize (ref modes, modes.Length + 1);
 		modes [modes.Length - 1] = modes [modes.Length - 2];
 		EnforceMode (points.Length - 4);
+		steps++;
 	}
 
 	public int CurveCount {
@@ -209,13 +219,39 @@ public class Bezier : MonoBehaviour{
 		points [enforcedIndex] = middle + enforcedTangent;
 	}
 
-	private void Start () {
+	void Start () {
 		points = new Vector3[0];
 		Reset ();
 		AddCurve ();
 		AddCurve ();
-		Build ();
+		//Build ();
 		//Rebuild ();
+	}
+
+	void Update() {
+		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > 800f) {
+			//remove far away points behind the player
+			Debug.Log("Removing old points");
+			Vector3[] newPoints = new Vector3[points.Length - 3];
+			for (int i = 0; i < newPoints.Length; i++) {
+				newPoints [i] = points [i + 3];
+			}
+		}
+		if (Vector3.Distance (points [0], WorldManager.instance.player.transform.position) < 800f) {
+			//create points on the curve behind the player
+			//this shouldn't ever be used, unless we reverse
+			//Debug.Log("fucked up first");
+		}
+		if (Vector3.Distance (points [points.Length - 1], WorldManager.instance.player.transform.position) < 800f) {
+			//create points on the curve in front of the player
+			AddCurve ();
+			Debug.Log ("Adding new curve");
+		}else if (Vector3.Distance (points [points.Length - 4], WorldManager.instance.player.transform.position) > 800f) {
+			//remove far away points in front of the player
+			//this shouldn't ever be used, unless we reverse
+			//Array.Resize (ref points, points.Length -3);
+			Debug.Log ("fucked up second");
+		}
 	}
 
 	public void Build () {
@@ -547,6 +583,8 @@ public class Bezier : MonoBehaviour{
 	
 	void OnDrawGizmosSelected () {
 		Gizmos.color = Color.blue;
+		Debug.Log (vertices);
+		Debug.Log (normals);
 		for (int i=0; i<vertices.Count && i<normals.Count; i++) {
 			Gizmos.DrawLine(GetComponent<Transform>().position+vertices[i], GetComponent<Transform>().position+vertices[i]+normals[i]*0.01f);
 		}
