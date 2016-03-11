@@ -87,6 +87,9 @@ public class GameManager : MonoBehaviour {
 	bool hasShownSongArrangerHelp = false;
 	bool hasShownRiffEditorHelp = false;
 
+	public GameObject shortSongWarningPrompt;
+	int shortSongWarningThreshold = 6;
+
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
@@ -124,6 +127,7 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(liveIcons);
 		DisableMenu(tooltip);
 		DisableMenu(songProgressBar);
+		DisableMenu(shortSongWarningPrompt);
 		SwitchToMenu(Menu.Main);
 		Load();
 		//StartCoroutine("Load");
@@ -237,6 +241,14 @@ public class GameManager : MonoBehaviour {
 		currentMenu = (Menu)menu;
 	}
 
+	public void AttemptSwitchToLive () {
+		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold) {
+			EnableMenu(shortSongWarningPrompt);
+		} else {
+			SwitchToLive();
+		}
+	}
+
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
 		paused = false;
@@ -250,6 +262,8 @@ public class GameManager : MonoBehaviour {
 		EnableMenu(songProgressBar);
 		if (MusicManager.instance.loopSong) EnableMenu(loopIcon);
 		else DisableMenu(loopIcon);
+		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewChase);
+		MusicManager.instance.StartSong();
 
 		if (!hasShownLiveHelp) {
 			ShowLiveHelp();
