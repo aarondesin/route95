@@ -25,8 +25,8 @@ public class InputManager : MonoBehaviour {
 
 	public static List<KeyCode> mappedLicks = new List<KeyCode>() {
 		KeyCode.Q,
-		KeyCode.W
-		//KeyCode.E
+		KeyCode.W,
+		KeyCode.E
 	};
 
 	void Start () {
@@ -70,8 +70,8 @@ public class InputManager : MonoBehaviour {
 					keyToLick = new Dictionary<KeyCode, int>() {
 						
 						{ KeyCode.Q, 0 },
-						{ KeyCode.W, 1 }
-						//{ KeyCode.E, 2 }
+						{ KeyCode.W, 1 },
+						{ KeyCode.E, 2 }
 
 
 					};
@@ -83,8 +83,8 @@ public class InputManager : MonoBehaviour {
 					keyToLick = new Dictionary<KeyCode, int>() {
 						
 						{ KeyCode.Q, 0 },
-						{ KeyCode.W, 1 }
-						//{ KeyCode.E, 2 }
+						{ KeyCode.W, 1 },
+						{ KeyCode.E, 2 }
 
 
 					};
