@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class InputManager : MonoBehaviour {
 
@@ -21,12 +22,12 @@ public class InputManager : MonoBehaviour {
 		KeyCode.Alpha3
 	};
 
-	public static Dictionary<KeyCode, int> keyToLick;
-
-	public static List<KeyCode> mappedLicks = new List<KeyCode>() {
-		KeyCode.Q,
-		KeyCode.W,
-		KeyCode.E
+	public static Dictionary<KeyCode, int> keyToLick = new Dictionary<KeyCode, int>() {
+		{ KeyCode.Q, 0 },
+		{ KeyCode.W, 1 },
+		{ KeyCode.E, 2 },
+		{ KeyCode.R, 3 },
+		{ KeyCode.T, 4 }
 	};
 
 	void Start () {
@@ -55,7 +56,7 @@ public class InputManager : MonoBehaviour {
 					}
 				}
 				// Check for playing lick
-				foreach (KeyCode key2 in mappedLicks) {
+				foreach (KeyCode key2 in keyToLick.Keys.ToList()) {
 					if (Input.GetKey(key2)) {
 						if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
 							PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
@@ -67,14 +68,7 @@ public class InputManager : MonoBehaviour {
 				}
 				if (keyToLick == null) {
 					
-					keyToLick = new Dictionary<KeyCode, int>() {
-						
-						{ KeyCode.Q, 0 },
-						{ KeyCode.W, 1 },
-						{ KeyCode.E, 2 }
 
-
-					};
 					Debug.Log(keyToLick.Count);
 					Debug.Log (MusicManager.instance.licks.Count);
 				}

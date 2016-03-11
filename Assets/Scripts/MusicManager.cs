@@ -360,13 +360,6 @@ public class MusicManager : MonoBehaviour {
 
 	}
 
-	// Plays a single sound effect through OneShot AudioSource
-	public void PlayOneShot (AudioClip clip) {
-		OneShot.Stop();
-		OneShot.clip = clip;
-		OneShot.Play();
-	}
-
 	// Loads a single audio clip
 	void LoadAudioClip (string path) {
 		AudioClip sound = (AudioClip) Resources.Load (path);
@@ -626,6 +619,36 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
 				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Hat")}
+
+			}
+		});
+		licks[Instrument.RockDrums].Add (new Riff () {
+			name = "Example Drums Lick 4",
+			instrument = Instrument.RockDrums,
+			notes = new List<List<Note>>() {
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note> (){new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note> (),
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Hat")}
+
+			}
+		});
+		licks[Instrument.RockDrums].Add (new Riff () {
+			name = "Example Drums Lick 5",
+			instrument = Instrument.RockDrums,
+			notes = new List<List<Note>>() {
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
+				new List<Note> (){new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
+				new List<Note> (){new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Snare")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
+				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
+				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Kick")}
 
 			}
 		});
