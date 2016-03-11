@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public static InstrumentSetup instance;
 
 	public RiffAI riffai;
-	public bool DICKSAUCE;
+	public static bool DICKSAUCE = true;
 
 	// Icons for percussion setup buttons
 	public Sprite percussionEmpty;
@@ -60,8 +61,8 @@ public class InstrumentSetup : MonoBehaviour {
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
-		//riffai = new RiffAI ();
-		DICKSAUCE = true;
+		riffai = new RiffAI ();
+
 	}
 
 	// Calls appropriate Setup() function based on current instrument
@@ -211,6 +212,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void MakeMelodicButtons (string title, int row, string fileName) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
+		Debug.Log ("numbuttons (x length) " + numButtons);
 		//buttonGrid.Clear ();
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
 			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
@@ -250,7 +252,7 @@ public class InstrumentSetup : MonoBehaviour {
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
 				if (InstrumentSetup.currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
 				else ClearSuggestions();
-				//Suggest (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
+				Suggest ();
 				//SuggestChords(bt);
 				
 				Toggle(bt.GetComponent<Button>());
@@ -364,26 +366,38 @@ public class InstrumentSetup : MonoBehaviour {
 		tempoText.text = MusicManager.instance.tempo.ToString();
 	}
 
-	void Suggest (int pos) {
-		if (pos >= buttons.Count) {
-			Debug.LogError ("Suggestion out of bounds!");
+	void Suggest () {
+		int posX = riffai.FindHintXPosition (currentRiff, subdivsShown);
+		Debug.Log ("posX = " + posX);
+		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [Instrument.ElectricGuitar], subdivsShown);
+		Debug.Log ("posY = " + posY);
+		if (posX >= buttonGrid.Count || posX < 0) {
+			Debug.Log ("Suggestion X out of bounds!");
 			return;
-		} else {
-			Debug.Log("Suggesting "+pos);
+		}
+		if (posY >= buttonGrid[0].Count || posY < 0) {
+			Debug.Log ("Suggestion Y out of bounds!");
+			return;
+		} 
+		else {
+			int subPower = Convert.ToInt32(Math.Pow(2, subdivsShown));
+			//Debug.Log("posx "+posX+" subdivs pow" + subPower);
+			//int processedX = (posX * (subPower)) -1;
+			//int processedX = (posX * (2)) -1;
+			Debug.Log("Suggesting "+posX+" " + posY);
 			Debug.Log ("curr key " + MusicManager.instance.currentKey);
 			Debug.Log (" curr inst " +InstrumentSetup.currentRiff.instrument);
 			Debug.Log (" guitar " + Instrument.ElectricGuitar);
-			//FOR TESTING PURPOSES
+			Debug.Log("buttongrid x length: " + buttonGrid.Count);
+			Debug.Log("buttongrid Y length: " + buttonGrid[posX].Count);
+			//Debug.Log ("processedX: " + processedX);
+			Suggest (buttonGrid[posX][posY]);
 
-			//if (DICKSAUCE) {
-			//CaseLibrary.initializecases ();
-			//DICKSAUCE = false;
-			//}
-			Suggest (buttons[riffai.FindHintYPosition(currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [InstrumentSetup.currentRiff.instrument])*subdivsShown + pos+1]);
 		}
 	}
 
 	void Suggest (GameObject button) {
+		Debug.Log ("in Suggest");
 		Sprite img = button.GetComponent<Image>().sprite;
 		if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
 			button.GetComponent<Image>().sprite = percussionSuggested;

@@ -12,22 +12,22 @@ public class CaseLibrary{
 			name = "test",
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>> () {
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
+				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].root[0]) },
 				new List<Note> (),
 				new List<Note> (),
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") },
-				new List<Note> () { new Note ("Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A2") }
+				new List<Note> (),
+				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].second[0]) },
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].seventh[0])},
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> (),
+				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fourth[0])},
+				new List<Note> () ,
+				new List<Note> (){new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].second[0])},
+				new List<Note> ()
 			}
 		});
 	}

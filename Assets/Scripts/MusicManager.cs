@@ -446,6 +446,28 @@ public class MusicManager : MonoBehaviour {
 				}
 			});
 			riffs.Add( new Riff () {
+				name = "Test",
+				instrument = Instrument.ElectricGuitar,
+				notes = new List<List<Note>>() {
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].root[0]) },
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].fifth[0]) },
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].seventh[0])},
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> (),
+					new List<Note> ()
+				}
+			});
+			riffs.Add( new Riff () {
 				name = "Example Bass Riff",
 				instrument = Instrument.ElectricBass,
 				notes = new List<List<Note>>() {
@@ -541,13 +563,8 @@ public class MusicManager : MonoBehaviour {
 					new List<Note> () ,
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].third[0]) },
 					new List<Note> () ,
-					new List<Note> () ,
-					new List<Note> () ,
-					new List<Note> () ,
-					new List<Note> () ,
-					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].fifth[0]) },
-					new List<Note> () ,
-					new List<Note> () ,
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].third[0]) },
+					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].root[0]) },
 					new List<Note> ()
 				}
 			});
