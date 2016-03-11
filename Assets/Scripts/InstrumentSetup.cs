@@ -82,8 +82,8 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
 		}
-		scrollBarH.value = 0f;
-		scrollBarV.value = 1f;
+		scrollBarH.value = 0.01f;
+		scrollBarV.value = 0.99f;
 		playRiffButton.GetComponent<Image>().sprite = play;
 		UpdateBeatsText();
 		UpdateTempoText();
@@ -405,6 +405,7 @@ public class InstrumentSetup : MonoBehaviour {
 	void ClearSuggestions () {
 		foreach (GameObject suggestion in suggestions) Destroy(suggestion);
 		suggestions.Clear();
+		GameManager.instance.HideTooltip();
 	}
 
 	void SuggestMinorChord (GameObject button) {

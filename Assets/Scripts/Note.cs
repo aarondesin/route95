@@ -14,8 +14,8 @@ public class Note {
 	
 	public AudioClip sound;
 	public string filename; // name of audio clip
-	float volume;
-	float duration;
+	public float volume;
+	public float duration;
 
 	public Note () {
 		sound = null;
