@@ -32,8 +32,7 @@ public class Spectrum2 : MonoBehaviour {
 	void Update () {
 		//Debug.Log ("dikkudes");
 		//if (DynamicTerrain.instance == null) Debug.Log ("weehee");
-		if (GameManager.instance.currentMode == Mode.Live &&
-			DynamicTerrain.instance != null) {
+		if (DynamicTerrain.instance != null) {
 
 			//float[] freqDataArray = new float[256];
 			//LinInt spectrum = new LinInt (freqDataArray);

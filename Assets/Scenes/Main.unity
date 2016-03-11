@@ -8472,7 +8472,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &872671700
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8837,7 +8837,7 @@ MonoBehaviour:
   CHUNK_SIZE: 100
   CHUNK_RESOLUTION: 10
   LOADED_CHUNK_RADIUS: 8
-  VERT_HEIGHT_SCALE: 600
+  VERT_HEIGHT_SCALE: 800
   VERT_UPDATE_DISTANCE: 600
   TERRAIN_MATERIAL: {fileID: 2100000, guid: b439d74372e8dff4f8d601f12ded9868, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
@@ -11706,9 +11706,9 @@ RectTransform:
   - {fileID: 1356348916}
   m_Father: {fileID: 1803614118}
   m_RootOrder: 3
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000030518, y: 410}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0.000030518, y: -64}
   m_SizeDelta: {x: 440, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1192401271
