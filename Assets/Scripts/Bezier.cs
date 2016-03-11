@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 
-public class Bezier : MonoBehaviour {
+public class Bezier : MonoBehaviour{
 
 	[SerializeField]
 	private Vector3[] points;
@@ -34,6 +34,9 @@ public class Bezier : MonoBehaviour {
 	public bool flipped;
 
 	public void Reset () {
+		if (points == null) {
+			points = new Vector3[0];
+		}
 		modes = new BezierControlPointMode[points.Length / 2];
 		for (int i=0; i<modes.Length; i++) {
 			modes [i] = BezierControlPointMode.Free;
@@ -117,7 +120,15 @@ public class Bezier : MonoBehaviour {
 	}
 
 	public void AddCurve () {
-		Vector3 point = points [points.Length - 1];
+		if (points == null) {
+			points = new Vector3[0];
+		}
+		Vector3 point;
+		if (points.Length > 0) {
+			point = points [points.Length - 1];
+		} else {
+			point = WorldManager.instance.player.transform.position;
+		}
 		Array.Resize (ref points, points.Length + 3);
 		point.x += 1f;
 		points [points.Length - 3] = point;
@@ -199,6 +210,11 @@ public class Bezier : MonoBehaviour {
 	}
 
 	private void Start () {
+		points = new Vector3[0];
+		Reset ();
+		AddCurve ();
+		AddCurve ();
+		Build ();
 		//Rebuild ();
 	}
 

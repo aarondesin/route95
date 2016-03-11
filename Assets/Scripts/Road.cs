@@ -8,6 +8,7 @@ public class Road : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		roadBezier = new Bezier ();
+		roadBezier.Reset ();
 	}
 	
 	// Update is called once per frame

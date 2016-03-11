@@ -34,6 +34,7 @@ public class WorldManager : MonoBehaviour {
 
 	private DynamicTerrain terrain;
 	private float[] freqDataArray;
+	private GameObject road;
 	private GameObject sun;
 	private GameObject moon;
 
@@ -51,6 +52,8 @@ public class WorldManager : MonoBehaviour {
 		createSun();
 		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
+
+		createRoad ();
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -140,7 +143,13 @@ public class WorldManager : MonoBehaviour {
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 	}
-		
+
+	void createRoad(){
+		road = new GameObject ("Road");
+		road.AddComponent<MeshFilter> ();
+		road.AddComponent<Bezier> ();
+	}
+
 	// Attempts to place a single decoration
 	// May be called more than once
 	void Decorate (Chunk chunk, GameObject decoration) {
