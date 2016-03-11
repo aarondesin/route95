@@ -90,7 +90,8 @@ public class Sounds : MonoBehaviour {
 			"Audio/Instruments/Percussion/RockDrums_Kick",
 			"Audio/Instruments/Percussion/RockDrums_Snare",
 			"Audio/Instruments/Percussion/RockDrums_Tom",
-			"Audio/Instruments/Percussion/RockDrums_Hat"
+			"Audio/Instruments/Percussion/RockDrums_Hat",
+			"Audio/Instruments/Percussion/RockDrums_Crash",
 			} }
 	};
 }

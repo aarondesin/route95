@@ -122,6 +122,7 @@ public class InstrumentSetup : MonoBehaviour {
 			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
 			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
 			MakePercussionButtons ("Hat", 3, "Audio/Instruments/Percussion/RockDrums_Hat", hatIcon);
+			MakePercussionButtons ("Crash", 4, "Audio/Instruments/Percussion/RockDrums_Crash", hatIcon);
 			break;
 		}
 	}

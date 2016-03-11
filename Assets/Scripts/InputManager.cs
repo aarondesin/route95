@@ -69,8 +69,8 @@ public class InputManager : MonoBehaviour {
 					
 					keyToLick = new Dictionary<KeyCode, int>() {
 						
-						{ KeyCode.Q, 0 }
-						//{ KeyCode.W, 1 },
+						{ KeyCode.Q, 0 },
+						{ KeyCode.W, 1 }
 						//{ KeyCode.E, 2 }
 
 
