@@ -604,15 +604,12 @@ public class MusicManager : MonoBehaviour {
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].root[0]) },
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].third[0]) },
 					new List<Note> () ,
-<<<<<<< HEAD
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].third[0]) },
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].root[0]) },
-					new List<Note> ()
-=======
+					new List<Note> (),
 					new List<Note> () ,
 					new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].fifth[0]) },
 					new List<Note> () 
->>>>>>> origin/master
 				}
 			});
 			licks[Instrument.ElectricBass].Add (new Riff () {

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿using UnityEngine;
-=======
 using UnityEngine;
->>>>>>> origin/master
 using System;
 using System.Collections;
 using System.Collections.Generic;
