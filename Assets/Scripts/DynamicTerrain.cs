@@ -8,6 +8,7 @@ using UnityEditor;
 #endif
 
 public class DynamicTerrain {
+	public static DynamicTerrain instance;
 
 	private float HEIGHT_SCALE; //scales the heights of the vertices from the LinInt data
 	private float CHUNK_SIZE; //the width of the terrain square in Unity distance units
@@ -22,6 +23,31 @@ public class DynamicTerrain {
 	private List<Chunk> activeChunks; //list of active chunks
 	private GameObject player;
 
+	public LinInt freqData;
+	public int freqSampleSize = 128;
+	public FFTWindow fftWindow = FFTWindow.Rectangular;
+
+	LinInt UpdateFreqData () {
+		float[] data = new float[freqSampleSize];
+		foreach (AudioSource source in MusicManager.instance.instrumentAudioSources.Values) {
+			float[] sample = new float[freqSampleSize];
+			source.GetSpectrumData (sample, 0, fftWindow);
+			for (int i = 0; i < freqSampleSize; i++) {
+				//Debug.Log (sample [i]);
+				//if (sample [i] == float.NaN && sample[i] == 0f)
+				//	Debug.Log ("dicknuts");
+				if (sample [i] != float.NaN && sample [i] != 0f) {
+					if (source == MusicManager.instance.instrumentAudioSources [(Instrument)0]) {
+						data [i] = sample [i];
+					} else {
+						data [i] += sample [i];
+					}
+				}
+			}
+		}
+		return new LinInt (data);
+	}
+
 	//if no value given for parameters in Unity Editor, set to these defaults
 
 	public void translateWorld (Vector3 offset){
@@ -33,6 +59,7 @@ public class DynamicTerrain {
 	}
 
 	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius, float vertUpdateDist, float heightScale){
+		instance = this;
 		activeChunks = new List<Chunk>();
 		this.player = player;
 		CHUNK_SIZE = chunkSize;
@@ -47,8 +74,9 @@ public class DynamicTerrain {
 	}
 
 	void updateChunks(float[] freqDataArray){
-		AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
-		LinInt freqData = new LinInt (freqDataArray);
+		//AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
+		//LinInt freqData = new LinInt (freqDataArray);
+		freqData = UpdateFreqData();
 		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
 		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
 		createChunkLists (xChunks, yChunks);

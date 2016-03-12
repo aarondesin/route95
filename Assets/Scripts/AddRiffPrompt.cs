@@ -12,7 +12,6 @@ public class AddRiffPrompt : MonoBehaviour {
 
 	void Start () {
 		instance = this;
-		inputField.onEndEdit.AddListener (delegate { confirmButton.interactable = true; });
 	}
 
 	// Resets all selections on the prompt
@@ -21,6 +20,8 @@ public class AddRiffPrompt : MonoBehaviour {
 		inputField.text = "";
 		dropdown.value = 0;
 		confirmButton.interactable = false;
+		inputField.onEndEdit.RemoveAllListeners ();
+		inputField.onEndEdit.AddListener (delegate { confirmButton.interactable = true; });
 	}
 
 	// Initializes the instrument selection dropdown

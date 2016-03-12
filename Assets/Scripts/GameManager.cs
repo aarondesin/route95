@@ -242,7 +242,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void AttemptSwitchToLive () {
-		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold) {
+		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold && !MusicManager.instance.loopSong) {
 			EnableMenu(shortSongWarningPrompt);
 		} else {
 			SwitchToLive();
@@ -403,7 +403,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void ShowLiveHelp() {
-		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys Q to play with those instruments (more in the final version!)", "Okay");
+		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys QWERT to play with those instruments (more in the final version!). You can increase your song's tempo by pressing the up or down arrow keys.", "Okay");
 		Pause();
 	}
 
