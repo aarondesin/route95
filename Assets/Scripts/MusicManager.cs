@@ -367,7 +367,7 @@ public class MusicManager : MonoBehaviour {
 		if (sound == null) {
 			Debug.LogError("Failed to load AudioClip at "+path);
 		} else {
-			Debug.Log("Loaded "+path);
+			//Debug.Log("Loaded "+path);
 			//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
 			SoundClips.Add (path, sound);
 			GameManager.instance.IncrementLoadProgress();

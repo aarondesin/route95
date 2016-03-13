@@ -12558,7 +12558,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   riffai: {fileID: 0}
-  DICKSAUCE: 0
   percussionEmpty: {fileID: 21300000, guid: d48fa44c2cefb824fbecd9abfd4fb125, type: 3}
   percussionFilled: {fileID: 21300000, guid: aa6d2396bd3be5d4792ed1e3d2428bdc, type: 3}
   percussionSuggested: {fileID: 21300000, guid: 1672d6125f25ee64e8eacb38690d8c62,

@@ -21,6 +21,8 @@ public class RiffAI : MonoBehaviour{
 	public Riff FindSimilarCase(Riff playerRiff){
 		Dictionary<Riff, int> SimilarityDictionary = new Dictionary<Riff, int>();
 		foreach(Riff caseRiff in CaseLibrary.cases) {
+			if (caseRiff.instrument != playerRiff.instrument)
+				continue;
 			SimilarityDictionary.Add(caseRiff, 0);
 			//Compare riff in each case to the given riff,
 			//adding points to that case's score in the dicitonary.
@@ -38,7 +40,7 @@ public class RiffAI : MonoBehaviour{
 						break;
 					}
 					if (playerRiff.notes[i][j].Equals(caseRiff.notes[i][j])) {
-						//Debug.Log(playerRiff.name);
+						Debug.Log("playeRiff name " + playerRiff.name);
 						//Debug.Log(playerRiff.notes[i].Count);
 						SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
 					}
@@ -98,7 +100,7 @@ public class RiffAI : MonoBehaviour{
 		Debug.Log ("inside findhintX: playerPosition = " + playerPosition);
 		//Note caseNote = new Note();
 		//caseNote = closestCase.notes[playerPosition][0];
-		for (int i = playerPosition + 1; i < closestCase.beatsShown*4; ++i){
+		for (int i = playerPosition + 1; i < playerRiff.beatsShown*4; ++i){
 			//Debug.Log ("inside findhintY, in for, outside if ");
 			int q = 99;
 			switch (subdivs) {
@@ -122,6 +124,11 @@ public class RiffAI : MonoBehaviour{
 				Debug.Log ("inside findhintX, suggestedX = " + suggestionPosition);
 				break;
 			}
+		}
+
+		if (suggestionPosition % Math.Pow (2, 2-subdivs) != 0) {
+			return -1;
+
 		}
 		return suggestionPosition;
 	}
@@ -149,6 +156,8 @@ public class RiffAI : MonoBehaviour{
 		Debug.Log ("scaleDude.allnotes count = " + matchNotes.Count);
 		for (int i = 0; i < matchNotes.Count; i++) {
 			//Debug.Log ("scale[" + i + "] = " + matchNotes[i]);
+			Debug.Log ("caseNote.filename: " + caseNote.filename);
+			Debug.Log ("matchNotes [i]: " + matchNotes [i]);
 			if (matchNotes [i] == caseNote.filename) {
 				//int j = i - 1;
 				Debug.Log ("return findhintY: y = " + i);

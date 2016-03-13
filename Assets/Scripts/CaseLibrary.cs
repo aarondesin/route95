@@ -13,7 +13,7 @@ public class CaseLibrary{
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>> () {
 				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].root[0]) },
-				new List<Note> (),
+				new List<Note> (){new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fourth[0])},
 				new List<Note> (),
 				new List<Note> (),
 				new List<Note> () {new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].second[0]) },
@@ -41,7 +41,7 @@ public class CaseLibrary{
 				new List<Note> ()
 			}
 		});
-		/*cases.Add( new Riff () {
+		cases.Add( new Riff () {
 			name = "Example Guitar Riff",
 			instrument = Instrument.ElectricGuitar,
 			notes = new List<List<Note>>() {
@@ -84,7 +84,7 @@ public class CaseLibrary{
 				new List<Note> (),
 				new List<Note> ()
 			}
-		});*/
+		});
 	}
 
 

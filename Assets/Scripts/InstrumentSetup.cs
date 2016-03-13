@@ -369,7 +369,9 @@ public class InstrumentSetup : MonoBehaviour {
 	void Suggest () {
 		int posX = riffai.FindHintXPosition (currentRiff, subdivsShown);
 		Debug.Log ("posX = " + posX);
-		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [Instrument.ElectricGuitar], subdivsShown);
+		//Debug.Log ("curr inst " + currentRiff.instrument);
+
+		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [ currentRiff.instrument], subdivsShown);
 		Debug.Log ("posY = " + posY);
 		if (posX >= buttonGrid.Count || posX < 0) {
 			Debug.Log ("Suggestion X out of bounds!");
@@ -385,9 +387,9 @@ public class InstrumentSetup : MonoBehaviour {
 			//int processedX = (posX * (subPower)) -1;
 			//int processedX = (posX * (2)) -1;
 			Debug.Log("Suggesting "+posX+" " + posY);
-			Debug.Log ("curr key " + MusicManager.instance.currentKey);
-			Debug.Log (" curr inst " +InstrumentSetup.currentRiff.instrument);
-			Debug.Log (" guitar " + Instrument.ElectricGuitar);
+			//Debug.Log ("curr key " + MusicManager.instance.currentKey);
+			//Debug.Log (" curr inst " +InstrumentSetup.currentRiff.instrument);
+			//Debug.Log (" guitar " + Instrument.ElectricGuitar);
 			Debug.Log("buttongrid x length: " + buttonGrid.Count);
 			Debug.Log("buttongrid Y length: " + buttonGrid[posX].Count);
 			//Debug.Log ("processedX: " + processedX);
