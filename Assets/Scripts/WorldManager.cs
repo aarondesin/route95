@@ -144,19 +144,25 @@ public class WorldManager : MonoBehaviour {
 	// Attempts to place a single decoration
 	// May be called more than once
 	void Decorate (Chunk chunk, GameObject decoration) {
-		//Debug.Log("yee");
-		Vector2 coordinate = new Vector2 (
-			chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
-			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
-		);
-		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
-				GameObject newDecoration = 
-					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
-				newDecoration.GetComponent<Decoration>().Randomize();
-				newDecoration.transform.parent = chunk.chunk.transform;
-				numDecorations++;
+		Decoration decorationProperties = decoration.GetComponent<Decoration>();
+
+		switch (decorationProperties.distribution) {
+
+		case DecorationDistribution.Random:
+			Vector2 coordinate = new Vector2 (
+				chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
+				chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
+			);
+			if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
+				if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+					GameObject newDecoration = 
+						(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
+					newDecoration.GetComponent<Decoration>().Randomize();
+					newDecoration.transform.parent = chunk.chunk.transform;
+					numDecorations++;
+				}
 			}
+			break;
 		}
 	}
 

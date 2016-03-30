@@ -1,9 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum DecorationDistribution {
+	Random,
+	Roadside
+}
+
 public class Decoration : MonoBehaviour {
 
 	public float density; // 0-1, density of population
+	public DecorationDistribution distribution;
 
 	public Vector3 positionOffset;
 	public Vector3 rotationOffset;
