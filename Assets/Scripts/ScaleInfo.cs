@@ -20,4 +20,14 @@ public class ScaleInfo {
 		rootIndex = 2
 	};
 
+	public static ScaleInfo Major = new ScaleInfo () {
+		secondIndex = 2,
+		thirdIndex = 2,
+		fourthIndex = 1,
+		fifthIndex = 2,
+		sixthIndex = 2,
+		seventhIndex = 2,
+		rootIndex = 1
+	};
+
 }

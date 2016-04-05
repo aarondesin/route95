@@ -82,6 +82,12 @@ public class InstrumentSetup : MonoBehaviour {
 		case Instrument.ElectricBass:
 			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
 			break;
+		case Instrument.AcousticGuitar:
+			InitializeMelodicSetup (MelodicInstrument.AcousticGuitar);
+			break;
+		case Instrument.ClassicalGuitar:
+			InitializeMelodicSetup (MelodicInstrument.ClassicalGuitar);
+			break;
 		}
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
@@ -155,6 +161,28 @@ public class InstrumentSetup : MonoBehaviour {
 				i++;
 			}
 			break;
+
+		case MelodicInstrument.AcousticGuitar: 
+
+		// Make rows of buttons for notes (in a grid)
+		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.AcousticGuitar].allNotes) {
+			//if (note == null)
+			//Debug.Log ("dick");
+			MakeMelodicButtons (note.Split ('_') [1], i, note);
+			i++;
+		}
+		break;
+
+		case MelodicInstrument.ClassicalGuitar: 
+
+		// Make rows of buttons for notes (in a grid)
+		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ClassicalGuitar].allNotes) {
+			//if (note == null)
+			//Debug.Log ("dick");
+			MakeMelodicButtons (note.Split ('_') [1], i, note);
+			i++;
+		}
+		break;
 		}
 	}
 

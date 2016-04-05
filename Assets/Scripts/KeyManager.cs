@@ -16,11 +16,50 @@ public class KeyManager : MonoBehaviour {
 
 	public void BuildScales () {
 		scales = new Dictionary<Key, Dictionary<Instrument, Scale>> () { 
+			// All E minor scales
 			{ Key.Eminor, new Dictionary<Instrument,Scale> () {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 0 ) },
-					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 0) }
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 0) },
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 0) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 0) }
 				}
-			}
+			},
+
+			// All C major scales
+			{ Key.CMajor, new Dictionary<Instrument,Scale> () {
+					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Major, 8 ) },
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Major, 8) },
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 8) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 8) }
+				}
+			},
+
+			// All F# minor scales
+			{ Key.FSharpMinor, new Dictionary<Instrument,Scale> () {
+					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 2 ) },
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 2) },
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 2) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 2) }
+				}
+			},
+
+			// All D minor scales
+			{ Key.DMinor, new Dictionary<Instrument,Scale> () {
+					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 10 ) },
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 10) },
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 10) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 10) }
+				}
+			},
+
+			// All D# minor scales
+			{ Key.DSharpMinor, new Dictionary<Instrument,Scale> () {
+					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 11 ) },
+					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 11) },
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 11) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 11) }
+				}
+			},
 		};
 	}
 

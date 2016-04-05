@@ -85,6 +85,64 @@ public class Sounds : MonoBehaviour {
 			"Audio/Instruments/Melodic/ElectricBass/ElectricBass_D#4"
 			} },
 
+		//Melodic.AcousticGuitar
+		{ "AcousticGuitar", new List<string> () {
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_E2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_F2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_F#2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_G2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_G#2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_A2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_A#2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_B2",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_C3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_C#3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_D3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_D#3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_E3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_F3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_F#3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_G3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_G#3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_A3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_A#3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_B3",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_C4",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_C#4",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_D4",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_D#4",
+				"Audio/Instruments/Melodic/AcousticGuitar/AcousticGuitar_E5"
+			} },
+
+		//Melodic.ClassicalGuitar
+		{ "ClassicalGuitar", new List<string> () {
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_E2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_F2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_F#2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_G2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_G#2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_A2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_A#2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_B2",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_C3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_C#3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_D3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_D#3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_E3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_F3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_F#3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_G3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_G#3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_A3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_A#3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_B3",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_C4",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_C#4",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_D4",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_D#4",
+				"Audio/Instruments/Melodic/ClassicalGuitar/ClassicalGuitar_E5"
+			} },
+
 		// Percussion.RockDrums
 		{ "RockDrums", new List<string> () {
 			"Audio/Instruments/Percussion/RockDrums_Kick",

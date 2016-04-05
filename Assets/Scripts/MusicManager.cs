@@ -18,7 +18,9 @@ public enum PercussionInstrument {
 // All melodic instruments
 public enum MelodicInstrument {
 	ElectricGuitar,
-	ElectricBass
+	ElectricBass,
+	AcousticGuitar,
+	ClassicalGuitar
 };
 
 // All instruments (melodic and percussion) for use by MusicManager
@@ -26,6 +28,8 @@ public enum Instrument {
 	RockDrums,
 	ElectricGuitar,
 	ElectricBass,
+	AcousticGuitar,
+	ClassicalGuitar,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
@@ -37,7 +41,11 @@ public enum Key{
 	EFlat,
 	EMajor,
 	Eminor,
-	FMajor
+	FMajor,
+	CMajor,
+	FSharpMinor,
+	DMinor,
+	DSharpMinor
 };
 
 public enum Tempo {
@@ -76,8 +84,10 @@ public class MusicManager : MonoBehaviour {
 
 	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
 		{ Instrument.ElectricGuitar, "Electric Guitar" },
-		{ Instrument.RockDrums, "Rock Drums" },
 		{ Instrument.ElectricBass, "Electric Bass" },
+		{ Instrument.AcousticGuitar, "Acoustic Guitar" },
+		{ Instrument.ClassicalGuitar, "Classical Guitar" },
+		{ Instrument.RockDrums, "Rock Drums" }
 	};
 		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)

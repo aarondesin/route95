@@ -17,11 +17,15 @@ public class InstrumentDisplay : MonoBehaviour {
 		instrumentIcons = new Dictionary<Instrument, Sprite>() {
 			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar") },
 			{ Instrument.ElectricBass, Resources.Load<Sprite>("UI/Instrument_ElectricBass") },
+			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar") },
+			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar") },
 			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums") }
 		};
 		instrumentIconGlows = new Dictionary<Instrument, Sprite>() {
 			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar_Glow") },
 			{ Instrument.ElectricBass, Resources.Load<Sprite>("UI/Instrument_ElectricBass_Glow") },
+			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar_Glow") },
+			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar_Glow") },
 			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums_Glow") }
 		};
 	}
