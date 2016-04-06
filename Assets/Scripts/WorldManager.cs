@@ -20,7 +20,8 @@ public class WorldManager : MonoBehaviour {
 	[SerializeField]
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
-		"Prefabs/Decoration_Saguaro"
+		"Prefabs/Decoration_Saguaro",
+		"Prefabs/Decoration_BarrelCactus"
 	};
 	public List<GameObject> decorations = new List<GameObject>();
 
@@ -38,8 +39,7 @@ public class WorldManager : MonoBehaviour {
 	private GameObject moon;
 
 	float startLoadTime;
-	bool loadedDecorations = false;
-	bool decorated = false;
+	bool loaded = false;
 
 	// Use this for initialization
 	void Start () {
@@ -70,24 +70,21 @@ public class WorldManager : MonoBehaviour {
 		GameManager.instance.ChangeLoadingMessage("Loading world...");
 		terrain.update(freqDataArray);
 		if (DO_DECORATE) {
-			StartCoroutine("LoadDecorations");
-			StartCoroutine("DoDecorate");
+			LoadDecorations();
+			DoDecorate();
 		}
+		NotifyLoadingDone();
 	}
 
-	IEnumerator LoadDecorations () {
+	void LoadDecorations () {
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
 			GameManager.instance.IncrementLoadProgress();
-			yield return null;
 		}
-		if (decorations.Count == decorationPaths.Count) {
-			loadedDecorations = true;
-			yield return null;
-		}
+
 	}
 
-	IEnumerator DoDecorate () {
+	void DoDecorate () {
 		
 
 		while (numDecorations < MAX_DECORATIONS) {
@@ -97,30 +94,20 @@ public class WorldManager : MonoBehaviour {
 				GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
-			yield return null;
 
 		}
 				
-		if (numDecorations >= MAX_DECORATIONS) {
-			decorated = true;
-			yield return NotifyLoadingDone();
-		} else {
-			yield return null;
-		}
 	}
 
-	IEnumerator NotifyLoadingDone () {
-		if (loadedDecorations && decorated) {
+	void NotifyLoadingDone () {
 			Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 			GameManager.instance.LoadNext();
-			StopCoroutine("DoLoad");
-			yield return null;
-		}
+		loaded = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (loadedDecorations && decorated) {
+		if (loaded) {
 			terrain.update(freqDataArray);
 			if (DO_DECORATE) {
 				for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
@@ -128,6 +115,7 @@ public class WorldManager : MonoBehaviour {
 				}
 			}
 		}
+
 	}
 
 	void createSun(){
@@ -171,7 +159,7 @@ public class WorldManager : MonoBehaviour {
 		if (decoration == null) {
 			Debug.LogError ("Failed to load decoration at "+path);
 		} else {
-			Debug.Log("Loaded "+path);
+			//Debug.Log("Loaded "+path);
 			decorations.Add(decoration);
 			GameManager.instance.IncrementLoadProgress();
 		}

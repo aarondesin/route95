@@ -9182,6 +9182,7 @@ MonoBehaviour:
   numDecorations: 0
   decorationPaths:
   - Prefabs/Decoration_Saguaro
+  - Prefabs/Decoration_BarrelCactus
   decorations: []
   TIME_SCALE: 0.01
   LIGHT_X_SCALE: 999999
