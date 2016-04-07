@@ -9179,6 +9179,8 @@ MonoBehaviour:
   DO_DECORATE: 1
   MAX_DECORATIONS: 500
   DECORATIONS_PER_STEP: 100
+  MAX_DECORATION_HEIGHT: 0
+  MIN_DECORATION_HEIGHT: 0
   numDecorations: 0
   decorationPaths:
   - Prefabs/Decoration_Saguaro
@@ -9186,6 +9188,8 @@ MonoBehaviour:
   - Prefabs/Decoration_Boulder01
   - Prefabs/Decoration_Boulder02
   - Prefabs/Decoration_Boulder03
+  - Prefabs/Decoration_Agave01
+  - Prefabs/Decoration_JoshuaTree01
   decorations: []
   TIME_SCALE: 0.01
   LIGHT_X_SCALE: 999999
