@@ -17,6 +17,8 @@ public class WorldManager : MonoBehaviour {
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
 	public int DECORATIONS_PER_STEP;
+	public float MAX_DECORATION_HEIGHT;
+	public float MIN_DECORATION_HEIGHT;
 	[SerializeField]
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
@@ -90,7 +92,7 @@ public class WorldManager : MonoBehaviour {
 		while (numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 					//Debug.Log("dick");
-				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+				AttemptDecorate ();
 				GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
@@ -109,13 +111,32 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		if (loaded) {
 			terrain.update(freqDataArray);
-			if (DO_DECORATE) {
-				for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
-					Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+			AttemptDecorate();
+		}
+
+	}
+
+	void AttemptDecorate () {
+		if (DO_DECORATE) {
+			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
+
+				// Pick a random decoration and decorate with it
+				GameObject decoration = decorations[Random.Range(0, decorations.Count)];
+				switch (decoration.GetComponent<Decoration>().distribution) {
+				case DecorationDistribution.Random:
+					DecorateRandom (terrain.RandomChunk(), decoration);
+					break;
+				case DecorationDistribution.Roadside:
+					break;
+				case DecorationDistribution.CloseToRoad:
+					DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
+					break;
+
+
+
 				}
 			}
 		}
-
 	}
 
 	void createSun(){
@@ -129,28 +150,26 @@ public class WorldManager : MonoBehaviour {
 		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 	}
 		
-	// Attempts to place a single decoration
-	// May be called more than once
-	void Decorate (Chunk chunk, GameObject decoration) {
-		Decoration decorationProperties = decoration.GetComponent<Decoration>();
-
-		switch (decorationProperties.distribution) {
-
-		case DecorationDistribution.Random:
-			Vector2 coordinate = new Vector2 (
-				chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
-				chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
-			);
-			if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-				if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
-					GameObject newDecoration = 
-						(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
-					newDecoration.GetComponent<Decoration>().Randomize();
-					newDecoration.transform.parent = chunk.chunk.transform;
-					numDecorations++;
+	void DecorateRandom (Chunk chunk, GameObject decoration) {
+		Vector2 coordinate = new Vector2 (
+			chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
+			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
+		);
+		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
+			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+				RaycastHit hit;
+				float y = 0f;
+				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, MAX_DECORATION_HEIGHT-MIN_DECORATION_HEIGHT)) {
+					Debug.Log("bap");
+					y = hit.point.y;
 				}
+					
+				GameObject newDecoration = 
+					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
+				newDecoration.GetComponent<Decoration>().Randomize();
+				newDecoration.transform.parent = chunk.chunk.transform;
+				numDecorations++;
 			}
-			break;
 		}
 	}
 

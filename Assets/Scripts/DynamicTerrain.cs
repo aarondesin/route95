@@ -21,6 +21,8 @@ public class DynamicTerrain {
 
 	private GameObject terrain;
 	private List<Chunk> activeChunks; //list of active chunks
+	private List<Chunk> activeRoadChunks; // list of active chunks with road on them
+	private List<Chunk> activeCloseToRoadChunks;
 	private GameObject player;
 
 	public LinInt freqData;
@@ -61,6 +63,8 @@ public class DynamicTerrain {
 	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius, float vertUpdateDist, float heightScale){
 		instance = this;
 		activeChunks = new List<Chunk>();
+		activeRoadChunks = new List<Chunk>();
+		activeCloseToRoadChunks = new List<Chunk>();
 		this.player = player;
 		CHUNK_SIZE = chunkSize;
 		CHUNK_RESOLUTION = chunkResolution;
@@ -98,6 +102,15 @@ public class DynamicTerrain {
 		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
 	}
 
+	// Returns a random chunk with road on it
+	public Chunk RandomRoadChunk() {
+		return activeRoadChunks[UnityEngine.Random.Range(0, activeRoadChunks.Count)];
+	}
+
+	public Chunk RandomCloseToRoadChunk() {
+		return activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
+	}
+
 	//populates lists of chunk coords to be loaded
 	void createChunkLists(List<int> xChunks, List<int> yChunks){
 		int playerChunkX = (int)Math.Floor((player.transform.position.x - this.terrain.transform.position.x) / CHUNK_SIZE);
@@ -125,6 +138,10 @@ public class DynamicTerrain {
 				}
 				if (!loaded) {
 					activeChunks.Add (createChunk(x, y));
+					if (x >= -1 && x <= 1) {
+						if (x == 0) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
+						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
+					}
 				}
 			}
 		}
@@ -147,6 +164,10 @@ public class DynamicTerrain {
 		}
 		foreach (Chunk chunk in deletions) {
 			activeChunks.Remove (chunk);
+			if (activeRoadChunks.Contains(chunk))
+				activeRoadChunks.Remove (chunk);
+			if (activeCloseToRoadChunks.Contains(chunk))
+				activeCloseToRoadChunks.Remove(chunk);
 		}
 	}
 

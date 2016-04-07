@@ -9177,12 +9177,15 @@ MonoBehaviour:
   DO_RANDOM_HEIGHT_MAPS: 0
   FREQ_ARRAY_SIZE: 256
   DO_DECORATE: 1
-  MAX_DECORATIONS: 1000
+  MAX_DECORATIONS: 500
   DECORATIONS_PER_STEP: 100
   numDecorations: 0
   decorationPaths:
   - Prefabs/Decoration_Saguaro
   - Prefabs/Decoration_BarrelCactus
+  - Prefabs/Decoration_Boulder01
+  - Prefabs/Decoration_Boulder02
+  - Prefabs/Decoration_Boulder03
   decorations: []
   TIME_SCALE: 0.01
   LIGHT_X_SCALE: 999999

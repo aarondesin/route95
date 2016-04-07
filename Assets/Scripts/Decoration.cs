@@ -2,8 +2,9 @@
 using System.Collections;
 
 public enum DecorationDistribution {
-	Random,
-	Roadside
+	Random, // truly random, based on density
+	Roadside, // for signs, placed alongside road facing either direction
+	CloseToRoad // placed close to road (good for small objects)
 }
 
 public class Decoration : MonoBehaviour {
