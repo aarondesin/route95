@@ -310,6 +310,8 @@ public class GameManager : MonoBehaviour {
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		TESTPlayerMovement.moving = false;
 		DisableMenu(loopIcon);
+		MusicManager.instance.currentSong = new Song();
+		SongTimeline.instance.RefreshTimeline();
 	}
 		
 	// Toggle visibility of system buttons
