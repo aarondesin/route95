@@ -13769,7 +13769,7 @@ Prefab:
     - target: {fileID: 2300000, guid: c6a0e0e4c64237e46a342ec944e54ca5, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: be55dcce5cd1c2246bbcb09b2cd5f494, type: 2}
+      objectReference: {fileID: 2100000, guid: 0d5f95dc6fc6e7b49bbc2bd86e2d1b5e, type: 2}
     - target: {fileID: 2300000, guid: c6a0e0e4c64237e46a342ec944e54ca5, type: 3}
       propertyPath: m_ReflectionProbeUsage
       value: 2
