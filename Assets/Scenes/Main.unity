@@ -13073,6 +13073,7 @@ MonoBehaviour:
   points: []
   scale: 50
   opacity: 0.5
+  fallRate: 5
 --- !u!120 &1277712147
 LineRenderer:
   m_ObjectHideFlags: 0

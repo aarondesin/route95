@@ -12,10 +12,12 @@ public class Spectrum2 : MonoBehaviour {
 	public Vector3[] points;
 	public float scale = 20f;
 	public float opacity;
+	public float fallRate;
 
 	void Start () {
 		instance = this;
 
+		// Initialize visualizer points
 		points = new Vector3[numberOfObjects];
 		for (int i=0; i<numberOfObjects; i++) {
 			float angle = i*Mathf.PI*2f/numberOfObjects;
@@ -30,26 +32,17 @@ public class Spectrum2 : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		//Debug.Log ("dikkudes");
-		//if (DynamicTerrain.instance == null) Debug.Log ("weehee");
 		if (DynamicTerrain.instance != null && DynamicTerrain.instance.freqData != null) {
 
-			//float[] freqDataArray = new float[256];
-			//LinInt spectrum = new LinInt (freqDataArray);
-
-			//LinInt spectrum = DynamicTerrain.instance.freqData;
-
 			for (int i = 0; i < numberOfObjects; i++) {
-				//Debug.Log("dick");
+				
 				float y = height + Mathf.Log (DynamicTerrain.instance.freqData.getDataPoint ((float)i / numberOfObjects)) * scale;
-				//Debug.Log (y);
 				if (y != float.NaN) {
-				//Vector3 previousScale = points[i].GetComponent<Transform>().localScale;
-				//previousScale.y = Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale;
-				//points [i].transform.localScale = previousScale;
-				//points[i] = GetComponent<Transform>().parent.position + new Vector3 (points[i].x, height + Mathf.Log(spectrum.getDataPoint ((float)i / numberOfObjects)) * scale, points[i].z);
-					points [i].y = y;
-				//Debug.DrawLine (points[i].transform.position, (i == 0 ? points[points.Count-1].transform.position : points[i-1].transform.position), Color.green, 0.02f, true);
+					if (y < points[i].y) {
+						points[i].y -= fallRate;
+					} else {
+						points [i].y = y;
+					}
 				}
 			}
 			GetComponent<LineRenderer> ().SetPositions (points);

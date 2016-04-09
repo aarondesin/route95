@@ -356,6 +356,9 @@ public class GameManager : MonoBehaviour {
 		menuObject.SetActive(false);
 	}
 
+	// Called when the user presses escape
+	// If in setup, it will ask to confirm exit
+	// If in live, it will pause the game
 	public void AttemptExit () {
 		switch (currentMode) {
 		case Mode.Setup: case Mode.Postplay:
@@ -367,14 +370,17 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	// Enables visibility of the tooltip with the given message
 	public void ShowTooltip (string message) {
 		tooltip.SetActive(true);
 		tooltip.GetComponent<Text>().text = message;
 	}
 
+	// Hides the tooltip
 	public void HideTooltip () {
 		tooltip.SetActive(false);
 	}
+
 
 	public void EnableLoadProjectPrompt () {
 		LoadProjectPrompt.instance.gameObject.SetActive(true);
