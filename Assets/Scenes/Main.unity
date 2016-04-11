@@ -4694,8 +4694,8 @@ GameObject:
   - 4: {fileID: 419966873}
   - 198: {fileID: 419966875}
   - 199: {fileID: 419966874}
-  m_Layer: 0
-  m_Name: Particle System
+  m_Layer: 8
+  m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8813,8 +8813,8 @@ GameObject:
   - 4: {fileID: 645894582}
   - 198: {fileID: 645894584}
   - 199: {fileID: 645894583}
-  m_Layer: 0
-  m_Name: Particle System (1)
+  m_Layer: 8
+  m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12292,6 +12292,7 @@ MonoBehaviour:
   LOADED_CHUNK_RADIUS: 8
   VERT_HEIGHT_SCALE: 800
   VERT_UPDATE_DISTANCE: 600
+  SMOOTH_FACTOR: 2
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
   FREQ_ARRAY_SIZE: 256
@@ -12485,7 +12486,7 @@ ReflectionProbe:
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294967039
   m_IntensityMultiplier: 1
   m_BlendDistance: 1
   m_HDR: 1

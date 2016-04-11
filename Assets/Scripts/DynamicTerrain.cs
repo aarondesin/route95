@@ -16,6 +16,7 @@ public class DynamicTerrain {
 	private Material TERRAIN_MATERIAL; //the material to apply to the terrain
 	private int LOADED_CHUNK_RADIUS; //number of chunks from the player's chunk to load
 	private float VERT_UPDATE_DISTANCE;
+	public float SMOOTH_FACTOR;
 
 	private int MAX_DECORATIONS; // maximum number of decorations
 
@@ -62,7 +63,7 @@ public class DynamicTerrain {
 		terrain.transform.localPosition += offset;
 	}
 
-	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius, float vertUpdateDist, float heightScale){
+	public DynamicTerrain (GameObject player, float chunkSize, int chunkResolution, Material material, int chunkRadius, float vertUpdateDist, float heightScale, float smoothFactor){
 		instance = this;
 		activeChunks = new List<Chunk>();
 		activeRoadChunks = new List<Chunk>();
@@ -78,6 +79,7 @@ public class DynamicTerrain {
 		VERT_UPDATE_DISTANCE = vertUpdateDist;
 		HEIGHT_SCALE = heightScale;
 		heightmap = new Dictionary<int, Dictionary<int, float>>();
+		SMOOTH_FACTOR = smoothFactor;
 	}
 
 	void updateChunks(float[] freqDataArray){
