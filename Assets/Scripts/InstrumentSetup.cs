@@ -183,7 +183,31 @@ public class InstrumentSetup : MonoBehaviour {
 			i++;
 		}
 		break;
+
+		/*case MelodicInstrument.PipeOrgan: 
+
+			// Make rows of buttons for notes (in a grid)
+			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.PipeOrgan].allNotes) {
+				//if (note == null)
+				//Debug.Log ("dick");
+				MakeMelodicButtons (note.Split ('_') [1], i, note);
+				i++;
+			}
+			break;
+
+		case MelodicInstrument.Keyboard: 
+
+			// Make rows of buttons for notes (in a grid)
+			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.Keyboard].allNotes) {
+				//if (note == null)
+				//Debug.Log ("dick");
+				MakeMelodicButtons (note.Split ('_') [1], i, note);
+				i++;
+			}
+			break;*/
 		}
+
+
 	}
 
 	// Creates all buttons for percussion setup

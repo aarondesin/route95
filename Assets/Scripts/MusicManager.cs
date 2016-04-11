@@ -21,6 +21,8 @@ public enum MelodicInstrument {
 	ElectricBass,
 	AcousticGuitar,
 	ClassicalGuitar
+	//PipeOrgan,
+	//Keyboard
 };
 
 // All instruments (melodic and percussion) for use by MusicManager
@@ -30,6 +32,8 @@ public enum Instrument {
 	ElectricBass,
 	AcousticGuitar,
 	ClassicalGuitar,
+	//PipeOrgan,
+	//Keyboard,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
@@ -87,6 +91,8 @@ public class MusicManager : MonoBehaviour {
 		{ Instrument.ElectricBass, "Electric Bass" },
 		{ Instrument.AcousticGuitar, "Acoustic Guitar" },
 		{ Instrument.ClassicalGuitar, "Classical Guitar" },
+		//{ Instrument.PipeOrgan, "PipeOrgan" },
+		//{ Instrument.Keyboard, "Keyboard" },
 		{ Instrument.RockDrums, "Rock Drums" }
 	};
 		
