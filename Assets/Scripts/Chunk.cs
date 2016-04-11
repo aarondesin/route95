@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
  * A chunk is a square mesh that's part of the larger terrain object.
@@ -33,6 +34,21 @@ public class Chunk{
 		chunk = createChunk (verts, uvs, triangles);
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
 		chunk.transform.position += new Vector3 (x * CHUNK_SIZE, 0f, y * CHUNK_SIZE);
+
+		int r = Random.Range (0, verts.Length-1);
+
+		for (int i=0; i<verts.Length; i++) {
+			
+			Vector2 c = IntToV2 (i);
+			if (DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) == float.NaN) {
+				DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+			} else {
+				verts[i].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y);
+			}
+			if (i == r) {
+				Debug.Log(""+i+"on chunk "+x+","+y+" maps to "+(int)c.x+","+(int)c.y);
+			}
+		}
 
 		//test for random height map
 		if (WorldManager.instance.DO_RANDOM_HEIGHT_MAPS) {
@@ -175,6 +191,8 @@ public class Chunk{
 
 		//mesh renderer stuff
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
+		chunk.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+		chunk.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
 		return chunk;
 	}
@@ -187,16 +205,26 @@ public class Chunk{
 		float margin = CHUNK_SIZE / 2;
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		for (int v = 0; v < vertices.Length; v++) {
-			if (!vertLocked [v] && !Constrained(chunk.transform.position+ vertices[v])) {
-				Vector3 vertPos = chunk.transform.position + vertices [v];
-				float distance = Vector3.Distance (vertPos, player.transform.position);
-				if (checkDist (distance, updateDist, margin)) {
-					Vector3 angleVector = vertPos - player.transform.position;
-					float angle = Vector3.Angle (Vector3.right, angleVector);
-					float linIntInput = angle / 360f;
-					float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
-					vertices [v].y = newY;
-					vertLocked [v] = true;
+			Vector2 c = IntToV2 (v);
+			if (!Constrained(chunk.transform.position+ vertices[v])) {
+				if (!vertLocked [v]) {
+					Vector3 vertPos = chunk.transform.position + vertices [v];
+					float distance = Vector3.Distance (vertPos, player.transform.position);
+					if (checkDist (distance, updateDist, margin)) {
+						Vector3 angleVector = vertPos - player.transform.position;
+						float angle = Vector3.Angle (Vector3.right, angleVector);
+						float linIntInput = angle / 360f;
+						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
+						DynamicTerrain.instance.WriteHeightMap((int)c.x, (int)c.y, newY);
+						vertices [v].y = newY;
+						vertLocked [v] = true;
+						if (chunk.GetComponent<MeshFilter>().mesh.normals[v].y < 0f) {
+							chunk.GetComponent<MeshFilter>().mesh.normals[v] *= -1;
+						}
+						Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
+					}
+				} else if (vertices[v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y)) {
+					vertices[v].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y);
 				}
 			}
 		}
@@ -213,6 +241,15 @@ public class Chunk{
 	}
 	public bool Constrained (Vector3 vertex) {
 		return (vertex.x < 6f && vertex.x > -6f);
+	}
+
+	Vector2 IntToV2 (int i) {
+		int xi = x*CHUNK_RESOLUTION + i%CHUNK_RESOLUTION;
+		int yi = y*CHUNK_RESOLUTION + i/CHUNK_RESOLUTION;
+		return new Vector2 (
+			xi - x,
+			yi - y
+		);
 	}
 
 }

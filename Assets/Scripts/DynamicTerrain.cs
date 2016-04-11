@@ -25,6 +25,8 @@ public class DynamicTerrain {
 	private List<Chunk> activeCloseToRoadChunks;
 	private GameObject player;
 
+	public Dictionary<int ,Dictionary<int, float>> heightmap;
+
 	public LinInt freqData;
 	public int freqSampleSize = 128;
 	public FFTWindow fftWindow = FFTWindow.Rectangular;
@@ -75,6 +77,7 @@ public class DynamicTerrain {
 		terrain.transform.position = player.transform.position;
 		VERT_UPDATE_DISTANCE = vertUpdateDist;
 		HEIGHT_SCALE = heightScale;
+		heightmap = new Dictionary<int, Dictionary<int, float>>();
 	}
 
 	void updateChunks(float[] freqDataArray){
@@ -187,4 +190,27 @@ public class DynamicTerrain {
 	public void update(float[] freqDataArray){
 		updateChunks (freqDataArray);
 	}
+
+	public float ReadHeightMap (int x, int y) {
+		if (!heightmap.ContainsKey(x)) return float.NaN;
+		if (!heightmap[x].ContainsKey(y)) return float.NaN;
+		return heightmap[x][y];
+	}
+
+	/*public float ReadHeightMap (int i) {
+		return ReadHeightMap (i/instance.CHUNK_RESOLUTION, i%CHUNK_RESOLUTION);
+	}*/
+
+	public void WriteHeightMap (int x, int y, float v) {
+		if (!heightmap.ContainsKey(x))
+			heightmap.Add(x, new Dictionary<int, float>());
+		if (!heightmap[x].ContainsKey(y))
+			heightmap[x].Add(y, v);
+		else heightmap[x][y] = v;
+	}
+
+	/*public void WriteHeightMap (int i, float v) {
+		WriteHeightMap (v);
+	}*/
+		
 }
