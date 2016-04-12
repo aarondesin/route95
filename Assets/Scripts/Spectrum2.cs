@@ -38,7 +38,7 @@ public class Spectrum2 : MonoBehaviour {
 				
 				float y = height + Mathf.Log (DynamicTerrain.instance.freqData.getDataPoint ((float)i / numberOfObjects)) * scale;
 				if (y != float.NaN) {
-					if (y < points[i].y) {
+					if (y < points[i].y && points[i].y >= transform.position.y+fallRate) {
 						points[i].y -= fallRate;
 					} else {
 						points [i].y = y;
