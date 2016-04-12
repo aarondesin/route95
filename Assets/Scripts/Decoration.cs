@@ -1,9 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum DecorationDistribution {
+	Random, // truly random, based on density
+	Roadside, // for signs, placed alongside road facing either direction
+	CloseToRoad // placed close to road (good for small objects)
+}
+
 public class Decoration : MonoBehaviour {
 
 	public float density; // 0-1, density of population
+	public DecorationDistribution distribution;
 
 	public Vector3 positionOffset;
 	public Vector3 rotationOffset;

@@ -242,7 +242,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void AttemptSwitchToLive () {
-		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold) {
+		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold && !MusicManager.instance.loopSong) {
 			EnableMenu(shortSongWarningPrompt);
 		} else {
 			SwitchToLive();
@@ -310,6 +310,8 @@ public class GameManager : MonoBehaviour {
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		TESTPlayerMovement.moving = false;
 		DisableMenu(loopIcon);
+		MusicManager.instance.currentSong = new Song();
+		SongTimeline.instance.RefreshTimeline();
 	}
 		
 	// Toggle visibility of system buttons
@@ -354,6 +356,9 @@ public class GameManager : MonoBehaviour {
 		menuObject.SetActive(false);
 	}
 
+	// Called when the user presses escape
+	// If in setup, it will ask to confirm exit
+	// If in live, it will pause the game
 	public void AttemptExit () {
 		switch (currentMode) {
 		case Mode.Setup: case Mode.Postplay:
@@ -365,14 +370,17 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	// Enables visibility of the tooltip with the given message
 	public void ShowTooltip (string message) {
 		tooltip.SetActive(true);
 		tooltip.GetComponent<Text>().text = message;
 	}
 
+	// Hides the tooltip
 	public void HideTooltip () {
 		tooltip.SetActive(false);
 	}
+
 
 	public void EnableLoadProjectPrompt () {
 		LoadProjectPrompt.instance.gameObject.SetActive(true);
@@ -403,7 +411,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void ShowLiveHelp() {
-		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys Q to play with those instruments (more in the final version!)", "Okay");
+		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys QWERT to play with those instruments (more in the final version!). You can increase your song's tempo by pressing the up or down arrow keys.", "Okay");
 		Pause();
 	}
 
