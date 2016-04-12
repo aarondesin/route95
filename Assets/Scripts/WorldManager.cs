@@ -160,8 +160,8 @@ public class WorldManager : MonoBehaviour {
 			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
 				RaycastHit hit;
 				float y = 0f;
-				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, MAX_DECORATION_HEIGHT-MIN_DECORATION_HEIGHT)) {
-					Debug.Log("bap");
+				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
+					//Debug.Log("bap");
 					y = hit.point.y;
 				}
 					
