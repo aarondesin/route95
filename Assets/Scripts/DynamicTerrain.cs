@@ -53,6 +53,18 @@ public class DynamicTerrain {
 		return new LinInt (data);
 	}
 
+	public bool activeChunksContains(Chunk chunk) {
+		return activeChunks.Contains (chunk);
+	}
+
+	public bool activeRoadChunksContains(Chunk chunk) {
+		return activeRoadChunks.Contains (chunk);
+	}
+
+	public bool activeCloseToRoadChunksContains(Chunk chunk) {
+		return activeCloseToRoadChunks.Contains (chunk);
+	}
+
 	//if no value given for parameters in Unity Editor, set to these defaults
 
 	public void translateWorld (Vector3 offset){

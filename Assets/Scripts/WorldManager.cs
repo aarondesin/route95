@@ -130,7 +130,11 @@ public class WorldManager : MonoBehaviour {
 				GameObject decoration = decorations[Random.Range(0, decorations.Count)];
 				switch (decoration.GetComponent<Decoration>().distribution) {
 				case DecorationDistribution.Random:
-					DecorateRandom (terrain.RandomChunk(), decoration);
+					Chunk chunk = terrain.RandomChunk ();
+					while (terrain.activeRoadChunksContains (chunk)) {
+						chunk = terrain.RandomChunk ();
+					}
+					DecorateRandom (chunk, decoration);
 					break;
 				case DecorationDistribution.Roadside:
 					break;

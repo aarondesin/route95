@@ -236,6 +236,10 @@ public class Chunk{
 					}
 				} else {
 					vertices[v].y = 0f;
+					DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+					if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
+						chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
+					}
 					vertLocked [v] = true;
 				}
 			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
@@ -276,10 +280,10 @@ public class Chunk{
 
 	public bool nearbyRoad () {
 		Vector3 pos = chunk.transform.position;
-		float xMin = pos.x-10f;
-		float xMax = xMin + CHUNK_SIZE+10f;
-		float zMin = pos.z-10f;
-		float zMax = zMin + CHUNK_SIZE+10f;
+		float xMin = pos.x-CHUNK_SIZE*0.5f;
+		float xMax = pos.x + CHUNK_SIZE*1.5f;
+		float zMin = pos.z-CHUNK_SIZE*0.5f;
+		float zMax = pos.z + CHUNK_SIZE*1.5f;
 		float resolution = 100f;
 		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
 		float progress = 0f;
