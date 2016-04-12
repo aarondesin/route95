@@ -17,6 +17,7 @@ public class Chunk{
 
 	public GameObject chunk;
 	private bool[] vertLocked; //if vertex in mesh.vertices has had its height set
+	private bool roadNearby;
 	private Vector3[] dMap; //displacement map, displaces each vertex by a Vector3
 	private Material terrainMaterial;
 
@@ -34,6 +35,7 @@ public class Chunk{
 		chunk = createChunk (verts, uvs, triangles);
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
 		chunk.transform.position += new Vector3 (x * CHUNK_SIZE, 0f, y * CHUNK_SIZE);
+		roadNearby = nearbyRoad ();
 
 		//int r = Random.Range (0, verts.Length-1);
 
@@ -213,8 +215,8 @@ public class Chunk{
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		for (int v = 0; v < vertices.Length; v++) {
 			Vector2 c = IntToV2 (v);
-			if (!Constrained(chunk.transform.position+ vertices[v])) {
-				if (!vertLocked [v]) {
+			if (!vertLocked[v]) {
+				if (!Constrained (chunk.transform.position + vertices [v])) {
 					Vector3 vertPos = chunk.transform.position + vertices [v];
 					float distance = Vector3.Distance (vertPos, player.transform.position);
 					if (checkDist (distance, updateDist, margin)) {
@@ -222,19 +224,26 @@ public class Chunk{
 						float angle = Vector3.Angle (Vector3.right, angleVector);
 						float linIntInput = angle / 360f;
 						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
-						DynamicTerrain.instance.WriteHeightMap((int)c.x, (int)c.y, newY);
+						DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, newY);
 						vertices [v].y = newY;
 						vertLocked [v] = true;
-						if (chunk.GetComponent<MeshFilter>().mesh.normals[v].y < 0f) {
-							chunk.GetComponent<MeshFilter>().mesh.normals[v] *= -1;
+						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
+							chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
 						}
-						chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
-						chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+						chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds ();
+						chunk.GetComponent<MeshCollider> ().sharedMesh = chunk.GetComponent<MeshFilter> ().mesh;
 						//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
-				} else if (vertices[v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y)) {
-					vertices[v].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y);
+				} else {
+					vertices[v].y = 0f;
+					DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+					if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
+						chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
+					}
+					vertLocked [v] = true;
 				}
+			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
+				vertices [v].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y);
 			}
 		}
 		chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
@@ -245,12 +254,70 @@ public class Chunk{
 	public void update (GameObject player, float updateDist, LinInt freqData){
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (CHUNK_SIZE / 2, 0f, CHUNK_SIZE / 2);
 		float distance = Vector3.Distance (player.transform.position, centerOfChunk);
+		roadNearby = nearbyRoad ();
 		if (checkDist(distance, updateDist, CHUNK_SIZE)) {
 			updateVerts (player, updateDist, freqData);
 		}
 	}
 	public bool Constrained (Vector3 vertex) {
-		return (vertex.x < 6f && vertex.x > -6f);
+		if (!roadNearby) {
+			return false;
+		}
+		// check if vertex is within distance to road
+		float resolution = 100f;
+		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
+		float progress = 0f;
+		while (progress <= 1f) {
+			Vector3 sample = road.GetPoint (progress);
+			Vector3 chunk = vertex - new Vector3 (0f, vertex.y, 0f);
+			if (Mathf.Abs (Vector3.Distance (sample, chunk)) < 50f) {
+				return true;
+			}
+			progress += 1 / resolution;
+		}
+		return false;
+	}
+
+	public bool nearbyRoad () {
+		Vector3 pos = chunk.transform.position;
+		float xMin = pos.x-CHUNK_SIZE*0.5f;
+		float xMax = pos.x + CHUNK_SIZE*1.5f;
+		float zMin = pos.z-CHUNK_SIZE*0.5f;
+		float zMax = pos.z + CHUNK_SIZE*1.5f;
+		float resolution = 100f;
+		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
+		float progress = 0f;
+		while (progress <= 1f) {
+			Vector3 sample = road.GetPoint (progress);
+			float x = sample.x;
+			float z = sample.z;
+			if (x >= xMin && x < xMax && z >= zMin && z < zMax) {
+				return true;
+			}
+			progress += 1 / resolution;
+		}
+		return false;
+	}
+
+	public bool containsRoad () {
+		Vector3 pos = chunk.transform.position;
+		float xMin = pos.x;
+		float xMax = xMin + CHUNK_SIZE;
+		float zMin = pos.z;
+		float zMax = zMin + CHUNK_SIZE;
+		float resolution = 100f;
+		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
+		float progress = 0f;
+		while (progress <= 1f) {
+			Vector3 sample = road.GetPoint (progress);
+			float x = sample.x;
+			float z = sample.z;
+			if (x >= xMin && x < xMax && z >= zMin && z < zMax) {
+				return true;
+			}
+			progress += 1 / resolution;
+		}
+		return false;
 	}
 
 	Vector2 IntToV2 (int i) {

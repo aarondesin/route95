@@ -50,6 +50,18 @@ public class DynamicTerrain {
 		return new LinInt (data);
 	}
 
+	public bool activeChunksContains(Chunk chunk) {
+		return activeChunks.Contains (chunk);
+	}
+
+	public bool activeRoadChunksContains(Chunk chunk) {
+		return activeRoadChunks.Contains (chunk);
+	}
+
+	public bool activeCloseToRoadChunksContains(Chunk chunk) {
+		return activeCloseToRoadChunks.Contains (chunk);
+	}
+
 	//if no value given for parameters in Unity Editor, set to these defaults
 
 	public void translateWorld (Vector3 offset){
@@ -139,9 +151,10 @@ public class DynamicTerrain {
 					}
 				}
 				if (!loaded) {
-					activeChunks.Add (createChunk(x, y));
-					if (x >= -1 && x <= 1) {
-						if (x == 0) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
+					Chunk chunk = createChunk (x, y);
+					activeChunks.Add (chunk);
+					if (chunk.nearbyRoad()) {
+						if (chunk.containsRoad()) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 					}
 				}

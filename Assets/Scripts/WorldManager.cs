@@ -14,17 +14,18 @@ public class WorldManager : MonoBehaviour {
 	public Material TERRAIN_MATERIAL; //material used for terrain
 	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
 	public int FREQ_ARRAY_SIZE; //must be a power of 2
+	public float ROAD_RADIUS; //radius in unity units in which to spawn road
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
 	public int DECORATIONS_PER_STEP;
-	public float MAX_DECORATION_HEIGHT;
+    public float MAX_DECORATION_HEIGHT;
 	public float MIN_DECORATION_HEIGHT;
 	[SerializeField]
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
 		"Prefabs/Decoration_Saguaro",
-		"Prefabs/Decoration_BarrelCactus"
+        "Prefabs/Decoration_BarrelCactus"
 	};
 	public List<GameObject> decorations = new List<GameObject>();
 
@@ -38,11 +39,14 @@ public class WorldManager : MonoBehaviour {
 
 	private DynamicTerrain terrain;
 	private float[] freqDataArray;
+	public GameObject road;
 	private GameObject sun;
 	private GameObject moon;
 
 	float startLoadTime;
-	bool loaded = false;
+    bool loaded = false;
+	bool loadedDecorations = false;
+	bool decorated = false;
 
 	// Use this for initialization
 	void Start () {
@@ -54,6 +58,12 @@ public class WorldManager : MonoBehaviour {
 		createSun();
 		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
+
+		createRoad ();
+		if (ROAD_RADIUS == 0) {
+			ROAD_RADIUS = 1000f;
+		}
+		road.GetComponent<Bezier> ().ROAD_RADIUS = ROAD_RADIUS;
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -73,10 +83,10 @@ public class WorldManager : MonoBehaviour {
 		GameManager.instance.ChangeLoadingMessage("Loading world...");
 		terrain.update(freqDataArray);
 		if (DO_DECORATE) {
-			LoadDecorations();
-			DoDecorate();
+			StartCoroutine("LoadDecorations");
+			StartCoroutine("DoDecorate");
 		}
-		NotifyLoadingDone();
+        NotifyLoadingDone();
 	}
 
 	void LoadDecorations () {
@@ -84,12 +94,9 @@ public class WorldManager : MonoBehaviour {
 			LoadDecoration (path);
 			GameManager.instance.IncrementLoadProgress();
 		}
-
 	}
 
 	void DoDecorate () {
-		
-
 		while (numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 					//Debug.Log("dick");
@@ -97,9 +104,7 @@ public class WorldManager : MonoBehaviour {
 				GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
-
 		}
-				
 	}
 
 	void NotifyLoadingDone () {
@@ -116,7 +121,7 @@ public class WorldManager : MonoBehaviour {
 		}
 
 	}
-
+    
 	void AttemptDecorate () {
 		if (DO_DECORATE) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
@@ -125,7 +130,11 @@ public class WorldManager : MonoBehaviour {
 				GameObject decoration = decorations[Random.Range(0, decorations.Count)];
 				switch (decoration.GetComponent<Decoration>().distribution) {
 				case DecorationDistribution.Random:
-					DecorateRandom (terrain.RandomChunk(), decoration);
+					Chunk chunk = terrain.RandomChunk ();
+					while (terrain.activeRoadChunksContains (chunk)) {
+						chunk = terrain.RandomChunk ();
+					}
+					DecorateRandom (chunk, decoration);
 					break;
 				case DecorationDistribution.Roadside:
 					break;
@@ -139,7 +148,7 @@ public class WorldManager : MonoBehaviour {
 			}
 		}
 	}
-
+    
 	void createSun(){
 		GameObject sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
@@ -150,14 +159,21 @@ public class WorldManager : MonoBehaviour {
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 	}
-		
+
+	void createRoad(){
+		road = new GameObject ("Road");
+		road.AddComponent<MeshFilter> ();
+		road.AddComponent<MeshCollider> ();
+		road.AddComponent<Bezier> ();
+	}
+
 	void DecorateRandom (Chunk chunk, GameObject decoration) {
 		Vector2 coordinate = new Vector2 (
 			chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
 			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
 		);
 		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+			if (!chunk.Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
 				RaycastHit hit;
 				float y = 0f;
 				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
