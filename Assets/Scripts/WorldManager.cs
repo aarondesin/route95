@@ -173,7 +173,7 @@ public class WorldManager : MonoBehaviour {
 			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
 		);
 		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+			if (!chunk.Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
 				RaycastHit hit;
 				float y = 0f;
 				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
