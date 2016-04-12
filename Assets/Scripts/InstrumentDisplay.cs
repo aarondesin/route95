@@ -20,8 +20,8 @@ public class InstrumentDisplay : MonoBehaviour {
 			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_AcousticGuitar") },
 			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ClassicalGuitar") },
 			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums") },
-			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_RockDrums") },
-			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_RockDrums") }
+			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_PipeOrgan") },
+			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_Keyboard") }
 		};
 		instrumentIconGlows = new Dictionary<Instrument, Sprite>() {
 			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar_Glow") },
@@ -29,8 +29,8 @@ public class InstrumentDisplay : MonoBehaviour {
 			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_AcousticGuitar_Glow") },
 			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ClassicalGuitar_Glow") },
 			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums_Glow") },
-			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_RockDrums_Glow") },
-			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_RockDrums_Glow") }
+			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_PipeOrgan_Glow") },
+			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_Keyboard_Glow") }
 		};
 	}
 
