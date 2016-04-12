@@ -38,9 +38,6 @@ public class DynamicTerrain {
 			float[] sample = new float[freqSampleSize];
 			source.GetSpectrumData (sample, 0, fftWindow);
 			for (int i = 0; i < freqSampleSize; i++) {
-				//Debug.Log (sample [i]);
-				//if (sample [i] == float.NaN && sample[i] == 0f)
-				//	Debug.Log ("dicknuts");
 				if (sample [i] != float.NaN && sample [i] != 0f) {
 					if (source == MusicManager.instance.instrumentAudioSources [(Instrument)0]) {
 						data [i] = sample [i];

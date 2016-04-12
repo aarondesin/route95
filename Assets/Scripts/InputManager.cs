@@ -10,17 +10,14 @@ public class InputManager : MonoBehaviour {
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, Instrument.RockDrums },
 		{ KeyCode.Alpha2, Instrument.ElectricGuitar },
-		{ KeyCode.Alpha3, Instrument.ElectricBass }
+		{ KeyCode.Alpha3, Instrument.ElectricBass },
+		{ KeyCode.Alpha4, Instrument.AcousticGuitar },
+		{ KeyCode.Alpha5, Instrument.ClassicalGuitar },
+		{ KeyCode.Alpha6, Instrument.PipeOrgan },
+		{ KeyCode.Alpha7, Instrument.Keyboard }
 	};
 
 	public Dictionary<Instrument, AudioClip> instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>();
-
-	// List of mapped keys for instruments, so that the program knows what to check for
-	public static List<KeyCode> mappedInstruments = new List<KeyCode>() {
-		KeyCode.Alpha1,
-		KeyCode.Alpha2,
-		KeyCode.Alpha3
-	};
 
 	public static Dictionary<KeyCode, int> keyToLick = new Dictionary<KeyCode, int>() {
 		{ KeyCode.Q, 0 },
@@ -33,9 +30,13 @@ public class InputManager : MonoBehaviour {
 	void Start () {
 		instance = this;
 		instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>() {
-			{Instrument.RockDrums, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums")},
-			{Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
-			{Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
+			{ Instrument.RockDrums, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums") },
+			{ Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
+			{ Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
+			{ Instrument.AcousticGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
+			{ Instrument.ClassicalGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
+			{ Instrument.PipeOrgan, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
+			{ Instrument.Keyboard, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
 		};
 	}
 
@@ -49,19 +50,21 @@ public class InputManager : MonoBehaviour {
 				MusicManager.instance.DecreaseTempo ();
 			} else {
 				// Check for instruments switch
-				foreach (KeyCode key in mappedInstruments) {
-					if (Input.GetKeyDown(key)) {
-						SwitchInstrument(keyToInstrument[key]);
+				foreach (KeyValuePair<KeyCode, Instrument> key in keyToInstrument) {
+					if (Input.GetKeyDown(key.Key)) {
+						SwitchInstrument(keyToInstrument[key.Key]);
 						GameManager.instance.WakeLiveUI();
 					}
 				}
 				// Check for playing lick
 				foreach (KeyCode key2 in keyToLick.Keys.ToList()) {
 					if (Input.GetKey(key2)) {
-						if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
-							PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
-						else {
-							Debug.Log ("none available");
+						if (MusicManager.instance.licks[MusicManager.instance.currentInstrument] != null) {
+							if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
+								PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
+							else {
+								Debug.Log ("none available");
+							}
 						}
 					}
 
@@ -72,7 +75,7 @@ public class InputManager : MonoBehaviour {
 					Debug.Log(keyToLick.Count);
 					Debug.Log (MusicManager.instance.licks.Count);
 				}
-				if (keyToLick == null) {
+				/*if (keyToLick == null) {
 					
 					keyToLick = new Dictionary<KeyCode, int>() {
 						
@@ -84,7 +87,7 @@ public class InputManager : MonoBehaviour {
 					};
 					Debug.Log(keyToLick.Count);
 					Debug.Log (MusicManager.instance.licks.Count);
-				}
+				}*/
 			}
 		}
 	}

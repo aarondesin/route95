@@ -21,9 +21,9 @@ public class KeyManager : MonoBehaviour {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 0 ) },
 					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 0) },
 					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 0) },
-					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 0) }
-					//{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor,7 ) },
-					//{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 7) }
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 0) },
+					{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["PipeOrgan"], ScaleInfo.Minor,0 ) },
+					{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["Keyboard"], ScaleInfo.Minor, 0) }
 				}
 			},
 
@@ -31,10 +31,10 @@ public class KeyManager : MonoBehaviour {
 			{ Key.CMajor, new Dictionary<Instrument,Scale> () {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Major, 8 ) },
 					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Major, 8) },
-					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 8) },
-					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 8) }
-					//{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor,3 ) },
-					//{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 3) }
+					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Major, 8) },
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Major, 8) },
+					{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["PipeOrgan"], ScaleInfo.Major,8 ) },
+					{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["Keyboard"], ScaleInfo.Major, 8) }
 
 				}
 			},
@@ -44,9 +44,9 @@ public class KeyManager : MonoBehaviour {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 2 ) },
 					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 2) },
 					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 2) },
-					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 2) }
-					//{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor,9 ) },
-					//{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 9) }
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 2) },
+					{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["PipeOrgan"], ScaleInfo.Minor,2 ) },
+					{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["Keyboard"], ScaleInfo.Minor, 2) }
 				}
 			},
 
@@ -55,9 +55,9 @@ public class KeyManager : MonoBehaviour {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 10 ) },
 					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 10) },
 					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 10) },
-					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 10) }
-					//{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor,5 ) },
-					//{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 5) }
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 10) },
+					{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["PipeOrgan"], ScaleInfo.Minor, 10 ) },
+					{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["Keyboard"], ScaleInfo.Minor, 10) }
 				}
 			},
 
@@ -66,9 +66,9 @@ public class KeyManager : MonoBehaviour {
 					{ Instrument.ElectricGuitar, BuildScale (Sounds.soundsToLoad["ElectricGuitar"], ScaleInfo.Minor, 11 ) },
 					{ Instrument.ElectricBass, BuildScale (Sounds.soundsToLoad["ElectricBass"], ScaleInfo.Minor, 11) },
 					{ Instrument.AcousticGuitar, BuildScale (Sounds.soundsToLoad["AcousticGuitar"], ScaleInfo.Minor, 11) },
-					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 11) }
-					//{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor,6 ) },
-					//{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 6) }
+					{ Instrument.ClassicalGuitar, BuildScale (Sounds.soundsToLoad["ClassicalGuitar"], ScaleInfo.Minor, 11) },
+					{ Instrument.PipeOrgan, BuildScale (Sounds.soundsToLoad["PipeOrgan"], ScaleInfo.Minor,11 ) },
+					{ Instrument.Keyboard, BuildScale (Sounds.soundsToLoad["Keyboard"], ScaleInfo.Minor, 11) }
 				}
 			},
 		};

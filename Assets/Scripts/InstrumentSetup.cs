@@ -72,7 +72,14 @@ public class InstrumentSetup : MonoBehaviour {
 		nameInputField.text = currentRiff.name;
 		MakeBeatNumbers ();
 		//switch (MusicManager.currentInstrument) {
-		switch (currentRiff.instrument) {
+		if (Enum.IsDefined(typeof(PercussionInstrument), currentRiff.instrument.ToString())) {
+			InitializePercussionSetup ((PercussionInstrument)Enum.Parse (typeof(PercussionInstrument), currentRiff.instrument.ToString()));
+		} else if (Enum.IsDefined(typeof(MelodicInstrument), currentRiff.instrument.ToString())) {
+			InitializeMelodicSetup ((MelodicInstrument)Enum.Parse (typeof(MelodicInstrument), currentRiff.instrument.ToString()));
+		} else {
+			Debug.LogError(currentRiff.instrument.ToString() + " unable to initialize.");
+		}
+		/*switch (currentRiff.instrument) {
 		case Instrument.RockDrums:
 			InitializePercussionSetup (PercussionInstrument.RockDrums);
 			break;
@@ -88,7 +95,13 @@ public class InstrumentSetup : MonoBehaviour {
 		case Instrument.ClassicalGuitar:
 			InitializeMelodicSetup (MelodicInstrument.ClassicalGuitar);
 			break;
-		}
+		case Instrument.PipeOrgan:
+			InitializeMelodicSetup (MelodicInstrument.PipeOrgan);
+			break;
+		case Instrument.Keyboard:
+			InitializeMelodicSetup (MelodicInstrument.Keyboard);
+			break;
+		}*/
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
 		playRiffButton.GetComponent<Image>().sprite = play;
@@ -141,7 +154,14 @@ public class InstrumentSetup : MonoBehaviour {
 			buttonGrid.Add(new List<GameObject>());
 		}
 		int i = 0;
-		switch (meloInst) {
+
+		Instrument inst = (Instrument)Enum.Parse(typeof(Instrument),meloInst.ToString());
+		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes) {
+			MakeMelodicButtons (note.Split('_')[1],i,note);
+			i++;
+		}
+
+		/*switch (meloInst) {
 		case MelodicInstrument.ElectricGuitar:
 
 			// Make rows of buttons for notes (in a grid)
@@ -184,7 +204,7 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 		break;
 
-		/*case MelodicInstrument.PipeOrgan: 
+		case MelodicInstrument.PipeOrgan: 
 
 			// Make rows of buttons for notes (in a grid)
 			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.PipeOrgan].allNotes) {
@@ -204,8 +224,8 @@ public class InstrumentSetup : MonoBehaviour {
 				MakeMelodicButtons (note.Split ('_') [1], i, note);
 				i++;
 			}
-			break;*/
-		}
+			break;
+		}*/
 
 
 	}
