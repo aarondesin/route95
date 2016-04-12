@@ -79,29 +79,6 @@ public class InstrumentSetup : MonoBehaviour {
 		} else {
 			Debug.LogError(currentRiff.instrument.ToString() + " unable to initialize.");
 		}
-		/*switch (currentRiff.instrument) {
-		case Instrument.RockDrums:
-			InitializePercussionSetup (PercussionInstrument.RockDrums);
-			break;
-		case Instrument.ElectricGuitar:
-			InitializeMelodicSetup (MelodicInstrument.ElectricGuitar);
-			break;
-		case Instrument.ElectricBass:
-			InitializeMelodicSetup (MelodicInstrument.ElectricBass);
-			break;
-		case Instrument.AcousticGuitar:
-			InitializeMelodicSetup (MelodicInstrument.AcousticGuitar);
-			break;
-		case Instrument.ClassicalGuitar:
-			InitializeMelodicSetup (MelodicInstrument.ClassicalGuitar);
-			break;
-		case Instrument.PipeOrgan:
-			InitializeMelodicSetup (MelodicInstrument.PipeOrgan);
-			break;
-		case Instrument.Keyboard:
-			InitializeMelodicSetup (MelodicInstrument.Keyboard);
-			break;
-		}*/
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
 		playRiffButton.GetComponent<Image>().sprite = play;
@@ -160,74 +137,7 @@ public class InstrumentSetup : MonoBehaviour {
 			MakeMelodicButtons (note.Split('_')[1],i,note);
 			i++;
 		}
-
-		/*switch (meloInst) {
-		case MelodicInstrument.ElectricGuitar:
-
-			// Make rows of buttons for notes (in a grid)
-			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricGuitar].allNotes) {
-				MakeMelodicButtons (note.Split ('_') [1], i, note);
-				i++;
-			}
-			break;
-
-		case MelodicInstrument.ElectricBass: 
-
-			// Make rows of buttons for notes (in a grid)
-			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].allNotes) {
-				//if (note == null)
-				//Debug.Log ("dick");
-				MakeMelodicButtons (note.Split ('_') [1], i, note);
-				i++;
-			}
-			break;
-
-		case MelodicInstrument.AcousticGuitar: 
-
-		// Make rows of buttons for notes (in a grid)
-		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.AcousticGuitar].allNotes) {
-			//if (note == null)
-			//Debug.Log ("dick");
-			MakeMelodicButtons (note.Split ('_') [1], i, note);
-			i++;
-		}
-		break;
-
-		case MelodicInstrument.ClassicalGuitar: 
-
-		// Make rows of buttons for notes (in a grid)
-		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ClassicalGuitar].allNotes) {
-			//if (note == null)
-			//Debug.Log ("dick");
-			MakeMelodicButtons (note.Split ('_') [1], i, note);
-			i++;
-		}
-		break;
-
-		case MelodicInstrument.PipeOrgan: 
-
-			// Make rows of buttons for notes (in a grid)
-			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.PipeOrgan].allNotes) {
-				//if (note == null)
-				//Debug.Log ("dick");
-				MakeMelodicButtons (note.Split ('_') [1], i, note);
-				i++;
-			}
-			break;
-
-		case MelodicInstrument.Keyboard: 
-
-			// Make rows of buttons for notes (in a grid)
-			foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.Keyboard].allNotes) {
-				//if (note == null)
-				//Debug.Log ("dick");
-				MakeMelodicButtons (note.Split ('_') [1], i, note);
-				i++;
-			}
-			break;
-		}*/
-
-
+			
 	}
 
 	// Creates all buttons for percussion setup

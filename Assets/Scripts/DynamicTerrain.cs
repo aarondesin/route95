@@ -34,7 +34,9 @@ public class DynamicTerrain {
 
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
-		foreach (AudioSource source in MusicManager.instance.instrumentAudioSources.Values) {
+		List<AudioSource> sources = new List<AudioSource>(); //InputManager.instance.audioSources;
+		sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
+		foreach (AudioSource source in sources) {
 			float[] sample = new float[freqSampleSize];
 			source.GetSpectrumData (sample, 0, fftWindow);
 			for (int i = 0; i < freqSampleSize; i++) {

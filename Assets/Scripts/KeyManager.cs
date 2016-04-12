@@ -8,6 +8,7 @@ public class KeyManager : MonoBehaviour {
 	public static KeyManager instance;
 
 	public Dictionary<Key, Dictionary<Instrument, Scale>> scales;
+	public Dictionary<Instrument, List<string>> percussionSets;
 
 	void Start () {
 		instance = this;
@@ -15,6 +16,9 @@ public class KeyManager : MonoBehaviour {
 	}
 
 	public void BuildScales () {
+		percussionSets = new Dictionary<Instrument, List<string>>() {
+			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] }
+		};
 		scales = new Dictionary<Key, Dictionary<Instrument, Scale>> () { 
 			// All E minor scales
 			{ Key.Eminor, new Dictionary<Instrument,Scale> () {

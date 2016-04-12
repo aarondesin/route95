@@ -7,6 +7,12 @@ public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
 
+	public List<AudioSource> audioSources;
+
+	// 0: lick system
+	// 1: single-note system
+	private int LiveSystem = 1;
+
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, Instrument.RockDrums },
 		{ KeyCode.Alpha2, Instrument.ElectricGuitar },
@@ -27,6 +33,35 @@ public class InputManager : MonoBehaviour {
 		{ KeyCode.T, 4 }
 	};
 
+	public static Dictionary<KeyCode, int> keyToNote = new Dictionary<KeyCode, int>() {
+		{ KeyCode.P, 0 },
+		{ KeyCode.O, 1 },
+		{ KeyCode.I, 2 },
+		{ KeyCode.U, 3 },
+		{ KeyCode.Y, 4 },
+		{ KeyCode.T, 5 },
+		{ KeyCode.R, 6 },
+		{ KeyCode.E, 7 },
+		{ KeyCode.W, 8 },
+		{ KeyCode.Q, 9 },
+		{ KeyCode.L, 10 },
+		{ KeyCode.K, 11 },
+		{ KeyCode.J, 12 },
+		{ KeyCode.H, 13 },
+		{ KeyCode.G, 14 },
+		{ KeyCode.F, 15 },
+		{ KeyCode.D, 16 },
+		{ KeyCode.S, 17 },
+		{ KeyCode.A, 18 },
+		{ KeyCode.M, 19 },
+		{ KeyCode.N, 20 },
+		{ KeyCode.B, 21 },
+		{ KeyCode.V, 22 },
+		{ KeyCode.C, 23 },
+		{ KeyCode.X, 24 },
+		{ KeyCode.Z, 25 }
+	};
+
 	void Start () {
 		instance = this;
 		instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>() {
@@ -38,6 +73,13 @@ public class InputManager : MonoBehaviour {
 			{ Instrument.PipeOrgan, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
 			{ Instrument.Keyboard, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
 		};
+		audioSources = new List<AudioSource>();
+		for (int i=0; i<26; i++) {
+			GameObject obj = new GameObject();
+			AudioSource temp = obj.AddComponent<AudioSource>();
+			temp.volume = 1.0f;
+			audioSources.Add(temp);
+		}
 	}
 
 	void Update () {
@@ -56,24 +98,56 @@ public class InputManager : MonoBehaviour {
 						GameManager.instance.WakeLiveUI();
 					}
 				}
-				// Check for playing lick
-				foreach (KeyCode key2 in keyToLick.Keys.ToList()) {
-					if (Input.GetKey(key2)) {
-						if (MusicManager.instance.licks[MusicManager.instance.currentInstrument] != null) {
-							if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
-								PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
-							else {
-								Debug.Log ("none available");
+
+				switch (LiveSystem) {
+				case 0: // licks
+					// Check for playing lick
+					foreach (KeyCode key2 in keyToLick.Keys.ToList()) {
+						if (Input.GetKey(key2)) {
+							if (MusicManager.instance.licks[MusicManager.instance.currentInstrument] != null) {
+								if (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]] != null)
+									PlayLick (MusicManager.instance.licks [MusicManager.instance.currentInstrument] [keyToLick [key2]]);
+								else {
+									Debug.Log ("none available");
+								}
 							}
 						}
+
 					}
+					if (keyToLick == null) {
+						
 
-				}
-				if (keyToLick == null) {
-					
+						Debug.Log(keyToLick.Count);
+						Debug.Log (MusicManager.instance.licks.Count);
+					}
+					break;
 
-					Debug.Log(keyToLick.Count);
-					Debug.Log (MusicManager.instance.licks.Count);
+					case 1: // notes
+					foreach (KeyCode key in keyToNote.Keys.ToList()) {
+						Instrument inst = MusicManager.instance.currentInstrument;
+						if (Input.GetKeyDown(key)) {
+							int noteIndex;
+							if (inst == Instrument.RockDrums) {
+								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[key];
+								if (noteIndex >= 0) {
+									Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
+									note.PlayNote(audioSources[keyToNote[key]], false);
+								}
+							} else {
+								noteIndex = KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes.Count-1-keyToNote[key];
+								if (noteIndex >= 0) {
+									Note note = new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes[noteIndex]);
+									//note.PlayNote(MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument], true);
+									if (note != null)
+										note.PlayNote(audioSources[keyToNote[key]], true);
+								}
+							}
+							
+						} else if (Input.GetKeyUp(key) && MusicManager.instance.currentInstrument != Instrument.RockDrums) {
+							audioSources[keyToNote[key]].Stop();
+						}
+					}
+						break;
 				}
 				/*if (keyToLick == null) {
 					
