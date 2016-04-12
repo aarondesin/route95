@@ -20,9 +20,9 @@ public enum MelodicInstrument {
 	ElectricGuitar,
 	ElectricBass,
 	AcousticGuitar,
-	ClassicalGuitar
-	//PipeOrgan,
-	//Keyboard
+	ClassicalGuitar,
+	PipeOrgan,
+	Keyboard
 };
 
 // All instruments (melodic and percussion) for use by MusicManager
@@ -32,8 +32,8 @@ public enum Instrument {
 	ElectricBass,
 	AcousticGuitar,
 	ClassicalGuitar,
-	//PipeOrgan,
-	//Keyboard,
+	PipeOrgan,
+	Keyboard,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
 };
 
@@ -79,6 +79,8 @@ public class MusicManager : MonoBehaviour {
 	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
+		{ Instrument.AcousticGuitar, new List<Riff> () },
+		{ Instrument.ClassicalGuitar, new List<Riff> () },
 		{ Instrument.RockDrums, new List <Riff> () }
 	};
 	// All lick notes waiting to be played
@@ -91,8 +93,8 @@ public class MusicManager : MonoBehaviour {
 		{ Instrument.ElectricBass, "Electric Bass" },
 		{ Instrument.AcousticGuitar, "Acoustic Guitar" },
 		{ Instrument.ClassicalGuitar, "Classical Guitar" },
-		//{ Instrument.PipeOrgan, "PipeOrgan" },
-		//{ Instrument.Keyboard, "Keyboard" },
+		{ Instrument.PipeOrgan, "Pipe Organ" },
+		{ Instrument.Keyboard, "Keyboard" },
 		{ Instrument.RockDrums, "Rock Drums" }
 	};
 		
