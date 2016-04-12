@@ -142,9 +142,10 @@ public class DynamicTerrain {
 					}
 				}
 				if (!loaded) {
-					activeChunks.Add (createChunk(x, y));
-					if (x >= -1 && x <= 1) {
-						if (x == 0) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
+					Chunk chunk = createChunk (x, y);
+					activeChunks.Add (chunk);
+					if (chunk.nearbyRoad()) {
+						if (chunk.containsRoad()) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 					}
 				}

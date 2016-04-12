@@ -14,6 +14,7 @@ public class WorldManager : MonoBehaviour {
 	public Material TERRAIN_MATERIAL; //material used for terrain
 	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
 	public int FREQ_ARRAY_SIZE; //must be a power of 2
+	public float ROAD_RADIUS; //radius in unity units in which to spawn road
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
@@ -43,6 +44,7 @@ public class WorldManager : MonoBehaviour {
 	private GameObject moon;
 
 	float startLoadTime;
+    bool loaded = false;
 	bool loadedDecorations = false;
 	bool decorated = false;
 
@@ -58,6 +60,10 @@ public class WorldManager : MonoBehaviour {
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
 
 		createRoad ();
+		if (ROAD_RADIUS == 0) {
+			ROAD_RADIUS = 1000f;
+		}
+		road.GetComponent<Bezier> ().ROAD_RADIUS = ROAD_RADIUS;
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -83,17 +89,14 @@ public class WorldManager : MonoBehaviour {
         NotifyLoadingDone();
 	}
 
-void LoadDecorations () {
+	void LoadDecorations () {
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
 			GameManager.instance.IncrementLoadProgress();
 		}
-
 	}
 
 	void DoDecorate () {
-		
-
 		while (numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 					//Debug.Log("dick");
@@ -101,9 +104,7 @@ void LoadDecorations () {
 				GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
-
 		}
-				
 	}
 
 	void NotifyLoadingDone () {

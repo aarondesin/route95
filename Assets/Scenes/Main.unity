@@ -3811,7 +3811,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightRight: {fileID: 1080503465}
   lightLeft: {fileID: 1299636034}
-  velocity: 80
+  velocity: 0.2
+  progress: 0
 --- !u!82 &371512239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12296,6 +12297,7 @@ MonoBehaviour:
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
   FREQ_ARRAY_SIZE: 256
+  ROAD_RADIUS: 1000
   DO_DECORATE: 1
   MAX_DECORATIONS: 500
   DECORATIONS_PER_STEP: 100
@@ -12317,6 +12319,7 @@ MonoBehaviour:
   LIGHT_Z_SCALE: 999999
   player: {fileID: 371512236}
   audioOut: {fileID: 0}
+  road: {fileID: 0}
 --- !u!1 &906108765
 GameObject:
   m_ObjectHideFlags: 0

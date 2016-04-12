@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class Road : MonoBehaviour {
-	private Bezier roadBezier;
+	public Bezier roadBezier;
 
 
 	// Use this for initialization
@@ -13,7 +13,7 @@ public class Road : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		roadBezier.AddCurve ();
+		roadBezier.Update ();
 		roadBezier.Build ();
 	}
 }

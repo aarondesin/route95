@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 //using UnityEditor;
 using System.Collections.Generic;
+using System.Collections;
 using System;
 
 public class Bezier : MonoBehaviour{
@@ -12,6 +13,7 @@ public class Bezier : MonoBehaviour{
 	[SerializeField]
 	private Vector3[] points;
 	public int steps;
+	public float ROAD_RADIUS;
 
 	public enum BezierControlPointMode {
 		Free,
@@ -37,17 +39,19 @@ public class Bezier : MonoBehaviour{
 		points = new Vector3[4];
 		points [0] = WorldManager.instance.player.transform.position;
 		points [0].y = 2.227f;
-		points [1].z = points [0].z + 10f;
+		points [1].z = points [0].z;
 		points [1].y = points [0].y;
-		points [2].z = points [1].z + 10f;
-		points [2].y = points [1].y;
-		points [3].z = points [2].z + 10f;
-		points [3].y = points [2].y;
-		points [3].x = points [2].x + 5f;
+		points [1].x = points [0].x - 60f;
+		points [2].z = points [0].z + 130f;
+		points [2].y = points [0].y;
+		points [2].x = points [0].x + 60f;
+		points [3].z = points [0].z + 150f;
+		points [3].y = points [0].y;
+		points [3].x = points [0].x;
 		steps = 1;
 		modes = new BezierControlPointMode[points.Length / 2];
 		for (int i=0; i<modes.Length; i++) {
-			modes [i] = BezierControlPointMode.Free;
+			modes [i] = BezierControlPointMode.Mirrored;
 		}
 	}
 
@@ -103,7 +107,7 @@ public class Bezier : MonoBehaviour{
 		int closestInd = 0;
 		Vector3 sPt = points [0];
 		for (int i=1; i<= CurveCount; i++) {
-			Vector3 ePt = GetPoint2(i/(float)CurveCount);
+			Vector3 ePt = GetPoint(i/(float)CurveCount);
 			var segment = (ePt-sPt).normalized;
 			var dot = Mathf.Abs(Vector3.Dot (pt-sPt, segment));
 			if (dot <= closestVal) {
@@ -128,6 +132,8 @@ public class Bezier : MonoBehaviour{
 	}
 
 	public void AddCurve () {
+		float scale = 80f;
+		float displacedDirection = scale * 0.8f;
 		if (points == null) {
 			points = new Vector3[0];
 		}
@@ -137,13 +143,16 @@ public class Bezier : MonoBehaviour{
 		} else {
 			point = WorldManager.instance.player.transform.position;
 		}
-		Vector3 direction = point - points [points.Length - 2];
+		Vector3 direction = GetVelocity (1f);
+		Debug.Log (direction);
 		Array.Resize (ref points, points.Length + 3);
-		point += direction;
+		direction = direction.normalized;
+		direction = direction * scale;
+		point += direction + new Vector3(UnityEngine.Random.Range(-displacedDirection, displacedDirection), 0f, UnityEngine.Random.Range(-displacedDirection, displacedDirection));
 		points [points.Length - 3] = point;
-		point += direction;
+		point += direction + new Vector3(UnityEngine.Random.Range(-displacedDirection, displacedDirection), 0f, UnityEngine.Random.Range(-displacedDirection, displacedDirection));
 		points [points.Length - 2] = point;
-		point += direction;
+		point += direction + new Vector3(UnityEngine.Random.Range(-displacedDirection, displacedDirection), 0f, UnityEngine.Random.Range(-displacedDirection, displacedDirection));
 		points [points.Length - 1] = point;
 
 		Array.Resize (ref modes, modes.Length + 1);
@@ -222,31 +231,41 @@ public class Bezier : MonoBehaviour{
 	void Start () {
 		points = new Vector3[0];
 		Reset ();
-		AddCurve ();
-		AddCurve ();
+		//AddCurve ();
+		//AddCurve ();
 		//Build ();
 		//Rebuild ();
 	}
 
-	void Update() {
-		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > 800f) {
+	public void Update () {
+		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > ROAD_RADIUS) {
 			//remove far away points behind the player
 			Debug.Log("Removing old points");
+			float progress = WorldManager.instance.player.GetComponent<TESTPlayerMovement>().progress;
+			float numerator = progress * this.CurveCount;
 			Vector3[] newPoints = new Vector3[points.Length - 3];
 			for (int i = 0; i < newPoints.Length; i++) {
 				newPoints [i] = points [i + 3];
 			}
+			WorldManager.instance.player.GetComponent<TESTPlayerMovement> ().progress = numerator / this.CurveCount;
 		}
-		if (Vector3.Distance (points [0], WorldManager.instance.player.transform.position) < 800f) {
+		if (Vector3.Distance (points [0], WorldManager.instance.player.transform.position) < ROAD_RADIUS) {
 			//create points on the curve behind the player
 			//this shouldn't ever be used, unless we reverse
 			//Debug.Log("fucked up first");
 		}
-		if (Vector3.Distance (points [points.Length - 1], WorldManager.instance.player.transform.position) < 800f) {
+		if (Vector3.Distance (points [points.Length - 1], WorldManager.instance.player.transform.position) < ROAD_RADIUS) {
 			//create points on the curve in front of the player
+			float progress = WorldManager.instance.player.GetComponent<TESTPlayerMovement>().progress;
+			float numerator = progress * this.CurveCount;
 			AddCurve ();
+			WorldManager.instance.player.GetComponent<TESTPlayerMovement> ().progress = numerator / this.CurveCount;
+			//Build ();
 			Debug.Log ("Adding new curve");
-		}else if (Vector3.Distance (points [points.Length - 4], WorldManager.instance.player.transform.position) > 800f) {
+			//for (int i = 0; i < points.Length; i++) {
+				//Debug.Log ("Point:" + points [i]);
+			//}
+		}else if (Vector3.Distance (points [points.Length - 4], WorldManager.instance.player.transform.position) > ROAD_RADIUS) {
 			//remove far away points in front of the player
 			//this shouldn't ever be used, unless we reverse
 			//Array.Resize (ref points, points.Length -3);
