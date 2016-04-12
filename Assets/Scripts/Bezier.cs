@@ -144,7 +144,7 @@ public class Bezier : MonoBehaviour{
 			point = WorldManager.instance.player.transform.position;
 		}
 		Vector3 direction = GetVelocity (1f);
-		Debug.Log (direction);
+		//Debug.Log (direction);
 		Array.Resize (ref points, points.Length + 3);
 		direction = direction.normalized;
 		direction = direction * scale;
@@ -240,7 +240,7 @@ public class Bezier : MonoBehaviour{
 	public void Update () {
 		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > ROAD_RADIUS) {
 			//remove far away points behind the player
-			Debug.Log("Removing old points");
+			//Debug.Log("Removing old points");
 			float progress = WorldManager.instance.player.GetComponent<TESTPlayerMovement>().progress;
 			float numerator = progress * this.CurveCount;
 			Vector3[] newPoints = new Vector3[points.Length - 3];
@@ -261,7 +261,7 @@ public class Bezier : MonoBehaviour{
 			AddCurve ();
 			WorldManager.instance.player.GetComponent<TESTPlayerMovement> ().progress = numerator / this.CurveCount;
 			//Build ();
-			Debug.Log ("Adding new curve");
+			//Debug.Log ("Adding new curve");
 			//for (int i = 0; i < points.Length; i++) {
 				//Debug.Log ("Point:" + points [i]);
 			//}
@@ -269,7 +269,7 @@ public class Bezier : MonoBehaviour{
 			//remove far away points in front of the player
 			//this shouldn't ever be used, unless we reverse
 			//Array.Resize (ref points, points.Length -3);
-			Debug.Log ("fucked up second");
+			//Debug.Log ("fucked up second");
 		}
 	}
 
