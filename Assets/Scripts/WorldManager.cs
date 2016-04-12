@@ -18,10 +18,13 @@ public class WorldManager : MonoBehaviour {
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
 	public int DECORATIONS_PER_STEP;
+    public float MAX_DECORATION_HEIGHT;
+	public float MIN_DECORATION_HEIGHT;
 	[SerializeField]
 	private int numDecorations;
 	public List<string> decorationPaths = new List<string>() {
-		"Prefabs/Decoration_Saguaro"
+		"Prefabs/Decoration_Saguaro",
+        "Prefabs/Decoration_BarrelCactus"
 	};
 	public List<GameObject> decorations = new List<GameObject>();
 
@@ -77,63 +80,70 @@ public class WorldManager : MonoBehaviour {
 			StartCoroutine("LoadDecorations");
 			StartCoroutine("DoDecorate");
 		}
+        NotifyLoadingDone();
 	}
 
-	IEnumerator LoadDecorations () {
+void LoadDecorations () {
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
 			GameManager.instance.IncrementLoadProgress();
-			yield return null;
 		}
-		if (decorations.Count == decorationPaths.Count) {
-			loadedDecorations = true;
-			yield return null;
-		}
+
 	}
 
-	IEnumerator DoDecorate () {
+	void DoDecorate () {
 		
 
 		while (numDecorations < MAX_DECORATIONS) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 					//Debug.Log("dick");
-				Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+				AttemptDecorate ();
 				GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
-			yield return null;
 
 		}
 				
-		if (numDecorations >= MAX_DECORATIONS) {
-			decorated = true;
-			yield return NotifyLoadingDone();
-		} else {
-			yield return null;
-		}
 	}
 
-	IEnumerator NotifyLoadingDone () {
-		if (loadedDecorations && decorated) {
+	void NotifyLoadingDone () {
 			Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 			GameManager.instance.LoadNext();
-			StopCoroutine("DoLoad");
-			yield return null;
-		}
+		loaded = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (loadedDecorations && decorated) {
+		if (loaded) {
 			terrain.update(freqDataArray);
-			if (DO_DECORATE) {
-				for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
-					Decorate (terrain.RandomChunk(), decorations[Random.Range(0, decorations.Count)]);
+			AttemptDecorate();
+		}
+
+	}
+    
+	void AttemptDecorate () {
+		if (DO_DECORATE) {
+			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
+
+				// Pick a random decoration and decorate with it
+				GameObject decoration = decorations[Random.Range(0, decorations.Count)];
+				switch (decoration.GetComponent<Decoration>().distribution) {
+				case DecorationDistribution.Random:
+					DecorateRandom (terrain.RandomChunk(), decoration);
+					break;
+				case DecorationDistribution.Roadside:
+					break;
+				case DecorationDistribution.CloseToRoad:
+					DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
+					break;
+
+
+
 				}
 			}
 		}
 	}
-
+    
 	void createSun(){
 		GameObject sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
@@ -152,10 +162,7 @@ public class WorldManager : MonoBehaviour {
 		road.AddComponent<Bezier> ();
 	}
 
-	// Attempts to place a single decoration
-	// May be called more than once
-	void Decorate (Chunk chunk, GameObject decoration) {
-		//Debug.Log("yee");
+	void DecorateRandom (Chunk chunk, GameObject decoration) {
 		Vector2 coordinate = new Vector2 (
 			chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
 			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)
@@ -168,8 +175,9 @@ public class WorldManager : MonoBehaviour {
 					//Debug.Log("bap");
 					y = hit.point.y;
 				}
+					
 				GameObject newDecoration = 
-					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
+					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
 				newDecoration.GetComponent<Decoration>().Randomize();
 				newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
@@ -182,7 +190,7 @@ public class WorldManager : MonoBehaviour {
 		if (decoration == null) {
 			Debug.LogError ("Failed to load decoration at "+path);
 		} else {
-			Debug.Log("Loaded "+path);
+			//Debug.Log("Loaded "+path);
 			decorations.Add(decoration);
 			GameManager.instance.IncrementLoadProgress();
 		}
