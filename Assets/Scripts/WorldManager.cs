@@ -162,6 +162,12 @@ public class WorldManager : MonoBehaviour {
 		);
 		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
 			if (!Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+				RaycastHit hit;
+				float y = 0f;
+				if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
+					//Debug.Log("bap");
+					y = hit.point.y;
+				}
 				GameObject newDecoration = 
 					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, 0f, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
 				newDecoration.GetComponent<Decoration>().Randomize();

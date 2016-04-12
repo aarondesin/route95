@@ -35,7 +35,7 @@ public class Chunk{
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
 		chunk.transform.position += new Vector3 (x * CHUNK_SIZE, 0f, y * CHUNK_SIZE);
 
-		int r = Random.Range (0, verts.Length-1);
+		//int r = Random.Range (0, verts.Length-1);
 
 		for (int i=0; i<verts.Length; i++) {
 			
@@ -45,9 +45,9 @@ public class Chunk{
 			} else {
 				verts[i].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y);
 			}
-			if (i == r) {
-				Debug.Log(""+i+"on chunk "+x+","+y+" maps to "+(int)c.x+","+(int)c.y);
-			}
+			//if (i == r) {
+				//Debug.Log(""+i+"on chunk "+x+","+y+" maps to "+(int)c.x+","+(int)c.y);
+			//}
 		}
 
 		//test for random height map
@@ -177,7 +177,11 @@ public class Chunk{
 
 	//create terrain gameobject with mesh
 	GameObject createChunk (Vector3[] vertices, Vector2[] UVcoords, int[] triangles) {
-		GameObject chunk = new GameObject ("chunk", typeof(MeshFilter), typeof(MeshRenderer));
+		GameObject chunk = new GameObject ("chunk", 
+			typeof(MeshFilter), 
+			typeof(MeshRenderer),
+			typeof(MeshCollider)
+		);
 		chunk.transform.position = new Vector3 (-CHUNK_SIZE/2, 0, -CHUNK_SIZE/2);
 
 		//mesh filter stuff
@@ -188,11 +192,14 @@ public class Chunk{
 		mesh.RecalculateNormals ();
 		mesh.RecalculateBounds ();
 		chunk.GetComponent<MeshFilter> ().mesh = mesh;
+		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
 
 		//mesh renderer stuff
 		chunk.GetComponent<MeshRenderer> ().material = terrainMaterial;
 		chunk.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		chunk.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+
+		chunk.GetComponent<MeshCollider>().convex = false;
 
 		return chunk;
 	}
@@ -221,7 +228,9 @@ public class Chunk{
 						if (chunk.GetComponent<MeshFilter>().mesh.normals[v].y < 0f) {
 							chunk.GetComponent<MeshFilter>().mesh.normals[v] *= -1;
 						}
-						Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
+						chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+						chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+						//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
 				} else if (vertices[v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y)) {
 					vertices[v].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int) c.y);
@@ -231,6 +240,7 @@ public class Chunk{
 		chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
 		chunk.GetComponent<MeshFilter> ().mesh.RecalculateNormals();
 		chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds();
+		ReplaceDecorations();
 	}
 	public void update (GameObject player, float updateDist, LinInt freqData){
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (CHUNK_SIZE / 2, 0f, CHUNK_SIZE / 2);
@@ -250,6 +260,19 @@ public class Chunk{
 			xi - x,
 			yi - y
 		);
+	}
+
+	public void ReplaceDecorations () {
+		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
+			if (tr != chunk.transform) {
+				RaycastHit hit;
+				float y = 0f;
+				if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.MAX_DECORATION_HEIGHT, tr.position.y), Vector3.down,out hit, Mathf.Infinity)) {
+					//Debug.Log("bap");
+					tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);
+				}
+			}
+		}
 	}
 
 }
