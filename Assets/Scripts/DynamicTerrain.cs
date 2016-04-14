@@ -32,6 +32,9 @@ public class DynamicTerrain {
 	public int freqSampleSize = 128;
 	public FFTWindow fftWindow = FFTWindow.Rectangular;
 
+	private Dictionary<Chunk, int> chunkPriorities;
+	private int chunkUpdatesPerCycle = 16;
+
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
 		List<AudioSource> sources = new List<AudioSource>(); //InputManager.instance.audioSources;
@@ -91,6 +94,7 @@ public class DynamicTerrain {
 		HEIGHT_SCALE = heightScale;
 		heightmap = new Dictionary<int, Dictionary<int, float>>();
 		SMOOTH_FACTOR = smoothFactor;
+		chunkPriorities = new Dictionary<Chunk, int>();
 	}
 
 	void updateChunks(float[] freqDataArray){
@@ -103,13 +107,66 @@ public class DynamicTerrain {
 		createChunks (xChunks, yChunks);
 		deleteChunks (xChunks, yChunks);
 		foreach (Chunk chunk in activeChunks) {
-			chunk.update(player, VERT_UPDATE_DISTANCE, freqData);
+			//chunk.update(player, VERT_UPDATE_DISTANCE, freqData);
+			chunkPriorities[chunk] += ChunkHeuristic(chunk) + 1;
 		}
+		for (int i=0; i<chunkUpdatesPerCycle; i++) {
+			Chunk temp = HighestPriorityChunk();
+			if (temp == null) return;
+			HighestPriorityChunk().update(player, VERT_UPDATE_DISTANCE, freqData);
+			chunkPriorities[temp] = 0;
+		}
+	}
+
+	Chunk HighestPriorityChunk () {
+		int max = 0;
+		Chunk result = null;
+		foreach (Chunk chunk in activeChunks) {
+			if (chunkPriorities[chunk] > max) {
+				result = chunk;
+				max = chunkPriorities[chunk];
+			}
+		}
+		//Debug.Log(max);
+		return result;
+	}
+
+	public int ChunkHeuristic (Chunk chunk) {
+		int dist = (int)DistanceToPlayer(chunk);
+		//Debug.Log(dist);
+		return 
+			(int)DistanceToPlayer(chunk) + 
+			//(chunk.nearbyRoad() ? 250 : 0) +
+			(InView(chunk) ? 20000 : 0);
+	}
+
+	float DistanceToPlayer (Chunk chunk) {
+		return Vector3.Distance (
+			new Vector3 (chunk.getX()*CHUNK_SIZE, 0f, chunk.getY()*CHUNK_SIZE),
+			new Vector3 (player.transform.position.x, 0f, player.transform.position.y)
+		);
+	}
+
+	bool InView (Chunk chunk) {
+		/*Vector3 camEulers = Camera.main.transform.rotation.eulerAngles;
+		float CameraAngle = camEulers.y;
+		float diff = AngularDistance(camEulers.y, Vector3.Angle(Camera.main.transform.position, chunk.chunk.transform.position));
+		//Debug.Log(diff, chunk.chunk);
+		bool result = diff < Camera.main.fieldOfView*Mathf.Deg2Rad/2f/2f/Mathf.PI;
+		if (result && UnityEngine.Random.Range(0,60) == 0) Debug.Log("inview",chunk.chunk);*/
+		//return result;
+		//Vector3 screenPos = Camera.main.WorldToViewportPoint(chunk.chunk.transform.position);
+		//bool result = screenPos.x >= 0f && screenPos.x <= 1f && ;
+		bool result = Vector3.Angle((chunk.chunk.transform.position-Camera.main.gameObject.transform.position), Camera.main.transform.forward) < Camera.main.fieldOfView/2f;
+		//if (result && UnityEngine.Random.Range(0,3840) == 0) Debug.Log("inview",chunk.chunk);
+		return result;
+
 	}
 
 	Chunk createChunk(int x, int y){
 		Chunk newChunk = new Chunk(x, y, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, HEIGHT_SCALE);
 		newChunk.chunk.transform.parent = terrain.transform;
+		chunkPriorities.Add(newChunk, 0);
 		return newChunk;
 	}
 
@@ -165,6 +222,7 @@ public class DynamicTerrain {
 	}
 
 	void deleteChunk(Chunk chunk){
+		chunkPriorities.Remove(chunk);
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
@@ -226,5 +284,14 @@ public class DynamicTerrain {
 	/*public void WriteHeightMap (int i, float v) {
 		WriteHeightMap (v);
 	}*/
+
+	float AngularDistance (float angle, float pos) {
+		float d = angle - pos;
+		while (d < -Mathf.PI)
+			d += 2f * Mathf.PI;
+		while (d > Mathf.PI)
+			d -= 2f * Mathf.PI;
+		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
+	}
 		
 }

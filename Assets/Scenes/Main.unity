@@ -3844,7 +3844,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 371512236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -46.139107, y: -1.8892481, z: 42.651978}
+  m_LocalPosition: {x: 0, y: 2.227, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1422931009}
@@ -3869,8 +3869,8 @@ Transform:
   - {fileID: 1080503466}
   - {fileID: 1980634885}
   - {fileID: 924040318}
-  m_Father: {fileID: 1664068196}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
 --- !u!114 &371512238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8609,11 +8609,11 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 622006808}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 46.139107, y: 4.116248, z: -42.651978}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1664068196}
-  m_RootOrder: 1
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
 --- !u!1 &632941291
 GameObject:
   m_ObjectHideFlags: 0
@@ -12508,7 +12508,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CHUNK_SIZE: 100
-  CHUNK_RESOLUTION: 10
+  CHUNK_RESOLUTION: 8
   LOADED_CHUNK_RADIUS: 8
   VERT_HEIGHT_SCALE: 800
   VERT_UPDATE_DISTANCE: 600
@@ -14771,6 +14771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a300714b61ccf4f90fce550713f5f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSources: []
 --- !u!4 &1118047755
 Transform:
   m_ObjectHideFlags: 0
@@ -15533,7 +15534,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1589577489}
   m_Direction: 0
   m_Value: 0.5000019
-  m_Size: 0.98001504
+  m_Size: 0.98
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20844,9 +20845,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 46.139107, y: 4.116248, z: -42.651978}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 371512237}
-  - {fileID: 622006810}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
 --- !u!114 &1664068197
