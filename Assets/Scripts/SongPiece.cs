@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class SongPiece {
 
 	public static int DEFAULT_MEASURES = 1;
@@ -12,12 +13,12 @@ public class SongPiece {
 
 	// Default constructor makes an empty 1-measure SongPiece
 	public SongPiece () {
-		name = MusicManager.instance.songPieces.Count.ToString();
+		//name = MusicManager.instance.currentProject.songPieces.Count.ToString();
 		riffs = new List<List<Riff>> () {
 			new List<Riff>()
 		};
 		measures = DEFAULT_MEASURES;
-		MusicManager.instance.AddSongPiece(this);
+		//MusicManager.instance.AddSongPiece(this);
 		//MusicManager.instance.AddSongPieceToSong(this);
 	}
 
@@ -31,7 +32,7 @@ public class SongPiece {
 
 	public SongPiece (string loadString) {
 		//string[] vars = loadString.Split(new char[]{save_load.itemSeparator, save_load.noteSeparator});
-		string [] vars = loadString.Split (save_load.noteSeparator);
+		string [] vars = loadString.Split (SaveLoad.noteSeparator);
 
 		name = vars[0];
 		Debug.Log("SongPiece.name = "+name);
@@ -66,7 +67,7 @@ public class SongPiece {
 	public override string ToString () {
 		string result = "";
 		//result += name + save_load.itemSeparator;
-		result += name + save_load.noteSeparator;
+		result += name + SaveLoad.noteSeparator;
 		/*for (int i = 0; i < riffs.Count; i++) {
 			result += i.ToString() + save_load.itemSeparator;
 			foreach (Riff riff in riffs[i]) {
@@ -75,7 +76,7 @@ public class SongPiece {
 
 		}*/
 		foreach (Riff riff in riffs[0]) {
-			result += riff.name + save_load.noteSeparator;
+			result += riff.name + SaveLoad.noteSeparator;
 		}
 		// measures
 		return result;

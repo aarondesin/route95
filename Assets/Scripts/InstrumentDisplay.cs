@@ -9,29 +9,8 @@ public class InstrumentDisplay : MonoBehaviour {
 	public Image glow;
 	public float fadeSpeed;
 
-	public static Dictionary<Instrument, Sprite> instrumentIcons;
-	public static Dictionary<Instrument, Sprite> instrumentIconGlows;
-
 	void Start () {
 		instance = this;
-		instrumentIcons = new Dictionary<Instrument, Sprite>() {
-			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar") },
-			{ Instrument.ElectricBass, Resources.Load<Sprite>("UI/Instrument_ElectricBass") },
-			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_AcousticGuitar") },
-			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ClassicalGuitar") },
-			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums") },
-			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_PipeOrgan") },
-			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_Keyboard") }
-		};
-		instrumentIconGlows = new Dictionary<Instrument, Sprite>() {
-			{ Instrument.ElectricGuitar, Resources.Load<Sprite>("UI/Instrument_ElectricGuitar_Glow") },
-			{ Instrument.ElectricBass, Resources.Load<Sprite>("UI/Instrument_ElectricBass_Glow") },
-			{ Instrument.AcousticGuitar, Resources.Load<Sprite>("UI/Instrument_AcousticGuitar_Glow") },
-			{ Instrument.ClassicalGuitar, Resources.Load<Sprite>("UI/Instrument_ClassicalGuitar_Glow") },
-			{ Instrument.RockDrums, Resources.Load<Sprite> ("UI/Instrument_RockDrums_Glow") },
-			{ Instrument.PipeOrgan, Resources.Load<Sprite> ("UI/Instrument_PipeOrgan_Glow") },
-			{ Instrument.Keyboard, Resources.Load<Sprite> ("UI/Instrument_Keyboard_Glow") }
-		};
 	}
 
 	void FixedUpdate () {
@@ -43,8 +22,8 @@ public class InstrumentDisplay : MonoBehaviour {
 	}
 
 	public void Refresh () {
-		GetComponent<Image>().sprite = instrumentIcons[MusicManager.instance.currentInstrument];
-		glow.GetComponent<Image>().sprite = instrumentIconGlows[MusicManager.instance.currentInstrument];
+		GetComponent<Image>().sprite = MusicManager.instance.currentInstrument.icon;
+		glow.GetComponent<Image>().sprite = MusicManager.instance.currentInstrument.glow;
 	}
 
 	public void WakeGlow () {

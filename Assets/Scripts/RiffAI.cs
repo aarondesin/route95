@@ -31,18 +31,18 @@ public class RiffAI : MonoBehaviour{
 					SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
 				}
 				*/
-				for (int j=0; j <playerRiff.notes[i].Count; j++) {
+				for (int j=0; j <playerRiff.beats[i].NumNotes(); j++) {
 					try {
-						var test_a = playerRiff.notes[i][j];
-						var test_b = caseRiff.notes[i][j];
+						Note test_a = playerRiff.beats[i].notes[j];
+						Note test_b = caseRiff.beats[i].notes[j];
 					}
 					catch {
 						break;
 					}
-					if (playerRiff.notes[i][j].Equals(caseRiff.notes[i][j])) {
+					if (playerRiff.beats[i].notes[j].Equals(caseRiff.beats[i].notes[j])) {
 						Debug.Log("playeRiff name " + playerRiff.name);
 						//Debug.Log(playerRiff.notes[i].Count);
-						SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
+						SimilarityDictionary [caseRiff] += playerRiff.beats[i].NumNotes() + 1;
 					}
 				}
 			}
@@ -92,7 +92,7 @@ public class RiffAI : MonoBehaviour{
 		//int i = 16;
 		//foreach(Note note in playerRiff[i]){ 		*(int)(Math.Pow(2, subdivs))
 		for (int i = playerRiff.beatsShown*4 - 1; i >= 0; --i){
-			if (playerRiff.notes[i].Any() == true){
+			if (playerRiff.beats[i].notes.Any() == true){
 				playerPosition = i;
 				break;
 			}
@@ -115,10 +115,10 @@ public class RiffAI : MonoBehaviour{
 					break;
 			}
 			Debug.Log ("q = " + q);
-			if (i + q >= closestCase.notes.Count) {
+			if (i + q >= closestCase.beats.Count) {
 				return -1;
 			}
-			if (closestCase.notes[i].Any() == true){
+			if (closestCase.beats[i].notes.Any() == true){
 				//Debug.Log ("inside findhintY, in if");
 				suggestionPosition = i;
 				Debug.Log ("inside findhintX, suggestedX = " + suggestionPosition);
@@ -148,7 +148,7 @@ public class RiffAI : MonoBehaviour{
 		//caseNote = closestCase.notes[playerPosition][0];
 		//Debug.Log ("inside findhintY, below Note");
 		Debug.Log ("inside findhintY, closestCase is null " + (closestCase == null));
-		caseNote = closestCase.notes[suggestedPosition][0];// return note at a specific position still broken
+		caseNote = closestCase.beats[suggestedPosition].notes[0];// return note at a specific position still broken
 		Debug.Log ("inside findhintY, casenote = " + caseNote.ToString());
 
 		//Debug.Log ("inside findhintY scale dude " + scaleDude.allNotes.ToString());

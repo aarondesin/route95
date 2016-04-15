@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEditor;
 #endif
 
+[System.Serializable]
 public class Riff {
 	public static int MAX_SUBDIVS = 2;
 	public static int MAX_BEATS = 32;
@@ -18,7 +19,7 @@ public class Riff {
 
 	public string name; // user-defined name of the riff
 	public Instrument instrument; // instrument used for this riff
-	public List<List<Note>> notes = new List<List<Note>>(); // contains notes
+	public List<Beat> beats = new List<Beat>(); // contains notes
 	public bool cutSelf = true; // if true, sounds will cut themselves off
 	public int beatsShown = 4;
 
@@ -30,7 +31,7 @@ public class Riff {
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
 	public Riff () {
 		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++) {
-			notes.Add (new List<Note> ());
+			beats.Add (new Beat ());
 		}
 		copy = 0;
 	}
@@ -38,7 +39,7 @@ public class Riff {
 	// Constructor to make a riff of a certain number of beats
 	public Riff (int length) {
 		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
-			notes.Add (new List<Note>());
+			beats.Add (new Beat());
 		}
 		copy = 0;
 	}
@@ -48,11 +49,7 @@ public class Riff {
 		currentInstrument = (Instrument)Enum.Parse (typeof(Instrument), instrumentString);
 	}*/
 
-	public Riff (string loadString) {
-
-		/*for (int i=0; i<1*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
-			notes.Add (new List<Note>());
-		}*/
+	/*public Riff (string loadString) {
 
 		string[] vars= loadString.Split (new char[]{save_load.itemSeparator,save_load.noteSeparator});
 
@@ -88,9 +85,9 @@ public class Riff {
 			}
 		}
 		//copy = MusicManager.instance.CopyNumber(name);
-	}
+	}*/
 
-	public void LoadName (string str) {
+	/*public void LoadName (string str) {
 		Debug.Log("LoadName("+str+")");
 		string[] split = str.Split(new char[]{'(',')'});
 		int cpy;
@@ -113,14 +110,10 @@ public class Riff {
 		Debug.Log(str);
 		Debug.Log(name);
 		Debug.Log(copy);
-	}
+	}*/
 
-	public void SetInstrument (Instrument inst) {
-		instrument = inst;
-	}
-
-	public int GetLength () {
-		return notes.Count;
+	public int Length () {
+		return beats.Count;
 	}
 
 	public bool Lookup (string filename, int pos) {
@@ -132,20 +125,20 @@ public class Riff {
 	public bool Lookup (Note newNote, int pos) {
 		try {
 			//return notes[pos].Contains(newNote);
-			foreach (Note note in notes[pos]) {
-				if (note.sound == newNote.sound) return true;
+			foreach (Note note in beats[pos].notes) {
+				if (note.filename == newNote.filename) return true;
 			}
 			return false;
 		} catch (ArgumentOutOfRangeException) {
-			Debug.LogError("Tried to access pos "+pos+" in "+notes.Count+"-long riff!");
+			Debug.LogError("Tried to access pos "+pos+" in "+Length()+"-long riff!");
 			return false;
 		}
 	}
 
 	public void RemoveNote (Note newNote, int pos) {
-		foreach (Note note in notes[pos]) {
-			if (note.sound == newNote.sound) {
-				notes[pos].Remove(note);
+		foreach (Note note in beats[pos].notes) {
+			if (note.filename == newNote.filename) {
+				beats[pos].notes.Remove(note);
 				return;
 			}
 		}
@@ -153,29 +146,20 @@ public class Riff {
 
 	// Removes all notes at position
 	public void Clear (int pos) {
-		notes[pos].Clear();
+		beats[pos].Clear();
 	}
 
 	// Adds or removes a note at pos
 	public void Toggle (Note newNote, int pos) {
 		// Lookup
-		//foreach (Note note in notes[pos]) {
-			//if (newNote.sound == note.sound) {
 		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
-				//notes [pos].Remove (note);
-			//notes[pos].Remove(newNote);
 			RemoveNote (newNote, pos);
-			//Debug.Log("removed note");
-				return;
-			}
-		//}
+			return;
+		}
 		// Note not already there
-		notes [pos].Add (newNote);
-		//Debug.Log (newNote.ToString());
-		//Debug.Log(this.ToString());
-		MusicManager.instance.instrumentAudioSources[instrument].PlayOneShot(newNote.sound);
-		//Debug.Log ("added note");
+		beats [pos].Add (newNote);
+		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
 	}
 	public void PlayRiffLoop (AudioClip clip) {
 		MusicManager.instance.LoopRiff.Stop();
@@ -185,40 +169,25 @@ public class Riff {
 
 	// Plays all the notes at pos
 	public void PlayRiff (int pos) { 
-		//Debug.Log ("before for loop");
 		try {
-			if (notes[pos].Count != 0) {
+			if (beats[pos].NumNotes() != 0) {
 				if (cutSelf) MusicManager.instance.instrumentAudioSources[instrument].Stop();
-
-				foreach (Note note in notes[pos]) {
-					//Debug.Log("inside for loop " + pos);
-
-						//MusicManager.instance.OneShot.Stop();
-
-					//if (MusicManager.instance.instrumentAudioSources[currentInstrument] == null) Debug.Log("shit");
+				foreach (Note note in beats[pos].notes) {
 					note.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
-
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {
 			Debug.LogError("Tried to play out of range of song! Pos: "+pos);
 		}
-
-		
-	}
-
-	public int Length () {
-		return notes.Count;
 	}
 
 	public void ShowMore () {
 		if (beatsShown < MAX_BEATS) {
 			beatsShown += 4;
-			if (beatsShown > notes.Count/(int)Mathf.Pow(2f, MAX_SUBDIVS)) {
-				for (int i=0; i<4*(int)Mathf.Pow(2f, MAX_SUBDIVS); i++) notes.Add(new List<Note>());
+			if (beatsShown > beats.Count/(int)Mathf.Pow(2f, MAX_SUBDIVS)) {
+				for (int i=0; i<4*(int)Mathf.Pow(2f, MAX_SUBDIVS); i++) beats.Add(new Beat());
 			}
 		}
-		//Debug.Log("bap");
 	}
 
 	public void ShowLess () {
@@ -227,7 +196,7 @@ public class Riff {
 		}
 	}
 
-	// FORMAT:
+	/*// FORMAT:
 	// name@instrument@cutSelf@beatsShown@beat@notesatbeat@otherbeat@notesatotherbeat@othernotesatotherbeat
 	public override string ToString () {
 		string result = name;
@@ -244,6 +213,6 @@ public class Riff {
 		}
 		Debug.Log("Riff.ToString(): "+result);
 		return result;
-	}
+	}*/
 		
 }

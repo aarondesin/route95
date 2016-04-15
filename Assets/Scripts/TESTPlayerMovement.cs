@@ -17,7 +17,7 @@ public class TESTPlayerMovement : MonoBehaviour {
 		if (velocity == 0f)
 			velocity = 0.2f;
 		progress = 0f;
-		road = WorldManager.instance.road.GetComponent<Bezier> ();
+		//road = WorldManager.instance.road.GetComponent<Bezier> ();
 	}
 	
 	// Update is called once per frame

@@ -3,11 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class Song {
 
 	public string name = "New Song";
+	public Key key;
 	public List<SongPiece> songPieces = new List<SongPiece>();
-	//List<List<Riff>> compiledSong = new List<List<Riff>> ();
 	public int measures;
 	public int beats;
 
@@ -21,20 +22,20 @@ public class Song {
 		};
 	}
 
-	public Song (string loadFile) {
+	/*public Song (string loadFile) {
 		if (loadFile.Length == 0) {
 			//Debug.LogError("Failed to load song.");
 			throw new FailedToLoadException("Song() given an empty string.");
 		}
 
 		try {
-			string[] vars = loadFile.Split(save_load.itemSeparator);
+			string[] vars = loadFile.Split(SaveLoad.itemSeparator);
 			name = vars[0];
 			Debug.Log(vars[1]);
 			Key key = (Key)Enum.Parse(typeof (Key), vars[1]);
 			MusicManager.instance.SetKey( key );
 			MusicManager.instance.tempo = (Tempo)Enum.Parse(typeof (Tempo), vars[2]);
-			string[] pieces = vars[3].Split(save_load.noteSeparator);
+			string[] pieces = vars[3].Split(SaveLoad.noteSeparator);
 			foreach (string songPiece in pieces) {
 				if (songPiece.Length == 0) continue;
 				Debug.Log("Finding songpiece "+songPiece+".");
@@ -46,13 +47,9 @@ public class Song {
 		} //catch (KeyNotFoundException) {
 			//throw new FailedToLoadException("Song.Song(): unable to find songpiece");
 		//}
-	}
+	}*/
 
 	public void PlaySong (int pos) {
-		/*int totalMeasures = NumMeasures ();
-		foreach (SongPiece songPiece in songPieces) {
-			int measure = pos / 4;
-		}*/
 		try {
 			// For now, all song pieces are assumed to be one measure long
 			foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
@@ -77,7 +74,7 @@ public class Song {
 	public void RemoveAt (int pos, Instrument inst) {
 		foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].riffs[0]) {
 			if (riff.instrument == inst) {
-				riff.notes[pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].Clear();
+				riff.beats[pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].Clear();
 			}
 		}
 	}
@@ -118,14 +115,14 @@ public class Song {
 		Debug.Log("Song.CompileSong(): beats: "+beats+ " measures: "+measures);
 	}
 
-	public override string ToString () {
+	/*public override string ToString () {
 		string result = "";
-		result += name + save_load.itemSeparator;
+		result += name + SaveLoad.itemSeparator;
 		result += Enum.GetName(typeof (Key), MusicManager.instance.currentKey) + save_load.itemSeparator;
 		result += Enum.GetName(typeof (Tempo), MusicManager.instance.tempo) + save_load.itemSeparator;
 		foreach (SongPiece songPiece in songPieces) {
 			result += songPiece.name + save_load.noteSeparator;
 		}
 		return result;
-	}
+	}*/
 }

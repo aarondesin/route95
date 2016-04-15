@@ -71,13 +71,12 @@ public class InstrumentSetup : MonoBehaviour {
 		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
 		nameInputField.text = currentRiff.name;
 		MakeBeatNumbers ();
-		//switch (MusicManager.currentInstrument) {
-		if (Enum.IsDefined(typeof(PercussionInstrument), currentRiff.instrument.ToString())) {
-			InitializePercussionSetup ((PercussionInstrument)Enum.Parse (typeof(PercussionInstrument), currentRiff.instrument.ToString()));
-		} else if (Enum.IsDefined(typeof(MelodicInstrument), currentRiff.instrument.ToString())) {
-			InitializeMelodicSetup ((MelodicInstrument)Enum.Parse (typeof(MelodicInstrument), currentRiff.instrument.ToString()));
+		if (currentRiff.instrument.type == InstrumentType.Percussion) {
+			InitializePercussionSetup (currentRiff.instrument);
+		} else if (currentRiff.instrument.type == InstrumentType.Melodic) {
+			InitializeMelodicSetup (currentRiff.instrument);
 		} else {
-			Debug.LogError(currentRiff.instrument.ToString() + " unable to initialize.");
+			Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
 		}
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
@@ -110,9 +109,9 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	// Initializes a percussion setup menu
-	void InitializePercussionSetup (PercussionInstrument percInst) {
-		switch (percInst) {
-		case PercussionInstrument.RockDrums:
+	void InitializePercussionSetup (Instrument percInst) {
+		switch (percInst.name) {
+		case "Rock Drums":
 			// Make rows of buttons for drums
 			numRows = 4;
 			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
@@ -125,7 +124,7 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	// Initializes a melodic setup menu
-	void InitializeMelodicSetup (MelodicInstrument meloInst) {
+	void InitializeMelodicSetup (Instrument meloInst) {
 		buttonGrid.Clear();
 		for(int n = 0; n<(int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS); n++) {
 			buttonGrid.Add(new List<GameObject>());
@@ -133,7 +132,7 @@ public class InstrumentSetup : MonoBehaviour {
 		int i = 0;
 
 		Instrument inst = (Instrument)Enum.Parse(typeof(Instrument),meloInst.ToString());
-		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes) {
+		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes) {
 			MakeMelodicButtons (note.Split('_')[1],i,note);
 			i++;
 		}
@@ -353,7 +352,7 @@ public class InstrumentSetup : MonoBehaviour {
 		Debug.Log ("posX = " + posX);
 		//Debug.Log ("curr inst " + currentRiff.instrument);
 
-		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentKey] [ currentRiff.instrument], subdivsShown);
+		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentSong.key] [ currentRiff.instrument], subdivsShown);
 		Debug.Log ("posY = " + posY);
 		if (posX >= buttonGrid.Count || posX < 0) {
 			Debug.Log ("Suggestion X out of bounds!");
@@ -364,7 +363,7 @@ public class InstrumentSetup : MonoBehaviour {
 			return;
 		} 
 		else {
-			int subPower = Convert.ToInt32(Math.Pow(2, subdivsShown));
+			//int subPower = Convert.ToInt32(Math.Pow(2, subdivsShown));
 			//Debug.Log("posx "+posX+" subdivs pow" + subPower);
 			//int processedX = (posX * (subPower)) -1;
 			//int processedX = (posX * (2)) -1;

@@ -28,9 +28,9 @@ public class AddRiffPrompt : MonoBehaviour {
 	void SetupDropdown () {
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
-		for (int i=0; i<(int)Instrument.NUM_INSTRUMENTS; i++) {
-			Sprite sprite = InstrumentDisplay.instrumentIcons[(Instrument)i];
-			string instName = MusicManager.instToString[(Instrument)i];
+		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
+			Sprite sprite = Instrument.AllInstruments[i].icon;
+			string instName = Instrument.AllInstruments[i].name;
 			Dropdown.OptionData option = new Dropdown.OptionData (instName, sprite);
 			options.Add(option);
 		}
@@ -40,7 +40,7 @@ public class AddRiffPrompt : MonoBehaviour {
 	// Creates a new riff with the filled in properties
 	public void AddRiff () {
 		Riff temp = MusicManager.instance.AddRiff ();
-		temp.instrument = (Instrument)dropdown.value;
+		temp.instrument = Instrument.AllInstruments[dropdown.value];
 		temp.name = inputField.text;
 		GameManager.instance.DisableAddRiffPrompt();
 		GameManager.instance.SwitchToMenu ((int)Menu.RiffEdit);

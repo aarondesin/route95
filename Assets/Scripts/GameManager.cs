@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour {
 	void Load () {
 	//IEnumerator Load () {
 		startLoadTime = Time.realtimeSinceStartup;
-		loadValue = (int)Instrument.NUM_INSTRUMENTS+
+		loadValue = Instrument.AllInstruments.Count+
 			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
 			WorldManager.instance.MAX_DECORATIONS;
 

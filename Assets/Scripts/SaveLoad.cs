@@ -18,42 +18,73 @@ public class FailedToLoadException: ApplicationException {
 	public FailedToLoadException() {}
 }
 
-public class save_load : MonoBehaviour {
+public class SaveLoad {
 	public static char saveSeparator = '$'; // separates riffs, songpieces, song
 	public static char itemSeparator = '@';
 	public static char riffSeparator = '%';
 	public static char noteSeparator = ',';
 	//char[] separators = { '$', ',', '#', '%' };
 
-	public static string saveExtension = ".r95";
+	public static string projectSaveExtension = ".r95p";
+	public static string songSaveExtension = ".r95s";
 
 
 	public void SaveCurrentProject () {
 		BinaryFormatter bf = new BinaryFormatter ();
 
-		//string path = Application.persistentDataPath + "/" + InstrumentSetup.currentRiff.name;
-		string directoryPath = Application.persistentDataPath + "/";
-		string filePath = directoryPath + MusicManager.instance.currentSong.name + saveExtension;
-		//Debug.Log (directoryPath);
-		//Debug.Log (filePath);
+		string directoryPath = Application.persistentDataPath + "/Projects/";
+		string filePath = directoryPath + MusicManager.instance.currentSong.name + projectSaveExtension;
+
 		Directory.CreateDirectory (directoryPath);
 		FileStream file = File.Open(filePath, FileMode.Create);
-		//string test = SaveToString ();
-		//Debug.Log (test);
-
-		riffdata data = new riffdata ();
-		//data.riff = InstrumentSetup.currentRiff;
-		//data.riffName = InstrumentSetup.currentRiff.name;
-		//data.pos = InstrumentSetup.currentRiff.intPos;
-		data.songData = SaveSong();
-		bf.Serialize (file, data);
+	
+		bf.Serialize (file, MusicManager.instance.currentProject);
 
 		file.Close ();
 		Prompt.instance.PromptMessage("Save Project", "Successfully saved project!", "Okay");
 	}
-		
 
 	public static void LoadFile (string path) {
+		if (File.Exists(path)) {
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream file = File.Open (path, FileMode.Open);
+
+			Project backupProject = MusicManager.instance.currentProject;
+			Song backupSong = MusicManager.instance.currentSong;
+
+			try {
+				Project project = (Project)bf.Deserialize(file);
+				MusicManager.instance.currentProject = project;
+
+				SongArrangeSetup.instance.Refresh();
+				SongTimeline.instance.RefreshTimeline();
+
+				Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
+			} catch (SerializationException) {
+				Debug.LogError ("SaveLoad.LoadFile(): Failed to deserialize file, probably empty.");
+				Prompt.instance.PromptMessage("Failed to load project", "File is empty.", "Okay");
+			} catch (EndOfStreamException) {
+				Debug.LogError ("SaveLoad.LoadFile(): Attempted to read past end of stream, file is wrong format?");
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} catch (ArgumentException) {
+				Debug.LogError ("SaveLoad.LoadFile(): Failed to load a riff or song piece. Already exists?");
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} catch (FailedToLoadException f) {
+				Debug.LogError("FailedToLoadException: "+f);
+				MusicManager.instance.currentProject = backupProject;
+				MusicManager.instance.currentSong = backupSong;
+				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+			} finally {
+				file.Close ();
+			}
+		} else {
+			Debug.LogError ("SaveLoad.LoadFile(): File \'"+path+"\' doesn't exist.");
+			Prompt.instance.PromptMessage("Failed to load project", "Could not find file.", "Okay");
+		}
+	}
+		
+
+	/*public static void LoadFile (string path) {
 		if (File.Exists (path)) {
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open (path, FileMode.Open);
@@ -115,9 +146,9 @@ public class save_load : MonoBehaviour {
 			Prompt.instance.PromptMessage("Failed to load project", "Could not find file.", "Okay");
 		}
 		
-	}
+	}*/
 
-	public static List<Riff> LoadRiffs (string riffString) {
+	/*public static List<Riff> LoadRiffs (string riffString) {
 		string[] riffs = riffString.Split (riffSeparator);
 
 		if (riffs.Length == 0) {
@@ -154,12 +185,12 @@ public class save_load : MonoBehaviour {
 		}
 		Debug.Log("Loaded "+loadedSongPiecesCounter+" song pieces.");
 		return temp;
-	}
+	}*/
 
-	public static Song LoadSong (string songString) {
+	/*public static Song LoadSong (string songString) {
 		//MusicManager.instance.currentSong = new Song(songString);
 		return new Song(songString);
-	}
+	}*/
 		
 
 	public static string SaveSong () {
@@ -219,14 +250,5 @@ public class save_load : MonoBehaviour {
 		result += "("+copy.ToString()+")";
 		return result;
 	}
-
-}
-
- [Serializable]
-class riffdata{
-	
-	//public Riff riff;
-	//public int beat;
-	public string songData;
 
 }

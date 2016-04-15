@@ -100,7 +100,7 @@ public class InputManager : MonoBehaviour {
 				}
 
 				switch (LiveSystem) {
-				case 0: // licks
+				/*case 0: // licks
 					// Check for playing lick
 					foreach (KeyCode key2 in keyToLick.Keys.ToList()) {
 						if (Input.GetKey(key2)) {
@@ -120,7 +120,7 @@ public class InputManager : MonoBehaviour {
 						Debug.Log(keyToLick.Count);
 						Debug.Log (MusicManager.instance.licks.Count);
 					}
-					break;
+					break;*/
 
 					case 1: // notes
 					foreach (KeyCode key in keyToNote.Keys.ToList()) {
@@ -134,9 +134,9 @@ public class InputManager : MonoBehaviour {
 									note.PlayNote(audioSources[keyToNote[key]], false);
 								}
 							} else {
-								noteIndex = KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes.Count-1-keyToNote[key];
+								noteIndex = KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes.Count-1-keyToNote[key];
 								if (noteIndex >= 0) {
-									Note note = new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][inst].allNotes[noteIndex]);
+									Note note = new Note(KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes[noteIndex]);
 									//note.PlayNote(MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument], true);
 									if (note != null)
 										note.PlayNote(audioSources[keyToNote[key]], true);
@@ -175,7 +175,7 @@ public class InputManager : MonoBehaviour {
 		}
 	}
 
-	void PlayLick (Riff lick) {
+	/*void PlayLick (Riff lick) {
 		MusicManager.instance.QueueLick(lick);
-	}
+	}*/
 }

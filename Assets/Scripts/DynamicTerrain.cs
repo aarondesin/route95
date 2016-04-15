@@ -44,7 +44,7 @@ public class DynamicTerrain {
 			source.GetSpectrumData (sample, 0, fftWindow);
 			for (int i = 0; i < freqSampleSize; i++) {
 				if (sample [i] != float.NaN && sample [i] != 0f) {
-					if (source == MusicManager.instance.instrumentAudioSources [(Instrument)0]) {
+					if (source == MusicManager.instance.instrumentAudioSources [Instrument.AllInstruments[0]]) {
 						data [i] = sample [i];
 					} else {
 						data [i] += sample [i];

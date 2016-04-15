@@ -54,7 +54,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ClassicalGuitar
+  m_Name: Classical Guitar
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 57cf0fbc75f3210489fb0af4527c92e9
   m_Children: []
@@ -130,7 +130,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: RockDrums
+  m_Name: Rock Drums
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: eff501adad3e15c48bd51eb00af77983
   m_Children: []
@@ -147,7 +147,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: PipeOrgan
+  m_Name: Pipe Organ
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: b87097a81694bfe4a9f5a5f80f49f6f8
   m_Children: []
@@ -164,7 +164,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ElectricGuitar
+  m_Name: Electric Guitar
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: f8282b7de91b199448506ce0b33c9968
   m_Children: []
@@ -183,7 +183,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: AcousticGuitar
+  m_Name: Acoustic Guitar
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 768facea385cfe9439a95bc1e4a1ef99
   m_Children: []
@@ -200,7 +200,7 @@ AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ElectricBass
+  m_Name: Electric Bass
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: c6b99f0a95c92844ab2dbfc19967ce08
   m_Children: []

@@ -10,7 +10,7 @@ using System.IO; // need for path operations
 using UnityEditor;
 #endif
 
-// All percussion instruments
+/*// All percussion instruments
 public enum PercussionInstrument {
 	RockDrums
 };
@@ -35,7 +35,7 @@ public enum Instrument {
 	PipeOrgan,
 	Keyboard,
 	NUM_INSTRUMENTS // easy access to number of instruments in game
-};
+};*/
 
 
 // All keys available in the game
@@ -65,8 +65,10 @@ public class MusicManager : MonoBehaviour {
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
 	public AudioMixer mixer;
 
+	public Project currentProject = new Project();
+
 	// --Global Music Properties-- //
-	public Key currentKey = Key.EMajor; // value will be passed from key button
+	//public Key currentKey = Key.EMajor; // value will be passed from key button
 	public Instrument currentInstrument = Instrument.ElectricGuitar;
 	public Song currentSong;
 	public bool loopSong = false; // loop song in live mode?
@@ -76,7 +78,7 @@ public class MusicManager : MonoBehaviour {
 	public List<Riff> riffs = new List<Riff> ();
 	public List<SongPiece> songPieces = new List<SongPiece>();
 	public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
-	public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
+	/*public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
 		{ Instrument.AcousticGuitar, new List<Riff> () },
@@ -84,21 +86,10 @@ public class MusicManager : MonoBehaviour {
 		{ Instrument.RockDrums, new List <Riff> () },
 		{ Instrument.PipeOrgan, new List<Riff> () },
 		{ Instrument.Keyboard, new List<Riff> () }
-	};
+	};*/
 	// All lick notes waiting to be played
-	List<List<Note>> lickQueue = new List<List<Note>>();
-	bool lickPlaying = false;
-
-
-	public static Dictionary<Instrument, string> instToString = new Dictionary<Instrument, string> () {
-		{ Instrument.ElectricGuitar, "Electric Guitar" },
-		{ Instrument.ElectricBass, "Electric Bass" },
-		{ Instrument.AcousticGuitar, "Acoustic Guitar" },
-		{ Instrument.ClassicalGuitar, "Classical Guitar" },
-		{ Instrument.PipeOrgan, "Pipe Organ" },
-		{ Instrument.Keyboard, "Keyboard" },
-		{ Instrument.RockDrums, "Rock Drums" }
-	};
+	//List<List<Note>> lickQueue = new List<List<Note>>();
+	//bool lickPlaying = false;
 		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
 	public AudioSource LoopRiff;
@@ -123,9 +114,9 @@ public class MusicManager : MonoBehaviour {
 
 	float startLoadTime;
 
-	bool loadedExamples = false;
+	//bool loadedExamples = false;
 
-	Instrument lickInstrument;
+	//Instrument lickInstrument;
 
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
@@ -164,12 +155,12 @@ public class MusicManager : MonoBehaviour {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
-		for (int i=0; i<(int)Instrument.NUM_INSTRUMENTS; i++) {
+		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
 			GameObject obj = new GameObject ();
-			obj.name = (string)Enum.GetName (typeof(Instrument), (Instrument)i);
+			obj.name = Instrument.AllInstruments[i].name;
 			AudioSource source = obj.AddComponent<AudioSource>();
 			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
-			instrumentAudioSources.Add((Instrument)i, source);
+			instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
 			obj.AddComponent<AudioReverbFilter>();
 			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
 			obj.GetComponent<AudioReverbFilter>().room = GetComponent<AudioReverbFilter>().room;
@@ -199,13 +190,13 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void SetKey (int key) {
-		currentKey = (Key)key;
-		LoadExampleLicks();
+		currentSong.key = (Key)key;
+		//LoadExampleLicks();
 	}
 
 	public void SetKey (Key key) {
-		currentKey = key;
-		LoadExampleLicks();
+		SetKey ((int)key);
+		//LoadExampleLicks();
 	}
 
 	public void PlayRiffLoop(){
@@ -251,7 +242,7 @@ public class MusicManager : MonoBehaviour {
 							GameManager.instance.SwitchToPostplay();
 						}
 					}
-					if (lickQueue.Count > 0){
+					/*if (lickQueue.Count > 0){
 						if (IsDownBeat(beat)) {
 							//Debug.Log("dick");
 							lickPlaying = true;
@@ -261,9 +252,10 @@ public class MusicManager : MonoBehaviour {
 						}
 					} else {
 						lickPlaying = false;
-					}
-					if (!lickPlaying) currentSong.PlaySong(beat);
-						else currentSong.PlaySongExceptFor(beat, lickInstrument);
+					}*/
+					//if (!lickPlaying) 
+						currentSong.PlaySong(beat);
+					//	else currentSong.PlaySongExceptFor(beat, lickInstrument);
 					//Debug.Log(beat);
 					float songTotalTime = currentSong.beats*7200f/tempoToFloat[tempo]/4f;
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
@@ -321,55 +313,43 @@ public class MusicManager : MonoBehaviour {
 		return null;
 	}
 
-	public void AddSongPiece (SongPiece songPiece) {
+	/*public void AddSongPiece (SongPiece songPiece) {
 		//Debug.Log("Adding "+songPiece.name);
 		songPieces.Add(songPiece);
 		songPiecesByName.Add(songPiece.name, songPiece);
 		//Debug.Log("Loaded songpiece "+songPiece.name);
 		//SongArrangeSetup.instance.Refresh();
-	}
+	}*/
 
-	public void AddSongPieceToSong () {
+	/*public void AddSongPieceToSong () {
 		SongPiece temp = new SongPiece() {
 			name = "SongPiece"+songPieces.Count
 		};
 		songPieces.Add(temp);
 		currentSong.songPieces.Add(temp);
 		songPiecesByName.Add(temp.name, temp);
-	}
+	}*/
 
-	public void AddSongPieceToSong (SongPiece songPiece) {
+	/*public void AddSongPieceToSong (SongPiece songPiece) {
 		AddSongPiece(songPiece);
 		currentSong.songPieces.Add(songPiece);
-	}
+	}*/
 
-	public void QueueLick (Riff lick) {
+	/*public void QueueLick (Riff lick) {
 		if (lick == null || lickQueue.Count != 0) return;
 		lickQueue.Clear();
 		lickInstrument = lick.instrument;
-		foreach (List<Note> beat in lick.notes) {
-			lickQueue.Add(beat);
-			//Debug.Log ("test");
+		foreach (Beat beat in lick.beats) {
+			lickQueue.Add(beat.notes);
 		}
 		lickPlaying = false;
-		//Debug.Log("queued "+lickQueue.Count);
-	}
-
-	/*public void QueueLick (Riff lick) {
-		if (lick == null) return;
-		int nextDownBeat = (beat % 4 == 0 ? beat :
-			beat+1 % 4 == 0 ? beat+1 :
-			beat+2 % 4 == 0 ? beat+1 :
-			beat+3 % 4 == 0 ? beat+3 :
-		);
-		for (int i=nextDownBeat) 
 	}*/
 
-	bool IsDownBeat(int pos) {
+	/*bool IsDownBeat(int pos) {
 		return pos%4 == 0;
-	}
+	}*/
 
-	public void PopLickQueue () {
+	/*public void PopLickQueue () {
 		//Debug.Log("play");
 		//MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
 		foreach (Note note in lickQueue[0]) {
@@ -379,7 +359,7 @@ public class MusicManager : MonoBehaviour {
 		}
 		lickQueue.RemoveAt(0);
 
-	}
+	}*/
 
 	// Loads a single audio clip
 	void LoadAudioClip (string path) {
@@ -435,7 +415,7 @@ public class MusicManager : MonoBehaviour {
 		songPiecesByName.Clear();
 	}
 		
-	public void LoadExampleRiffs() {
+	/*public void LoadExampleRiffs() {
 		if (!loadedExamples) {
 			riffs.Add( new Riff () {
 				name = "Example Guitar Riff",
@@ -945,6 +925,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.Keyboard].root[1]) }
 			}
 		});
-	}
+	}*/
 }
 	
