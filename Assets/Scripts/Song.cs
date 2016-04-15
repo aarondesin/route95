@@ -115,6 +115,10 @@ public class Song {
 		Debug.Log("Song.CompileSong(): beats: "+beats+ " measures: "+measures);
 	}
 
+	public void AddNewSongPiece() {
+		songPieces.Add(new SongPiece());
+	}
+
 	/*public override string ToString () {
 		string result = "";
 		result += name + SaveLoad.itemSeparator;

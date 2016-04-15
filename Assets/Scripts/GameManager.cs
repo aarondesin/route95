@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
 
 	// Parent objects for all menu UI objects
 	public GameObject mainMenu;
+	public GameObject playlistMenu;
 	public GameObject keySelectMenu;
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
@@ -52,6 +53,10 @@ public class GameManager : MonoBehaviour {
 	public GameObject liveIcons;
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
+
+	public Sprite arrowIcon;
+	public Sprite editIcon;
+	public Sprite removeIcon;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;
@@ -116,19 +121,8 @@ public class GameManager : MonoBehaviour {
 		SongTimeline.instance.scrollbar.GetComponent<Scrollbar>().value = 0f;
 		
 		// Hide all menus and display default menu (main)
-		DisableMenu(menus[Menu.KeySelect]);
-		DisableMenu(menus[Menu.SongArrange]);
-		DisableMenu(menus[Menu.RiffEdit]);
-		DisableMenu (menus [Menu.PostPlay]);
-		DisableMenu(addRiffPrompt);
-		DisableMenu(loadProjectPrompt);
-		DisableMenu(prompt);
-		DisableMenu(pauseMenu);
-		DisableMenu(liveIcons);
-		DisableMenu(tooltip);
-		DisableMenu(songProgressBar);
-		DisableMenu(shortSongWarningPrompt);
-		SwitchToMenu(Menu.Main);
+		HideAll ();
+		Show (mainMenu);
 		Load();
 		//StartCoroutine("Load");
 		initialized = true;
@@ -225,6 +219,38 @@ public class GameManager : MonoBehaviour {
 			livePlayQuitPrompt.color = Color.white;
 			//livePlayQuitPrompt.color = Color.white;
 		}
+	}
+
+	public void GoToMainMenu () {
+		HideAll ();
+		Show (mainMenu);
+	}
+
+	public void GoToSongArrangeMenu () {
+	}
+
+	public void GoToPlaylistMenu () {
+		HideAll ();
+		Show (playlistMenu);
+	}
+
+	public void Show (GameObject menu) {
+		menu.SetActive(true);
+	}
+
+	public void Hide (GameObject menu) {
+		menu.SetActive(false);
+	}
+
+	public void HideAll () {
+		Hide (mainMenu);
+		Hide (playlistMenu);
+		Hide (keySelectMenu);
+		Hide (riffEditMenu);
+
+		Hide (addRiffPrompt);
+		Hide (loadProjectPrompt);
+		Hide (prompt);
 	}
 		
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)

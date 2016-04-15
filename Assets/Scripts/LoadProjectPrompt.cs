@@ -41,12 +41,8 @@ public class LoadProjectPrompt : MonoBehaviour {
 		for (int i=0; i<files.Length; i++) {
 			string filename = Path.GetFileNameWithoutExtension (files[i]);
 
-			GameObject button = new GameObject();
-			button.name = filename;
+			GameObject button = UI.MakeButton(filename);
 
-			button.AddComponent<Button>();
-			button.AddComponent<CanvasRenderer>();
-			button.AddComponent<RectTransform>();
 			button.GetComponent<RectTransform>().SetParent(fileList);
 			float width = ((RectTransform)button.GetComponent<RectTransform>().parent.parent).rect.width;
 			button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, buttonSize.y);
@@ -58,7 +54,7 @@ public class LoadProjectPrompt : MonoBehaviour {
 				((i == 0 ? 0f : verticalPadding) + button.GetComponent<RectTransform>().sizeDelta.y)*-(float)(i+1),
 				0f
 			);
-			button.AddComponent<Image>();
+
 			button.GetComponent<Image>().sprite = fillSprite;
 			button.GetComponent<Image>().color = new Color(1f,1f,1f,0f);
 

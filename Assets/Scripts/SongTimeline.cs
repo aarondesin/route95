@@ -94,7 +94,7 @@ public class SongTimeline : MonoBehaviour {
 			
 		addColumnButton.AddComponent<Button>();
 		addColumnButton.GetComponent<Button>().onClick.AddListener(()=>{
-			MusicManager.instance.currentProject.AddNewSongPiece();
+			MusicManager.instance.currentSong.AddNewSongPiece();
 			RefreshTimeline();
 		});
 

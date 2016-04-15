@@ -189,6 +189,10 @@ public class MusicManager : MonoBehaviour {
 		KeyManager.instance.BuildScales();
 	}
 
+	public void NewProject () {
+		currentProject = new Project();
+	}
+
 	public void SetKey (int key) {
 		currentSong.key = (Key)key;
 		//LoadExampleLicks();
