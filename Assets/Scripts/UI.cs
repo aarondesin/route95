@@ -8,11 +8,13 @@ public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	public List<GameObject> objects;
 
 	public void OnPointerEnter (PointerEventData eventData) {
-		foreach (GameObject obj in objects) obj.SetActive(true);
+		if (objects != null)
+			foreach (GameObject obj in objects) obj.SetActive(true);
 	}
 
 	public void OnPointerExit (PointerEventData eventData) {
-		foreach (GameObject obj in objects) obj.SetActive(false);
+		if (objects != null)
+			foreach (GameObject obj in objects) obj.SetActive(false);
 	}
 }
 
@@ -26,6 +28,7 @@ public class UI : MonoBehaviour {
 			typeof (ShowHide),
 			typeof (Image)
 		);
+		button.GetComponent<RectTransform>().localScale = new Vector3 (1f,1f,1f);
 		return button;
 	}
 

@@ -28,12 +28,11 @@ public class SaveLoad {
 	public static string projectSaveExtension = ".r95p";
 	public static string songSaveExtension = ".r95s";
 
-
-	public void SaveCurrentProject () {
+	public static void SaveCurrentProject () {
 		BinaryFormatter bf = new BinaryFormatter ();
 
 		string directoryPath = Application.persistentDataPath + "/Projects/";
-		string filePath = directoryPath + MusicManager.instance.currentSong.name + projectSaveExtension;
+		string filePath = directoryPath + MusicManager.instance.currentProject.name + projectSaveExtension;
 
 		Directory.CreateDirectory (directoryPath);
 		FileStream file = File.Open(filePath, FileMode.Create);
@@ -44,7 +43,7 @@ public class SaveLoad {
 		Prompt.instance.PromptMessage("Save Project", "Successfully saved project!", "Okay");
 	}
 
-	public static void LoadFile (string path) {
+	public static void LoadProject (string path) {
 		if (File.Exists(path)) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open (path, FileMode.Open);
@@ -55,7 +54,11 @@ public class SaveLoad {
 			try {
 				Project project = (Project)bf.Deserialize(file);
 				MusicManager.instance.currentProject = project;
+				if (!project.Empty())
+					MusicManager.instance.currentSong = project.songs[0];
+				else MusicManager.instance.NewSong();
 
+				PlaylistBrowser.instance.RefreshName();
 				SongArrangeSetup.instance.Refresh();
 				SongTimeline.instance.RefreshTimeline();
 
@@ -78,8 +81,60 @@ public class SaveLoad {
 				file.Close ();
 			}
 		} else {
-			Debug.LogError ("SaveLoad.LoadFile(): File \'"+path+"\' doesn't exist.");
+			Debug.LogError ("SaveLoad.LoadProject(): Project \'"+path+"\' doesn't exist.");
 			Prompt.instance.PromptMessage("Failed to load project", "Could not find file.", "Okay");
+		}
+	}
+
+	public static void SaveCurrentSong () {
+		BinaryFormatter bf = new BinaryFormatter ();
+
+		string directoryPath = Application.persistentDataPath + "/Songs/";
+		string filePath = directoryPath + MusicManager.instance.currentSong.name + songSaveExtension;
+
+		Directory.CreateDirectory (directoryPath);
+		FileStream file = File.Open(filePath, FileMode.Create);
+
+		bf.Serialize (file, MusicManager.instance.currentSong);
+
+		file.Close ();
+		Prompt.instance.PromptMessage("Save Project", "Successfully saved Song!", "Okay");
+	}
+
+	public static void LoadSong (string path) {
+		if (File.Exists(path)) {
+			BinaryFormatter bf = new BinaryFormatter();
+			FileStream file = File.Open (path, FileMode.Open);
+
+			Song backupSong = MusicManager.instance.currentSong;
+
+			try {
+				Song song = (Song)bf.Deserialize(file);
+				MusicManager.instance.currentSong = song;
+
+				SongArrangeSetup.instance.Refresh();
+				SongTimeline.instance.RefreshTimeline();
+
+				Prompt.instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
+			} catch (SerializationException) {
+				Debug.LogError ("SaveLoad.LoadSong(): Failed to deserialize file, probably empty.");
+				Prompt.instance.PromptMessage("Failed to load song", "File is empty.", "Okay");
+			} catch (EndOfStreamException) {
+				Debug.LogError ("SaveLoad.LoadSong(): Attempted to read past end of stream, file is wrong format?");
+				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+			} catch (ArgumentException) {
+				Debug.LogError ("SaveLoad.LoadSong(): Failed to load a riff or song piece. Already exists?");
+				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+			} catch (FailedToLoadException f) {
+				Debug.LogError("FailedToLoadException: "+f);
+				MusicManager.instance.currentSong = backupSong;
+				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+			} finally {
+				file.Close ();
+			}
+		} else {
+			Debug.LogError ("SaveLoad.LoadSong(): Song \'"+path+"\' doesn't exist.");
+			Prompt.instance.PromptMessage("Failed to load Song", "Could not find file.", "Okay");
 		}
 	}
 		
@@ -193,7 +248,7 @@ public class SaveLoad {
 	}*/
 		
 
-	public static string SaveSong () {
+	/*public static string SaveSong () {
 		string output = "";
 
 
@@ -216,19 +271,14 @@ public class SaveLoad {
 		output += saveSeparator;
 
 		// save song
-		/*foreach (SongPiece songPiece in MusicManager.instance.currentSong.songPieces) {
-			output += songPiece.name + "#";
-		}*/
+		// (SongPiece songPiece in MusicManager.instance.currentSong.songPieces) {
+		//	output += songPiece.name + "#";
+		//}
 		output += MusicManager.instance.currentSong.ToString ();
 
 		Debug.Log("SaveSong():" +output);
 		return output;
-	}
-
-
-	public void LoadSong(){
-
-	}
+	}*/
 
 	static bool IsCopy (string str) {
 		string[] split = str.Split(new char[]{'(', ')'});

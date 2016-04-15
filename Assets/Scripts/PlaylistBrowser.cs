@@ -21,9 +21,17 @@ public class PlaylistBrowser : MonoBehaviour {
 
 	void Start () {
 		instance = this;
+		projectNameInputField.onEndEdit.AddListener( delegate {
+			MusicManager.instance.currentProject.name = projectNameInputField.text;
+		});
 	}
 
-	void Refresh () {
+	public void RefreshName () {
+		projectNameInputField.text = MusicManager.instance.currentProject.name;
+	}
+
+	public void Refresh () {
+
 		if (listings == null) listings = new List<GameObject>();
 		else {
 			foreach (GameObject listing in listings) Destroy (listing);

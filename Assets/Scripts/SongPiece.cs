@@ -6,18 +6,21 @@ using System.Collections.Generic;
 public class SongPiece {
 
 	public static int DEFAULT_MEASURES = 1;
-	
+
+	[SerializeField]
 	public string name; 
-	public List<List<Riff>> riffs = new List<List<Riff>> ();
-	public int measures;
+
+	[SerializeField]
+	public List<Measure> measures = new List<Measure> ();
+	//public int measures;
 
 	// Default constructor makes an empty 1-measure SongPiece
 	public SongPiece () {
 		//name = MusicManager.instance.currentProject.songPieces.Count.ToString();
-		riffs = new List<List<Riff>> () {
-			new List<Riff>()
+		measures = new List<Measure> () {
+			new Measure()
 		};
-		measures = DEFAULT_MEASURES;
+		//measures = DEFAULT_MEASURES;
 		//MusicManager.instance.AddSongPiece(this);
 		//MusicManager.instance.AddSongPieceToSong(this);
 	}
@@ -37,8 +40,8 @@ public class SongPiece {
 		name = vars[0];
 		Debug.Log("SongPiece.name = "+name);
 
-		riffs = new List<List<Riff>> () {
-			new List<Riff>()
+		measures = new List<Measure> () {
+			new Measure ()
 		};
 
 		for (int i=1; i<vars.Length; i++) {
@@ -49,17 +52,17 @@ public class SongPiece {
 			if (riff == null) {
 				Debug.LogError ("SongPiece(): riff \"" + vars[i] +"\" invalid.");
 			} else {
-				riffs[0].Add(riff);
+				measures[0].riffs.Add(riff);
 			}
 		}
-		measures = DEFAULT_MEASURES;
+		//measures = DEFAULT_MEASURES;
 	}
 
 	//public void Toggle (
 
 	public void PlaySongPiece (int pos){ // plays all the notes at pos
-		int measure = pos/4;
-		foreach (Riff riff in riffs[measure]) {
+		int measureNum = pos/4;
+		foreach (Riff riff in measures[measureNum].riffs) {
 			riff.PlayRiff (pos % 4);
 		}
 	}
@@ -75,7 +78,7 @@ public class SongPiece {
 			}
 
 		}*/
-		foreach (Riff riff in riffs[0]) {
+		foreach (Riff riff in measures[0].riffs) {
 			result += riff.name + SaveLoad.noteSeparator;
 		}
 		// measures

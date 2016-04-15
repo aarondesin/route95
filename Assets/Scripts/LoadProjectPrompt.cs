@@ -37,7 +37,7 @@ public class LoadProjectPrompt : MonoBehaviour {
 
 		// Get list of files in save location
 		//DirectoryInfo saveDirectory = new DirectoryInfo (@GameManager.instance.savePath);
-		string[] files = Directory.GetFiles(GameManager.instance.savePath, "*"+SaveLoad.projectSaveExtension);
+		string[] files = Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension);
 		for (int i=0; i<files.Length; i++) {
 			string filename = Path.GetFileNameWithoutExtension (files[i]);
 
@@ -92,9 +92,9 @@ public class LoadProjectPrompt : MonoBehaviour {
 
 	// calls save_load to load the currently selected file
 	public void LoadSelectedPath () {
-		string fullPath = GameManager.instance.savePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
+		string fullPath = GameManager.instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
 		Debug.Log("LoadProjectPrompt.LoadSelectedPath(): loading "+fullPath);
-		SaveLoad.LoadFile (fullPath);
+		SaveLoad.LoadProject (fullPath);
 	}
 
 	// Resets highlighting of all buttons

@@ -72,7 +72,8 @@ public class GameManager : MonoBehaviour {
 	public Mode currentMode = Mode.Setup;
 
 	// Global save path
-	public string savePath; 
+	public string projectSavePath;
+	public string songSavePath;
 
 	// Icon fading vars
 	public float fadeWaitTime;
@@ -98,8 +99,9 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
-		savePath = Application.persistentDataPath;
-		//Sounds.Load();
+		projectSavePath = Application.persistentDataPath + "/Projects/";
+		songSavePath = Application.persistentDataPath + "/Songs/";
+			//Sounds.Load();
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
@@ -338,6 +340,10 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(loopIcon);
 		MusicManager.instance.currentSong = new Song();
 		SongTimeline.instance.RefreshTimeline();
+	}
+
+	public void SaveCurrentProject () {
+		SaveLoad.SaveCurrentProject();
 	}
 		
 	// Toggle visibility of system buttons

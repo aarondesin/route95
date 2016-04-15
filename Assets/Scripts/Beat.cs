@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Beat {
 
+	[SerializeField]
 	public List<Note> notes;
 
 	// Add a note to the beat

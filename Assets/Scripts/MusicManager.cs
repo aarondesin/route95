@@ -193,6 +193,16 @@ public class MusicManager : MonoBehaviour {
 		currentProject = new Project();
 	}
 
+	public void NewSong () {
+		/*if (currentProject.Full()) {
+			Prompt.instance.PromptMessage ("Project full", "The current project has reached the max number of songs.", "Bummer.");
+		} else {*/
+			Song newSong = new Song();
+			currentSong = newSong;
+			currentProject.AddSong(newSong);
+		//}
+	}
+
 	public void SetKey (int key) {
 		currentSong.key = (Key)key;
 		//LoadExampleLicks();
@@ -206,7 +216,7 @@ public class MusicManager : MonoBehaviour {
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
-			instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
+			instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 		} else {
 			playing = true;
 			loop = true;
@@ -217,7 +227,7 @@ public class MusicManager : MonoBehaviour {
 		playing = false;
 		loop = false;
 		beat = 0;
-		instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
+		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 		//OneShot.Stop();
 	}
 
