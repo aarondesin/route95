@@ -10,11 +10,13 @@ public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	public void OnPointerEnter (PointerEventData eventData) {
 		if (objects != null)
 			foreach (GameObject obj in objects) obj.SetActive(true);
+		//Debug.Log("OnPointerEnter", gameObject);
 	}
 
 	public void OnPointerExit (PointerEventData eventData) {
 		if (objects != null)
 			foreach (GameObject obj in objects) obj.SetActive(false);
+		//Debug.Log("OnPointerExit", gameObject);
 	}
 }
 
@@ -39,5 +41,14 @@ public class UI : MonoBehaviour {
 			typeof (Text)
 		);
 		return text;
+	}
+
+	public static GameObject MakeImage (string imageName) {
+		GameObject image = new GameObject (imageName,
+			typeof (RectTransform),
+			typeof (CanvasRenderer),
+			typeof (Image)
+		);
+		return image;
 	}
 }

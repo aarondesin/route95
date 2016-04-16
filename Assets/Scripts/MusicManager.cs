@@ -193,6 +193,10 @@ public class MusicManager : MonoBehaviour {
 		currentProject = new Project();
 	}
 
+	public void SaveCurrentProject () {
+		SaveLoad.SaveCurrentProject();
+	}
+
 	public void NewSong () {
 		/*if (currentProject.Full()) {
 			Prompt.instance.PromptMessage ("Project full", "The current project has reached the max number of songs.", "Bummer.");
@@ -201,6 +205,10 @@ public class MusicManager : MonoBehaviour {
 			currentSong = newSong;
 			currentProject.AddSong(newSong);
 		//}
+	}
+		
+	public void SaveCurrentSong () {
+		SaveLoad.SaveCurrentSong();
 	}
 
 	public void SetKey (int key) {

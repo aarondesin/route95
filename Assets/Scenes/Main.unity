@@ -1633,8 +1633,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 622006809}
-        m_MethodName: SwitchToMenu
-        m_Mode: 3
+        m_MethodName: GoToSongArrangeMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1701,17 +1701,6 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1664068197}
         m_MethodName: LoadExampleLicks
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 622006809}
-        m_MethodName: ShowSongArrangerHelp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2673,6 +2662,17 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 622006809}
         m_MethodName: GoToPlaylistMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 537561990}
+        m_MethodName: Refresh
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4202,17 +4202,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2011310440}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 1664068199}
         m_MethodName: PlayOneShot
         m_Mode: 2
@@ -4225,8 +4214,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 2011310444}
-        m_MethodName: PopulateList
+      - m_Target: {fileID: 622006809}
+        m_MethodName: ShowLoadPromptForProjects
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8407,10 +8396,11 @@ MonoBehaviour:
   projectNameInputField: {fileID: 1798203143}
   playlist: {fileID: 1095947005}
   buttonHeight: 64
-  horizontalPadding: 4
+  horizontalPadding: 8
   verticalPadding: 4
+  iconScale: 0.9
   fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
-  fontSize: 36
+  fontSize: 48
   font: {fileID: 12800000, guid: 8db80b3f7b8ad7e488136bc8b3fd6400, type: 3}
 --- !u!1 &545578592
 GameObject:
@@ -9441,7 +9431,7 @@ MonoBehaviour:
   postPlayMenu: {fileID: 909404789}
   pauseMenu: {fileID: 358512286}
   addRiffPrompt: {fileID: 1415144758}
-  loadProjectPrompt: {fileID: 2011310440}
+  loadPrompt: {fileID: 2011310440}
   prompt: {fileID: 484484982}
   confirmExitPrompt: {fileID: 1180570935}
   keySelectConfirmButton: {fileID: 177463291}
@@ -9451,8 +9441,10 @@ MonoBehaviour:
   songProgressBar: {fileID: 1170065699}
   loopIcon: {fileID: 906108765}
   arrowIcon: {fileID: 21300000, guid: d609bb3db92815b4f84c54def93896d6, type: 3}
+  addIcon: {fileID: 21300000, guid: ed614671d2e9fca49a149b99abdc6eb1, type: 3}
   editIcon: {fileID: 21300000, guid: 73753c5230f1f76498ba0d937217a3f7, type: 3}
-  removeIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
+  loadIcon: {fileID: 21300000, guid: 771e46b24b8c2b242b1fca076d792aa0, type: 3}
+  removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
   loadingSpeed: 3
   loadingScreen: {fileID: 796519848}
   loadingBar: {fileID: 1576480158}
@@ -15694,7 +15686,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 300.00006}
+  m_AnchoredPosition: {x: 0, y: -0.000030517578}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1103795635
@@ -17341,23 +17333,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 622006809}
-        m_MethodName: DisableLoadProjectPrompt
-        m_Mode: 1
+      - m_Target: {fileID: 1664068199}
+        m_MethodName: PlayOneShot
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1664068197}
-        m_MethodName: Clear
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 8300000, guid: 5f28d112f6413e44baa2ced59af01738,
+            type: 3}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -17374,13 +17356,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1664068199}
-        m_MethodName: PlayOneShot
-        m_Mode: 2
+      - m_Target: {fileID: 622006809}
+        m_MethodName: GoToPlaylistMenu
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 8300000, guid: 5f28d112f6413e44baa2ced59af01738,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -19192,8 +19173,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 622006809}
-        m_MethodName: SwitchToMenu
-        m_Mode: 3
+        m_MethodName: GoToPlaylistMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -19787,7 +19768,7 @@ GameObject:
   - 114: {fileID: 1437502262}
   - 114: {fileID: 1437502265}
   m_Layer: 5
-  m_Name: SaveProjectButton
+  m_Name: SaveSongButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19849,8 +19830,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: SaveCurrentProject
+      - m_Target: {fileID: 1664068197}
+        m_MethodName: SaveCurrentSong
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24168,7 +24149,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 595336894}
   m_HandleRect: {fileID: 595336893}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -24608,7 +24589,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 622006809}
-        m_MethodName: EnableLoadProjectPrompt
+        m_MethodName: ShowLoadPromptForProjects
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24677,7 +24658,7 @@ GameObject:
   - 114: {fileID: 2011310442}
   - 114: {fileID: 2011310444}
   m_Layer: 5
-  m_Name: LoadProjectPrompt
+  m_Name: LoadPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

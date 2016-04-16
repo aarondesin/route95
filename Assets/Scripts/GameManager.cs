@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour {
 
 	// Pop-up menu prompts
 	public GameObject addRiffPrompt; // "Add Riff"
-	public GameObject loadProjectPrompt; // "Load Project"
+	public GameObject loadPrompt; // "Load Project"
 	public GameObject prompt; // Generic pop-up prompt
 	public GameObject confirmExitPrompt; // "Would you like to exit..."
 
@@ -55,7 +55,9 @@ public class GameManager : MonoBehaviour {
 	public GameObject loopIcon;
 
 	public Sprite arrowIcon;
+	public Sprite addIcon;
 	public Sprite editIcon;
+	public Sprite loadIcon;
 	public Sprite removeIcon;
 
 	public int loadingSpeed;
@@ -112,7 +114,7 @@ public class GameManager : MonoBehaviour {
 			{ Menu.PostPlay, postPlayMenu }
 		};
 
-		loadProjectPrompt.SetActive(true);
+		loadPrompt.SetActive(true);
 		loadingScreen.SetActive(true);
 		prompt.SetActive(true);
 
@@ -228,12 +230,24 @@ public class GameManager : MonoBehaviour {
 		Show (mainMenu);
 	}
 
+	public void GoToKeySelectMenu () {
+		HideAll();
+		Show (keySelectMenu);
+		DisableKeySelectConfirmButton();
+	}
+
 	public void GoToSongArrangeMenu () {
+		HideAll ();
+		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		SongArrangeSetup.instance.Refresh();
+		SongTimeline.instance.RefreshTimeline();
 	}
 
 	public void GoToPlaylistMenu () {
 		HideAll ();
 		Show (playlistMenu);
+		PlaylistBrowser.instance.Refresh();
+		PlaylistBrowser.instance.RefreshName();
 	}
 
 	public void Show (GameObject menu) {
@@ -251,8 +265,9 @@ public class GameManager : MonoBehaviour {
 		Hide (riffEditMenu);
 
 		Hide (addRiffPrompt);
-		Hide (loadProjectPrompt);
+		Hide (loadPrompt);
 		Hide (prompt);
+		Hide (shortSongWarningPrompt);
 	}
 		
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
@@ -345,6 +360,18 @@ public class GameManager : MonoBehaviour {
 	public void SaveCurrentProject () {
 		SaveLoad.SaveCurrentProject();
 	}
+
+	public void ShowLoadPromptForProjects () {
+		Show (loadPrompt);
+		LoadPrompt.instance.SetLoadMode(LoadMode.Project);
+		LoadPrompt.instance.Refresh();
+	}
+
+	public void ShowLoadPromptForSongs () {
+		Show (loadPrompt);
+		LoadPrompt.instance.SetLoadMode(LoadMode.Song);
+		LoadPrompt.instance.Refresh();
+	}
 		
 	// Toggle visibility of system buttons
 	public void ToggleSystemButtons () {
@@ -411,16 +438,6 @@ public class GameManager : MonoBehaviour {
 	// Hides the tooltip
 	public void HideTooltip () {
 		tooltip.SetActive(false);
-	}
-
-
-	public void EnableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(true);
-		LoadProjectPrompt.instance.PopulateList();
-	}
-
-	public void DisableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(false);
 	}
 
 	public void TogglePause () {

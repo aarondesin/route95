@@ -23,7 +23,7 @@ public class Project {
 	}
 
 	public void AddSong (Song song) {
-		
+		songs.Add(song);
 	}
 
 	/*public void RemoveSongAt (int i) {

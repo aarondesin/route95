@@ -33,8 +33,8 @@ public class RiffAI : MonoBehaviour{
 				*/
 				for (int j=0; j <playerRiff.beats[i].NumNotes(); j++) {
 					try {
-						Note test_a = playerRiff.beats[i].notes[j];
-						Note test_b = caseRiff.beats[i].notes[j];
+						//Note test_a = playerRiff.beats[i].notes[j];
+						//Note test_b = caseRiff.beats[i].notes[j];
 					}
 					catch {
 						break;
