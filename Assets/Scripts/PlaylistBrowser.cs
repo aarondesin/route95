@@ -59,7 +59,8 @@ public class PlaylistBrowser : MonoBehaviour {
 			tr.anchorMax = new Vector2 (0f, 1f);
 			tr.anchoredPosition3D = new Vector3 (
 				horizontalPadding + tr.sizeDelta.x/2f,
-				((i == 0 ? 0f : verticalPadding) + tr.sizeDelta.y) * -(float)(i+1),
+				//((i == 0 ? verticalPadding : verticalPadding + tr.sizeDelta.y)) * -(float)(i+1),
+				- verticalPadding - tr.sizeDelta.y / 2f - (verticalPadding + tr.sizeDelta.y) * (float)i,
 				0f
 			);
 
@@ -74,11 +75,15 @@ public class PlaylistBrowser : MonoBehaviour {
 			GameObject listing_bg = UI.MakeImage (song.name + "_bg");
 			RectTransform bgtr = listing_bg.GetComponent<RectTransform>();
 			bgtr.SetParent (playlist);
-			bgtr.sizeDelta = new Vector2 (tr.sizeDelta.x, tr.sizeDelta.y);
+			bgtr.sizeDelta = new Vector2 (tr.sizeDelta.x - 2f * horizontalPadding, tr.sizeDelta.y);
 			bgtr.localScale = new Vector3 (1f, 1f, 1f);
-			bgtr.anchorMin = tr.anchorMin;
-			bgtr.anchorMax = tr.anchorMax;
-			bgtr.anchoredPosition3D = tr.anchoredPosition3D;
+			bgtr.anchorMin = new Vector2 (0f, 1f);
+			bgtr.anchorMax = new Vector2 (0f, 1f);
+			bgtr.anchoredPosition3D = new Vector3 (
+				horizontalPadding + bgtr.sizeDelta.x / 2f,
+				tr.anchoredPosition3D.y,
+				0f
+			);
 			bgtr.SetSiblingIndex(-1);
 
 			Image bgimg = listing_bg.GetComponent<Image>();
@@ -106,7 +111,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			);
 
 			Text ttxt = listing_text.GetComponent<Text>();
-			ttxt.text = song.name;
+			ttxt.text = (i+1).ToString() + ". " + song.name;
 			ttxt.fontSize = fontSize;
 			ttxt.color = Color.white;
 			ttxt.font = font;
@@ -184,13 +189,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 				RectTransform utr = listing_up.GetComponent<RectTransform>();
 				utr.SetParent(tr);
-				utr.sizeDelta = new Vector2 (tr.sizeDelta.y*0.8f, tr.sizeDelta.y*0.8f);
+				utr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
 				utr.localScale = new Vector3 (1f, 1f, 1f);
 				utr.anchorMin = new Vector2 (0f, 0.5f);
 				utr.anchorMax = new Vector2 (0f, 0.5f);
 				utr.anchoredPosition3D = new Vector3 (
-					horizontalPadding, 
-					utr.sizeDelta.y/2f + verticalPadding, 
+					horizontalPadding + utr.sizeDelta.x / 2f, 
+					utr.sizeDelta.y/2f + verticalPadding / 2f, 
 					0f
 				);
 				utr.localRotation = Quaternion.Euler(0f, 0f, 90f);
@@ -218,13 +223,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 				RectTransform dtr = listing_down.GetComponent<RectTransform>();
 				dtr.SetParent(tr);
-				dtr.sizeDelta = new Vector2 (tr.sizeDelta.y*0.8f, tr.sizeDelta.y*0.8f);
+				dtr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
 				dtr.localScale = new Vector3 (1f, 1f, 1f);
 				dtr.anchorMin = new Vector2 (0f, 0.5f);
 				dtr.anchorMax = new Vector2 (0f, 0.5f);
 				dtr.anchoredPosition3D = new Vector3 (
-					horizontalPadding, 
-					dtr.sizeDelta.y/2f + verticalPadding, 
+					horizontalPadding + dtr.sizeDelta.x / 2f, 
+					 - dtr.sizeDelta.y / 2f - verticalPadding / 2f, 
 					0f
 				);
 				dtr.localRotation = Quaternion.Euler(0f, 0f, -90f);
@@ -299,19 +304,19 @@ public class PlaylistBrowser : MonoBehaviour {
 		GameObject loadNewSongButton = UI.MakeButton("Load New Song");
 		listings.Add (loadNewSongButton);
 
-		RectTransform lntr = newSongButton.GetComponent<RectTransform>();
+		RectTransform lntr = loadNewSongButton.GetComponent<RectTransform>();
 		lntr.SetParent (playlist);
 		lntr.sizeDelta = new Vector2 (buttonHeight, buttonHeight);
 		lntr.localScale = new Vector3 (1f, 1f, 1f);
-		lntr.anchorMin = new Vector2 (0f, 1f);
-		lntr.anchorMax = new Vector2 (0f, 1f);
+		lntr.anchorMin = new Vector2 (0.5f, 1f);
+		lntr.anchorMax = new Vector2 (0.5f, 1f);
 		lntr.anchoredPosition3D = new Vector3 (
-			2f * horizontalPadding + ntr.sizeDelta.x,
+			horizontalPadding + lntr.sizeDelta.x / 2f,
 			(verticalPadding + 2*ntr.sizeDelta.y) * -(float)(MusicManager.instance.currentProject.songs.Count+1),
 			0f
 		);
 
-		Image lnimg = ntr.GetComponent<Image>();
+		Image lnimg = lntr.GetComponent<Image>();
 		lnimg.sprite = GameManager.instance.loadIcon;
 		lnimg.color = new Color (1f, 1f, 1f, 1f);
 
@@ -321,8 +326,8 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		GameObject loadNewSong_text = UI.MakeText("Load New Song_text");
 
-		RectTransform lnttr = newSong_text.GetComponent<RectTransform>();
-		lnttr.SetParent(ntr);
+		RectTransform lnttr = loadNewSong_text.GetComponent<RectTransform>();
+		lnttr.SetParent(lntr);
 		lnttr.sizeDelta = new Vector2 (playlist.rect.width, ntr.sizeDelta.y);
 		lnttr.localScale = new Vector3 (1f, 1f, 1f);
 		lnttr.anchorMin = new Vector2 (0f, 0.5f);
@@ -333,7 +338,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			0f
 		);
 
-		Text lnttxt = newSong_text.GetComponent<Text>();
+		Text lnttxt = loadNewSong_text.GetComponent<Text>();
 		lnttxt.text = "Load Song...";
 		lnttxt.fontSize = fontSize;
 		lnttxt.color = Color.white;

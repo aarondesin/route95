@@ -4744,9 +4744,9 @@ MonoBehaviour:
   m_Content: {fileID: 1095947005}
   m_Horizontal: 1
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
-  m_Inertia: 1
+  m_Inertia: 0
   m_DecelerationRate: 0.135
   m_ScrollSensitivity: 1
   m_Viewport: {fileID: 43564437}
@@ -8397,10 +8397,10 @@ MonoBehaviour:
   playlist: {fileID: 1095947005}
   buttonHeight: 64
   horizontalPadding: 8
-  verticalPadding: 4
+  verticalPadding: 8
   iconScale: 0.9
   fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
-  fontSize: 48
+  fontSize: 46
   font: {fileID: 12800000, guid: 8db80b3f7b8ad7e488136bc8b3fd6400, type: 3}
 --- !u!1 &545578592
 GameObject:
@@ -15686,7 +15686,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 300}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1103795635
@@ -18093,9 +18093,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 622006809}
-        m_MethodName: DisableLoadProjectPrompt
-        m_Mode: 1
+      - m_Target: {fileID: 2011310440}
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24149,7 +24149,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 595336894}
   m_HandleRect: {fileID: 595336893}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

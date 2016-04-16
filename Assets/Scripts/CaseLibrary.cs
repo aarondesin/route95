@@ -48,25 +48,25 @@ public class CaseLibrary{
 			instrument = Instrument.ElectricGuitar,
 			beats = new List<Beat>() {
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].root[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fifth[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fifth[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fourth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fourth[0])}},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].seventh[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].seventh[0])}},
 				new Beat () ,
 				new Beat () {notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].second[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].second[0])}},
 				new Beat ()
 			}
 		});
@@ -75,28 +75,28 @@ public class CaseLibrary{
 			instrument = Instrument.ElectricGuitar,
 			beats = new List<Beat>() {
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].root[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat () { notes = new List<Note> () { 
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fifth[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fifth[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fourth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fourth[0])}},
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fifth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fifth[0])}},
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].sixth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].sixth[0])}},
 				new Beat () ,
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].seventh[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].seventh[0])}},
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].root[1])}}
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].root[1])}}
 			}
 		});
 		cases.Add( new Riff () {
@@ -104,29 +104,29 @@ public class CaseLibrary{
 			instrument = Instrument.ElectricGuitar,
 			beats = new List<Beat>() {
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].third[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].third[0]) }},
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].third[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].third[0]) }},
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].third[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].third[0]) }},
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].third[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].third[0]) }},
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fifth[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fifth[0]) }},
 				new Beat (),
 				new Beat (){ notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].sixth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].sixth[0])}},
 				new Beat (),
 				new Beat () ,
 				new Beat (),
 				new Beat (){ notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fifth[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fifth[0]) }},
 				new Beat (),
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].fourth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].fourth[0])}},
 				new Beat () ,
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricGuitar].sixth[0])}},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricGuitar].sixth[0])}},
 				new Beat ()
 			}
 		});
@@ -135,23 +135,23 @@ public class CaseLibrary{
 			instrument = Instrument.ElectricBass,
 			beats = new List<Beat>() {
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricBass].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricBass].root[0]) }},
 				new Beat () ,
 				new Beat () { notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricBass].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricBass].root[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat (){ notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricBass].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricBass].root[0]) }},
 				new Beat (),
 				new Beat (){ notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricBass].root[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricBass].root[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat (),
 				new Beat (){ notes = new List<Note> () {
-						new Note(KeyManager.instance.scales[Key.Eminor][Instrument.ElectricBass].third[0]) }},
+						new Note(KeyManager.instance.scales[Key.E][ScaleInfo.Minor][Instrument.ElectricBass].third[0]) }},
 				new Beat (),
 				new Beat (),
 				new Beat ()

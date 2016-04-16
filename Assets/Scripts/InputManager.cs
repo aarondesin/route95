@@ -123,28 +123,30 @@ public class InputManager : MonoBehaviour {
 					break;*/
 
 					case 1: // notes
-					foreach (KeyCode key in keyToNote.Keys.ToList()) {
+					foreach (KeyCode keyPress in keyToNote.Keys.ToList()) {
 						Instrument inst = MusicManager.instance.currentInstrument;
-						if (Input.GetKeyDown(key)) {
+						Key key = MusicManager.instance.currentSong.key;
+						ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
+						if (Input.GetKeyDown(keyPress)) {
 							int noteIndex;
 							if (inst == Instrument.RockDrums) {
-								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[key];
+								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[keyPress];
 								if (noteIndex >= 0) {
 									Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
-									note.PlayNote(audioSources[keyToNote[key]], false);
+									note.PlayNote(audioSources[keyToNote[keyPress]], false);
 								}
 							} else {
-								noteIndex = KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes.Count-1-keyToNote[key];
+								noteIndex = KeyManager.instance.scales[key][scale][inst].allNotes.Count-1-keyToNote[keyPress];
 								if (noteIndex >= 0) {
-									Note note = new Note(KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes[noteIndex]);
+									Note note = new Note(KeyManager.instance.scales[key][scale][inst].allNotes[noteIndex]);
 									//note.PlayNote(MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument], true);
 									if (note != null)
-										note.PlayNote(audioSources[keyToNote[key]], true);
+										note.PlayNote(audioSources[keyToNote[keyPress]], true);
 								}
 							}
 							
-						} else if (Input.GetKeyUp(key) && MusicManager.instance.currentInstrument != Instrument.RockDrums) {
-							audioSources[keyToNote[key]].Stop();
+						} else if (Input.GetKeyUp(keyPress) && inst.type != InstrumentType.Percussion) {
+							audioSources[keyToNote[keyPress]].Stop();
 						}
 					}
 						break;

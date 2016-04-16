@@ -7,10 +7,13 @@ using System.Collections.Generic;
 public class Song {
 
 	[SerializeField]
-	public string name = "New Song";
+	public string name;
 
 	[SerializeField]
 	public Key key;
+
+	[SerializeField]
+	public int scale; // scale index
 
 	[SerializeField]
 	public List<SongPiece> songPieces = new List<SongPiece>();
@@ -20,6 +23,7 @@ public class Song {
 
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
+		name = "New Song";
 		songPieces = new List<SongPiece>() {
 			new SongPiece() { name = "SongPiece1" },
 			new SongPiece() { name = "SongPiece2" },

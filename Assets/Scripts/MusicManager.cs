@@ -10,46 +10,20 @@ using System.IO; // need for path operations
 using UnityEditor;
 #endif
 
-/*// All percussion instruments
-public enum PercussionInstrument {
-	RockDrums
-};
-
-// All melodic instruments
-public enum MelodicInstrument {
-	ElectricGuitar,
-	ElectricBass,
-	AcousticGuitar,
-	ClassicalGuitar,
-	PipeOrgan,
-	Keyboard
-};
-
-// All instruments (melodic and percussion) for use by MusicManager
-public enum Instrument {
-	RockDrums,
-	ElectricGuitar,
-	ElectricBass,
-	AcousticGuitar,
-	ClassicalGuitar,
-	PipeOrgan,
-	Keyboard,
-	NUM_INSTRUMENTS // easy access to number of instruments in game
-};*/
-
-
 // All keys available in the game
-public enum Key{
-	DFlat,
-	DMajor,
-	EFlat,
-	EMajor,
-	Eminor,
-	FMajor,
-	CMajor,
-	FSharpMinor,
-	DMinor,
-	DSharpMinor
+public enum Key {
+	C,
+	CSharp,
+	D,
+	DSharp,
+	E,
+	F,
+	FSharp,
+	G,
+	GSharp,
+	A,
+	ASharp,
+	B
 };
 
 public enum Tempo {
