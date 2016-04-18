@@ -63,7 +63,7 @@ public class SongTimeline : MonoBehaviour {
 			int num = i; // avoid pointer problems
 			column.AddComponent<Button>();
 			column.GetComponent<Button>().onClick.AddListener(()=>{
-				MusicManager.instance.currentSong.ToggleRiff(MusicManager.instance.riffs[SongArrangeSetup.instance.selectedRiffIndex], num);
+				MusicManager.instance.currentSong.ToggleRiff(MusicManager.instance.currentProject.riffs[SongArrangeSetup.instance.selectedRiffIndex], num);
 				RefreshColumn (column, MusicManager.instance.currentSong.songPieces[num]);
 				Debug.Log(MusicManager.instance.currentSong.songPieces[num].ToString());
 			});
@@ -94,7 +94,7 @@ public class SongTimeline : MonoBehaviour {
 			
 		addColumnButton.AddComponent<Button>();
 		addColumnButton.GetComponent<Button>().onClick.AddListener(()=>{
-			MusicManager.instance.currentProject.AddNewSongPiece();
+			MusicManager.instance.currentSong.AddNewSongPiece();
 			RefreshTimeline();
 		});
 
@@ -118,14 +118,14 @@ public class SongTimeline : MonoBehaviour {
 			Destroy(child.gameObject);
 		}
 		int i = 0;
-		foreach (Riff riff in songpiece.riffs[0]) {
+		foreach (Riff riff in songpiece.measures[0].riffs) {
 			GameObject label = new GameObject();
 			label.name = riff.name;
 			label.AddComponent<RectTransform>();
 			label.GetComponent<RectTransform>().SetParent(column.GetComponent<RectTransform>());
 			label.GetComponent<RectTransform>().sizeDelta = new Vector2 (
 				column.GetComponent<RectTransform>().rect.width,
-				column.GetComponent<RectTransform>().rect.height/(float)songpiece.riffs[0].Count
+				column.GetComponent<RectTransform>().rect.height/(float)songpiece.measures[0].riffs.Count
 			);
 			label.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 			label.AddComponent<CanvasRenderer>();
@@ -140,9 +140,10 @@ public class SongTimeline : MonoBehaviour {
 			label.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.0f);
 			label.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
 				0,
-				(float)(songpiece.riffs[0].Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
+				(float)(songpiece.measures[0].riffs.Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
 				0f
 			);
+			label.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 0f, 0f);
 			i++;
 		}
 	}

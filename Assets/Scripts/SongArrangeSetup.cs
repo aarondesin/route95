@@ -28,7 +28,7 @@ public class SongArrangeSetup : MonoBehaviour {
 		// Update the options in the dropdown to include all riffs
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
-		foreach (Riff riff in MusicManager.instance.riffs) {
+		foreach (Riff riff in MusicManager.instance.currentProject.riffs) {
 			Sprite sprite = riff.instrument.icon;
 			Dropdown.OptionData option = new Dropdown.OptionData (riff.name + (riff.copy !=0 ? " ("+riff.copy.ToString()+")" : ""), sprite);
 			//Dropdown.OptionData option = new Dropdown.OptionData (MusicManager.instToString[riff.currentInstrument]);
@@ -36,12 +36,17 @@ public class SongArrangeSetup : MonoBehaviour {
 		}
 		dropdown.AddOptions (options);
 
-		if (MusicManager.instance.riffs.Count == 0) {
+		if (MusicManager.instance.currentProject.riffs.Count == 0) {
 			InstrumentSetup.currentRiff = null;
+			dropdown.interactable = false;
 			editRiffButton.GetComponent<Button>().interactable = false;
+			playRiffButton.GetComponent<Button> ().interactable = false;
 		} else {
-			InstrumentSetup.currentRiff = MusicManager.instance.riffs[0];
+			dropdown.interactable = true;
+			if (InstrumentSetup.currentRiff == null)
+				InstrumentSetup.currentRiff = MusicManager.instance.currentProject.riffs[0];
 			editRiffButton.GetComponent<Button>().interactable = true;
+			playRiffButton.GetComponent<Button> ().interactable = true;
 		}
 
 		// Refresh song name input field
@@ -54,7 +59,7 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	public void UpdateValue () {
 		selectedRiffIndex = dropdown.value;
-		InstrumentSetup.currentRiff = MusicManager.instance.riffs[selectedRiffIndex];
+		InstrumentSetup.currentRiff = MusicManager.instance.currentProject.riffs[selectedRiffIndex];
 	}
 
 	public void SetValue () {

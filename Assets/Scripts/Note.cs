@@ -14,8 +14,11 @@ public class Note {
 	//static char varSeparator = '|';
 	
 	//public AudioClip sound;
+	[SerializeField]
 	public string filename; // name of audio clip
+	[SerializeField]
 	public float volume;
+	[SerializeField]
 	public float duration;
 
 	public Note () {

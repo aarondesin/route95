@@ -10,46 +10,20 @@ using System.IO; // need for path operations
 using UnityEditor;
 #endif
 
-/*// All percussion instruments
-public enum PercussionInstrument {
-	RockDrums
-};
-
-// All melodic instruments
-public enum MelodicInstrument {
-	ElectricGuitar,
-	ElectricBass,
-	AcousticGuitar,
-	ClassicalGuitar,
-	PipeOrgan,
-	Keyboard
-};
-
-// All instruments (melodic and percussion) for use by MusicManager
-public enum Instrument {
-	RockDrums,
-	ElectricGuitar,
-	ElectricBass,
-	AcousticGuitar,
-	ClassicalGuitar,
-	PipeOrgan,
-	Keyboard,
-	NUM_INSTRUMENTS // easy access to number of instruments in game
-};*/
-
-
 // All keys available in the game
-public enum Key{
-	DFlat,
-	DMajor,
-	EFlat,
-	EMajor,
-	Eminor,
-	FMajor,
-	CMajor,
-	FSharpMinor,
-	DMinor,
-	DSharpMinor
+public enum Key {
+	C,
+	CSharp,
+	D,
+	DSharp,
+	E,
+	F,
+	FSharp,
+	G,
+	GSharp,
+	A,
+	ASharp,
+	B
 };
 
 public enum Tempo {
@@ -75,9 +49,9 @@ public class MusicManager : MonoBehaviour {
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
-	public List<Riff> riffs = new List<Riff> ();
-	public List<SongPiece> songPieces = new List<SongPiece>();
-	public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
+	//public List<Riff> riffs = new List<Riff> ();
+	//public List<SongPiece> songPieces = new List<SongPiece>();
+	//public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
 	/*public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
 		{ Instrument.ElectricBass, new List <Riff> () },
 		{ Instrument.ElectricGuitar, new List <Riff> () },
@@ -154,6 +128,8 @@ public class MusicManager : MonoBehaviour {
 	void LoadInstruments () {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
+		Instrument.LoadInstruments ();
+
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
 			GameObject obj = new GameObject ();
@@ -189,6 +165,28 @@ public class MusicManager : MonoBehaviour {
 		KeyManager.instance.BuildScales();
 	}
 
+	public void NewProject () {
+		currentProject = new Project();
+	}
+
+	public void SaveCurrentProject () {
+		SaveLoad.SaveCurrentProject();
+	}
+
+	public void NewSong () {
+		/*if (currentProject.Full()) {
+			Prompt.instance.PromptMessage ("Project full", "The current project has reached the max number of songs.", "Bummer.");
+		} else {*/
+			Song newSong = new Song();
+			currentSong = newSong;
+			currentProject.AddSong(newSong);
+		//}
+	}
+		
+	public void SaveCurrentSong () {
+		SaveLoad.SaveCurrentSong();
+	}
+
 	public void SetKey (int key) {
 		currentSong.key = (Key)key;
 		//LoadExampleLicks();
@@ -202,7 +200,7 @@ public class MusicManager : MonoBehaviour {
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
-			instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
+			instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 		} else {
 			playing = true;
 			loop = true;
@@ -213,7 +211,7 @@ public class MusicManager : MonoBehaviour {
 		playing = false;
 		loop = false;
 		beat = 0;
-		instrumentAudioSources[InstrumentSetup.currentRiff.instrument].Stop();
+		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 		//OneShot.Stop();
 	}
 
@@ -294,20 +292,20 @@ public class MusicManager : MonoBehaviour {
 		//Debug.Log("added");
 		Riff temp = new Riff ();
 		InstrumentSetup.currentRiff = temp;
-		SongArrangeSetup.instance.selectedRiffIndex = riffs.Count;
-		riffs.Add (temp);
+		SongArrangeSetup.instance.selectedRiffIndex = currentProject.riffs.Count;
+		currentProject.riffs.Add (temp);
 		SongArrangeSetup.instance.Refresh();
 		return temp;
 	}
 
 	public void AddRiff (Riff riff) {
 		riff.copy = CopyNumber(riff.name);
-		riffs.Add (riff);
+		currentProject.riffs.Add (riff);
 		//SongArrangeSetup.instance.Refresh();
 	}
 
 	public Riff RiffByString (string riffName) {
-		foreach (Riff riff in riffs) {
+		foreach (Riff riff in currentProject.riffs) {
 			if (riffName == riff.name) return riff;
 		}
 		return null;
@@ -392,7 +390,7 @@ public class MusicManager : MonoBehaviour {
 
 	// Returns true if there is a riff of a certain name already
 	public bool ContainsRiffNamed (string riffName) {
-		foreach (Riff riff in riffs) {
+		foreach (Riff riff in currentProject.riffs) {
 			if (riff.name == riffName) return true;
 		}
 		return false;
@@ -400,7 +398,7 @@ public class MusicManager : MonoBehaviour {
 	public int CopyNumber (string riffName) {
 		Debug.Log("CopyNumber(): "+riffName);
 		int result = 0;
-		foreach (Riff riff in riffs) {
+		foreach (Riff riff in currentProject.riffs) {
 			if (riff.name == riffName) {
 				result++;
 			}
@@ -410,9 +408,9 @@ public class MusicManager : MonoBehaviour {
 
 	// Clears song, songpiece, and riff data
 	public void Clear () {
-		riffs.Clear();
-		songPieces.Clear();
-		songPiecesByName.Clear();
+		//currentProject.riffs.Clear();
+		//songPieces.Clear();
+		//songPiecesByName.Clear();
 	}
 		
 	/*public void LoadExampleRiffs() {

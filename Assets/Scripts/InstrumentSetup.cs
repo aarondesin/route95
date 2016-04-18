@@ -68,7 +68,7 @@ public class InstrumentSetup : MonoBehaviour {
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
 		Cleanup();
-		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
+		if (currentRiff == null) currentRiff = MusicManager.instance.currentProject.riffs[0];
 		nameInputField.text = currentRiff.name;
 		MakeBeatNumbers ();
 		if (currentRiff.instrument.type == InstrumentType.Percussion) {
@@ -131,8 +131,9 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 		int i = 0;
 
-		Instrument inst = (Instrument)Enum.Parse(typeof(Instrument),meloInst.ToString());
-		foreach (string note in KeyManager.instance.scales[MusicManager.instance.currentSong.key][inst].allNotes) {
+		Key key = MusicManager.instance.currentSong.key;
+		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
+		foreach (string note in KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes) {
 			MakeMelodicButtons (note.Split('_')[1],i,note);
 			i++;
 		}
@@ -352,7 +353,10 @@ public class InstrumentSetup : MonoBehaviour {
 		Debug.Log ("posX = " + posX);
 		//Debug.Log ("curr inst " + currentRiff.instrument);
 
-		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [MusicManager.instance.currentSong.key] [ currentRiff.instrument], subdivsShown);
+		Key key = MusicManager.instance.currentSong.key;
+		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
+
+		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [key][scale][currentRiff.instrument], subdivsShown);
 		Debug.Log ("posY = " + posY);
 		if (posX >= buttonGrid.Count || posX < 0) {
 			Debug.Log ("Suggestion X out of bounds!");

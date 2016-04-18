@@ -17,15 +17,21 @@ public class Riff {
 	// VARIABLES SAVED IN PROJECT
 	//
 
+	[SerializeField]
 	public string name; // user-defined name of the riff
-	public Instrument instrument; // instrument used for this riff
+	[SerializeField]
+	public int instrumentIndex; // instrument used for this riff
+	[SerializeField]
 	public List<Beat> beats = new List<Beat>(); // contains notes
+	[SerializeField]
 	public bool cutSelf = true; // if true, sounds will cut themselves off
+	[SerializeField]
 	public int beatsShown = 4;
 
 	//
 	// VARIABLES NOT SAVED IN PROJECT
 	//
+	public Instrument instrument;
 	public int copy = 0; // not saved
 
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
@@ -34,6 +40,7 @@ public class Riff {
 			beats.Add (new Beat ());
 		}
 		copy = 0;
+		instrument = Instrument.AllInstruments[instrumentIndex];
 	}
 
 	// Constructor to make a riff of a certain number of beats
@@ -42,6 +49,7 @@ public class Riff {
 			beats.Add (new Beat());
 		}
 		copy = 0;
+		instrument = Instrument.AllInstruments[instrumentIndex];
 	}
 
 	/*// Loading from a string
@@ -159,7 +167,7 @@ public class Riff {
 		}
 		// Note not already there
 		beats [pos].Add (newNote);
-		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
+		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
 	}
 	public void PlayRiffLoop (AudioClip clip) {
 		MusicManager.instance.LoopRiff.Stop();
@@ -171,9 +179,9 @@ public class Riff {
 	public void PlayRiff (int pos) { 
 		try {
 			if (beats[pos].NumNotes() != 0) {
-				if (cutSelf) MusicManager.instance.instrumentAudioSources[instrument].Stop();
+				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
 				foreach (Note note in beats[pos].notes) {
-					note.PlayNote(MusicManager.instance.instrumentAudioSources[instrument]);
+					note.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {

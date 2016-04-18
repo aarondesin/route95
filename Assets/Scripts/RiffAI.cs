@@ -21,7 +21,7 @@ public class RiffAI : MonoBehaviour{
 	public Riff FindSimilarCase(Riff playerRiff){
 		Dictionary<Riff, int> SimilarityDictionary = new Dictionary<Riff, int>();
 		foreach(Riff caseRiff in CaseLibrary.cases) {
-			if (caseRiff.instrument != playerRiff.instrument)
+			if (caseRiff.instrumentIndex != playerRiff.instrumentIndex)
 				continue;
 			SimilarityDictionary.Add(caseRiff, 0);
 			//Compare riff in each case to the given riff,
@@ -33,8 +33,8 @@ public class RiffAI : MonoBehaviour{
 				*/
 				for (int j=0; j <playerRiff.beats[i].NumNotes(); j++) {
 					try {
-						Note test_a = playerRiff.beats[i].notes[j];
-						Note test_b = caseRiff.beats[i].notes[j];
+						//Note test_a = playerRiff.beats[i].notes[j];
+						//Note test_b = caseRiff.beats[i].notes[j];
 					}
 					catch {
 						break;

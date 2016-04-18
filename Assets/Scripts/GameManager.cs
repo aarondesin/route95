@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
 
 	// Parent objects for all menu UI objects
 	public GameObject mainMenu;
+	public GameObject playlistMenu;
 	public GameObject keySelectMenu;
 	public GameObject songArrangeMenu;
 	public GameObject riffEditMenu;
@@ -39,7 +40,7 @@ public class GameManager : MonoBehaviour {
 
 	// Pop-up menu prompts
 	public GameObject addRiffPrompt; // "Add Riff"
-	public GameObject loadProjectPrompt; // "Load Project"
+	public GameObject loadPrompt; // "Load Project"
 	public GameObject prompt; // Generic pop-up prompt
 	public GameObject confirmExitPrompt; // "Would you like to exit..."
 
@@ -52,6 +53,13 @@ public class GameManager : MonoBehaviour {
 	public GameObject liveIcons;
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
+
+	public Sprite arrowIcon;
+	public Sprite addIcon;
+	public Sprite editIcon;
+	public Sprite loadIcon;
+	public Sprite removeIcon;
+	public Sprite circleIcon;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;
@@ -67,7 +75,8 @@ public class GameManager : MonoBehaviour {
 	public Mode currentMode = Mode.Setup;
 
 	// Global save path
-	public string savePath; 
+	public string projectSavePath;
+	public string songSavePath;
 
 	// Icon fading vars
 	public float fadeWaitTime;
@@ -93,8 +102,9 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
-		savePath = Application.persistentDataPath;
-		//Sounds.Load();
+		projectSavePath = Application.persistentDataPath + "/Projects/";
+		songSavePath = Application.persistentDataPath + "/Songs/";
+			//Sounds.Load();
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
@@ -105,9 +115,7 @@ public class GameManager : MonoBehaviour {
 			{ Menu.PostPlay, postPlayMenu }
 		};
 
-		loadProjectPrompt.SetActive(true);
-		loadingScreen.SetActive(true);
-		prompt.SetActive(true);
+		ShowAll ();
 
 	}
 
@@ -116,19 +124,8 @@ public class GameManager : MonoBehaviour {
 		SongTimeline.instance.scrollbar.GetComponent<Scrollbar>().value = 0f;
 		
 		// Hide all menus and display default menu (main)
-		DisableMenu(menus[Menu.KeySelect]);
-		DisableMenu(menus[Menu.SongArrange]);
-		DisableMenu(menus[Menu.RiffEdit]);
-		DisableMenu (menus [Menu.PostPlay]);
-		DisableMenu(addRiffPrompt);
-		DisableMenu(loadProjectPrompt);
-		DisableMenu(prompt);
-		DisableMenu(pauseMenu);
-		DisableMenu(liveIcons);
-		DisableMenu(tooltip);
-		DisableMenu(songProgressBar);
-		DisableMenu(shortSongWarningPrompt);
-		SwitchToMenu(Menu.Main);
+		HideAll ();
+		Show (mainMenu);
 		Load();
 		//StartCoroutine("Load");
 		initialized = true;
@@ -226,6 +223,67 @@ public class GameManager : MonoBehaviour {
 			//livePlayQuitPrompt.color = Color.white;
 		}
 	}
+
+	public void GoToMainMenu () {
+		HideAll ();
+		Show (mainMenu);
+	}
+
+	public void GoToKeySelectMenu () {
+		HideAll();
+		Show (keySelectMenu);
+		DisableKeySelectConfirmButton();
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+	}
+
+	public void GoToSongArrangeMenu () {
+		HideAll ();
+		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		SongArrangeSetup.instance.Refresh();
+		SongTimeline.instance.RefreshTimeline();
+	}
+
+	public void GoToRiffEditor () {
+		HideAll ();
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+		InstrumentSetup.instance.Initialize ();
+	}
+
+	public void GoToPlaylistMenu () {
+		HideAll ();
+		Show (playlistMenu);
+		PlaylistBrowser.instance.Refresh();
+		PlaylistBrowser.instance.RefreshName();
+	}
+
+	public void Show (GameObject menu) {
+		menu.SetActive(true);
+	}
+
+	public void ShowAll () {
+		Show (playlistMenu);
+
+		Show (addRiffPrompt);
+		Show (loadPrompt);
+		Show (prompt);
+		Show (shortSongWarningPrompt);
+	}
+
+	public void Hide (GameObject menu) {
+		menu.SetActive(false);
+	}
+
+	public void HideAll () {
+		Hide (mainMenu);
+		Hide (playlistMenu);
+		Hide (keySelectMenu);
+		Hide (riffEditMenu);
+
+		Hide (addRiffPrompt);
+		Hide (loadPrompt);
+		Hide (prompt);
+		Hide (shortSongWarningPrompt);
+	}
 		
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
 	public void SwitchToMenu (Menu menu) {
@@ -251,10 +309,11 @@ public class GameManager : MonoBehaviour {
 
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
+		HideAll ();
+		Hide (songArrangeMenu);
 		paused = false;
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);
-		DisableMenu(menus[Menu.SongArrange]);
 		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.currentSong.CompileSong();
 		Debug.Log (MusicManager.instance.currentSong.ToString ());
@@ -312,6 +371,22 @@ public class GameManager : MonoBehaviour {
 		DisableMenu(loopIcon);
 		MusicManager.instance.currentSong = new Song();
 		SongTimeline.instance.RefreshTimeline();
+	}
+
+	public void SaveCurrentProject () {
+		SaveLoad.SaveCurrentProject();
+	}
+
+	public void ShowLoadPromptForProjects () {
+		Show (loadPrompt);
+		LoadPrompt.instance.SetLoadMode(LoadMode.Project);
+		LoadPrompt.instance.Refresh();
+	}
+
+	public void ShowLoadPromptForSongs () {
+		Show (loadPrompt);
+		LoadPrompt.instance.SetLoadMode(LoadMode.Song);
+		LoadPrompt.instance.Refresh();
 	}
 		
 	// Toggle visibility of system buttons
@@ -381,16 +456,6 @@ public class GameManager : MonoBehaviour {
 		tooltip.SetActive(false);
 	}
 
-
-	public void EnableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(true);
-		LoadProjectPrompt.instance.PopulateList();
-	}
-
-	public void DisableLoadProjectPrompt () {
-		LoadProjectPrompt.instance.gameObject.SetActive(false);
-	}
-
 	public void TogglePause () {
 		if (paused) Unpause();
 		else Pause();
@@ -423,9 +488,9 @@ public class GameManager : MonoBehaviour {
 	}
 		
 	public void ShowRiffEditorHelp() {
-		if (!hasShownRiffEditorHelp) {
+		/*if (!hasShownRiffEditorHelp) {
 			Prompt.instance.PromptMessage("Riff Editor", "Here, you can edit your riff. Click a button to add note at that position in time.", "Alrighty");
 			hasShownRiffEditorHelp = true;
-		}
+		}*/
 	}
 }
