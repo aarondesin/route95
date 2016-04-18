@@ -143,6 +143,7 @@ public class SongTimeline : MonoBehaviour {
 				(float)(songpiece.measures[0].riffs.Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
 				0f
 			);
+			label.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 0f, 0f);
 			i++;
 		}
 	}

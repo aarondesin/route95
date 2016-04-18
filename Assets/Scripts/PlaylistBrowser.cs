@@ -40,8 +40,14 @@ public class PlaylistBrowser : MonoBehaviour {
 			listings.Clear();
 		}
 
+		int numSongs = MusicManager.instance.currentProject.songs.Count;
+		playlist.sizeDelta = new Vector2 (
+			playlist.sizeDelta.x,
+			verticalPadding * (numSongs + 2) + buttonHeight * (numSongs + 1)
+		);
+
 		// Create song listings
-		for (int i=0; i<MusicManager.instance.currentProject.songs.Count; i++) {
+		for (int i=0; i<numSongs; i++) {
 			int num = i;
 			Song song = MusicManager.instance.currentProject.songs[num];
 
@@ -259,13 +265,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		RectTransform ntr = newSongButton.GetComponent<RectTransform>();
 		ntr.SetParent (playlist);
-		ntr.sizeDelta = new Vector2 (buttonHeight, buttonHeight);
+		ntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
 		ntr.localScale = new Vector3 (1f, 1f, 1f);
 		ntr.anchorMin = new Vector2 (0f, 1f);
 		ntr.anchorMax = new Vector2 (0f, 1f);
 		ntr.anchoredPosition3D = new Vector3 (
 			horizontalPadding + ntr.sizeDelta.x/2f,
-			(verticalPadding + 2*ntr.sizeDelta.y) * -(float)(MusicManager.instance.currentProject.songs.Count+1),
+			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);
 
@@ -294,7 +300,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Text nttxt = newSong_text.GetComponent<Text>();
 		nttxt.text = "New Song...";
-		nttxt.fontSize = fontSize;
+		nttxt.fontSize = (int)(fontSize * iconScale);
 		nttxt.color = Color.white;
 		nttxt.font = font;
 		nttxt.fontStyle = FontStyle.Normal;
@@ -306,13 +312,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		RectTransform lntr = loadNewSongButton.GetComponent<RectTransform>();
 		lntr.SetParent (playlist);
-		lntr.sizeDelta = new Vector2 (buttonHeight, buttonHeight);
+		lntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
 		lntr.localScale = new Vector3 (1f, 1f, 1f);
 		lntr.anchorMin = new Vector2 (0.5f, 1f);
 		lntr.anchorMax = new Vector2 (0.5f, 1f);
 		lntr.anchoredPosition3D = new Vector3 (
 			horizontalPadding + lntr.sizeDelta.x / 2f,
-			(verticalPadding + 2*ntr.sizeDelta.y) * -(float)(MusicManager.instance.currentProject.songs.Count+1),
+			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);
 
@@ -340,7 +346,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Text lnttxt = loadNewSong_text.GetComponent<Text>();
 		lnttxt.text = "Load Song...";
-		lnttxt.fontSize = fontSize;
+		lnttxt.fontSize = (int)(fontSize * iconScale);
 		lnttxt.color = Color.white;
 		lnttxt.font = font;
 		lnttxt.fontStyle = FontStyle.Normal;

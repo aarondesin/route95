@@ -34,6 +34,21 @@ public class UI : MonoBehaviour {
 		return button;
 	}
 
+	public static GameObject MakeTextButton (string buttonText) {
+		GameObject button = MakeButton (buttonText);
+		RectTransform button_tr = button.GetComponent<RectTransform>();
+		GameObject text = MakeText (buttonText+"text");
+		RectTransform text_tr = text.GetComponent<RectTransform>();
+		Text text_text = text.GetComponent<Text>();
+		text_tr.SetParent(button_tr);
+		text_tr.sizeDelta = button_tr.sizeDelta;
+		text_tr.localScale = button_tr.localScale;
+		text_text.alignment = TextAnchor.MiddleCenter;
+		text_text.text = buttonText;
+
+		return button;
+	}
+
 	public static GameObject MakeText (string textName) {
 		GameObject text = new GameObject (textName,
 			typeof (RectTransform),
@@ -51,4 +66,6 @@ public class UI : MonoBehaviour {
 		);
 		return image;
 	}
+
+
 }

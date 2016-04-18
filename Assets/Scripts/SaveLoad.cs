@@ -110,6 +110,7 @@ public class SaveLoad {
 
 			try {
 				Song song = (Song)bf.Deserialize(file);
+				MusicManager.instance.currentProject.AddSong(song);
 				MusicManager.instance.currentSong = song;
 
 				SongArrangeSetup.instance.Refresh();

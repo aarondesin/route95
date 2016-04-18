@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ScaleInfo {
+	public string name;
 	public int scaleIndex; // index in list of all scales
 
 	public int rootIndex;
@@ -14,6 +15,7 @@ public class ScaleInfo {
 	public int seventhIndex;
 
 	public static ScaleInfo Major = new ScaleInfo () {
+		name = "Major",
 		scaleIndex = 0,
 		secondIndex = 2,
 		thirdIndex = 2,
@@ -25,6 +27,7 @@ public class ScaleInfo {
 	};
 
 	public static ScaleInfo Minor = new ScaleInfo () {
+		name = "Minor",
 		scaleIndex = 1,
 		secondIndex = 2,
 		thirdIndex = 1,
