@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour {
 	public Sprite editIcon;
 	public Sprite loadIcon;
 	public Sprite removeIcon;
+	public Sprite circleIcon;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;
@@ -114,9 +115,7 @@ public class GameManager : MonoBehaviour {
 			{ Menu.PostPlay, postPlayMenu }
 		};
 
-		loadPrompt.SetActive(true);
-		loadingScreen.SetActive(true);
-		prompt.SetActive(true);
+		ShowAll ();
 
 	}
 
@@ -254,6 +253,15 @@ public class GameManager : MonoBehaviour {
 		menu.SetActive(true);
 	}
 
+	public void ShowAll () {
+		Show (playlistMenu);
+
+		Show (addRiffPrompt);
+		Show (loadPrompt);
+		Show (prompt);
+		Show (shortSongWarningPrompt);
+	}
+
 	public void Hide (GameObject menu) {
 		menu.SetActive(false);
 	}
@@ -294,10 +302,11 @@ public class GameManager : MonoBehaviour {
 
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
+		HideAll ();
+		Hide (songArrangeMenu);
 		paused = false;
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);
-		DisableMenu(menus[Menu.SongArrange]);
 		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.currentSong.CompileSong();
 		Debug.Log (MusicManager.instance.currentSong.ToString ());
