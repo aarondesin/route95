@@ -13,7 +13,7 @@ public class Song {
 	public Key key;
 
 	[SerializeField]
-	public int scale; // scale index
+	public int scale = -1; // scale index
 
 	[SerializeField]
 	public List<SongPiece> songPieces = new List<SongPiece>();
@@ -31,34 +31,7 @@ public class Song {
 			new SongPiece() { name = "SongPiece4" }
 		};
 	}
-
-	/*public Song (string loadFile) {
-		if (loadFile.Length == 0) {
-			//Debug.LogError("Failed to load song.");
-			throw new FailedToLoadException("Song() given an empty string.");
-		}
-
-		try {
-			string[] vars = loadFile.Split(SaveLoad.itemSeparator);
-			name = vars[0];
-			Debug.Log(vars[1]);
-			Key key = (Key)Enum.Parse(typeof (Key), vars[1]);
-			MusicManager.instance.SetKey( key );
-			MusicManager.instance.tempo = (Tempo)Enum.Parse(typeof (Tempo), vars[2]);
-			string[] pieces = vars[3].Split(SaveLoad.noteSeparator);
-			foreach (string songPiece in pieces) {
-				if (songPiece.Length == 0) continue;
-				Debug.Log("Finding songpiece "+songPiece+".");
-				songPieces.Add(MusicManager.instance.songPiecesByName[songPiece]);
-			}
-		} catch (IndexOutOfRangeException) {
-			//Debug.LogError("Failed to load song.");
-			throw new FailedToLoadException("Song() given an invalid input.");
-		} //catch (KeyNotFoundException) {
-			//throw new FailedToLoadException("Song.Song(): unable to find songpiece");
-		//}
-	}*/
-
+		
 	public void PlaySong (int pos) {
 		try {
 			// For now, all song pieces are assumed to be one measure long
@@ -105,11 +78,7 @@ public class Song {
 		// Riff not already there
 		songPieces[pos].measures[0].riffs.Add (newRiff);
 	}
-
-	// Combine all song pieces into one 2-dimensional list
-	//public void Compile () {
-	//	foreach (List<Riff> riffs in 
-
+		
 	// Iterates through whole song and and adds number of measures in song pieces
 	public int NumMeasures () {
 		int temp = 0;
@@ -128,15 +97,5 @@ public class Song {
 	public void AddNewSongPiece() {
 		songPieces.Add(new SongPiece());
 	}
-
-	/*public override string ToString () {
-		string result = "";
-		result += name + SaveLoad.itemSeparator;
-		result += Enum.GetName(typeof (Key), MusicManager.instance.currentKey) + save_load.itemSeparator;
-		result += Enum.GetName(typeof (Tempo), MusicManager.instance.tempo) + save_load.itemSeparator;
-		foreach (SongPiece songPiece in songPieces) {
-			result += songPiece.name + save_load.noteSeparator;
-		}
-		return result;
-	}*/
+		
 }

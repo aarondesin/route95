@@ -233,6 +233,7 @@ public class GameManager : MonoBehaviour {
 		HideAll();
 		Show (keySelectMenu);
 		DisableKeySelectConfirmButton();
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
 	}
 
 	public void GoToSongArrangeMenu () {
@@ -240,6 +241,12 @@ public class GameManager : MonoBehaviour {
 		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
 		SongArrangeSetup.instance.Refresh();
 		SongTimeline.instance.RefreshTimeline();
+	}
+
+	public void GoToRiffEditor () {
+		HideAll ();
+		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+		InstrumentSetup.instance.Initialize ();
 	}
 
 	public void GoToPlaylistMenu () {
@@ -481,9 +488,9 @@ public class GameManager : MonoBehaviour {
 	}
 		
 	public void ShowRiffEditorHelp() {
-		if (!hasShownRiffEditorHelp) {
+		/*if (!hasShownRiffEditorHelp) {
 			Prompt.instance.PromptMessage("Riff Editor", "Here, you can edit your riff. Click a button to add note at that position in time.", "Alrighty");
 			hasShownRiffEditorHelp = true;
-		}
+		}*/
 	}
 }

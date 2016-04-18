@@ -68,7 +68,7 @@ public class InstrumentSetup : MonoBehaviour {
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
 		Cleanup();
-		if (currentRiff == null) currentRiff = MusicManager.instance.riffs[0];
+		if (currentRiff == null) currentRiff = MusicManager.instance.currentProject.riffs[0];
 		nameInputField.text = currentRiff.name;
 		MakeBeatNumbers ();
 		if (currentRiff.instrument.type == InstrumentType.Percussion) {

@@ -13,6 +13,7 @@ public class RadialKeyMenu : MonoBehaviour {
 	private float scale;
 	public float baseScale;
 	public float scaleFactor;
+	public GameObject confirmButton;
 
 	void LateStart () {
 		instance = this;
@@ -64,7 +65,10 @@ public class RadialKeyMenu : MonoBehaviour {
 
 			button.GetComponent<Button>().onClick.AddListener (delegate {
 				MusicManager.instance.currentSong.key = key;
+				Refresh();
 			});
+
+			objects.Add (button);
 		}
 
 		// Layer two
@@ -98,8 +102,19 @@ public class RadialKeyMenu : MonoBehaviour {
 
 			button.GetComponent<Button>().onClick.AddListener (delegate {
 				MusicManager.instance.currentSong.scale = scalei.scaleIndex;
+				Refresh();
 			});
+
+			objects.Add (button);
+				
 		}
+
+		// Confirm button
+		if (MusicManager.instance.currentSong.key != null &&
+			MusicManager.instance.currentSong.scale != -1) {
+			confirmButton.SetActive (true);
+		} else
+			confirmButton.SetActive (false);
 
 	}
 
