@@ -47,6 +47,7 @@ public class Chunk{
 			} else {
 				verts[i].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y);
 			}
+			new Vertex ((int)c.x, (int)c.y, 0f);
 			//if (i == r) {
 				//Debug.Log(""+i+"on chunk "+x+","+y+" maps to "+(int)c.x+","+(int)c.y);
 			//}
@@ -215,7 +216,7 @@ public class Chunk{
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		for (int v = 0; v < vertices.Length; v++) {
 			Vector2 c = IntToV2 (v);
-			if (!vertLocked[v]) {
+			if (!vertLocked [v]) {
 				if (!Constrained (chunk.transform.position + vertices [v])) {
 					Vector3 vertPos = chunk.transform.position + vertices [v];
 					float distance = Vector3.Distance (vertPos, player.transform.position);
@@ -224,9 +225,10 @@ public class Chunk{
 						float angle = Vector3.Angle (Vector3.right, angleVector);
 						float linIntInput = angle / 360f;
 						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
-						DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, newY);
+						//DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, newY);
+						Vertex.Vertices [(int)c.x] [(int)c.y].setHeight (newY);
 						float diff = newY - vertices [v].y;
-						vertices [v].y += diff/3f;
+						vertices [v].y += diff / 3f;
 						vertLocked [v] = true;
 						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
 							chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
@@ -236,15 +238,19 @@ public class Chunk{
 						//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
 				} else {
-					vertices[v].y = 0f;
-					DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+					vertices [v].y = 0f;
+					//DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+					Vertex.Vertices [(int)c.x] [(int)c.y].setHeight (0f);
 					if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
 						chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
 					}
 					vertLocked [v] = true;
 				}
-			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
-				float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
+				//} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
+
+			}else if (vertices[v].y != Vertex.Vertices[(int)c.x][(int)c.y].getHeight) {
+				//float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
+				float diff = Vertex.Vertices[(int)c.x][(int)c.y].getHeight - vertices [v].y;
 				vertices [v].y += diff/3f;
 			}
 		}

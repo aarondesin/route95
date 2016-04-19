@@ -25,4 +25,12 @@ public class Vertex {
 			Vertex.Vertices [x].Add (y, this);
 		} 
 	}
+
+	public void setHeight(float height) {
+		this.height = height;
+	}
+
+	public float getHeight {
+		get { return height; }
+	}
 }
