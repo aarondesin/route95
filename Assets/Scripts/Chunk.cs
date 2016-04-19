@@ -243,7 +243,8 @@ public class Chunk{
 					vertLocked [v] = true;
 				}
 			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
-				vertices [v].y = DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y);
+				float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
+				vertices [v].y += diff/2f;
 			}
 		}
 		chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
