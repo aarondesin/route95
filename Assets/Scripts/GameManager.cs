@@ -325,7 +325,7 @@ public class GameManager : MonoBehaviour {
 		MusicManager.instance.StartSong();
 
 		if (!hasShownLiveHelp) {
-			ShowLiveHelp();
+			//ShowLiveHelp();
 			hasShownLiveHelp = true;
 		}
 
