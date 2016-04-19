@@ -225,7 +225,8 @@ public class Chunk{
 						float linIntInput = angle / 360f;
 						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
 						DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, newY);
-						vertices [v].y = newY;
+						float diff = newY - vertices [v].y;
+						vertices [v].y += diff/3f;
 						vertLocked [v] = true;
 						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
 							chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
@@ -244,7 +245,7 @@ public class Chunk{
 				}
 			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
 				float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
-				vertices [v].y += diff/2f;
+				vertices [v].y += diff/3f;
 			}
 		}
 		chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
