@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,10 @@ using System.Linq;
 public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
+
+	[SerializeField]
+	GameObject selected;
+	//EventSystem eventSystem;
 
 	public List<AudioSource> audioSources;
 
@@ -168,6 +173,12 @@ public class InputManager : MonoBehaviour {
 					Debug.Log(keyToLick.Count);
 					Debug.Log (MusicManager.instance.licks.Count);
 				}*/
+			}
+		} else if (GameManager.instance.currentMode == Mode.Setup) {
+			if (Input.GetMouseButtonDown(0)) {
+				selected = EventSystem.current.currentSelectedGameObject;
+			} else if (Input.GetMouseButtonUp(0)) {
+				selected = null;
 			}
 		}
 	}

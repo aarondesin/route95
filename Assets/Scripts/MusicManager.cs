@@ -45,6 +45,7 @@ public class MusicManager : MonoBehaviour {
 	//public Key currentKey = Key.EMajor; // value will be passed from key button
 	public Instrument currentInstrument = Instrument.ElectricGuitar;
 	public Song currentSong;
+	public int currentPlayingSong;
 	public bool loopSong = false; // loop song in live mode?
 
 	// --Game Data Storage --//
@@ -237,7 +238,12 @@ public class MusicManager : MonoBehaviour {
 						if (loopSong) {
 							//Debug.Log(lickQueue.Count);
 						} else {
-							GameManager.instance.SwitchToPostplay();
+							if (currentPlayingSong < currentProject.songs.Count-1) {
+								beat = 0;
+								currentPlayingSong++;
+							} else {
+								GameManager.instance.SwitchToPostplay();
+							}
 						}
 					}
 					/*if (lickQueue.Count > 0){

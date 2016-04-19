@@ -15,6 +15,9 @@ public class WorldManager : MonoBehaviour {
 	public bool DO_RANDOM_HEIGHT_MAPS; //will deform terrain with random height maps
 	public int FREQ_ARRAY_SIZE; //must be a power of 2
 	public float ROAD_RADIUS; //radius in unity units in which to spawn road
+	public float ROAD_WIDTH;
+	public float ROAD_HEIGHT;
+	public Material roadMaterial;
 
 	public bool DO_DECORATE;
 	public int MAX_DECORATIONS;
@@ -163,8 +166,12 @@ public class WorldManager : MonoBehaviour {
 	void createRoad(){
 		road = new GameObject ("Road");
 		road.AddComponent<MeshFilter> ();
-		road.AddComponent<MeshCollider> ();
+		//road.AddComponent<MeshCollider> ();
+		road.AddComponent<MeshRenderer>();
+		road.GetComponent<MeshRenderer>().material = roadMaterial;
 		road.AddComponent<Bezier> ();
+		road.GetComponent<Bezier>().ROAD_WIDTH = ROAD_WIDTH;
+		road.GetComponent<Bezier>().ROAD_HEIGHT = ROAD_HEIGHT;
 	}
 
 	void DecorateRandom (Chunk chunk, GameObject decoration) {
