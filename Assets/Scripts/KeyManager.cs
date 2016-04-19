@@ -17,7 +17,8 @@ public class KeyManager : MonoBehaviour {
 
 	public void BuildScales () {
 		percussionSets = new Dictionary<Instrument, List<string>>() {
-			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] }
+			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
+			{ Instrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
 		};
 
 		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>>();

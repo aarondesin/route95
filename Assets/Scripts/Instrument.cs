@@ -32,10 +32,20 @@ public class Instrument {
 		startingNote = null
 	};
 
+	public static Instrument ExoticPercussion = new Instrument {
+		name = "Exotic Percussion",
+		codeName = "ExoticPercussion",
+		index = 1,
+		type = InstrumentType.Percussion,
+		iconPath = "UI/Instrument_ExoticPercussion",
+		glowPath = "UI/Instrument_ExoticPercussion",
+		startingNote = null
+	};
+
 	public static Instrument ElectricGuitar = new Instrument {
 		name = "Electric Guitar",
 		codeName = "ElectricGuitar",
-		index = 1,
+		index = 2,
 		type = InstrumentType.Melodic,
 		iconPath = "UI/Instrument_ElectricGuitar",
 		glowPath = "UI/Instrument_ElectricGuitar_Glow",
@@ -58,7 +68,7 @@ public class Instrument {
 	public static Instrument ElectricBass = new Instrument {
 		name = "Electric Bass",
 		codeName = "ElectricBass",
-		index = 2,
+		index = 3,
 		type = InstrumentType.Melodic,
 		iconPath = "UI/Instrument_ElectricBass",
 		glowPath = "UI/Instrument_ElectricBass_Glow",
@@ -81,7 +91,7 @@ public class Instrument {
 	public static Instrument AcousticGuitar = new Instrument {
 		name = "Acoustic Guitar",
 		codeName = "AcousticGuitar",
-		index = 3,
+		index = 4,
 		type = InstrumentType.Melodic,
 		iconPath = "UI/Instrument_AcousticGuitar",
 		glowPath = "UI/Instrument_AcousticGuitar_Glow",
@@ -104,7 +114,7 @@ public class Instrument {
 	public static Instrument ClassicalGuitar = new Instrument {
 		name = "Classical Guitar",
 		codeName = "ClassicalGuitar",
-		index = 4,
+		index = 5,
 		type = InstrumentType.Melodic,
 		iconPath = "UI/Instrument_ClassicalGuitar",
 		glowPath = "UI/Instrument_ClassicalGuitar_Glow",
@@ -127,7 +137,7 @@ public class Instrument {
 	public static Instrument PipeOrgan = new Instrument {
 		name = "Pipe Organ",
 		codeName = "PipeOrgan",
-		index = 5,
+		index = 6,
 		type = InstrumentType.Melodic,
 		iconPath = "UI/Instrument_PipeOrgan",
 		glowPath = "UI/Instrument_PipeOrgan_Glow",
@@ -150,10 +160,33 @@ public class Instrument {
 	public static Instrument Keyboard = new Instrument {
 		name = "Keyboard",
 		codeName = "Keyboard",
-		index = 6,
+		index = 7,
 		type = InstrumentType.Melodic,
-		iconPath = "UI/Instrument_Keyboard",
+		iconPath = "UI/Instrument_Trumpet",
 		glowPath = "UI/Instrument_Keyboard_Glow",
+		startingNote = new Dictionary<Key, int> () {
+			{ Key.C, 3 },
+			{ Key.CSharp, 4 },
+			{ Key.D, 5 },
+			{ Key.DSharp, 6 },
+			{ Key.E, 7 },
+			{ Key.F, 8 },
+			{ Key.FSharp, 9 },
+			{ Key.G, 10 },
+			{ Key.GSharp, 11 },
+			{ Key.A, 0 },
+			{ Key.ASharp, 1 },
+			{ Key.B, 2 }
+		}
+	};
+
+	public static Instrument Trumpet = new Instrument {
+		name = "Trumpet",
+		codeName = "Trumpet",
+		index = 8,
+		type = InstrumentType.Melodic,
+		iconPath = "UI/Instrument_Trumpet",
+		glowPath = "UI/Instrument_Trumpet_Glow",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 3 },
 			{ Key.CSharp, 4 },
@@ -172,12 +205,14 @@ public class Instrument {
 
 	public static List<Instrument> AllInstruments = new List<Instrument> () {
 		RockDrums,
+		ExoticPercussion,
 		ElectricGuitar,
 		ElectricBass,
 		AcousticGuitar,
 		ClassicalGuitar,
 		PipeOrgan,
-		Keyboard
+		Keyboard,
+		Trumpet
 	};
 
 	public static void LoadInstruments () {

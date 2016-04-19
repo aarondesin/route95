@@ -28,6 +28,13 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite tomIcon;
 	public Sprite hatIcon;
 
+	public Sprite castinetsIcon;
+	public Sprite clavesIcon;
+	public Sprite cowbellIcon;
+	public Sprite jamBlockIcon;
+	public Sprite maracasIcon;
+	public Sprite tambourineIcon;
+
 	public static Riff currentRiff; // current riff being edited
 
 	public static float baseButtonScale = 1f; // base button sizes
@@ -122,17 +129,29 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Initializes a percussion setup menu
 	void InitializePercussionSetup (Instrument percInst) {
-		switch (percInst.name) {
-		case "Rock Drums":
+		switch (percInst.codeName) {
+		case "RockDrums":
 			// Make rows of buttons for drums
 			numNotes = 5;
-			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
-			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
-			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
-			MakePercussionButtons ("Hat", 3, "Audio/Instruments/Percussion/RockDrums_Hat", hatIcon);
-			MakePercussionButtons ("Crash", 4, "Audio/Instruments/Percussion/RockDrums_Crash", hatIcon);
+			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", kickIcon);
+			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", snareIcon);
+			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom", tomIcon);
+			MakePercussionButtons ("Hat", 3, "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", hatIcon);
+			MakePercussionButtons ("Crash", 4, "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", hatIcon);
+			break;
+		case "ExoticPercussion":
+			numNotes = 8;
+			MakePercussionButtons ("Castinets", 0, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets", castinetsIcon);
+			MakePercussionButtons ("Claves", 1, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", clavesIcon);
+			MakePercussionButtons ("Cowbell", 2, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", cowbellIcon);
+			MakePercussionButtons ("Cowbell2", 3, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", cowbellIcon);
+			MakePercussionButtons ("Jam Block", 4, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", jamBlockIcon);
+			MakePercussionButtons ("Maracas", 5, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas", maracasIcon);
+			MakePercussionButtons ("Maracas2", 6, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", maracasIcon);
+			MakePercussionButtons ("Tambourine", 7, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", tambourineIcon);
 			break;
 		}
+
 	}
 
 	// Initializes a melodic setup menu
