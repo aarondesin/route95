@@ -33,7 +33,9 @@ public class InstrumentSetup : MonoBehaviour {
 	public static float baseButtonScale = 1f; // base button sizes
 	public static int MAX_NUMNOTES = 8; // maximum number of notes (rows)
 	public static int numRows;
-	public static int subdivsShown = 1; // number of subdivisions to show
+	public static int subdivsShown = 2; // number of subdivisions to show
+	public int octavesShown = 2;
+	int maxOctaves;
 
 	List<GameObject> buttons = new List<GameObject>();
 	List<List<GameObject>> buttonGrid = new List<List<GameObject>>();
@@ -58,10 +60,19 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite powerSuggestion;
 	public Sprite octaveSuggestion;
 
+	public Scrollbar iconBar;
+	public RectTransform iconBar_tr;
+
+	public Scrollbar beatsBar;
+	public RectTransform beatsBar_tr;
+
+	int numNotes;
+	int numButtons;
+
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
-		riffai = new RiffAI ();
+		//riffai = new RiffAI ();
 
 	}
 
@@ -70,6 +81,7 @@ public class InstrumentSetup : MonoBehaviour {
 		Cleanup();
 		if (currentRiff == null) currentRiff = MusicManager.instance.currentProject.riffs[0];
 		nameInputField.text = currentRiff.name;
+		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
 		MakeBeatNumbers ();
 		if (currentRiff.instrument.type == InstrumentType.Percussion) {
 			InitializePercussionSetup (currentRiff.instrument);
@@ -98,11 +110,11 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public void MakeBeatNumbers () {
 		for (int i=0; i<currentRiff.beatsShown; i++) {
-			buttons.Add(MakeText((i+1).ToString(), GetComponent<RectTransform>(),
+			buttons.Add(MakeText((i+1).ToString(), beatsBar_tr,
 				new Vector2 (48f, 48f),
 				new Vector2 (
 					buttonWidth*2f + (buttonWidth+buttonSpacing)*(i*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS)),
-					-0.5f*buttonWidth
+					-beatsBar_tr.rect.height/2f
 				)
 			));
 		}
@@ -113,7 +125,7 @@ public class InstrumentSetup : MonoBehaviour {
 		switch (percInst.name) {
 		case "Rock Drums":
 			// Make rows of buttons for drums
-			numRows = 4;
+			numNotes = 5;
 			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums_Kick", kickIcon);
 			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums_Snare", snareIcon);
 			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums_Tom", tomIcon);
@@ -129,34 +141,52 @@ public class InstrumentSetup : MonoBehaviour {
 		for(int n = 0; n<(int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS); n++) {
 			buttonGrid.Add(new List<GameObject>());
 		}
-		int i = 0;
+		//int i = 0;
 
+		maxOctaves = (int)Mathf.CeilToInt( (float)(Sounds.soundsToLoad[currentRiff.instrument.codeName].Count) / 12f);
+		Debug.Log(maxOctaves);
+		if (maxOctaves < octavesShown) octavesShown = maxOctaves;
 		Key key = MusicManager.instance.currentSong.key;
 		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
-		foreach (string note in KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes) {
-			MakeMelodicButtons (note.Split('_')[1],i,note);
-			i++;
+		//foreach (string note in KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes) {
+		//foreach (string note in Sounds.soundsToLoad[currentRiff.instrument.codeName]) {
+		int startIndex = currentRiff.instrument.startingNote[key];
+		int totalNotes = Sounds.soundsToLoad[currentRiff.instrument.codeName].Count;
+		numNotes = startIndex + 12 * octavesShown + 1;
+
+		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
+			(numNotes+1)*buttonWidth + numNotes*buttonSpacing
+		);
+
+		for (int i = startIndex; i < numNotes && i < totalNotes; i++) {
+			string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i];
+			bool inScale = KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes.Contains(note);
+			MakeMelodicButtons (note.Split('_')[1], i, note, inScale);
+			//i++;
 		}
 			
 	}
 
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
-		int numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+		
 		buttonGrid.Clear ();
 		for(int n = 0; n<numButtons; n++) {
 			buttonGrid.Add(new List<GameObject>());
 		}
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
-			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
+			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
 		);
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
+		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
 
 		// Make icon for note
 		buttons.Add(MakeIcon (title, iconGraphic, 
-			GetComponent<RectTransform>(), new Vector2 (0.75f*buttonWidth, 0.75f*buttonWidth),
+			iconBar_tr, new Vector2 (0.75f*buttonWidth, 0.75f*buttonWidth),
 			new Vector2 (
-				buttonWidth,
+				iconBar_tr.rect.width/2f,
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			))
 		);
@@ -168,7 +198,7 @@ public class InstrumentSetup : MonoBehaviour {
 				GetComponent<RectTransform>(),
 				new Vector2 (buttonWidth*0.75f, buttonWidth*0.75f),
 				new Vector2 (
-					2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
+					buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
@@ -192,23 +222,25 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
-	void MakeMelodicButtons (string title, int row, string fileName) {
+	void MakeMelodicButtons (string title, int row, string fileName, bool inScale) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
-		Debug.Log ("numbuttons (x length) " + numButtons);
+		//Debug.Log ("numbuttons (x length) " + numButtons);
 		//buttonGrid.Clear ();
-		GetComponent<RectTransform>().sizeDelta = new Vector2 (
-			(numButtons+2)*buttonWidth + numButtons*buttonSpacing,
-			(row+2)*buttonWidth + row*buttonSpacing
-		);
 
-		buttons.Add(MakeText (title,
-			GetComponent<RectTransform>(),
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
+		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
+
+		GameObject txt = MakeText (title,
+			iconBar_tr,
 			new Vector2 (buttonWidth, buttonWidth),
 			new Vector2 (
-				buttonWidth,
+				iconBar_tr.rect.width/2f,
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			)
-		));
+		);
+		Color color = new Color (1f, 1f, 1f, 0.5f);
+		txt.GetComponent<Text>().color = (inScale ? Color.white : color);
+		buttons.Add(txt);
 
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
 			int num = i;
@@ -217,7 +249,7 @@ public class InstrumentSetup : MonoBehaviour {
 				GetComponent<RectTransform>(),
 				new Vector2(buttonWidth, buttonWidth/2f),
 				new Vector2 (
-					2f*buttonWidth + (buttonWidth+buttonSpacing)*num,
+					buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				));
 			float vol = 1f;
@@ -234,7 +266,7 @@ public class InstrumentSetup : MonoBehaviour {
 				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
 				if (InstrumentSetup.currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
 				else ClearSuggestions();
-				Suggest ();
+				//Suggest ();
 				//SuggestChords(bt);
 				
 				Toggle(bt.GetComponent<Button>());
@@ -310,6 +342,11 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
+	public void SyncScrollViews () {
+		iconBar.value = scrollBarV.value;
+		beatsBar.value = scrollBarH.value;
+	}
+
 	public void IncreaseSubdivisions () {
 		if (subdivsShown < Riff.MAX_SUBDIVS) {
 			subdivsShown++;
@@ -332,6 +369,16 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public void DecreaseBeatsShown () {
 		currentRiff.ShowLess();
+		Initialize();
+	}
+
+	public void IncreaseOctavesShown () {
+		if (octavesShown < maxOctaves) octavesShown++;
+		Initialize();
+	}
+
+	public void DecreaseOctavesShown () {
+		if (octavesShown > 1) octavesShown--;
 		Initialize();
 	}
 

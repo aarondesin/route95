@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class RiffAI : MonoBehaviour{
+public class RiffAI {
 
 	//public RiffAI instance;
 	int minimumSimilarityValue = 0;
