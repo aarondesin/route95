@@ -293,5 +293,9 @@ public class DynamicTerrain {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
-		
+
+	void createSquareMesa (){
+
+	}
+
 }

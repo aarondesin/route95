@@ -45,45 +45,87 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _ParallaxMap
+          name: _Front1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _OcclusionMap
+          name: _Back1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _EmissionMap
+          name: _Left1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _DetailMask
+          name: _Right1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _DetailAlbedoMap
+          name: _Up1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 629641880dda30441b9169f755036ee0, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _MetallicGlossMap
+          name: _Down1
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: a5af3fa037800f047ad77709c623476a, type: 3}
           m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Front2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Back2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Left2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Right2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Up2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Down2
+        second:
+          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
+          m_Scale: {x: 2, y: 2}
           m_Offset: {x: 0, y: 0}
       data:
         first:
@@ -129,94 +171,52 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Cube
+          name: _ParallaxMap
         second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Front1
+          name: _OcclusionMap
         second:
-          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Front2
+          name: _EmissionMap
         second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Back1
-        second:
-          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Back2
+          name: _DetailMask
         second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Left1
-        second:
-          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Left2
+          name: _DetailAlbedoMap
         second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Right1
-        second:
-          m_Texture: {fileID: 2800000, guid: 2bf8a1bdbdde8e945ba52d6f9aab5266, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Right2
+          name: _MetallicGlossMap
         second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Up1
-        second:
-          m_Texture: {fileID: 2800000, guid: 629641880dda30441b9169f755036ee0, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Up2
+          name: _Cube
         second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Down1
-        second:
-          m_Texture: {fileID: 2800000, guid: a5af3fa037800f047ad77709c623476a, type: 3}
+          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _Down2
-        second:
-          m_Texture: {fileID: 2800000, guid: ce989f87aca3640469aa47e2dd26c1a0, type: 3}
-          m_Scale: {x: 2, y: 2}
           m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
@@ -247,6 +247,14 @@ Material:
         first:
           name: _AtmosphereThickness
         second: 1.15
+      data:
+        first:
+          name: _Value
+        second: 0
+      data:
+        first:
+          name: _Rotation
+        second: 0
       data:
         first:
           name: _Parallax
@@ -282,14 +290,6 @@ Material:
       data:
         first:
           name: _Metallic
-        second: 0
-      data:
-        first:
-          name: _Rotation
-        second: 0
-      data:
-        first:
-          name: _Value
         second: 0
     m_Colors:
       data:
