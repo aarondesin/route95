@@ -10,7 +10,7 @@ public class Song {
 	public string name;
 
 	[SerializeField]
-	public Key key;
+	public Key key = Key.None;
 
 	[SerializeField]
 	public int scale = -1; // scale index

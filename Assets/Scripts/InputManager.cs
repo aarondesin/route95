@@ -177,6 +177,7 @@ public class InputManager : MonoBehaviour {
 		} else if (GameManager.instance.currentMode == Mode.Setup) {
 			if (Input.GetMouseButtonDown(0)) {
 				selected = EventSystem.current.currentSelectedGameObject;
+				Debug.Log(selected);
 			} else if (Input.GetMouseButtonUp(0)) {
 				selected = null;
 			}

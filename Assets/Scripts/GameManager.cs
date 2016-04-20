@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour {
 
 	bool hasShownLiveHelp = false;
 	bool hasShownSongArrangerHelp = false;
-	bool hasShownRiffEditorHelp = false;
+	//bool hasShownRiffEditorHelp = false;
 
 	public GameObject shortSongWarningPrompt;
 	int shortSongWarningThreshold = 6;

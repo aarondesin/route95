@@ -110,7 +110,7 @@ public class RadialKeyMenu : MonoBehaviour {
 		}
 
 		// Confirm button
-		if (MusicManager.instance.currentSong.key != null &&
+		if (MusicManager.instance.currentSong.key != Key.None &&
 			MusicManager.instance.currentSong.scale != -1) {
 			confirmButton.SetActive (true);
 		} else

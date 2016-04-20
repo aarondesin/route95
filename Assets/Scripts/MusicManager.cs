@@ -12,6 +12,7 @@ using UnityEditor;
 
 // All keys available in the game
 public enum Key {
+	None,
 	C,
 	CSharp,
 	D,

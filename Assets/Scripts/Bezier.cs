@@ -29,7 +29,7 @@ public class Bezier : MonoBehaviour{
 	
 	//private List<Vector3> vertices;
 	//private List<int> triangles;
-	private List<Vector3> normals;
+	//private List<Vector3> normals;
 	private List<Vector2> uvs;
 
 	public float w;
@@ -337,7 +337,7 @@ public class Bezier : MonoBehaviour{
 		List<Vector3> newVertices = new List<Vector3> ();
 		List<int> newTriangles = new List<int> ();
 		List<Vector2> newUVs = new List<Vector2>();
-		normals = new List<Vector3> ();
+		//normals = new List<Vector3> ();
 
 		float progressI = 0f;
 		Vector3 pointI = GetPoint (progressI);
@@ -358,7 +358,7 @@ public class Bezier : MonoBehaviour{
 		newUVs.Add(new Vector2(0f, 0f));
 		int rightUpI = 3;
 
-		bool flipUVs = true;
+		//bool flipUVs = true;
 
 		for (int i = 1; i<steps; i++) {
 			int num = i;

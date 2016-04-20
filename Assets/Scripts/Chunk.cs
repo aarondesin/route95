@@ -334,7 +334,6 @@ public class Chunk{
 		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
 			if (tr != chunk.transform) {
 				RaycastHit hit;
-				float y = 0f;
 				if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.MAX_DECORATION_HEIGHT, tr.position.y), Vector3.down,out hit, Mathf.Infinity)) {
 					//Debug.Log("bap");
 					tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);

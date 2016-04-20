@@ -10,7 +10,7 @@ public class PerfInfo {
 	public float frames = 0;
 	public float avgFPS = 0;
 
-	public string ToString() {
+	public override string ToString() {
 		return 
 			"Seconds: " + seconds.ToString("##.0000") + "\n" +
 			"Frames: " + frames.ToString ("##.00") + "\n" +
@@ -21,7 +21,7 @@ public class PerfInfo {
 public class PerfTracker : MonoBehaviour {
 
 	Dictionary<Mode, PerfInfo> perfTracker;
-	float currentTime;
+	//float currentTime;
 
 	// Use this for initialization
 	void Start () {
@@ -41,7 +41,7 @@ public class PerfTracker : MonoBehaviour {
 			perf.frames += 1;
 			perf.avgFPS += ((1f/Time.deltaTime) - perf.avgFPS) / perf.frames;
 				//perfTracker[currentMode].frames += timeDiff/Time.deltaTime;
-			currentTime = Time.realtimeSinceStartup;
+			//currentTime = Time.realtimeSinceStartup;
 		}
 	
 	}

@@ -48,8 +48,8 @@ public class WorldManager : MonoBehaviour {
 
 	float startLoadTime;
     bool loaded = false;
-	bool loadedDecorations = false;
-	bool decorated = false;
+	//bool loadedDecorations = false;
+	//bool decorated = false;
 
 	// Use this for initialization
 	void Start () {
