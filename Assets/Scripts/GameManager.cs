@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ public enum Menu {
 };
 
 public enum Mode {
+	Loading,
 	Setup,
 	Live,
 	Postplay
@@ -72,7 +74,7 @@ public class GameManager : MonoBehaviour {
 	public Dictionary<Menu, GameObject> menus; 
 		
 	public Menu currentMenu = Menu.None;
-	public Mode currentMode = Mode.Setup;
+	public Mode currentMode = Mode.Loading;
 
 	// Global save path
 	public string projectSavePath;
@@ -172,6 +174,8 @@ public class GameManager : MonoBehaviour {
 	void FinishLoading() {
 		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 		loadingScreen.SetActive(false);
+		//currentTime = 0;
+		currentMode = Mode.Setup;
 	}
 
 	public void ChangeLoadingMessage (string message) {
@@ -222,6 +226,7 @@ public class GameManager : MonoBehaviour {
 			livePlayQuitPrompt.color = Color.white;
 			//livePlayQuitPrompt.color = Color.white;
 		}
+
 	}
 
 	public void GoToMainMenu () {
