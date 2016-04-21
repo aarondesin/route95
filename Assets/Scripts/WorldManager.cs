@@ -46,6 +46,24 @@ public class WorldManager : MonoBehaviour {
 	private GameObject sun;
 	private GameObject moon;
 
+	public float timeOfDay;
+	private float timeScale = 1;
+
+	private Color primaryColor;
+	private Color secondaryColor;
+
+	public Color primaryDayColor;
+	public Color secondaryDayColor;
+
+	public Color primarySunsetColor;
+	public Color secondarySunsetColor;
+
+	public Color primaryNightColor;
+	public Color secondaryNightColor;
+
+	public Color primarySunriseColor;
+	public Color secondarySunriseColor;
+
 	float startLoadTime;
     bool loaded = false;
 	//bool loadedDecorations = false;
@@ -58,7 +76,8 @@ public class WorldManager : MonoBehaviour {
 
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE, VERT_HEIGHT_SCALE, SMOOTH_FACTOR);
 
-		createSun();
+		timeOfDay = Random.Range(0, 2*Mathf.PI);
+		sun = createSun();
 		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
 
@@ -67,6 +86,8 @@ public class WorldManager : MonoBehaviour {
 			ROAD_RADIUS = 1000f;
 		}
 		road.GetComponent<Bezier> ().ROAD_RADIUS = ROAD_RADIUS;
+
+
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -79,6 +100,10 @@ public class WorldManager : MonoBehaviour {
 		moon.GetComponent<Moon> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		moon.GetComponent<Light> ().shadows = LightShadows.Soft;
 		*/
+	}
+
+	public void setTimeScale(float t = 1) {
+		timeScale = t;
 	}
 
 	public void Load () {
@@ -120,9 +145,66 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		if (loaded) {
 			terrain.update(freqDataArray);
+			updateTime();
+			UpdateColor();
 			AttemptDecorate();
 		}
 
+	}
+
+	void UpdateColor() {
+		//Light light = this.GetComponent<Light>();
+
+		// Sunrise to noon
+		if ((timeOfDay >= 0) && (timeOfDay < (Mathf.PI / 2))) {
+			float lerpValue = timeOfDay / (Mathf.PI / 2);
+			primaryColor = Color.Lerp (primarySunriseColor, primaryDayColor, lerpValue);
+			secondaryColor = Color.Lerp (secondarySunriseColor, secondaryDayColor, lerpValue);
+
+		// Noon to sunset
+		} else if ((timeOfDay >= (Mathf.PI / 2)) && (timeOfDay < Mathf.PI)) {
+			float lerpValue = (timeOfDay - Mathf.PI / 2) / (Mathf.PI / 2);
+			primaryColor = Color.Lerp (primaryDayColor, primarySunsetColor, lerpValue);
+			secondaryColor = Color.Lerp (secondaryDayColor, secondarySunsetColor, lerpValue);
+
+		// Sunset to night
+		} else if ((timeOfDay >= Mathf.PI) && (timeOfDay < ((3f/2f) * Mathf.PI))){
+			float lerpValue = (timeOfDay - Mathf.PI) / (Mathf.PI / 2);
+			primaryColor = Color.Lerp (primarySunsetColor, primaryNightColor, lerpValue);
+			secondaryColor = Color.Lerp (secondarySunsetColor, secondaryNightColor, lerpValue);
+
+		// Night to sunrise
+		} else if ((timeOfDay >= ((3f/2f) * Mathf.PI)) && (timeOfDay < (2 * Mathf.PI))){
+			float lerpValue = (timeOfDay - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
+			primaryColor = Color.Lerp (primaryNightColor, primarySunriseColor, lerpValue);
+			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
+		}
+
+		sun.GetComponent<Light>().color = primaryColor;
+		RenderSettings.fogColor = secondaryColor;
+
+		RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
+		if (Spectrum2.instance != null) {
+			Color temp = new Color (sun.GetComponent<Light> ().color.r, sun.GetComponent<Light> ().color.g, sun.GetComponent<Light> ().color.b, Spectrum2.instance.opacity);
+			Spectrum2.instance.GetComponent<LineRenderer> ().SetColors (temp, temp);
+			Spectrum2.instance.GetComponent<LineRenderer> ().material.color = temp;
+		}
+	}
+
+	private void updateTime() {
+		timeOfDay += timeScale * Time.deltaTime;
+		while (timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
+			timeOfDay -= 2 * Mathf.PI;
+		}
+	}
+
+	float AngularDistance (float angle, float pos) {
+		float d = angle - pos;
+		while (d < -Mathf.PI)
+			d += 2f * Mathf.PI;
+		while (d > Mathf.PI)
+			d -= 2f * Mathf.PI;
+		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
     
 	void AttemptDecorate () {
@@ -151,16 +233,22 @@ public class WorldManager : MonoBehaviour {
 			}
 		}
 	}
+
+	void UpdateFog () {
+	}
+		
     
-	void createSun(){
+	GameObject createSun(){
 		GameObject sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
 		sun.AddComponent<Sun> ();
 		if (TIME_SCALE != 0) 
-			sun.GetComponent<Sun> ().setTimeScale (TIME_SCALE);
+			setTimeScale (TIME_SCALE);
 		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
+
+		return sun;
 	}
 
 	void createRoad(){
