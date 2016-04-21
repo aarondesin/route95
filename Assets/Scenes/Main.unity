@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0, g: 0, b: 0, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 0.5
+  m_AmbientIntensity: 0.25
   m_AmbientMode: 0
   m_SkyboxMaterial: {fileID: 2100000, guid: e3de9ff6ee2f3c04f869efc9b112ea25, type: 2}
   m_HaloStrength: 0.5
@@ -96,7 +96,7 @@ GameObject:
   - 222: {fileID: 5125174}
   - 114: {fileID: 5125173}
   - 114: {fileID: 5125175}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +357,7 @@ GameObject:
   - 224: {fileID: 32961206}
   - 222: {fileID: 32961208}
   - 114: {fileID: 32961207}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1001,7 +1001,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 82022493}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1071,7 +1071,7 @@ GameObject:
   - 222: {fileID: 87238412}
   - 114: {fileID: 87238411}
   - 114: {fileID: 87238410}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Template
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1695,7 +1695,7 @@ GameObject:
   - 224: {fileID: 138962592}
   - 222: {fileID: 138962594}
   - 114: {fileID: 138962593}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1767,7 +1767,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 146632908}
   - 114: {fileID: 146632909}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: SongTimeline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2214,7 +2214,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 180508673}
   - 114: {fileID: 180508674}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2591,6 +2591,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -2652,6 +2656,10 @@ Prefab:
     - target: {fileID: 100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
       propertyPath: m_Name
       value: Door_R
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
@@ -2715,6 +2723,10 @@ Prefab:
       propertyPath: m_LocalScale.x
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -2733,7 +2745,7 @@ GameObject:
   - 222: {fileID: 224373346}
   - 114: {fileID: 224373345}
   - 114: {fileID: 224373344}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: CancelButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3200,7 +3212,7 @@ GameObject:
   - 224: {fileID: 239510056}
   - 222: {fileID: 239510058}
   - 114: {fileID: 239510057}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3510,7 +3522,7 @@ GameObject:
   - 224: {fileID: 287455186}
   - 222: {fileID: 287455188}
   - 114: {fileID: 287455187}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3828,7 +3840,7 @@ GameObject:
   - 114: {fileID: 302479802}
   - 222: {fileID: 302479801}
   - 114: {fileID: 302479800}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3952,6 +3964,10 @@ Prefab:
     - target: {fileID: 400000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
       propertyPath: m_LocalScale.z
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
@@ -4355,7 +4371,7 @@ GameObject:
   - 224: {fileID: 347504812}
   - 222: {fileID: 347504814}
   - 114: {fileID: 347504813}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4461,6 +4477,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 0013589b6d0f89d4a8c8acc27dd4622b, type: 2}
+    - target: {fileID: 100000, guid: 293d4f2150692644f877783db0217417, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 293d4f2150692644f877783db0217417, type: 3}
   m_IsPrefabParent: 0
@@ -4513,7 +4533,7 @@ GameObject:
   - 114: {fileID: 358849375}
   - 114: {fileID: 358849374}
   - 114: {fileID: 358849377}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: EditRiffButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4868,7 +4888,7 @@ GameObject:
   - 114: {fileID: 371512238}
   - 82: {fileID: 371512239}
   - 164: {fileID: 371512240}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PlayerAvatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5100,7 +5120,7 @@ GameObject:
   - 222: {fileID: 387124032}
   - 114: {fileID: 387124031}
   - 114: {fileID: 387124030}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Template
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5302,7 +5322,7 @@ GameObject:
   - 222: {fileID: 399985237}
   - 114: {fileID: 399985236}
   - 114: {fileID: 399985235}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: InstrumentSelectDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5495,7 +5515,7 @@ GameObject:
   - 222: {fileID: 412077800}
   - 114: {fileID: 412077799}
   - 114: {fileID: 412077798}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: PlayRiffButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5840,7 +5860,7 @@ GameObject:
   - 4: {fileID: 419966873}
   - 198: {fileID: 419966875}
   - 199: {fileID: 419966874}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7711,7 +7731,7 @@ GameObject:
   - 222: {fileID: 428239024}
   - 114: {fileID: 428239023}
   - 114: {fileID: 428239022}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7904,7 +7924,7 @@ GameObject:
   - 223: {fileID: 438675751}
   - 114: {fileID: 438675750}
   - 114: {fileID: 438675749}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: SongArrangeCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8141,7 +8161,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 457202967}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8321,7 +8341,7 @@ GameObject:
   - 114: {fileID: 484500550}
   - 114: {fileID: 484500549}
   - 114: {fileID: 484500552}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: AddRiffButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8532,7 +8552,7 @@ GameObject:
   - 224: {fileID: 497647095}
   - 222: {fileID: 497647097}
   - 114: {fileID: 497647096}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8600,7 +8620,7 @@ GameObject:
   - 222: {fileID: 509972657}
   - 114: {fileID: 509972656}
   - 114: {fileID: 509972655}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Scrollbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8789,7 +8809,7 @@ GameObject:
   - 114: {fileID: 522794805}
   - 114: {fileID: 522794804}
   - 114: {fileID: 522794807}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: GoButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8994,7 +9014,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 530240447}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CamView_Radio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9083,7 +9103,7 @@ GameObject:
   - 224: {fileID: 545578593}
   - 222: {fileID: 545578595}
   - 114: {fileID: 545578594}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9947,7 +9967,7 @@ GameObject:
   - 224: {fileID: 611563040}
   - 222: {fileID: 611563042}
   - 114: {fileID: 611563041}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10502,7 +10522,7 @@ GameObject:
   - 4: {fileID: 645894582}
   - 198: {fileID: 645894584}
   - 199: {fileID: 645894583}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12198,7 +12218,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 656372253}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CamView_Driving
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12343,7 +12363,7 @@ GameObject:
   - 223: {fileID: 699857662}
   - 114: {fileID: 699857661}
   - 114: {fileID: 699857660}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: InstrumentDisplayCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12622,7 +12642,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 742050586}
   - 114: {fileID: 742050587}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Visualization
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12669,7 +12689,7 @@ GameObject:
   - 114: {fileID: 743299139}
   - 114: {fileID: 743299138}
   - 114: {fileID: 743299141}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: SongNameField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12859,7 +12879,7 @@ GameObject:
   - 224: {fileID: 751788659}
   - 222: {fileID: 751788661}
   - 114: {fileID: 751788660}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12999,7 +13019,7 @@ GameObject:
   - 224: {fileID: 773660299}
   - 222: {fileID: 773660301}
   - 114: {fileID: 773660300}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Checkmark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13495,7 +13515,7 @@ GameObject:
   - 222: {fileID: 834476438}
   - 114: {fileID: 834476437}
   - 114: {fileID: 834476436}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: CancelButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13818,7 +13838,7 @@ GameObject:
   - 224: {fileID: 850912526}
   - 222: {fileID: 850912528}
   - 114: {fileID: 850912527}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Placeholder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13999,7 +14019,7 @@ GameObject:
   - 224: {fileID: 863666240}
   - 222: {fileID: 863666242}
   - 114: {fileID: 863666241}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14468,7 +14488,7 @@ GameObject:
   - 224: {fileID: 894514199}
   - 222: {fileID: 894514201}
   - 114: {fileID: 894514200}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14613,9 +14633,11 @@ MonoBehaviour:
   primarySunsetColor: {r: 1, g: 1, b: 0, a: 1}
   secondarySunsetColor: {r: 1, g: 0.49803922, b: 0, a: 1}
   primaryNightColor: {r: 0.11764707, g: 0.20392159, b: 0.30588236, a: 1}
-  secondaryNightColor: {r: 0.25882354, g: 0.32156864, b: 0.4901961, a: 1}
+  secondaryNightColor: {r: 0, g: 0, b: 0, a: 1}
   primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
   secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
+  maxSunIntensity: 0
+  minSunIntensity: 1
 --- !u!1 &906108765
 GameObject:
   m_ObjectHideFlags: 0
@@ -14809,7 +14831,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 924040318}
   - 215: {fileID: 924040319}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Reflection Probe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15010,7 +15032,7 @@ GameObject:
   - 224: {fileID: 940595032}
   - 222: {fileID: 940595034}
   - 114: {fileID: 940595033}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15472,7 +15494,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 958589936}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15648,7 +15670,7 @@ GameObject:
   - 224: {fileID: 983082388}
   - 222: {fileID: 983082390}
   - 114: {fileID: 983082389}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15755,7 +15777,7 @@ GameObject:
   - 224: {fileID: 996081815}
   - 222: {fileID: 996081817}
   - 114: {fileID: 996081816}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16025,7 +16047,7 @@ GameObject:
   - 224: {fileID: 1008856832}
   - 222: {fileID: 1008856834}
   - 114: {fileID: 1008856833}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16129,7 +16151,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1025051311}
   - 114: {fileID: 1025051312}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16285,7 +16307,7 @@ GameObject:
   - 224: {fileID: 1035512245}
   - 222: {fileID: 1035512247}
   - 114: {fileID: 1035512246}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16425,7 +16447,7 @@ GameObject:
   - 224: {fileID: 1045526981}
   - 222: {fileID: 1045526983}
   - 114: {fileID: 1045526982}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16499,7 +16521,7 @@ GameObject:
   - 224: {fileID: 1052186130}
   - 222: {fileID: 1052186132}
   - 114: {fileID: 1052186131}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Checkmark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16648,7 +16670,7 @@ GameObject:
   - 114: {fileID: 1067672904}
   - 222: {fileID: 1067672903}
   - 114: {fileID: 1067672902}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16800,7 +16822,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1080503466}
   - 108: {fileID: 1080503467}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Light_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16969,7 +16991,7 @@ GameObject:
   - 114: {fileID: 1112486931}
   - 114: {fileID: 1112486930}
   - 114: {fileID: 1112486933}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: ChangeKeyButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17210,7 +17232,7 @@ GameObject:
   - 224: {fileID: 1120184622}
   - 222: {fileID: 1120184624}
   - 114: {fileID: 1120184623}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17278,7 +17300,7 @@ GameObject:
   - 222: {fileID: 1121296338}
   - 114: {fileID: 1121296337}
   - 114: {fileID: 1121296336}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: BackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17627,6 +17649,10 @@ Prefab:
       propertyPath: m_LocalScale.x
       value: -100
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e8bfe75317dba184fb982b5ddf84745d, type: 3}
   m_IsPrefabParent: 0
@@ -17959,7 +17985,7 @@ GameObject:
   - 222: {fileID: 1175178865}
   - 114: {fileID: 1175178864}
   - 114: {fileID: 1175178863}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Scrollbar Horizontal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18821,6 +18847,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -19021,7 +19051,7 @@ GameObject:
   - 222: {fileID: 1264361493}
   - 114: {fileID: 1264361492}
   - 114: {fileID: 1264361491}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: ShortSongWarningPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19398,7 +19428,7 @@ GameObject:
   - 4: {fileID: 1277712145}
   - 114: {fileID: 1277712146}
   - 120: {fileID: 1277712147}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Visualization (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19704,7 +19734,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1299636035}
   - 108: {fileID: 1299636036}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Light_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20093,7 +20123,8 @@ GameObject:
   - 114: {fileID: 1334809321}
   - 114: {fileID: 1334809322}
   - 114: {fileID: 1334809323}
-  m_Layer: 0
+  - 114: {fileID: 1334809324}
+  m_Layer: 9
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -20200,9 +20231,9 @@ MonoBehaviour:
   sunTransform: {fileID: 0}
   radialBlurIterations: 2
   sunColor: {r: 1, g: 1, b: 1, a: 1}
-  sunThreshold: {r: 0.87, g: 0.74, b: 0.65, a: 1}
-  sunShaftBlurRadius: 2.5
-  sunShaftIntensity: 1.15
+  sunThreshold: {r: 1, g: 1, b: 1, a: 1}
+  sunShaftBlurRadius: 2
+  sunShaftIntensity: 1
   maxRadius: 0.75
   useDepthTexture: 1
   sunShaftsShader: {fileID: 4800000, guid: d3b1c8c1036784176946f5cfbfb7fe4c, type: 3}
@@ -20213,13 +20244,13 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1334809314}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4975a6e437fc3b149a8cd508ce5bdd69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  threshold: 0.25
-  intensity: 0.75
+  threshold: 0.5
+  intensity: 0.25
   blurSize: 1
   blurIterations: 1
   blurType: 0
@@ -20243,6 +20274,38 @@ MonoBehaviour:
   heightDensity: 2
   startDistance: 10
   fogShader: {fileID: 4800000, guid: 70d8568987ac0499f952b54c7c13e265, type: 3}
+--- !u!114 &1334809324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1334809314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97e9b95cf609d96409b6c40519432957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  filterType: 2
+  preview: 0
+  previewScale: {x: 1, y: 1, z: 1}
+  movementScale: 0
+  rotationScale: 1
+  maxVelocity: 10
+  minVelocity: 0.1
+  velocityScale: 0.375
+  softZDistance: 0.005
+  velocityDownsample: 1
+  excludeLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  shader: {fileID: 4800000, guid: 85a88efa8c871af4a9d17c64791b6f4f, type: 3}
+  dx11MotionBlurShader: {fileID: 4800000, guid: f1b13d7a80660504a858ea24cfa418c6,
+    type: 3}
+  replacementClear: {fileID: 4800000, guid: 7699c5fbfa27745a1abe111ab7bf9785, type: 3}
+  noiseTexture: {fileID: 2800000, guid: 31f5a8611c4ed1245b18456206e798dc, type: 3}
+  jitter: 0.05
+  showVelocity: 0
+  showVelocityScale: 1
 --- !u!1001 &1337806173
 Prefab:
   m_ObjectHideFlags: 0
@@ -20293,6 +20356,10 @@ Prefab:
     - target: {fileID: 2300000, guid: c6a0e0e4c64237e46a342ec944e54ca5, type: 3}
       propertyPath: m_UseLightProbes
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: c6a0e0e4c64237e46a342ec944e54ca5, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c6a0e0e4c64237e46a342ec944e54ca5, type: 3}
@@ -20379,7 +20446,7 @@ GameObject:
   - 222: {fileID: 1344395454}
   - 114: {fileID: 1344395453}
   - 114: {fileID: 1344395452}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: RiffNameInputField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21290,7 +21357,7 @@ GameObject:
   - 222: {fileID: 1395670602}
   - 114: {fileID: 1395670601}
   - 114: {fileID: 1395670600}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: RiffSelectDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21484,7 +21551,7 @@ GameObject:
   - 222: {fileID: 1415144761}
   - 114: {fileID: 1415144760}
   - 114: {fileID: 1415144762}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: AddRiffPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21786,6 +21853,10 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
   m_IsPrefabParent: 0
@@ -21878,7 +21949,7 @@ GameObject:
   - 114: {fileID: 1437502263}
   - 114: {fileID: 1437502262}
   - 114: {fileID: 1437502265}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: SaveSongButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22194,7 +22265,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 1449829251}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22370,7 +22441,7 @@ GameObject:
   - 222: {fileID: 1478048000}
   - 114: {fileID: 1478047999}
   - 114: {fileID: 1478047998}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: ConfirmButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22606,7 +22677,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1501988302}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CamView_Chase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22635,7 +22706,7 @@ GameObject:
   - 224: {fileID: 1507672519}
   - 222: {fileID: 1507672521}
   - 114: {fileID: 1507672520}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23395,7 +23466,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1585738785}
   - 114: {fileID: 1585738786}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: SongArrangeMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23531,7 +23602,7 @@ GameObject:
   - 224: {fileID: 1589577489}
   - 222: {fileID: 1589577491}
   - 114: {fileID: 1589577490}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23600,7 +23671,7 @@ GameObject:
   - 222: {fileID: 1598446550}
   - 114: {fileID: 1598446549}
   - 114: {fileID: 1598446552}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Scroll View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24043,7 +24114,7 @@ GameObject:
   - 224: {fileID: 1609619179}
   - 222: {fileID: 1609619181}
   - 114: {fileID: 1609619180}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24110,7 +24181,7 @@ GameObject:
   - 224: {fileID: 1627327293}
   - 222: {fileID: 1627327295}
   - 114: {fileID: 1627327294}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24289,7 +24360,7 @@ GameObject:
   - 224: {fileID: 1643627758}
   - 222: {fileID: 1643627760}
   - 114: {fileID: 1643627759}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24356,7 +24427,7 @@ GameObject:
   - 224: {fileID: 1646935819}
   - 222: {fileID: 1646935821}
   - 114: {fileID: 1646935820}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24577,7 +24648,7 @@ GameObject:
   - 224: {fileID: 1665474791}
   - 222: {fileID: 1665474793}
   - 114: {fileID: 1665474792}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24800,7 +24871,7 @@ GameObject:
   - 224: {fileID: 1674090135}
   - 222: {fileID: 1674090137}
   - 114: {fileID: 1674090136}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25118,7 +25189,7 @@ GameObject:
   - 224: {fileID: 1692154284}
   - 222: {fileID: 1692154286}
   - 114: {fileID: 1692154285}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25253,7 +25324,7 @@ GameObject:
   - 224: {fileID: 1712714164}
   - 222: {fileID: 1712714166}
   - 114: {fileID: 1712714165}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Placeholder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26194,7 +26265,7 @@ GameObject:
   - 224: {fileID: 1845578494}
   - 222: {fileID: 1845578496}
   - 114: {fileID: 1845578495}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Instrument
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26265,7 +26336,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 1893654520}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26546,7 +26617,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1919180307}
   - 114: {fileID: 1919180308}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: ToggleLoopButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26689,7 +26760,7 @@ GameObject:
   - 224: {fileID: 1949362323}
   - 222: {fileID: 1949362325}
   - 114: {fileID: 1949362324}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27003,7 +27074,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1980634885}
   - 108: {fileID: 1980634886}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Point light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27066,7 +27137,7 @@ GameObject:
   - 222: {fileID: 2001066801}
   - 114: {fileID: 2001066800}
   - 114: {fileID: 2001066799}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Scrollbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27801,7 +27872,7 @@ GameObject:
   - 114: {fileID: 2036810860}
   - 222: {fileID: 2036810859}
   - 114: {fileID: 2036810858}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27881,7 +27952,7 @@ GameObject:
   - 224: {fileID: 2060657252}
   - 222: {fileID: 2060657254}
   - 114: {fileID: 2060657253}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27989,7 +28060,7 @@ GameObject:
   - 222: {fileID: 2073125413}
   - 114: {fileID: 2073125412}
   - 114: {fileID: 2073125411}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: ConfirmButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28500,7 +28571,7 @@ GameObject:
   - 224: {fileID: 2104321022}
   - 222: {fileID: 2104321024}
   - 114: {fileID: 2104321023}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Checkmark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28565,7 +28636,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 2107393831}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CamView_OutsideCar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28594,7 +28665,7 @@ GameObject:
   - 224: {fileID: 2121853819}
   - 222: {fileID: 2121853821}
   - 114: {fileID: 2121853820}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: Item Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

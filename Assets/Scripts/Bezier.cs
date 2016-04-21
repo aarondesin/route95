@@ -338,7 +338,7 @@ public class Bezier : MonoBehaviour{
 		GetComponent<MeshFilter> ().sharedMesh = mesh;
 		//GetComponent<MeshCollider> ().sharedMesh = mesh;
 
-		Debug.Log(GetComponent<MeshRenderer>().isVisible);
+		//Debug.Log(GetComponent<MeshRenderer>().isVisible);
 	}
 
 	private Vector3 BezDown (Vector3 direction) {
@@ -368,22 +368,22 @@ public class Bezier : MonoBehaviour{
 		Vector3 pointI = GetPoint (progressI);
 
 		newVertices.Add(pointI + w * -BezRight (GetDirection(progressI)));
-		newUVs.Add(new Vector2(0f, 0f));
+		newUVs.Add(new Vector2(-0.25f, 0f));
 		int leftDownI = 0;
 
 		newVertices.Add(pointI + w * BezRight (GetDirection(progressI)));
-		newUVs.Add(new Vector2(0f, 1f));
+		newUVs.Add(new Vector2(1.25f, 0f));
 		int rightDownI = 1;
 
 		newVertices.Add(pointI + slope * w * -BezRight (GetDirection(progressI)) + h * -BezDown(GetDirection(progressI)));
-		newUVs.Add(new Vector2(0f, 0f));
+		newUVs.Add(new Vector2(1-slope-0.25f, 0f));
 		int leftUpI = 2;
 
 		newVertices.Add(pointI + slope * w * BezRight (GetDirection(progressI)) + h * -BezDown(GetDirection(progressI)));
-		newUVs.Add(new Vector2(0f, 1f));
+		newUVs.Add(new Vector2(slope+0.25f, 1f));
 		int rightUpI = 3;
 
-		//bool flipUVs = true;
+		bool flipUVs = true;
 
 		for (int i = 1; i<steps; i++) {
 			int num = i;
@@ -392,66 +392,59 @@ public class Bezier : MonoBehaviour{
 			Vector3 pointF = GetPoint (progressF);
 
 			newVertices.Add(pointF + w * -BezRight (GetDirection(progressF)));
-			newUVs.Add(new Vector2(0f, 0f));
+			newUVs.Add(
+				(flipUVs ? new Vector2(-0.25f, 1f) : new Vector2 (-0.25f, 0f))
+			);
 			int leftDownF = num * 4;
 
 			newVertices.Add(pointF + w * BezRight (GetDirection(progressF)));
-			newUVs.Add(new Vector2(0f, 0f));
+			newUVs.Add(
+				(flipUVs ? new Vector2(1.25f, 1f) : new Vector2 (1.25f, 0f))
+			);
 			int rightDownF = num * 4 + 1;
 
 			newVertices.Add(pointF + slope * w * -BezRight (GetDirection(progressF)) + h * -BezDown(GetDirection(progressI)));
-			newUVs.Add(new Vector2(0f, 0f));
+			newUVs.Add(
+				(flipUVs ? new Vector2(1-slope-0.25f, 1f) : new Vector2 (1-slope-0.25f, 0f))
+			);
 			int leftUpF = num * 4 + 2;
 
 			newVertices.Add(pointF + slope * w * BezRight (GetDirection(progressF)) + h * -BezDown(GetDirection(progressI)));
-			newUVs.Add(new Vector2(0f, 0f));
+			newUVs.Add(
+				(flipUVs ? new Vector2(slope+0.25f, 1f) : new Vector2 (slope+0.25f, 0f))
+			);
 			int rightUpF = num * 4 + 3;
+
 
 			// Left slope
 			newTriangles.Add (leftDownI);
 			newTriangles.Add (leftUpI);
-
 			newTriangles.Add (leftDownF);
-
-
-
-
 
 			newTriangles.Add (leftDownF);
 			newTriangles.Add (leftUpI);
-
 			newTriangles.Add (leftUpF);
-
 
 
 			// Right slope
 			newTriangles.Add (rightUpI);
 			newTriangles.Add (rightDownI);
-
 			newTriangles.Add (rightDownF);
 
 			newTriangles.Add (rightUpF);
 			newTriangles.Add (rightUpI);
 			newTriangles.Add (rightDownF);
-
-
-
 
 
 			// Road surface plane
 			newTriangles.Add (leftUpF);
 			newTriangles.Add (rightUpI);
 			newTriangles.Add (rightUpF);
-
-
+		
 			newTriangles.Add (leftUpI);
 			newTriangles.Add (rightUpI);
 			newTriangles.Add (leftUpF);
-
-
-
-
-
+		
 
 			progressI = progressF;
 			pointI = pointF;
@@ -459,6 +452,8 @@ public class Bezier : MonoBehaviour{
 			rightDownI = rightDownF;
 			leftUpI = leftUpF;
 			rightUpI = rightUpF;
+
+			flipUVs = !flipUVs;
 		}
 
 		verts = newVertices;

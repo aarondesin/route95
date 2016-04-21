@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
@@ -63,6 +64,9 @@ public class WorldManager : MonoBehaviour {
 
 	public Color primarySunriseColor;
 	public Color secondarySunriseColor;
+
+	public float maxSunIntensity;
+	public float minSunIntensity;
 
 	float startLoadTime;
     bool loaded = false;
@@ -160,7 +164,6 @@ public class WorldManager : MonoBehaviour {
 			float lerpValue = timeOfDay / (Mathf.PI / 2);
 			primaryColor = Color.Lerp (primarySunriseColor, primaryDayColor, lerpValue);
 			secondaryColor = Color.Lerp (secondarySunriseColor, secondaryDayColor, lerpValue);
-
 		// Noon to sunset
 		} else if ((timeOfDay >= (Mathf.PI / 2)) && (timeOfDay < Mathf.PI)) {
 			float lerpValue = (timeOfDay - Mathf.PI / 2) / (Mathf.PI / 2);
@@ -180,6 +183,7 @@ public class WorldManager : MonoBehaviour {
 			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
 		}
 
+		sun.GetComponent<Light>().intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : minSunIntensity;
 		sun.GetComponent<Light>().color = primaryColor;
 		RenderSettings.fogColor = secondaryColor;
 
@@ -257,6 +261,7 @@ public class WorldManager : MonoBehaviour {
 		//road.AddComponent<MeshCollider> ();
 		road.AddComponent<MeshRenderer>();
 		road.GetComponent<MeshRenderer>().material = roadMaterial;
+		road.GetComponent<MeshRenderer>().reflectionProbeUsage = ReflectionProbeUsage.Off;
 		road.AddComponent<Bezier> ();
 		road.GetComponent<Bezier>().ROAD_WIDTH = ROAD_WIDTH;
 		road.GetComponent<Bezier>().ROAD_HEIGHT = ROAD_HEIGHT;
