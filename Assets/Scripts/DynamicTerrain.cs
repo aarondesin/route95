@@ -280,7 +280,7 @@ public class DynamicTerrain {
 			heightmap[x].Add(y, v);
 		else heightmap[x][y] = v;
 
-		Vertex.Vertices[x][y].SetHeight(v);
+		//Vertex.Vertices[x][y].SetHeight(v);
 	}
 
 	/*public void WriteHeightMap (int i, float v) {

@@ -2,6 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public class IntVector2 {
+	public int x;
+	public int y;
+
+}
+
 public class VertexMap {
 	public Dictionary<int, Dictionary<int, Vertex>> vertices; 
 
