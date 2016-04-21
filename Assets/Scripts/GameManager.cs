@@ -244,6 +244,7 @@ public class GameManager : MonoBehaviour {
 	public void GoToSongArrangeMenu () {
 		HideAll ();
 		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		Show (songArrangeMenu);
 		SongArrangeSetup.instance.Refresh();
 		SongTimeline.instance.RefreshTimeline();
 	}
@@ -267,6 +268,7 @@ public class GameManager : MonoBehaviour {
 
 	public void ShowAll () {
 		Show (playlistMenu);
+		Show (songArrangeMenu);
 
 		Show (addRiffPrompt);
 		Show (loadPrompt);

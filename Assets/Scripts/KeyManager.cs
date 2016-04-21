@@ -24,19 +24,21 @@ public class KeyManager : MonoBehaviour {
 		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>>();
 		foreach (Key key in Enum.GetValues(typeof(Key))) {
 			//Debug.Log(key.ToString());
-			
-			scales.Add (key, new Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>());
-			foreach (ScaleInfo scale in ScaleInfo.AllScales) {
-				//Debug.Log(scale.scaleIndex);
-				
-				scales[key].Add (scale, new Dictionary<Instrument, Scale>());
-				foreach (Instrument instrument in Instrument.AllInstruments) {
-					if (instrument.type == InstrumentType.Melodic) {
-						//Debug.Log(instrument.codeName);
-						scales[key][scale].Add (instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, instrument.startingNote[key]));
-					}
-				}
 
+			if (key != Key.None) {
+				scales.Add (key, new Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>());
+				foreach (ScaleInfo scale in ScaleInfo.AllScales) {
+					//Debug.Log(scale.scaleIndex);
+					
+					scales[key].Add (scale, new Dictionary<Instrument, Scale>());
+					foreach (Instrument instrument in Instrument.AllInstruments) {
+						if (instrument.type == InstrumentType.Melodic) {
+							//Debug.Log(instrument.codeName);
+							scales[key][scale].Add (instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, instrument.startingNote[key]));
+						}
+					}
+
+				}
 			}
 
 		}

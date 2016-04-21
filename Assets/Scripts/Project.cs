@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 [System.Serializable]
 public class Project {
-	public const int MAX_SONGS = 16;
-	public const int MAX_RIFFS = 128;
+	const int MAX_SONGS = 16;
+	const int MAX_RIFFS = 128;
 
 	[SerializeField]
 	public string name;
@@ -24,6 +24,13 @@ public class Project {
 
 	public void AddSong (Song song) {
 		songs.Add(song);
+	}
+
+	// Refresh references after loading
+	public void Refresh () {
+		foreach (Riff riff in riffs) {
+			riff.instrument = Instrument.AllInstruments[riff.instrumentIndex];
+		}
 	}
 
 	/*public void RemoveSongAt (int i) {

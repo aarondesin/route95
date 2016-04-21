@@ -103,6 +103,8 @@ public class MusicManager : MonoBehaviour {
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
 		tempo = Tempo.Medium;
+		Instrument.LoadInstruments ();
+
 	}
 
 	public void Load() {
@@ -130,7 +132,7 @@ public class MusicManager : MonoBehaviour {
 	void LoadInstruments () {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
-		Instrument.LoadInstruments ();
+
 
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
