@@ -9,8 +9,11 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public static InstrumentSetup instance;
 
+	public static Riff currentRiff; // current riff being edited
+
 	public RiffAI riffai;
-	public static bool DICKSAUCE = true;
+
+	public const int MAX_NUMNOTES = 8; // maximum number of notes (rows)
 
 	// Icons for percussion setup buttons
 	public Sprite percussionEmpty;
@@ -22,23 +25,8 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite melodicFilled;
 	public Sprite melodicSuggested;
 
-	// Icons for instruments
-	public Sprite kickIcon;
-	public Sprite snareIcon;
-	public Sprite tomIcon;
-	public Sprite hatIcon;
-
-	public Sprite castinetsIcon;
-	public Sprite clavesIcon;
-	public Sprite cowbellIcon;
-	public Sprite jamBlockIcon;
-	public Sprite maracasIcon;
-	public Sprite tambourineIcon;
-
-	public static Riff currentRiff; // current riff being edited
-
 	public static float baseButtonScale = 1f; // base button sizes
-	public static int MAX_NUMNOTES = 8; // maximum number of notes (rows)
+
 	public static int numRows;
 	public static int subdivsShown = 2; // number of subdivisions to show
 	public int octavesShown = 2;
@@ -53,8 +41,6 @@ public class InstrumentSetup : MonoBehaviour {
 	public InputField nameInputField;
 
 	public GameObject playRiffButton;
-	public Sprite play;
-	public Sprite pause;
 
 	public GameObject beatsText;
 	public Text tempoText;
@@ -85,34 +71,39 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
-		Cleanup();
-		if (currentRiff == null) currentRiff = MusicManager.instance.currentProject.riffs[0];
-		nameInputField.text = currentRiff.name;
-		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
-		MakeBeatNumbers ();
-		if (currentRiff.instrument.type == InstrumentType.Percussion) {
-			InitializePercussionSetup (currentRiff.instrument);
-		} else if (currentRiff.instrument.type == InstrumentType.Melodic) {
-			InitializeMelodicSetup (currentRiff.instrument);
-		} else {
-			Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
+		if (currentRiff == null) {
+			Debug.LogError ("InstrumentSetup.Initialize(): no riff selected!");
+			return;
 		}
-		scrollBarH.value = 0.01f;
-		scrollBarV.value = 0.99f;
-		playRiffButton.GetComponent<Image>().sprite = play;
+
+		// Clear all previous buttons
+		Cleanup();
+
+		// Set up riff editor properties
+		nameInputField.text = currentRiff.name;
+		playRiffButton.GetComponent<Image>().sprite = GameManager.instance.playIcon;
+		MakeBeatNumbers ();
 		UpdateBeatsText();
 		UpdateTempoText();
+		scrollBarH.value = 0.01f;
+		scrollBarV.value = 0.99f;
+
+		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+
+		// Create note buttons
+		if (currentRiff.instrument.type == InstrumentType.Percussion)
+			InitializePercussionSetup ((PercussionInstrument)currentRiff.instrument);
+		else if (currentRiff.instrument.type == InstrumentType.Melodic)
+			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
+		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
+
 	}
 
 	// Removes all existing buttons
 	public void Cleanup () {
-		foreach (GameObject button in buttons) {
-			Destroy(button);
-		}
+		foreach (GameObject button in buttons) Destroy(button);
 		buttons.Clear();
-		foreach (List<GameObject> list in buttonGrid) {
-			list.Clear();
-		}
+		foreach (List<GameObject> list in buttonGrid) list.Clear();
 	}
 
 	public void MakeBeatNumbers () {
@@ -128,34 +119,14 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	// Initializes a percussion setup menu
-	void InitializePercussionSetup (Instrument percInst) {
-		switch (percInst.codeName) {
-		case "RockDrums":
-			// Make rows of buttons for drums
-			numNotes = 5;
-			MakePercussionButtons ("Kick", 0, "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", kickIcon);
-			MakePercussionButtons ("Snare", 1, "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", snareIcon);
-			MakePercussionButtons ("Tom", 2, "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom", tomIcon);
-			MakePercussionButtons ("Hat", 3, "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", hatIcon);
-			MakePercussionButtons ("Crash", 4, "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", hatIcon);
-			break;
-		case "ExoticPercussion":
-			numNotes = 8;
-			MakePercussionButtons ("Castinets", 0, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets", castinetsIcon);
-			MakePercussionButtons ("Claves", 1, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", clavesIcon);
-			MakePercussionButtons ("Cowbell", 2, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", cowbellIcon);
-			MakePercussionButtons ("Cowbell2", 3, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", cowbellIcon);
-			MakePercussionButtons ("Jam Block", 4, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", jamBlockIcon);
-			MakePercussionButtons ("Maracas", 5, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas", maracasIcon);
-			MakePercussionButtons ("Maracas2", 6, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", maracasIcon);
-			MakePercussionButtons ("Tambourine", 7, "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", tambourineIcon);
-			break;
-		}
-
+	void InitializePercussionSetup (PercussionInstrument percInst) {
+		int i=0;
+		foreach (string note in KeyManager.instance.percussionSets[percInst]) 
+			MakePercussionButtons (note, i++, note, percInst.icons[note]);
 	}
 
 	// Initializes a melodic setup menu
-	void InitializeMelodicSetup (Instrument meloInst) {
+	void InitializeMelodicSetup (MelodicInstrument meloInst) {
 		buttonGrid.Clear();
 		for(int n = 0; n<(int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS); n++) {
 			buttonGrid.Add(new List<GameObject>());
@@ -163,13 +134,11 @@ public class InstrumentSetup : MonoBehaviour {
 		//int i = 0;
 
 		maxOctaves = (int)Mathf.CeilToInt( (float)(Sounds.soundsToLoad[currentRiff.instrument.codeName].Count) / 12f);
-		Debug.Log(maxOctaves);
 		if (maxOctaves < octavesShown) octavesShown = maxOctaves;
+
 		Key key = MusicManager.instance.currentSong.key;
 		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
-		//foreach (string note in KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes) {
-		//foreach (string note in Sounds.soundsToLoad[currentRiff.instrument.codeName]) {
-		int startIndex = currentRiff.instrument.startingNote[key];
+		int startIndex = meloInst.startingNote[key];
 		int totalNotes = Sounds.soundsToLoad[currentRiff.instrument.codeName].Count;
 		numNotes = startIndex + 12 * octavesShown + 1;
 
@@ -180,7 +149,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 		for (int i = startIndex; i < numNotes && i < totalNotes; i++) {
 			string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i];
-			bool inScale = KeyManager.instance.scales[key][scale][currentRiff.instrument].allNotes.Contains(note);
+			bool inScale = KeyManager.instance.scales[key][scale][meloInst].allNotes.Contains(note);
 			MakeMelodicButtons (note.Split('_')[1], i, note, inScale);
 			//i++;
 		}
@@ -200,6 +169,7 @@ public class InstrumentSetup : MonoBehaviour {
 		);
 		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
 		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
 
 		// Make icon for note
 		buttons.Add(MakeIcon (title, iconGraphic, 
@@ -212,6 +182,9 @@ public class InstrumentSetup : MonoBehaviour {
 
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
 			int num = i;
+			bool noteExists = currentRiff.Lookup(soundName, num);
+			float vol = 1f;
+			if (noteExists) vol = currentRiff.VolumeOfNote(soundName, num);
 			GameObject bt = MakeButton(title+"_"+i, 
 				(currentRiff.Lookup(soundName, num) ? percussionFilled : percussionEmpty),
 				GetComponent<RectTransform>(),
@@ -221,23 +194,51 @@ public class InstrumentSetup : MonoBehaviour {
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
-			float vol = 1f;
+			bt.tag = "StopScrolling";
+			bt.AddComponent<NoteButton>();
 			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-				vol = 0.9f;
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-				vol = 0.8f;
 			}
+				
+			Note note = new Note (soundName, vol, 1f);
+			GameObject volume = UI.MakeImage(title+"_volume");
+			volume.GetComponent<RectTransform>().SetParent(bt.GetComponent<RectTransform>());
+			volume.GetComponent<RectTransform>().sizeDelta = bt.GetComponent<RectTransform>().sizeDelta * 1.3f;
+			volume.GetComponent<RectTransform>().localScale = bt.GetComponent<RectTransform>().localScale * 1.3f;
+			volume.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.5f);
+			volume.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.5f);
+			volume.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			volume.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
+			volume.GetComponent<Image>().type = Image.Type.Filled;
+			if (vol != 1f) Debug.Log(vol);
+			volume.GetComponent<Image>().fillAmount = vol;
+
+
+			bt.GetComponent<NoteButton>().targetNote = note;
+			bt.GetComponent<NoteButton>().volumeImage = volume.GetComponent<Image>();
+
+			bt.AddComponent<ShowHide>();
+			bt.GetComponent<ShowHide>().objects = new List<GameObject>() { volume};
+			bt.GetComponent<ShowHide>().transitionType = TransitionType.Instant;
+			bt.GetComponent<ShowHide>().enabled = InstrumentSetup.currentRiff.Lookup(note, num);
+
+			volume.SetActive(false);
+
+
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);
+				InstrumentSetup.currentRiff.Toggle(note, num);
+				bt.GetComponent<ShowHide>().enabled = InstrumentSetup.currentRiff.Lookup(note, num);
 				// (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
+
 			buttons.Add(bt);
 			buttonGrid[i].Add(bt);
+			buttons.Add(volume);
 		}
 	}
 
@@ -402,8 +403,9 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	public void TogglePlayRiffButton () {
-		if (playRiffButton.GetComponent<Image>().sprite == play) playRiffButton.GetComponent<Image>().sprite = pause;
-		else playRiffButton.GetComponent<Image>().sprite = play;
+		if (playRiffButton.GetComponent<Image>().sprite == GameManager.instance.playIcon) 
+			playRiffButton.GetComponent<Image>().sprite = GameManager.instance.pauseIcon;
+		else playRiffButton.GetComponent<Image>().sprite = GameManager.instance.playIcon;
 	}
 
 	void UpdateBeatsText() {
@@ -422,7 +424,7 @@ public class InstrumentSetup : MonoBehaviour {
 		Key key = MusicManager.instance.currentSong.key;
 		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
 
-		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [key][scale][currentRiff.instrument], subdivsShown);
+		int posY = riffai.FindHintYPosition (currentRiff, KeyManager.instance.scales [key][scale][(MelodicInstrument)currentRiff.instrument], subdivsShown);
 		Debug.Log ("posY = " + posY);
 		if (posX >= buttonGrid.Count || posX < 0) {
 			Debug.Log ("Suggestion X out of bounds!");
@@ -452,7 +454,7 @@ public class InstrumentSetup : MonoBehaviour {
 	void Suggest (GameObject button) {
 		Debug.Log ("in Suggest");
 		Sprite img = button.GetComponent<Image>().sprite;
-		if (currentRiff.instrument == Instrument.RockDrums && img != percussionFilled) {
+		if (currentRiff.instrument.type == InstrumentType.Percussion && img != percussionFilled) {
 			button.GetComponent<Image>().sprite = percussionSuggested;
 		} else if (img != melodicFilled) {
 			button.GetComponent<Image>().sprite  = melodicSuggested;

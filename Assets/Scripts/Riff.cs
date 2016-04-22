@@ -56,74 +56,6 @@ public class Riff {
 		instrument = Instrument.AllInstruments[instrumentIndex];
 	}
 
-	/*// Loading from a string
-	public Riff (string instrumentString) {
-		currentInstrument = (Instrument)Enum.Parse (typeof(Instrument), instrumentString);
-	}*/
-
-	/*public Riff (string loadString) {
-
-		string[] vars= loadString.Split (new char[]{save_load.itemSeparator,save_load.noteSeparator});
-
-		LoadName(vars [0]);
-		//Debug.Log ("Riff name: " + name);
-		instrument = (Instrument)Enum.Parse (typeof(Instrument), vars [1]);
-		//Debug.Log ("Instrument: " + (string)Enum.GetName (typeof(Instrument), (int)instrument));
-		cutSelf = (vars [2] == "True" ? true : false);
-		//Debug.Log ("cutSelf: " + cutSelf.ToString ());
-		if (!int.TryParse(vars[3], out beatsShown)) {
-			throw new FailedToLoadException ("Riff.beatsShown invalid");
-		}
-		int currentBeat = 0; // current beat being loaded in
-		for (int i=3; i<vars.Length && vars[i] != ""; i++) {
-			//Debug.Log ("Parsing " + vars[i]);
-			int itemval;
-			if (!int.TryParse(vars[i], out itemval)) {
-				//Debug.Log("Note "+vars[i]+" at "+currentBeat);
-				notes [currentBeat].Add (new Note (vars[i]));
-				//newRiff.notes[currentBeat].Add (Note.LoadNote (item));
-			} else {
-				//int itemval;
-				bool beat = int.TryParse (vars[i],out itemval);
-				if (beat == false) {
-					//Debug.Log (vars[i] + "not a number");
-				} else {
-					currentBeat = itemval;
-					while (currentBeat >= notes.Count) {
-						notes.Add(new List<Note>());
-					}
-					//Debug.Log ("Now on beat " + itemval);
-				}
-			}
-		}
-		//copy = MusicManager.instance.CopyNumber(name);
-	}*/
-
-	/*public void LoadName (string str) {
-		Debug.Log("LoadName("+str+")");
-		string[] split = str.Split(new char[]{'(',')'});
-		int cpy;
-		for (int j=split.Length-1; j>=0; j--) {
-			if (int.TryParse(split[j], out cpy)) {
-				Debug.Log("is a copy");
-
-				name = "";
-				string[] split2 = str.Split('(');
-				for (int i=0; i<split2.Length-1; i++) {
-					if (i!=0) name += "(";
-					name += split2[i];
-				}
-				//copy = MusicManager.instance.CopyNumber(name);
-				return;
-			}
-		}
-		name = str;
-
-		Debug.Log(str);
-		Debug.Log(name);
-		Debug.Log(copy);
-	}*/
-
 	public int Length () {
 		return beats.Count;
 	}
@@ -146,6 +78,17 @@ public class Riff {
 			return false;
 		}
 	}
+
+	public float VolumeOfNote(string soundName, int pos) {
+		foreach (Note note in beats[pos].notes) {
+			if (note.filename == soundName) {
+				Debug.Log (note.volume);
+				return note.volume;
+			}
+		}
+		return 1f;
+	}
+		
 
 	public void RemoveNote (Note newNote, int pos) {
 		foreach (Note note in beats[pos].notes) {

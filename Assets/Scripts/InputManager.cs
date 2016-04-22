@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,30 +9,30 @@ public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
 
-	[SerializeField]
-	GameObject selected;
+	public GameObject selected;
+	Vector3 clickPosition;
 	//EventSystem eventSystem;
 
 	public List<AudioSource> audioSources;
+
+	public List<ScrollRect> scrollviews;
 
 	// 0: lick system
 	// 1: single-note system
 	private int LiveSystem = 1;
 
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
-		{ KeyCode.Alpha1, Instrument.RockDrums },
-		{ KeyCode.Alpha2, Instrument.ExoticPercussion },
-		{ KeyCode.Alpha3, Instrument.ElectricGuitar },
-		{ KeyCode.Alpha4, Instrument.ElectricBass },
-		{ KeyCode.Alpha5, Instrument.AcousticGuitar },
-		{ KeyCode.Alpha6, Instrument.ClassicalGuitar },
-		{ KeyCode.Alpha7, Instrument.PipeOrgan },
-		{ KeyCode.Alpha8, Instrument.Keyboard },
-		{ KeyCode.Alpha9, Instrument.Trumpet }
+		{ KeyCode.Alpha1, PercussionInstrument.RockDrums },
+		{ KeyCode.Alpha2, PercussionInstrument.ExoticPercussion },
+		{ KeyCode.Alpha3, MelodicInstrument.ElectricGuitar },
+		{ KeyCode.Alpha4, MelodicInstrument.ElectricBass },
+		{ KeyCode.Alpha5, MelodicInstrument.AcousticGuitar },
+		{ KeyCode.Alpha6, MelodicInstrument.ClassicalGuitar },
+		{ KeyCode.Alpha7, MelodicInstrument.PipeOrgan },
+		{ KeyCode.Alpha8, MelodicInstrument.Keyboard },
+		{ KeyCode.Alpha9, MelodicInstrument.Trumpet }
 	};
-
-	public Dictionary<Instrument, AudioClip> instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>();
-
+		
 	public static Dictionary<KeyCode, int> keyToLick = new Dictionary<KeyCode, int>() {
 		{ KeyCode.Q, 0 },
 		{ KeyCode.W, 1 },
@@ -71,17 +72,6 @@ public class InputManager : MonoBehaviour {
 
 	void Start () {
 		instance = this;
-		instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>() {
-			{ Instrument.RockDrums, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums") },
-			{ Instrument.ExoticPercussion, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums") },
-			{ Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
-			{ Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.AcousticGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.ClassicalGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.PipeOrgan, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.Keyboard, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.Trumpet, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
-		};
 		audioSources = new List<AudioSource>();
 		for (int i=0; i<26; i++) {
 			GameObject obj = new GameObject();
@@ -145,9 +135,9 @@ public class InputManager : MonoBehaviour {
 									note.PlayNote(audioSources[keyToNote[keyPress]], false);
 								}
 							} else {
-								noteIndex = KeyManager.instance.scales[key][scale][inst].allNotes.Count-1-keyToNote[keyPress];
+								noteIndex = KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes.Count-1-keyToNote[keyPress];
 								if (noteIndex >= 0) {
-									Note note = new Note(KeyManager.instance.scales[key][scale][inst].allNotes[noteIndex]);
+									Note note = new Note(KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes[noteIndex]);
 									//note.PlayNote(MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument], true);
 									if (note != null)
 										note.PlayNote(audioSources[keyToNote[keyPress]], true);
@@ -175,19 +165,51 @@ public class InputManager : MonoBehaviour {
 				}*/
 			}
 		} else if (GameManager.instance.currentMode == Mode.Setup) {
-			if (Input.GetMouseButtonDown(0)) {
-				selected = EventSystem.current.currentSelectedGameObject;
-				Debug.Log(selected);
-			} else if (Input.GetMouseButtonUp(0)) {
+			if (Input.GetMouseButtonUp(0)) {
+				if (selected != null) {
+					if (selected.GetComponent<DraggableButton>() != null) {
+						selected.GetComponent<DraggableButton>().OnMouseUp();
+					}
+				}
 				selected = null;
+				UnfreezeAllScrollviews();
+				clickPosition = Vector3.zero;
+			} else if (Input.GetMouseButtonDown(0)) {
+				selected = EventSystem.current.currentSelectedGameObject;
+				if (selected != null) {
+					if (selected.tag == "StopScrolling") FreezeAllScrollviews();
+					clickPosition = Input.mousePosition;
+					if (selected.GetComponent<DraggableButton>() != null) {
+						selected.GetComponent<DraggableButton>().OnMouseDown();
+					}
+					Debug.Log(selected);
+				}
+			} else {
+				if (selected) {
+					if (selected.GetComponent<DraggableButton>() != null) {
+						selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - clickPosition);
+					}
+				}
 			}
+		}
+	}
+
+	void FreezeAllScrollviews () {
+		foreach (ScrollRect scrollview in scrollviews) {
+			scrollview.enabled = false;
+		}
+	}
+
+	void UnfreezeAllScrollviews () {
+		foreach (ScrollRect scrollview in scrollviews) {
+			scrollview.enabled = true;
 		}
 	}
 
 	void SwitchInstrument (Instrument instrument) {
 		if (instrument != MusicManager.instance.currentInstrument) {
 			MusicManager.instance.currentInstrument = instrument;
-			MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(instrumentSwitchSounds[instrument]);
+			MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(instrument.switchSound);
 			Debug.Log (MusicManager.instance.currentInstrument);
 			InstrumentDisplay.instance.Refresh();
 		}

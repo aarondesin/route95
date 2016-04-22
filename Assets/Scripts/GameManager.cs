@@ -59,9 +59,12 @@ public class GameManager : MonoBehaviour {
 	public Sprite arrowIcon;
 	public Sprite addIcon;
 	public Sprite editIcon;
+	public Sprite playIcon;
+	public Sprite pauseIcon;
 	public Sprite loadIcon;
 	public Sprite removeIcon;
 	public Sprite circleIcon;
+	public Sprite volumeIcon;
 
 	public int loadingSpeed;
 	public GameObject loadingScreen;

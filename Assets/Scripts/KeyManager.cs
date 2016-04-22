@@ -7,7 +7,7 @@ public class KeyManager : MonoBehaviour {
 
 	public static KeyManager instance;
 
-	public Dictionary<Key, Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>> scales;
+	public Dictionary<Key, Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>> scales;
 	public Dictionary<Instrument, List<string>> percussionSets;
 
 	void Start () {
@@ -17,24 +17,24 @@ public class KeyManager : MonoBehaviour {
 
 	public void BuildScales () {
 		percussionSets = new Dictionary<Instrument, List<string>>() {
-			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
-			{ Instrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
+			{ PercussionInstrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
+			{ PercussionInstrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
 		};
 
-		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>>();
+		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>>();
 		foreach (Key key in Enum.GetValues(typeof(Key))) {
 			//Debug.Log(key.ToString());
 
 			if (key != Key.None) {
-				scales.Add (key, new Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>());
+				scales.Add (key, new Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>());
 				foreach (ScaleInfo scale in ScaleInfo.AllScales) {
 					//Debug.Log(scale.scaleIndex);
 					
-					scales[key].Add (scale, new Dictionary<Instrument, Scale>());
+					scales[key].Add (scale, new Dictionary<MelodicInstrument, Scale>());
 					foreach (Instrument instrument in Instrument.AllInstruments) {
 						if (instrument.type == InstrumentType.Melodic) {
 							//Debug.Log(instrument.codeName);
-							scales[key][scale].Add (instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, instrument.startingNote[key]));
+							scales[key][scale].Add ((MelodicInstrument)instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, ((MelodicInstrument)instrument).startingNote[key]));
 						}
 					}
 

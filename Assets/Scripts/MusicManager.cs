@@ -44,7 +44,7 @@ public class MusicManager : MonoBehaviour {
 
 	// --Global Music Properties-- //
 	//public Key currentKey = Key.EMajor; // value will be passed from key button
-	public Instrument currentInstrument = Instrument.ElectricGuitar;
+	public Instrument currentInstrument = MelodicInstrument.ElectricGuitar;
 	public Song currentSong;
 	public int currentPlayingSong;
 	public bool loopSong = false; // loop song in live mode?
@@ -159,9 +159,9 @@ public class MusicManager : MonoBehaviour {
 
 
 		}
-		instrumentAudioSources[Instrument.ElectricGuitar].volume = 0.25f;
-		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
-		instrumentAudioSources[Instrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
+		instrumentAudioSources[MelodicInstrument.ElectricGuitar].volume = 0.25f;
+		instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
+		instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
 
 	void LoadScales () {

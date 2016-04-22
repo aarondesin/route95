@@ -316,10 +316,8 @@ public class Bezier : MonoBehaviour{
 		mesh.Optimize();
 		
 		//mesh.vertices = vertices.ToArray ();
-		Debug.Log (mesh.vertices.Length);
 
 		//mesh.triangles = triangles.ToArray ();
-		Debug.Log (mesh.triangles.Length);
 
 		//mesh.uv = uvs.ToArray ();
 

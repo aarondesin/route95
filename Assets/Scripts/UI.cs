@@ -4,19 +4,58 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum TransitionType {
+	Instant,
+	Fade
+}
+
 public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 	public List<GameObject> objects;
+	public TransitionType transitionType = TransitionType.Instant;
+
+	public float fadeSpeed;
+	List<IEnumerator> activeFades;
 
 	public void OnPointerEnter (PointerEventData eventData) {
-		if (objects != null)
-			foreach (GameObject obj in objects) obj.SetActive(true);
-		//Debug.Log("OnPointerEnter", gameObject);
+		if (objects != null && InputManager.instance.selected == null) {
+			foreach (GameObject obj in objects) {
+				switch (transitionType) {
+					case TransitionType.Instant:
+						obj.SetActive(true);
+						break;
+				case TransitionType.Fade:
+					if (activeFades == null) activeFades = new List<IEnumerator>();
+					IEnumerator temp = Fade(obj);
+					activeFades.Add(temp);
+					StartCoroutine (temp);
+					break;
+				}
+			}
+		}
 	}
 
 	public void OnPointerExit (PointerEventData eventData) {
-		if (objects != null)
-			foreach (GameObject obj in objects) obj.SetActive(false);
-		//Debug.Log("OnPointerExit", gameObject);
+		if (objects != null && InputManager.instance.selected == null) {
+			foreach (GameObject obj in objects) {
+				switch (transitionType) {
+				case TransitionType.Instant:
+					obj.SetActive(false);
+					break;
+				case TransitionType.Fade:
+					foreach (IEnumerator fade in activeFades)
+						StopCoroutine (fade);
+					activeFades.Clear();
+					break;
+				}
+			}
+		}
+	}
+
+	public IEnumerator Fade (GameObject target) {
+		for (float a = 0f; a < 1.0f; a += fadeSpeed) {
+			target.GetComponent<Image>().color = new Color (1, 1, 1f, a);
+			yield return null;
+		}
 	}
 }
 
@@ -55,6 +94,7 @@ public class UI : MonoBehaviour {
 			typeof (CanvasRenderer),
 			typeof (Text)
 		);
+		text.GetComponent<Text>().resizeTextForBestFit = true;
 		return text;
 	}
 
