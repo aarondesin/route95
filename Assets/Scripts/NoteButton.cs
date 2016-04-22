@@ -23,6 +23,10 @@ public class NoteButton : DraggableButton {
 		oldVolume = targetNote.volume;
 	}
 
+	public override void OnMouseUp() {
+		Debug.Log(targetNote.volume);
+	}
+
 	public override void DragDown (float actionRatio) {
 		//targetNote.volume += 0.5f - (actionRatio / 2f);
 		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);

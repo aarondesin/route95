@@ -24,6 +24,7 @@ public class DraggableButton : MonoBehaviour {
 	}
 
 	public virtual void OnMouseDown () {}
+	public virtual void OnMouseUp () {}
 
 	public virtual void DragLeft (float actionRatio) {}
 	public virtual void DragRight (float actionRatio) {}

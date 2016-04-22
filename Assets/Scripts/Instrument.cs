@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -24,14 +25,70 @@ public class Instrument {
 	public InstrumentFamily family;
 
 	public Sprite icon;
-	private string iconPath;
+	protected string iconPath;
 
 	public Sprite glow;
-	private string glowPath;
+	protected string glowPath;
 
-	public Dictionary<Key, int> startingNote;
+	public AudioClip switchSound;
+	protected string switchSoundPath;
 
-	public static Instrument RockDrums = new Instrument {
+	/*public static List<Instrument> AllInstruments = new List<Instrument> () {
+		PercussionInstrument.RockDrums,
+		PercussionInstrument.ExoticPercussion,
+		MelodicInstrument.ElectricGuitar,
+		MelodicInstrument.ElectricBass,
+		MelodicInstrument.AcousticGuitar,
+		MelodicInstrument.ClassicalGuitar,
+		MelodicInstrument.PipeOrgan,
+		MelodicInstrument.Keyboard,
+		MelodicInstrument.Trumpet
+	};*/
+
+	public static List<Instrument> AllInstruments;
+
+	public virtual void Load () {
+		icon = Resources.Load<Sprite>(iconPath);
+		glow = Resources.Load<Sprite>(glowPath);
+		switchSound = Resources.Load<AudioClip>(switchSoundPath);
+	}
+
+	public static void LoadInstruments () {
+		AllInstruments = new List<Instrument> () {
+			PercussionInstrument.RockDrums,
+			PercussionInstrument.ExoticPercussion,
+			MelodicInstrument.ElectricGuitar,
+			MelodicInstrument.ElectricBass,
+			MelodicInstrument.AcousticGuitar,
+			MelodicInstrument.ClassicalGuitar,
+			MelodicInstrument.PipeOrgan,
+			MelodicInstrument.Keyboard,
+			MelodicInstrument.Trumpet
+		};
+		foreach (Instrument instrument in AllInstruments)
+			instrument.Load();
+	}
+}
+	
+public class PercussionInstrument : Instrument {
+
+	public Dictionary <string, Sprite> icons;
+	Dictionary <string, string> iconPaths;
+
+	public override void Load () {
+		base.Load();
+		icons = new Dictionary<string, Sprite>();
+		foreach (string path in iconPaths.Keys) {
+			Sprite sprite = Resources.Load<Sprite>(iconPaths[path]);
+			if (sprite == null) {
+				Debug.LogError ("PercussionInstrument.Load(): failed to load icon "+iconPaths[path]);
+				continue;
+			}
+			icons.Add (path, sprite);
+		}
+	}
+
+	public static PercussionInstrument RockDrums = new PercussionInstrument {
 		name = "Rock Drums",
 		codeName = "RockDrums",
 		index = 0,
@@ -39,10 +96,17 @@ public class Instrument {
 		family = InstrumentFamily.Percussion,
 		iconPath = "UI/Instrument_RockDrums",
 		glowPath = "UI/Instrument_RockDrums_Glow",
-		startingNote = null
+		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+		iconPaths = new Dictionary <string, string> () {
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom", "UI/Percussion_Tom" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "UI/Percussion_Hat" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "UI/Percussion_Hat" }
+		}
 	};
 
-	public static Instrument ExoticPercussion = new Instrument {
+	public static PercussionInstrument ExoticPercussion = new PercussionInstrument {
 		name = "Exotic Percussion",
 		codeName = "ExoticPercussion",
 		index = 1,
@@ -50,10 +114,26 @@ public class Instrument {
 		family = InstrumentFamily.Percussion,
 		iconPath = "UI/Instrument_ExoticPercussion",
 		glowPath = "UI/Instrument_ExoticPercussion",
-		startingNote = null
+		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+		iconPaths = new Dictionary<string, string> () {
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","UI/Percussion_Castinets" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "UI/Percussion_Claves" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "UI/Percussion_Cowbell" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", "UI/Percussion_Cowbell" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", "UI/Percussion_JamBlock" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1", "UI/Percussion_Maracas" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", "UI/Percussion_Maracas" },
+			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "UI/Percussion_Tambourine" }
+		}
 	};
+			
+}
 
-	public static Instrument ElectricGuitar = new Instrument {
+public class MelodicInstrument : Instrument {
+
+	public Dictionary<Key, int> startingNote;
+
+	public static MelodicInstrument ElectricGuitar = new MelodicInstrument {
 		name = "Electric Guitar",
 		codeName = "ElectricGuitar",
 		index = 2,
@@ -61,6 +141,7 @@ public class Instrument {
 		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_ElectricGuitar",
 		glowPath = "UI/Instrument_ElectricGuitar_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 8 },
 			{ Key.CSharp, 9 },
@@ -77,7 +158,7 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument ElectricBass = new Instrument {
+	public static MelodicInstrument ElectricBass = new MelodicInstrument {
 		name = "Electric Bass",
 		codeName = "ElectricBass",
 		index = 3,
@@ -85,6 +166,7 @@ public class Instrument {
 		family = InstrumentFamily.Bass,
 		iconPath = "UI/Instrument_ElectricBass",
 		glowPath = "UI/Instrument_ElectricBass_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricBass",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 8 },
 			{ Key.CSharp, 9 },
@@ -101,7 +183,7 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument AcousticGuitar = new Instrument {
+	public static MelodicInstrument AcousticGuitar = new MelodicInstrument {
 		name = "Acoustic Guitar",
 		codeName = "AcousticGuitar",
 		index = 4,
@@ -109,6 +191,7 @@ public class Instrument {
 		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_AcousticGuitar",
 		glowPath = "UI/Instrument_AcousticGuitar_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 8 },
 			{ Key.CSharp, 9 },
@@ -125,7 +208,7 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument ClassicalGuitar = new Instrument {
+	public static MelodicInstrument ClassicalGuitar = new MelodicInstrument {
 		name = "Classical Guitar",
 		codeName = "ClassicalGuitar",
 		index = 5,
@@ -133,6 +216,7 @@ public class Instrument {
 		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_ClassicalGuitar",
 		glowPath = "UI/Instrument_ClassicalGuitar_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 8 },
 			{ Key.CSharp, 9 },
@@ -149,7 +233,7 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument PipeOrgan = new Instrument {
+	public static MelodicInstrument PipeOrgan = new MelodicInstrument {
 		name = "Pipe Organ",
 		codeName = "PipeOrgan",
 		index = 6,
@@ -157,6 +241,7 @@ public class Instrument {
 		family = InstrumentFamily.Keyboard,
 		iconPath = "UI/Instrument_PipeOrgan",
 		glowPath = "UI/Instrument_PipeOrgan_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 3 },
 			{ Key.CSharp, 4 },
@@ -173,14 +258,15 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument Keyboard = new Instrument {
+	public static MelodicInstrument Keyboard = new MelodicInstrument {
 		name = "Keyboard",
 		codeName = "Keyboard",
 		index = 7,
 		type = InstrumentType.Melodic,
 		family = InstrumentFamily.Keyboard,
-		iconPath = "UI/Instrument_Trumpet",
+		iconPath = "UI/Instrument_Keyboard",
 		glowPath = "UI/Instrument_Keyboard_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 3 },
 			{ Key.CSharp, 4 },
@@ -197,7 +283,7 @@ public class Instrument {
 		}
 	};
 
-	public static Instrument Trumpet = new Instrument {
+	public static MelodicInstrument Trumpet = new MelodicInstrument {
 		name = "Trumpet",
 		codeName = "Trumpet",
 		index = 8,
@@ -205,6 +291,7 @@ public class Instrument {
 		family = InstrumentFamily.Brass,
 		iconPath = "UI/Instrument_Trumpet",
 		glowPath = "UI/Instrument_Trumpet_Glow",
+		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
 		startingNote = new Dictionary<Key, int> () {
 			{ Key.C, 3 },
 			{ Key.CSharp, 4 },
@@ -221,22 +308,4 @@ public class Instrument {
 		}
 	};
 
-	public static List<Instrument> AllInstruments = new List<Instrument> () {
-		RockDrums,
-		ExoticPercussion,
-		ElectricGuitar,
-		ElectricBass,
-		AcousticGuitar,
-		ClassicalGuitar,
-		PipeOrgan,
-		Keyboard,
-		Trumpet
-	};
-
-	public static void LoadInstruments () {
-		foreach (Instrument instrument in AllInstruments) {
-			instrument.icon = Resources.Load<Sprite>(instrument.iconPath);
-			instrument.glow = Resources.Load<Sprite>(instrument.glowPath);
-		}
-	}
 }

@@ -17,20 +17,16 @@ public class Note {
 	[SerializeField]
 	public string filename; // name of audio clip
 	[SerializeField]
-	public float volume;
+	public float volume = DEFAULT_VOLUME;
 	[SerializeField]
-	public float duration;
+	public float duration = DEFAULT_DURATION;
 
 	public Note () {
 		filename = null;
-		volume = DEFAULT_VOLUME;
-		duration = DEFAULT_DURATION;
 	}
 
 	public Note (string fileName) {
 		filename = fileName;
-		volume = DEFAULT_VOLUME;
-		duration = DEFAULT_DURATION;
 	}
 
 	/*public Note (string loadString) {
