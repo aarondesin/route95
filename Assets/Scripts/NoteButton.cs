@@ -10,6 +10,8 @@ public class NoteButton : DraggableButton {
 	public Note targetNote;
 	public Image volumeImage;
 
+	float oldVolume;
+
 	void Start () {
 		maxDragDistanceUp = vDragDistance;
 		maxDragDistanceDown = vDragDistance;
@@ -17,15 +19,21 @@ public class NoteButton : DraggableButton {
 		maxDragDistanceRight = hDragDistance;
 	}
 
+	public override void OnMouseDown() {
+		oldVolume = targetNote.volume;
+	}
+
 	public override void DragDown (float actionRatio) {
-		targetNote.volume = 0.5f - (actionRatio / 2f);
-		volumeImage.fillAmount = 0.5f - (actionRatio / 2f);
+		//targetNote.volume += 0.5f - (actionRatio / 2f);
+		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);
+		volumeImage.fillAmount = targetNote.volume;//0.5f - (actionRatio / 2f);
 		Debug.Log("DragDown("+actionRatio+")");
 	}
 
 	public override void DragUp (float actionRatio) {
-		targetNote.volume = 0.5f + (actionRatio / 2f);
-		volumeImage.fillAmount = 0.5f + (actionRatio / 2f);
+		//targetNote.volume = 0.5f + (actionRatio / 2f);
+		targetNote.volume = Mathf.Clamp01 (oldVolume + actionRatio);
+		volumeImage.fillAmount = targetNote.volume;
 	}
 
 	public override void DragLeft (float actionRatio) {

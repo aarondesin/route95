@@ -14,14 +14,16 @@ public class DraggableButton : MonoBehaviour {
 		float hDrag = Mathf.Abs(dragVector.x);
 		float yDrag = Mathf.Abs(dragVector.y);
 
-		if (hDrag > yDrag * dragBias) {
+		//if (hDrag > yDrag * dragBias) {
 			if (dragVector.x < 0f) DragLeft (Mathf.Clamp01(hDrag/maxDragDistanceLeft));
 			else DragRight (Mathf.Clamp01(hDrag/maxDragDistanceRight));
-		} else if (yDrag > hDrag * dragBias) {
+		//} else if (yDrag > hDrag * dragBias) {
 			if (dragVector.y < 0f) DragDown (Mathf.Clamp01(yDrag/maxDragDistanceDown));
 			else DragUp (Mathf.Clamp01(yDrag/maxDragDistanceUp));
-		}
+		//}
 	}
+
+	public virtual void OnMouseDown () {}
 
 	public virtual void DragLeft (float actionRatio) {}
 	public virtual void DragRight (float actionRatio) {}

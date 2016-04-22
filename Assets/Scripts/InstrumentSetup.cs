@@ -200,6 +200,7 @@ public class InstrumentSetup : MonoBehaviour {
 		);
 		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
 		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
 
 		// Make icon for note
 		buttons.Add(MakeIcon (title, iconGraphic, 
