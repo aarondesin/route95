@@ -81,7 +81,7 @@ public class InputManager : MonoBehaviour {
 		}
 	}
 
-	void Update () {
+	void FixedUpdate () {
 		if (GameManager.instance.currentMode == Mode.Live) {
 			if (Input.GetKeyDown (KeyCode.Escape)) {
 				GameManager.instance.TogglePause ();

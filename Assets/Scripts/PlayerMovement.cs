@@ -1,23 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class TESTPlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour {
+	public static PlayerMovement instance;
 	public GameObject lightRight;
 	public GameObject lightLeft;
 	public float velocity;
-	public static bool moving;
-	public static bool lights;
+	public bool moving;
+	public bool lights;
 	public float progress;
+	public List<ParticleSystem> particles;
 	Bezier road;
 
 	// Use this for initialization
 	void Start () {
+		instance = this;
 		lights = false;
 		moving = false;
 		if (velocity == 0f)
 			velocity = 0.2f;
 		progress = 0f;
+		StopMoving();
 		//road = WorldManager.instance.road.GetComponent<Bezier> ();
+	}
+
+	public void StartMoving() {
+		moving = true;
+		foreach (ParticleSystem ps in particles) ps.Play();
+	}
+
+	public void StopMoving() {
+		moving = false;
+		foreach (ParticleSystem ps in particles) ps.Pause();
 	}
 	
 	// Update is called once per frame

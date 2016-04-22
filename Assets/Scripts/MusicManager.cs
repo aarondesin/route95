@@ -43,7 +43,6 @@ public class MusicManager : MonoBehaviour {
 	public Project currentProject = new Project();
 
 	// --Global Music Properties-- //
-	//public Key currentKey = Key.EMajor; // value will be passed from key button
 	public Instrument currentInstrument = MelodicInstrument.ElectricGuitar;
 	public Song currentSong;
 	public int currentPlayingSong;
@@ -51,22 +50,6 @@ public class MusicManager : MonoBehaviour {
 
 	// --Game Data Storage --//
 	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
-	//public List<Riff> riffs = new List<Riff> ();
-	//public List<SongPiece> songPieces = new List<SongPiece>();
-	//public Dictionary<string, SongPiece> songPiecesByName = new Dictionary<string, SongPiece>();
-	/*public Dictionary<Instrument, List<Riff>> licks = new Dictionary<Instrument, List<Riff>>() {
-		{ Instrument.ElectricBass, new List <Riff> () },
-		{ Instrument.ElectricGuitar, new List <Riff> () },
-		{ Instrument.AcousticGuitar, new List<Riff> () },
-		{ Instrument.ClassicalGuitar, new List<Riff> () },
-		{ Instrument.RockDrums, new List <Riff> () },
-		{ Instrument.PipeOrgan, new List<Riff> () },
-		{ Instrument.Keyboard, new List<Riff> () }
-	};*/
-	// All lick notes waiting to be played
-	//List<List<Note>> lickQueue = new List<List<Note>>();
-	//bool lickPlaying = false;
-		
 	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
 	public AudioSource LoopRiff;
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources;

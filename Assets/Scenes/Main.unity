@@ -4937,13 +4937,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 371512236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5b1439b6fcbc524f993a59f8bb5f985, type: 3}
+  m_Script: {fileID: 11500000, guid: e6569196e08e6074a8985e2e361ee9ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lightRight: {fileID: 1080503465}
   lightLeft: {fileID: 1299636034}
   velocity: 0.2
+  moving: 0
+  lights: 0
   progress: 0
+  particles:
+  - {fileID: 419966875}
+  - {fileID: 645894584}
 --- !u!82 &371512239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7478,8 +7483,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 838191496}
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
-  m_Value: 0.0000012902343
-  m_Size: 0.9451212
+  m_Value: 0
+  m_Size: 0.94512135
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14881,7 +14886,7 @@ ReflectionProbe:
   m_IntensityMultiplier: 1
   m_BlendDistance: 1
   m_HDR: 1
-  m_BoxProjection: 1
+  m_BoxProjection: 0
   m_RenderDynamicObjects: 0
   m_UseOcclusionCulling: 1
   m_CustomBakedTexture: {fileID: 0}
@@ -16142,7 +16147,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.000030517578, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -21850,6 +21855,10 @@ Prefab:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
+      propertyPath: m_ReflectionProbeUsage
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 85f9b88a92bb5a6408b525510c7d22f1, type: 3}
   m_IsPrefabParent: 0
@@ -24056,7 +24065,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288437015}
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
-  m_Value: 0.0000017438616
+  m_Value: 0
   m_Size: 0.9793875
   m_NumberOfSteps: 0
   m_OnValueChanged:

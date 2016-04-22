@@ -260,13 +260,13 @@ public class Bezier : MonoBehaviour{
 		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > ROAD_RADIUS) {
 			//remove far away points behind the player
 			//Debug.Log("Removing old points");
-			float progress = WorldManager.instance.player.GetComponent<TESTPlayerMovement>().progress;
+			float progress = WorldManager.instance.player.GetComponent<PlayerMovement>().progress;
 			float numerator = progress * this.CurveCount;
 			Vector3[] newPoints = new Vector3[points.Length - 3];
 			for (int i = 0; i < newPoints.Length; i++) {
 				newPoints [i] = points [i + 3];
 			}
-			WorldManager.instance.player.GetComponent<TESTPlayerMovement> ().progress = numerator / this.CurveCount;
+			WorldManager.instance.player.GetComponent<PlayerMovement> ().progress = numerator / this.CurveCount;
 		}
 		if (Vector3.Distance (points [0], WorldManager.instance.player.transform.position) < ROAD_RADIUS) {
 			//create points on the curve behind the player
@@ -275,10 +275,10 @@ public class Bezier : MonoBehaviour{
 		}
 		if (Vector3.Distance (points [points.Length - 1], WorldManager.instance.player.transform.position) < ROAD_RADIUS) {
 			//create points on the curve in front of the player
-			float progress = WorldManager.instance.player.GetComponent<TESTPlayerMovement>().progress;
+			float progress = WorldManager.instance.player.GetComponent<PlayerMovement>().progress;
 			float numerator = progress * this.CurveCount;
 			AddCurve ();
-			WorldManager.instance.player.GetComponent<TESTPlayerMovement> ().progress = numerator / this.CurveCount;
+			WorldManager.instance.player.GetComponent<PlayerMovement> ().progress = numerator / this.CurveCount;
 			//Build ();
 			//Debug.Log ("Adding new curve");
 			//for (int i = 0; i < points.Length; i++) {

@@ -340,7 +340,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 		//sets player to moving
-		TESTPlayerMovement.moving = true;
+		PlayerMovement.instance.StartMoving();
 	}
 
 	// Switch from live mode to postplay
@@ -351,7 +351,7 @@ public class GameManager : MonoBehaviour {
 		SwitchToMenu (Menu.PostPlay);
 		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
 		//SwitchToMenu(Menu.SongArrange);
-		TESTPlayerMovement.moving = false;
+		PlayerMovement.instance.StopMoving();
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		DisableMenu(liveIcons);
 	}
@@ -364,7 +364,7 @@ public class GameManager : MonoBehaviour {
 		SwitchToMenu (Menu.SongArrange);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewRadio);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		TESTPlayerMovement.moving = false;
+		PlayerMovement.instance.StopMoving();
 		DisableMenu(loopIcon);
 		DisableMenu(liveIcons);
 	}
@@ -377,7 +377,7 @@ public class GameManager : MonoBehaviour {
 		SwitchToMenu (Menu.KeySelect);
 		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewOutsideCar);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		TESTPlayerMovement.moving = false;
+		PlayerMovement.instance.StopMoving();
 		DisableMenu(loopIcon);
 		MusicManager.instance.currentSong = new Song();
 		SongTimeline.instance.RefreshTimeline();
@@ -474,11 +474,13 @@ public class GameManager : MonoBehaviour {
 	public void Pause () {
 		paused = true;
 		pauseMenu.SetActive(true);
+		PlayerMovement.instance.StopMoving();
 	}
 
 	public void Unpause () {
 		paused = false;
 		pauseMenu.SetActive(false);
+		PlayerMovement.instance.StartMoving();
 	}
 
 	public void Exit () {
