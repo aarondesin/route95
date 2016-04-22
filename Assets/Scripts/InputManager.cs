@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,13 @@ public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
 
-	[SerializeField]
-	GameObject selected;
+	public GameObject selected;
+	Vector3 clickPosition;
 	//EventSystem eventSystem;
 
 	public List<AudioSource> audioSources;
+
+	public List<ScrollRect> scrollviews;
 
 	// 0: lick system
 	// 1: single-note system
@@ -175,12 +178,36 @@ public class InputManager : MonoBehaviour {
 				}*/
 			}
 		} else if (GameManager.instance.currentMode == Mode.Setup) {
-			if (Input.GetMouseButtonDown(0)) {
-				selected = EventSystem.current.currentSelectedGameObject;
-				Debug.Log(selected);
-			} else if (Input.GetMouseButtonUp(0)) {
+			if (Input.GetMouseButtonUp(0)) {
 				selected = null;
+				UnfreezeAllScrollviews();
+				clickPosition = Vector3.zero;
+			} else if (Input.GetMouseButtonDown(0)) {
+				selected = EventSystem.current.currentSelectedGameObject;
+				if (selected != null) {
+					if (selected.tag == "StopScrolling") FreezeAllScrollviews();
+					clickPosition = Input.mousePosition;
+					Debug.Log(selected);
+				}
+			} else {
+				if (selected) {
+					if (selected.GetComponent<DraggableButton>() != null) {
+						selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - clickPosition);
+					}
+				}
 			}
+		}
+	}
+
+	void FreezeAllScrollviews () {
+		foreach (ScrollRect scrollview in scrollviews) {
+			scrollview.enabled = false;
+		}
+	}
+
+	void UnfreezeAllScrollviews () {
+		foreach (ScrollRect scrollview in scrollviews) {
+			scrollview.enabled = true;
 		}
 	}
 

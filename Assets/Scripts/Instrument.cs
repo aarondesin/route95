@@ -6,6 +6,14 @@ public enum InstrumentType {
 	Percussion,
 	Melodic
 };
+
+public enum InstrumentFamily {
+	Percussion,
+	Guitar,
+	Bass,
+	Keyboard,
+	Brass
+};
 	
 public class Instrument {
 
@@ -13,6 +21,7 @@ public class Instrument {
 	public string codeName; // Name in code
 	public int index;
 	public InstrumentType type;
+	public InstrumentFamily family;
 
 	public Sprite icon;
 	private string iconPath;
@@ -27,6 +36,7 @@ public class Instrument {
 		codeName = "RockDrums",
 		index = 0,
 		type = InstrumentType.Percussion,
+		family = InstrumentFamily.Percussion,
 		iconPath = "UI/Instrument_RockDrums",
 		glowPath = "UI/Instrument_RockDrums_Glow",
 		startingNote = null
@@ -37,6 +47,7 @@ public class Instrument {
 		codeName = "ExoticPercussion",
 		index = 1,
 		type = InstrumentType.Percussion,
+		family = InstrumentFamily.Percussion,
 		iconPath = "UI/Instrument_ExoticPercussion",
 		glowPath = "UI/Instrument_ExoticPercussion",
 		startingNote = null
@@ -47,6 +58,7 @@ public class Instrument {
 		codeName = "ElectricGuitar",
 		index = 2,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_ElectricGuitar",
 		glowPath = "UI/Instrument_ElectricGuitar_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -70,6 +82,7 @@ public class Instrument {
 		codeName = "ElectricBass",
 		index = 3,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Bass,
 		iconPath = "UI/Instrument_ElectricBass",
 		glowPath = "UI/Instrument_ElectricBass_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -93,6 +106,7 @@ public class Instrument {
 		codeName = "AcousticGuitar",
 		index = 4,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_AcousticGuitar",
 		glowPath = "UI/Instrument_AcousticGuitar_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -116,6 +130,7 @@ public class Instrument {
 		codeName = "ClassicalGuitar",
 		index = 5,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Guitar,
 		iconPath = "UI/Instrument_ClassicalGuitar",
 		glowPath = "UI/Instrument_ClassicalGuitar_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -139,6 +154,7 @@ public class Instrument {
 		codeName = "PipeOrgan",
 		index = 6,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Keyboard,
 		iconPath = "UI/Instrument_PipeOrgan",
 		glowPath = "UI/Instrument_PipeOrgan_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -162,6 +178,7 @@ public class Instrument {
 		codeName = "Keyboard",
 		index = 7,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Keyboard,
 		iconPath = "UI/Instrument_Trumpet",
 		glowPath = "UI/Instrument_Keyboard_Glow",
 		startingNote = new Dictionary<Key, int> () {
@@ -185,6 +202,7 @@ public class Instrument {
 		codeName = "Trumpet",
 		index = 8,
 		type = InstrumentType.Melodic,
+		family = InstrumentFamily.Brass,
 		iconPath = "UI/Instrument_Trumpet",
 		glowPath = "UI/Instrument_Trumpet_Glow",
 		startingNote = new Dictionary<Key, int> () {

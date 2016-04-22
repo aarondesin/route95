@@ -3615,7 +3615,7 @@ RectTransform:
   m_Father: {fileID: 236417357}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.9793876, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7436,9 +7436,9 @@ RectTransform:
   m_Father: {fileID: 181759419}
   m_RootOrder: 2
   m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 20, y: -17}
+  m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &421280018
 MonoBehaviour:
@@ -7478,8 +7478,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 838191496}
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
-  m_Value: 0.0000012902343
-  m_Size: 0.9451212
+  m_Value: 0.17968343
+  m_Size: 0.94512135
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10148,6 +10148,7 @@ MonoBehaviour:
   loadIcon: {fileID: 21300000, guid: 771e46b24b8c2b242b1fca076d792aa0, type: 3}
   removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
   circleIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
+  volumeIcon: {fileID: 21300000, guid: a01c201d16be7a94ebf40dec47d5dc41, type: 3}
   loadingSpeed: 3
   loadingScreen: {fileID: 796519848}
   loadingBar: {fileID: 1576480158}
@@ -13667,7 +13668,7 @@ RectTransform:
   m_Father: {fileID: 1394626757}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.9451213}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -16610,9 +16611,9 @@ RectTransform:
   m_Father: {fileID: 181759419}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: -17}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1065215498
 MonoBehaviour:
@@ -17210,6 +17211,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 0}
   audioSources: []
+  scrollviews:
+  - {fileID: 181759422}
 --- !u!4 &1118047755
 Transform:
   m_ObjectHideFlags: 0
@@ -19371,7 +19374,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.5, y: 23.65274}
+  m_AnchoredPosition: {x: 17.5, y: 15.1527405}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -19949,7 +19952,7 @@ RectTransform:
   m_Father: {fileID: 1345854454}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -23068,7 +23071,7 @@ RectTransform:
   m_Father: {fileID: 1632941711}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -24021,9 +24024,9 @@ RectTransform:
   m_Father: {fileID: 181759419}
   m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 20}
+  m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1608562236
 MonoBehaviour:
@@ -26156,7 +26159,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1803614118
 RectTransform:
   m_ObjectHideFlags: 0

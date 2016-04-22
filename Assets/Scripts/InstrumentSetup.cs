@@ -221,6 +221,8 @@ public class InstrumentSetup : MonoBehaviour {
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
+			bt.tag = "StopScrolling";
+			bt.AddComponent<NoteButton>();
 			float vol = 1f;
 			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
@@ -231,13 +233,35 @@ public class InstrumentSetup : MonoBehaviour {
 				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 				vol = 0.8f;
 			}
+			Note note = new Note (soundName, vol, 1f);
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				InstrumentSetup.currentRiff.Toggle(new Note (soundName, vol, 1f), num);
+				InstrumentSetup.currentRiff.Toggle(note, num);
 				// (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
+
+
+			GameObject volume = UI.MakeImage(title+"_volume");
+			volume.GetComponent<RectTransform>().SetParent(bt.GetComponent<RectTransform>());
+			volume.GetComponent<RectTransform>().sizeDelta = bt.GetComponent<RectTransform>().sizeDelta * 1.3f;
+			volume.GetComponent<RectTransform>().localScale = bt.GetComponent<RectTransform>().localScale * 1.3f;
+			volume.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.5f);
+			volume.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.5f);
+			volume.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			volume.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
+			volume.GetComponent<Image>().type = Image.Type.Filled;
+			bt.GetComponent<NoteButton>().targetNote = note;
+			bt.GetComponent<NoteButton>().volumeImage = volume.GetComponent<Image>();
+
+			bt.AddComponent<ShowHide>();
+			bt.GetComponent<ShowHide>().objects = new List<GameObject>() { volume};
+			bt.GetComponent<ShowHide>().transitionType = TransitionType.Instant;
+
+			volume.SetActive(false);
+
 			buttons.Add(bt);
 			buttonGrid[i].Add(bt);
+			buttons.Add(volume);
 		}
 	}
 
