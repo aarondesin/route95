@@ -15,6 +15,11 @@ public class Riff {
 	[NonSerialized]
 	public const int MAX_BEATS = 32;
 
+	//Float values from audio effect knobs
+	public float distortionLevel = 0.9f;
+	public float echoDecayRatio = 0.9f;
+	public float echoDelay = 5000;
+
 	//
 	// VARIABLES SAVED IN PROJECT
 	//
@@ -45,6 +50,7 @@ public class Riff {
 		}
 		copy = 0;
 		instrument = Instrument.AllInstruments[instrumentIndex];
+		Debug.Log ("Current instrument is " + instrument);
 	}
 
 	// Constructor to make a riff of a certain number of beats

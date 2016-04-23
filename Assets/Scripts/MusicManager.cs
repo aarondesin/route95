@@ -112,6 +112,15 @@ public class MusicManager : MonoBehaviour {
 		}
 	}
 
+	void getAudioEffect () {
+		//currentInstrument = InstrumentSetup.currentRiff.instrument;
+		currentInstrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
+		Debug.Log ("Calling getAudioEffect " + currentInstrument);
+		instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
+		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
+		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
+	}
+
 	void LoadInstruments () {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
@@ -138,13 +147,17 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
 			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
+			obj.AddComponent<AudioDistortionFilter> ();
+			obj.AddComponent<AudioEchoFilter> ();
+			obj.AddComponent<AudioChorusFilter> ();
+
 			GameManager.instance.IncrementLoadProgress();
 
 
 		}
-		instrumentAudioSources[MelodicInstrument.ElectricGuitar].volume = 0.25f;
+		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].volume = 0.25f;
 		instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
-		instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
+		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
 
 	void LoadScales () {
@@ -164,12 +177,12 @@ public class MusicManager : MonoBehaviour {
 		/*if (currentProject.Full()) {
 			Prompt.instance.PromptMessage ("Project full", "The current project has reached the max number of songs.", "Bummer.");
 		} else {*/
-			Song newSong = new Song();
-			currentSong = newSong;
-			currentProject.AddSong(newSong);
+		Song newSong = new Song();
+		currentSong = newSong;
+		currentProject.AddSong(newSong);
 		//}
 	}
-		
+
 	public void SaveCurrentSong () {
 		SaveLoad.SaveCurrentSong();
 	}
@@ -212,7 +225,7 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 					break;
 				case Mode.Live:
-					
+
 
 					//Debug.Log(lickQueue.Count);
 
@@ -244,7 +257,7 @@ public class MusicManager : MonoBehaviour {
 						lickPlaying = false;
 					}*/
 					//if (!lickPlaying) 
-						currentSong.PlaySong(beat);
+					currentSong.PlaySong(beat);
 					//	else currentSong.PlaySongExceptFor(beat, lickInstrument);
 					//Debug.Log(beat);
 					float songTotalTime = currentSong.beats*7200f/tempoToFloat[tempo]/4f;
@@ -287,6 +300,7 @@ public class MusicManager : MonoBehaviour {
 		SongArrangeSetup.instance.selectedRiffIndex = currentProject.riffs.Count;
 		currentProject.riffs.Add (temp);
 		SongArrangeSetup.instance.Refresh();
+		getAudioEffect ();
 		return temp;
 	}
 
@@ -312,100 +326,99 @@ public class MusicManager : MonoBehaviour {
 	}*/
 
 	/*public void AddSongPieceToSong () {
-		SongPiece temp = new SongPiece() {
-			name = "SongPiece"+songPieces.Count
-		};
-		songPieces.Add(temp);
-		currentSong.songPieces.Add(temp);
-		songPiecesByName.Add(temp.name, temp);
-	}*/
+	SongPiece temp = new SongPiece() {
+		name = "SongPiece"+songPieces.Count
+	};
+	songPieces.Add(temp);
+	currentSong.songPieces.Add(temp);
+	songPiecesByName.Add(temp.name, temp);
+}*/
 
-	/*public void AddSongPieceToSong (SongPiece songPiece) {
-		AddSongPiece(songPiece);
-		currentSong.songPieces.Add(songPiece);
-	}*/
+/*public void AddSongPieceToSong (SongPiece songPiece) {
+AddSongPiece(songPiece);
+currentSong.songPieces.Add(songPiece);
+}*/
 
-	/*public void QueueLick (Riff lick) {
-		if (lick == null || lickQueue.Count != 0) return;
-		lickQueue.Clear();
-		lickInstrument = lick.instrument;
-		foreach (Beat beat in lick.beats) {
-			lickQueue.Add(beat.notes);
+/*public void QueueLick (Riff lick) {
+if (lick == null || lickQueue.Count != 0) return;
+lickQueue.Clear();
+lickInstrument = lick.instrument;
+foreach (Beat beat in lick.beats) {
+	lickQueue.Add(beat.notes);
+}
+lickPlaying = false;
+}*/
+
+/*bool IsDownBeat(int pos) {
+return pos%4 == 0;
+}*/
+
+/*public void PopLickQueue () {
+//Debug.Log("play");
+//MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
+foreach (Note note in lickQueue[0]) {
+	note.volume = 1.25f;
+	note.PlayNote(instrumentAudioSources[currentInstrument], true);
+	InstrumentDisplay.instance.WakeGlow();
+}
+lickQueue.RemoveAt(0);
+}*/
+
+// Loads a single audio clip
+void LoadAudioClip (string path) {
+	AudioClip sound = (AudioClip) Resources.Load (path);
+	if (sound == null) {
+		Debug.LogError("Failed to load AudioClip at "+path);
+	} else {
+		//Debug.Log("Loaded "+path);
+		//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
+		SoundClips.Add (path, sound);
+		GameManager.instance.IncrementLoadProgress();
+	}
+}
+
+// Remotely toggles looping
+public void ToggleLoopSong () {
+	loopSong = !loopSong;
+}
+
+public void StartSong () {
+	loop = loopSong;
+	playing = true;
+}
+
+public void StopPlaying () {
+	playing = false;
+	beat = 0;
+	//loop = false;
+}
+
+// Returns true if there is a riff of a certain name already
+public bool ContainsRiffNamed (string riffName) {
+	foreach (Riff riff in currentProject.riffs) {
+		if (riff.name == riffName) return true;
+	}
+	return false;
+}
+public int CopyNumber (string riffName) {
+	Debug.Log("CopyNumber(): "+riffName);
+	int result = 0;
+	foreach (Riff riff in currentProject.riffs) {
+		if (riff.name == riffName) {
+			result++;
 		}
-		lickPlaying = false;
-	}*/
-
-	/*bool IsDownBeat(int pos) {
-		return pos%4 == 0;
-	}*/
-
-	/*public void PopLickQueue () {
-		//Debug.Log("play");
-		//MusicManager.instance.currentSong.RemoveAt(beat, currentInstrument);
-		foreach (Note note in lickQueue[0]) {
-			note.volume = 1.25f;
-			note.PlayNote(instrumentAudioSources[currentInstrument], true);
-			InstrumentDisplay.instance.WakeGlow();
-		}
-		lickQueue.RemoveAt(0);
-
-	}*/
-
-	// Loads a single audio clip
-	void LoadAudioClip (string path) {
-		AudioClip sound = (AudioClip) Resources.Load (path);
-		if (sound == null) {
-			Debug.LogError("Failed to load AudioClip at "+path);
-		} else {
-			//Debug.Log("Loaded "+path);
-			//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
-			SoundClips.Add (path, sound);
-			GameManager.instance.IncrementLoadProgress();
-		}
 	}
+	return result;
+}
 
-	// Remotely toggles looping
-	public void ToggleLoopSong () {
-		loopSong = !loopSong;
-	}
+// Clears song, songpiece, and riff data
+public void Clear () {
+	//currentProject.riffs.Clear();
+	//songPieces.Clear();
+	//songPiecesByName.Clear();
+}
 
-	public void StartSong () {
-		loop = loopSong;
-		playing = true;
-	}
-
-	public void StopPlaying () {
-		playing = false;
-		beat = 0;
-		//loop = false;
-	}
-
-	// Returns true if there is a riff of a certain name already
-	public bool ContainsRiffNamed (string riffName) {
-		foreach (Riff riff in currentProject.riffs) {
-			if (riff.name == riffName) return true;
-		}
-		return false;
-	}
-	public int CopyNumber (string riffName) {
-		Debug.Log("CopyNumber(): "+riffName);
-		int result = 0;
-		foreach (Riff riff in currentProject.riffs) {
-			if (riff.name == riffName) {
-				result++;
-			}
-		}
-		return result;
-	}
-
-	// Clears song, songpiece, and riff data
-	public void Clear () {
-		//currentProject.riffs.Clear();
-		//songPieces.Clear();
-		//songPiecesByName.Clear();
-	}
-		
-	/*public void LoadExampleRiffs() {
+/*public void LoadExampleRiffs() {
 		if (!loadedExamples) {
 			riffs.Add( new Riff () {
 				name = "Example Guitar Riff",
@@ -584,7 +597,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () 
 			}
 		});
-
 			licks[Instrument.ElectricBass].Add (new Riff () {
 				name = "Example Bass Lick",
 				instrument = Instrument.ElectricBass,
@@ -666,8 +678,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note(KeyManager.instance.scales[MusicManager.instance.currentKey][Instrument.ElectricBass].root[0]) }
 			}
 		});
-
-
 			licks[Instrument.RockDrums].Add (new Riff () {
 				name = "Example Drums Lick",
 				instrument = Instrument.RockDrums,
@@ -710,7 +720,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
 				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Hat")}
-
 			}
 		});
 		licks[Instrument.RockDrums].Add (new Riff () {
@@ -725,7 +734,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Kick")},
 				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Hat")}
-
 			}
 		});
 		licks[Instrument.RockDrums].Add (new Riff () {
@@ -740,7 +748,6 @@ public class MusicManager : MonoBehaviour {
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
 				new List<Note> () {new Note("Audio/Instruments/Percussion/RockDrums_Hat")},
 				new List<Note>(){ new Note("Audio/Instruments/Percussion/RockDrums_Kick")}
-
 			}
 		});
 		licks[Instrument.AcousticGuitar].Add (new Riff () {
@@ -917,4 +924,3 @@ public class MusicManager : MonoBehaviour {
 		});
 	}*/
 }
-	
