@@ -38,9 +38,13 @@ public class ScaleInfo {
 		rootIndex = 2
 	};
 			
-	public static List<ScaleInfo> AllScales = new List<ScaleInfo> () {
-		Major,
-		Minor
-	};
+	public static List<ScaleInfo> AllScales;
+
+	public static void BuildScaleInfo () {
+		AllScales = new List<ScaleInfo> () {
+			Major,
+			Minor
+		};
+	}
 
 }

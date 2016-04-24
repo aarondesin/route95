@@ -254,8 +254,13 @@ public class GameManager : MonoBehaviour {
 
 	public void GoToRiffEditor () {
 		HideAll ();
-		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
-		InstrumentSetup.instance.Initialize ();
+		if (MusicManager.instance.currentSong.scale == -1) {
+			GoToKeySelectMenu();
+		} else {
+			CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+			Show (riffEditMenu);
+			InstrumentSetup.instance.Initialize ();
+		}
 	}
 
 	public void GoToPlaylistMenu () {

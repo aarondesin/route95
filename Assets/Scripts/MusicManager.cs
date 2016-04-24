@@ -93,6 +93,7 @@ public class MusicManager : MonoBehaviour {
 	public void Load() {
 		startLoadTime = Time.realtimeSinceStartup;
 		LoadSounds();
+		ScaleInfo.BuildScaleInfo();
 		LoadInstruments();
 		LoadScales();
 		//LoadExampleRiffs();
