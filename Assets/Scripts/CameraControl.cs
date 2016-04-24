@@ -16,17 +16,23 @@ public enum CameraControlMode {
 
 public enum CameraFollowMode {
 	Lead, // Points in front of target
-	Static
+	Static,
+	Shaky
 }
 
 public class CameraView {
 	public string name;
-	public Transform tr;
-	public float fov;
-	public CameraFollowMode followMode;
-	public float lag;
-	public Vector3 pos;
-	public Quaternion rot;
+	public Transform transform;
+	public float fov; // field of view
+	public CameraFollowMode followMode; // type of camera following
+	public Vector3 pos; // current position of camera
+	public Quaternion rot; // current rotation of camera
+
+	public Vector3 targetPos; // target transform
+	public Quaternion targetRot;
+
+	public float lag; // how tightly camera follows (lower = tighter)
+	public float shake;
 }
 
 public class CameraControl : MonoBehaviour {
@@ -102,7 +108,9 @@ public class CameraControl : MonoBehaviour {
 			// On the hood, forwards
 			new CameraView () {
 				name = "HoodForward",
-				tr = HoodForward,
+				transform = HoodForward,
+				targetPos = HoodForward.position,
+				targetRot = HoodForward.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -118,7 +126,9 @@ public class CameraControl : MonoBehaviour {
 			// Near chase
 			new CameraView () {
 				name = "NearChase",
-				tr = NearChase,
+				transform = NearChase,
+				targetPos = NearChase.position,
+				targetRot = NearChase.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Lead,
 				lag = 0.04f
@@ -127,7 +137,9 @@ public class CameraControl : MonoBehaviour {
 			// Far chase
 			new CameraView () {
 				name = "FarChase",
-				tr = FarChase,
+				transform = FarChase,
+				targetPos = FarChase.position,
+				targetRot = FarChase.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Lead,
 				lag = 0.05f
@@ -136,7 +148,9 @@ public class CameraControl : MonoBehaviour {
 			// Front right wheel
 			new CameraView () {
 				name = "FrontRightWheel",
-				tr = FrontRightWheel,
+				transform = FrontRightWheel,
+				targetPos = FrontRightWheel.position,
+				targetRot = FrontRightWheel.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -144,7 +158,9 @@ public class CameraControl : MonoBehaviour {
 			// Front left wheel
 			new CameraView () {
 				name = "FrontLeftWheel",
-				tr = FrontLeftWheel,
+				transform = FrontLeftWheel,
+				targetPos = FrontLeftWheel.position,
+				targetRot = FrontLeftWheel.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -152,7 +168,9 @@ public class CameraControl : MonoBehaviour {
 			// Rear right wheel
 			new CameraView () {
 				name = "RearRightWheel",
-				tr = RearRightWheel,
+				transform = RearRightWheel,
+				targetPos = RearRightWheel.position,
+				targetRot = RearRightWheel.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -160,7 +178,9 @@ public class CameraControl : MonoBehaviour {
 			// Rear left wheel
 			new CameraView () {
 				name = "RearLeftWheel",
-				tr = RearLeftWheel,
+				transform = RearLeftWheel,
+				targetPos = RearLeftWheel.position,
+				targetRot = RearLeftWheel.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -168,7 +188,9 @@ public class CameraControl : MonoBehaviour {
 			// Rear left wheel
 			new CameraView () {
 				name = "RearLeftWheel",
-				tr = RearLeftWheel,
+				transform = RearLeftWheel,
+				targetPos = RearLeftWheel.position,
+				targetRot = RearLeftWheel.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -176,7 +198,9 @@ public class CameraControl : MonoBehaviour {
 			// Wide rear
 			new CameraView () {
 				name = "WideRear",
-				tr = WideRear,
+				transform = WideRear,
+				targetPos = WideRear.position,
+				targetRot = WideRear.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
 			},
@@ -184,32 +208,70 @@ public class CameraControl : MonoBehaviour {
 			// Wide front
 			new CameraView () {
 				name = "WideFront",
-				tr = WideFront,
+				transform = WideFront,
+				targetPos = WideFront.position,
+				targetRot = WideFront.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Static
+			},
+
+			// Far top
+			new CameraView () {
+				name = "FarTop",
+				targetPos = PickRandom (25f, 50f),
+				fov = 60f,
+				followMode = CameraFollowMode.Shaky
+			},
+
+			// Far top
+			new CameraView () {
+				name = "Distant",
+				targetPos = PickRandom (10f, 20f),
+				fov = 60f,
+				followMode = CameraFollowMode.Shaky
 			}
 		};
 
 		foreach (CameraView angle in angles) {
-			angle.pos = angle.tr.position;
-			angle.rot = angle.tr.rotation;
+			angle.pos = angle.targetPos;
+			angle.rot = angle.targetRot;
 		}
+	}
+
+	Vector3 PickRandom (float minHeight, float maxHeight) {
+		Vector3 result = new Vector3 (
+			                 WorldManager.instance.player.transform.position.x + WorldManager.instance.CHUNK_SIZE,
+			                 WorldManager.instance.player.transform.position.y + Random.Range (minHeight, maxHeight),
+			                 WorldManager.instance.player.transform.position.z + WorldManager.instance.CHUNK_SIZE
+		                 );
+		return result;
 	}
 
 	void UpdateAngles () {
 		foreach (CameraView angle in angles) {
+			if (angle.transform != null) {
+				angle.targetPos = angle.transform.position;
+				angle.targetRot = angle.transform.rotation;
+			}
 			switch (angle.followMode) {
 			case CameraFollowMode.Lead:
 				//angle.pos = (angle.tr.position - angle.pos) * angle.lag * Time.deltaTime;
 				//angle.pos =Vector3.MoveTowards (angle.pos, angle.tr.position, Vector3.Distance(angle.pos, angle.tr.position) * angle.lag);
 				Vector3 velocity = Vector3.zero;
-				angle.pos = Vector3.SmoothDamp (angle.pos, angle.tr.position, ref velocity, angle.lag);
+				angle.pos = Vector3.SmoothDamp (angle.pos, angle.targetPos, ref velocity, angle.lag);
 				//transform.rotation = Quaternion.Euler (transform.rotation.eulerAngles + (currentAngle.tr.rotation.eulerAngles - transform.rotation.eulerAngles) * currentAngle.lag * Time.deltaTime);
 				angle.rot = Quaternion.LookRotation (WorldManager.instance.player.transform.position + WorldManager.instance.player.transform.forward *20f - angle.pos, Vector3.up);
 				break;
 			case CameraFollowMode.Static:
-				angle.pos = angle.tr.position;
-				angle.rot = angle.tr.rotation;
+				angle.pos = angle.targetPos;
+				angle.rot = angle.targetRot;
+				break;
+			case CameraFollowMode.Shaky:
+				angle.pos = angle.targetPos;
+				float x = Mathf.PerlinNoise (angle.shake, angle.shake);
+				float y = Mathf.PerlinNoise (angle.shake, angle.shake);
+				angle.rot = Quaternion.FromToRotation (angle.pos, WorldManager.instance.player.transform.position);
+				angle.rot = angle.targetRot * Quaternion.Euler (x, y, 0f);
 				break;
 			}
 		}
@@ -218,6 +280,7 @@ public class CameraControl : MonoBehaviour {
 	void Update() {
 		if (liveMode) {
 			UpdateAngles();
+			//Debug.Log (currentAngle.pos);
 			transform.position = currentAngle.pos;
 			transform.rotation = currentAngle.rot;
 			if (transitionTimer <= 0f) {

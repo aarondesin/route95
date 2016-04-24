@@ -7504,7 +7504,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9454755
+  m_Size: 0.94517106
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10170,12 +10170,12 @@ MonoBehaviour:
   arrowIcon: {fileID: 21300000, guid: d609bb3db92815b4f84c54def93896d6, type: 3}
   addIcon: {fileID: 21300000, guid: ed614671d2e9fca49a149b99abdc6eb1, type: 3}
   editIcon: {fileID: 21300000, guid: 73753c5230f1f76498ba0d937217a3f7, type: 3}
-  playIcon: {fileID: 21300000, guid: 5a63a9880030c94469da624501f0a408, type: 3}
-  pauseIcon: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
+  playIcon: {fileID: 0}
+  pauseIcon: {fileID: 0}
   loadIcon: {fileID: 21300000, guid: 771e46b24b8c2b242b1fca076d792aa0, type: 3}
   removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
   circleIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
-  volumeIcon: {fileID: 21300000, guid: a01c201d16be7a94ebf40dec47d5dc41, type: 3}
+  volumeIcon: {fileID: 0}
   loadingSpeed: 3
   loadingScreen: {fileID: 796519848}
   loadingBar: {fileID: 1576480158}
@@ -14700,16 +14700,16 @@ MonoBehaviour:
   audioOut: {fileID: 0}
   road: {fileID: 0}
   timeOfDay: 0
-  primaryDayColor: {r: 1, g: 1, b: 1, a: 1}
-  secondaryDayColor: {r: 0.62352943, g: 0.7803922, b: 0.8941177, a: 1}
-  primarySunsetColor: {r: 1, g: 1, b: 0, a: 1}
-  secondarySunsetColor: {r: 1, g: 0.49803922, b: 0, a: 1}
-  primaryNightColor: {r: 0.11764707, g: 0.20392159, b: 0.30588236, a: 1}
-  secondaryNightColor: {r: 0, g: 0, b: 0, a: 1}
-  primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
-  secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
+  primaryDayColor: {r: 0, g: 0, b: 0, a: 0}
+  secondaryDayColor: {r: 0, g: 0, b: 0, a: 0}
+  primarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
+  secondarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
+  primaryNightColor: {r: 0, g: 0, b: 0, a: 0}
+  secondaryNightColor: {r: 0, g: 0, b: 0, a: 0}
+  primarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
+  secondarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
   maxSunIntensity: 0
-  minSunIntensity: 1
+  minSunIntensity: 0
 --- !u!1 &906108765
 GameObject:
   m_ObjectHideFlags: 0
@@ -16238,7 +16238,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -17336,8 +17336,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selected: {fileID: 0}
   audioSources: []
-  scrollviews:
-  - {fileID: 181759422}
+  scrollviews: []
 --- !u!4 &1118047755
 Transform:
   m_ObjectHideFlags: 0
@@ -19060,7 +19059,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1550758007}
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -19428,8 +19427,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0.5
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -19499,7 +19498,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 849, y: 430.99997}
+  m_AnchoredPosition: {x: 17.5, y: 431}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -20341,7 +20340,7 @@ MonoBehaviour:
   RearRightWheel: {fileID: 96920339}
   WideRear: {fileID: 973962256}
   WideFront: {fileID: 665833772}
-  transitionFreq: 180
+  transitionFreq: 60
   liveMode: 0
 --- !u!114 &1334809321
 MonoBehaviour:
@@ -24212,7 +24211,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.97938764
+  m_Size: 0.9793875
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
