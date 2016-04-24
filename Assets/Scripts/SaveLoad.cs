@@ -58,6 +58,7 @@ public class SaveLoad {
 					MusicManager.instance.currentSong = project.songs[0];
 				else MusicManager.instance.NewSong();
 
+				project.Refresh();
 				PlaylistBrowser.instance.RefreshName();
 				SongArrangeSetup.instance.Refresh();
 				SongTimeline.instance.RefreshTimeline();

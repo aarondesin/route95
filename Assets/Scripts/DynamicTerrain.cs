@@ -132,7 +132,7 @@ public class DynamicTerrain {
 	}
 
 	public int ChunkHeuristic (Chunk chunk) {
-		int dist = (int)DistanceToPlayer(chunk);
+		//int dist = (int)DistanceToPlayer(chunk);
 		//Debug.Log(dist);
 		return 
 			(int)DistanceToPlayer(chunk) + 
@@ -279,6 +279,8 @@ public class DynamicTerrain {
 		if (!heightmap[x].ContainsKey(y))
 			heightmap[x].Add(y, v);
 		else heightmap[x][y] = v;
+
+		//Vertex.Vertices[x][y].SetHeight(v);
 	}
 
 	/*public void WriteHeightMap (int i, float v) {

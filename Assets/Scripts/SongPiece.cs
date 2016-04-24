@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class SongPiece {
 
-	public static int DEFAULT_MEASURES = 1;
+	const int DEFAULT_MEASURES = 1;
 
 	[SerializeField]
 	public string name; 

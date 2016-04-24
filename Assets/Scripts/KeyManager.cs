@@ -17,25 +17,28 @@ public class KeyManager : MonoBehaviour {
 
 	public void BuildScales () {
 		percussionSets = new Dictionary<Instrument, List<string>>() {
-			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] }
+			{ Instrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
+			{ Instrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
 		};
 
 		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>>();
 		foreach (Key key in Enum.GetValues(typeof(Key))) {
 			//Debug.Log(key.ToString());
-			
-			scales.Add (key, new Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>());
-			foreach (ScaleInfo scale in ScaleInfo.AllScales) {
-				//Debug.Log(scale.scaleIndex);
-				
-				scales[key].Add (scale, new Dictionary<Instrument, Scale>());
-				foreach (Instrument instrument in Instrument.AllInstruments) {
-					if (instrument.type == InstrumentType.Melodic) {
-						//Debug.Log(instrument.codeName);
-						scales[key][scale].Add (instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, instrument.startingNote[key]));
-					}
-				}
 
+			if (key != Key.None) {
+				scales.Add (key, new Dictionary<ScaleInfo, Dictionary<Instrument, Scale>>());
+				foreach (ScaleInfo scale in ScaleInfo.AllScales) {
+					//Debug.Log(scale.scaleIndex);
+					
+					scales[key].Add (scale, new Dictionary<Instrument, Scale>());
+					foreach (Instrument instrument in Instrument.AllInstruments) {
+						if (instrument.type == InstrumentType.Melodic) {
+							//Debug.Log(instrument.codeName);
+							scales[key][scale].Add (instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, instrument.startingNote[key]));
+						}
+					}
+
+				}
 			}
 
 		}

@@ -37,9 +37,9 @@ public class RadialKeyMenu : MonoBehaviour {
 
 		// Layer one
 		int numKeys = Enum.GetValues(typeof(Key)).Length;
-		for (int i=0; i < numKeys; i++) {
+		for (int i=1; i < numKeys; i++) { // i=1 so that it skips Key.None
 			Key key = (Key)i;
-			float angle = (float)i / (float)numKeys * 2f * Mathf.PI;
+			float angle = (float)i / (float)(numKeys-1) * 2f * Mathf.PI;
 			GameObject button = UI.MakeTextButton(key.ToString());
 
 			RectTransform tr = button.GetComponent<RectTransform>();
@@ -110,7 +110,7 @@ public class RadialKeyMenu : MonoBehaviour {
 		}
 
 		// Confirm button
-		if (MusicManager.instance.currentSong.key != null &&
+		if (MusicManager.instance.currentSong.key != Key.None &&
 			MusicManager.instance.currentSong.scale != -1) {
 			confirmButton.SetActive (true);
 		} else

@@ -9,11 +9,23 @@ using System.Collections;
 using System;
 
 public class Bezier : MonoBehaviour{
+	public static Bezier instance;
 
 	[SerializeField]
 	private Vector3[] points;
 	public int steps;
 	public float ROAD_RADIUS;
+	public float ROAD_WIDTH;
+	public float ROAD_HEIGHT;
+	public float slope = 0.8f;
+
+	//public Vector3[] verts;
+	//public Vector2[] UVs;
+	//public int[] tris;
+
+	public List<Vector3> verts;
+	public List<Vector2> UVs;
+	public List<int> tris;
 
 	public enum BezierControlPointMode {
 		Free,
@@ -24,9 +36,9 @@ public class Bezier : MonoBehaviour{
 	[SerializeField]
 	private BezierControlPointMode[] modes;
 	
-	private List<Vector3> vertices;
-	private List<int> triangles;
-	private List<Vector3> normals;
+	//private List<Vector3> vertices;
+	//private List<int> triangles;
+	//private List<Vector3> normals;
 	private List<Vector2> uvs;
 
 	public float w;
@@ -36,9 +48,14 @@ public class Bezier : MonoBehaviour{
 	public bool flipped;
 
 	public void Reset () {
+		instance = this;
 		points = new Vector3[4];
-		points [0] = WorldManager.instance.player.transform.position;
-		points [0].y = 2.227f;
+		Vector3 pp = new Vector3 (WorldManager.instance.player.transform.position.x,
+			WorldManager.instance.player.transform.position.y,
+			WorldManager.instance.player.transform.position.z
+		);
+		points [0] = pp;
+		points [0].y = 0f;//2.227f;
 		points [1].z = points [0].z;
 		points [1].y = points [0].y;
 		points [1].x = points [0].x - 60f;
@@ -48,7 +65,7 @@ public class Bezier : MonoBehaviour{
 		points [3].z = points [0].z + 150f;
 		points [3].y = points [0].y;
 		points [3].x = points [0].x;
-		steps = 1;
+		steps = 200;
 		modes = new BezierControlPointMode[points.Length / 2];
 		for (int i=0; i<modes.Length; i++) {
 			modes [i] = BezierControlPointMode.Mirrored;
@@ -159,6 +176,7 @@ public class Bezier : MonoBehaviour{
 		modes [modes.Length - 1] = modes [modes.Length - 2];
 		EnforceMode (points.Length - 4);
 		steps++;
+		Build();
 	}
 
 	public int CurveCount {
@@ -231,6 +249,7 @@ public class Bezier : MonoBehaviour{
 	void Start () {
 		points = new Vector3[0];
 		Reset ();
+		Build();
 		//AddCurve ();
 		//AddCurve ();
 		//Build ();
@@ -274,26 +293,37 @@ public class Bezier : MonoBehaviour{
 	}
 
 	public void Build () {
-		//GetComponent<MeshFilter> ().mesh.Clear ();
-		if (GetComponent<MeshFilter> ().sharedMesh != null)
-			GetComponent<MeshFilter> ().sharedMesh.Clear ();
-		Mesh mesh = new Mesh ();
+		w = ROAD_WIDTH;
+		h = ROAD_HEIGHT;
+		GetComponent<MeshFilter> ().mesh.Clear ();
 
-		BuildMeshSharp ();
-		
-		mesh.vertices = vertices.ToArray ();
-		//Debug.Log (mesh.vertices.Length);
+		Mesh mesh = new Mesh();
 
-		mesh.triangles = triangles.ToArray ();
-		//Debug.Log (mesh.triangles.Length);
+		//if (GetComponent<MeshFilter> ().sharedMesh != null) {
+			//GetComponent<MeshFilter> ().sharedMesh.Clear ();
+			//GetComponent<MeshCollider>().sharedMesh.Clear();
+		//}
 
-		mesh.uv = uvs.ToArray ();
+		//mesh = BuildRoadMesh ();
+		BuildRoadMesh ();
+
+		mesh.SetVertices (verts);
+		mesh.SetUVs (0, UVs);
+		mesh.SetTriangles (tris, 0);
 
 		mesh.RecalculateNormals();
-
-		Solve (mesh);
-
 		mesh.RecalculateBounds();
+		mesh.Optimize();
+		
+		//mesh.vertices = vertices.ToArray ();
+		Debug.Log (mesh.vertices.Length);
+
+		//mesh.triangles = triangles.ToArray ();
+		Debug.Log (mesh.triangles.Length);
+
+		//mesh.uv = uvs.ToArray ();
+
+
 
 
 		//mesh.normals = normals.ToArray ();
@@ -302,16 +332,13 @@ public class Bezier : MonoBehaviour{
 		//MeshGen.DoUVs (mesh);
 
 
-		mesh.Optimize();
 
+
+		GetComponent<MeshFilter> ().mesh = mesh;
 		GetComponent<MeshFilter> ().sharedMesh = mesh;
-		GetComponent<MeshCollider> ().sharedMesh = mesh;
-	}
+		//GetComponent<MeshCollider> ().sharedMesh = mesh;
 
-	private Vector3 pt1 (float t) {
-		//return (halved && flipped) ? sPt + Vector3.down * h : sPt + Vector3.down * h + Vector3.right * w;
-		//return (halved && flipped) ? GetPoint2(t) + Quaternion.AngleAxis(-45, Vector3.up)  * h : sPt + Vector3.down * h + Vector3.right * w;
-		return (halved && flipped) ? GetPoint(t) + BezDown(GetDirection(t)) * h : GetPoint(t) + BezDown(GetDirection(t)) * h + BezRight(GetDirection(t)) * w;
+		//Debug.Log(GetComponent<MeshRenderer>().isVisible);
 	}
 
 	private Vector3 BezDown (Vector3 direction) {
@@ -325,22 +352,144 @@ public class Bezier : MonoBehaviour{
 		planed = Quaternion.Euler (0, -90, 0) * planed;
 		return planed;
 	}
+		
+	//private Mesh BuildRoadMesh () {
+	void BuildRoadMesh() {
 
-	private Vector3 pt2 (float t) {
-		//return (!halved || (halved && flipped)) ? sPt + Vector3.down * h + Vector3.left * w : sPt + Vector3.down * h;
-		return (!halved || (halved && flipped)) ? GetPoint(t) + BezDown(GetDirection(t)) * h + -BezRight(GetDirection(t)) * w : GetPoint(t) + BezDown(GetDirection(t)) * h;
-	}
+		//Mesh mesh = new Mesh();
+		//mesh.name = "RoadMesh";
+		List<Vector3> newVertices = new List<Vector3> ();
+		List<int> newTriangles = new List<int> ();
+		List<Vector2> newUVs = new List<Vector2>();
+		//verts = new 
+		//normals = new List<Vector3> ();
 
-	private void BuildMeshSharp () {
-		vertices = new List<Vector3> ();
-		triangles = new List<int> ();
-		normals = new List<Vector3> ();
-		uvs = new List<Vector2> ();
+		float progressI = 0f;
+		Vector3 pointI = GetPoint (progressI);
+
+		newVertices.Add(pointI + w * -BezRight (GetDirection(progressI)));
+		newUVs.Add(new Vector2(-0.25f, 0f));
+		int leftDownI = 0;
+
+		newVertices.Add(pointI + w * BezRight (GetDirection(progressI)));
+		newUVs.Add(new Vector2(1.25f, 0f));
+		int rightDownI = 1;
+
+		newVertices.Add(pointI + slope * w * -BezRight (GetDirection(progressI)) + h * -BezDown(GetDirection(progressI)));
+		newUVs.Add(new Vector2(1-slope-0.25f, 0f));
+		int leftUpI = 2;
+
+		newVertices.Add(pointI + slope * w * BezRight (GetDirection(progressI)) + h * -BezDown(GetDirection(progressI)));
+		newUVs.Add(new Vector2(slope+0.25f, 1f));
+		int rightUpI = 3;
+
+		bool flipUVs = true;
+
+		for (int i = 1; i<steps; i++) {
+			int num = i;
+
+			float progressF = (float)(num) / (float)steps;
+			Vector3 pointF = GetPoint (progressF);
+
+			newVertices.Add(pointF + w * -BezRight (GetDirection(progressF)));
+			newUVs.Add(
+				(flipUVs ? new Vector2(-0.25f, 1f) : new Vector2 (-0.25f, 0f))
+			);
+			int leftDownF = num * 4;
+
+			newVertices.Add(pointF + w * BezRight (GetDirection(progressF)));
+			newUVs.Add(
+				(flipUVs ? new Vector2(1.25f, 1f) : new Vector2 (1.25f, 0f))
+			);
+			int rightDownF = num * 4 + 1;
+
+			newVertices.Add(pointF + slope * w * -BezRight (GetDirection(progressF)) + h * -BezDown(GetDirection(progressI)));
+			newUVs.Add(
+				(flipUVs ? new Vector2(1-slope-0.25f, 1f) : new Vector2 (1-slope-0.25f, 0f))
+			);
+			int leftUpF = num * 4 + 2;
+
+			newVertices.Add(pointF + slope * w * BezRight (GetDirection(progressF)) + h * -BezDown(GetDirection(progressI)));
+			newUVs.Add(
+				(flipUVs ? new Vector2(slope+0.25f, 1f) : new Vector2 (slope+0.25f, 0f))
+			);
+			int rightUpF = num * 4 + 3;
+
+
+			// Left slope
+			newTriangles.Add (leftDownI);
+			newTriangles.Add (leftUpI);
+			newTriangles.Add (leftDownF);
+
+			newTriangles.Add (leftDownF);
+			newTriangles.Add (leftUpI);
+			newTriangles.Add (leftUpF);
+
+
+			// Right slope
+			newTriangles.Add (rightUpI);
+			newTriangles.Add (rightDownI);
+			newTriangles.Add (rightDownF);
+
+			newTriangles.Add (rightUpF);
+			newTriangles.Add (rightUpI);
+			newTriangles.Add (rightDownF);
+
+
+			// Road surface plane
+			newTriangles.Add (leftUpF);
+			newTriangles.Add (rightUpI);
+			newTriangles.Add (rightUpF);
+		
+			newTriangles.Add (leftUpI);
+			newTriangles.Add (rightUpI);
+			newTriangles.Add (leftUpF);
+		
+
+			progressI = progressF;
+			pointI = pointF;
+			leftDownI = leftDownF;
+			rightDownI = rightDownF;
+			leftUpI = leftUpF;
+			rightUpI = rightUpF;
+
+			flipUVs = !flipUVs;
+		}
+
+		verts = newVertices;
+		UVs = newUVs;
+		tris = newTriangles;
+
+		//verts = newVertices.ToArray();
+		//UVs = newUVs.ToArray();
+		//tris = newTriangles.ToArray();
+
+		//mesh.vertices = newVertices.ToArray();
+		//mesh.uv = newUVs.ToArray();
+		//mesh.triangles = newTriangles.ToArray();
+
+
+
+
+
+		//mesh.RecalculateBounds();
+
+		//mesh.RecalculateNormals();
+
+		//Solve (mesh);
+
+		//mesh.Optimize();
+
+		//return mesh;
+
+		// left slope
+
 
 
 		//
 		// Generate front cap
 		//
+		/*
 		vertices.Add (points [0]); // 0
 		vertices.Add (pt1 (0f)); // 1
 		vertices.Add (pt2 (0f)); // 2
@@ -540,7 +689,7 @@ public class Bezier : MonoBehaviour{
 			
 			sPt1 = ePt1;
 			sPt2 = ePt2;
-		}
+		}*/
 			
 
 	}
@@ -602,10 +751,18 @@ public class Bezier : MonoBehaviour{
 	
 	void OnDrawGizmosSelected () {
 		Gizmos.color = Color.blue;
-		Debug.Log (vertices);
-		Debug.Log (normals);
-		for (int i=0; i<vertices.Count && i<normals.Count; i++) {
-			Gizmos.DrawLine(GetComponent<Transform>().position+vertices[i], GetComponent<Transform>().position+vertices[i]+normals[i]*0.01f);
+		//Debug.Log (vertices);
+		//Debug.Log (normals);
+		Vector3[] verts = GetComponent<MeshFilter>().mesh.vertices;
+		int[] tris = GetComponent<MeshFilter>().mesh.triangles;
+		for (int i=0; i<verts.Length-4 && i<GetComponent<MeshFilter>().mesh.normals.Length; i++) {
+			Gizmos.DrawLine (verts[i], verts[i+4]);
+			//Gizmos.DrawLine(GetComponent<Transform>().position+GetComponent<MeshFilter>().mesh.vertices[i], GetComponent<Transform>().position+GetComponent<MeshFilter>().mesh.vertices[i]+GetComponent<MeshFilter>().mesh.normals[i]*0.01f);
+		}
+		for (int i=0; i<tris.Length; i+=3) {
+			Gizmos.DrawLine (verts[tris[i]], verts[tris[i+1]]);
+			Gizmos.DrawLine (verts[tris[i+1]], verts[tris[i+2]]);
+			Gizmos.DrawLine (verts[tris[i+2]], verts[tris[i]]);
 		}
 	}
 }

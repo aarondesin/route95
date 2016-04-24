@@ -6,11 +6,16 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Song {
 
+	// 
+	// SERIALIZED VARIABLES
+	// These will be saved in the project/song save file
+	//
+
 	[SerializeField]
 	public string name;
 
 	[SerializeField]
-	public Key key;
+	public Key key = Key.None;
 
 	[SerializeField]
 	public int scale = -1; // scale index
@@ -18,7 +23,14 @@ public class Song {
 	[SerializeField]
 	public List<SongPiece> songPieces = new List<SongPiece>();
 
+	//
+	// NONSERIALIZED VARIABLES
+	// These will not be saved
+	//
+
+	[NonSerialized]
 	public int measures;
+	[NonSerialized]
 	public int beats;
 
 	// Default constructor creates a song of 4 1-measure song pieces

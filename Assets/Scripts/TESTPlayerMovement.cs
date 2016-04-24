@@ -44,11 +44,13 @@ public class TESTPlayerMovement : MonoBehaviour {
 				progress += velocity * Time.deltaTime / road.CurveCount; 
 				if (progress >= 1f)
 					progress = 1f;
-				this.transform.position = road.GetPoint (progress);
+				this.transform.position = road.GetPoint (progress) + new Vector3 (0f, 2.27f + Bezier.instance.ROAD_HEIGHT, 0f);
 				this.transform.LookAt (road.GetVelocity (progress) + this.transform.position);
 			}
-			lights = (Sun.instance.getDaytime () > (Mathf.PI * (7f / 8f))
-			|| Sun.instance.getDaytime () <= Mathf.PI * (1f / 8f));
+			//lights = (Sun.instance.getDaytime () > (Mathf.PI * (7f / 8f))
+			//|| Sun.instance.getDaytime () <= Mathf.PI * (1f / 8f));
+			lights = (WorldManager.instance.timeOfDay  > (Mathf.PI * (7f / 8f))
+				|| WorldManager.instance.timeOfDay <= Mathf.PI * (1f / 8f));
 			lightRight.GetComponent<Light> ().enabled = lights;
 			lightLeft.GetComponent<Light> ().enabled = lights;
 		}

@@ -12,6 +12,7 @@ using UnityEditor;
 
 // All keys available in the game
 public enum Key {
+	None,
 	C,
 	CSharp,
 	D,
@@ -45,6 +46,7 @@ public class MusicManager : MonoBehaviour {
 	//public Key currentKey = Key.EMajor; // value will be passed from key button
 	public Instrument currentInstrument = Instrument.ElectricGuitar;
 	public Song currentSong;
+	public int currentPlayingSong;
 	public bool loopSong = false; // loop song in live mode?
 
 	// --Game Data Storage --//
@@ -101,6 +103,8 @@ public class MusicManager : MonoBehaviour {
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
 		tempo = Tempo.Medium;
+		Instrument.LoadInstruments ();
+
 	}
 
 	public void Load() {
@@ -128,7 +132,7 @@ public class MusicManager : MonoBehaviour {
 	void LoadInstruments () {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
-		Instrument.LoadInstruments ();
+
 
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
@@ -237,7 +241,12 @@ public class MusicManager : MonoBehaviour {
 						if (loopSong) {
 							//Debug.Log(lickQueue.Count);
 						} else {
-							GameManager.instance.SwitchToPostplay();
+							if (currentPlayingSong < currentProject.songs.Count-1) {
+								beat = 0;
+								currentPlayingSong++;
+							} else {
+								GameManager.instance.SwitchToPostplay();
+							}
 						}
 					}
 					/*if (lickQueue.Count > 0){

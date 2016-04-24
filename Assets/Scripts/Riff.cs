@@ -10,8 +10,10 @@ using UnityEditor;
 
 [System.Serializable]
 public class Riff {
-	public static int MAX_SUBDIVS = 2;
-	public static int MAX_BEATS = 32;
+	[NonSerialized]
+	public const int MAX_SUBDIVS = 2;
+	[NonSerialized]
+	public const int MAX_BEATS = 32;
 
 	//
 	// VARIABLES SAVED IN PROJECT
@@ -31,7 +33,9 @@ public class Riff {
 	//
 	// VARIABLES NOT SAVED IN PROJECT
 	//
+	[NonSerialized]
 	public Instrument instrument;
+	[NonSerialized]
 	public int copy = 0; // not saved
 
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)

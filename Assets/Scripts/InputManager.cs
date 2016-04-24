@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,10 @@ using System.Linq;
 public class InputManager : MonoBehaviour {
 
 	public static InputManager instance;
+
+	[SerializeField]
+	GameObject selected;
+	//EventSystem eventSystem;
 
 	public List<AudioSource> audioSources;
 
@@ -15,12 +20,14 @@ public class InputManager : MonoBehaviour {
 
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, Instrument.RockDrums },
-		{ KeyCode.Alpha2, Instrument.ElectricGuitar },
-		{ KeyCode.Alpha3, Instrument.ElectricBass },
-		{ KeyCode.Alpha4, Instrument.AcousticGuitar },
-		{ KeyCode.Alpha5, Instrument.ClassicalGuitar },
-		{ KeyCode.Alpha6, Instrument.PipeOrgan },
-		{ KeyCode.Alpha7, Instrument.Keyboard }
+		{ KeyCode.Alpha2, Instrument.ExoticPercussion },
+		{ KeyCode.Alpha3, Instrument.ElectricGuitar },
+		{ KeyCode.Alpha4, Instrument.ElectricBass },
+		{ KeyCode.Alpha5, Instrument.AcousticGuitar },
+		{ KeyCode.Alpha6, Instrument.ClassicalGuitar },
+		{ KeyCode.Alpha7, Instrument.PipeOrgan },
+		{ KeyCode.Alpha8, Instrument.Keyboard },
+		{ KeyCode.Alpha9, Instrument.Trumpet }
 	};
 
 	public Dictionary<Instrument, AudioClip> instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>();
@@ -66,12 +73,14 @@ public class InputManager : MonoBehaviour {
 		instance = this;
 		instrumentSwitchSounds = new Dictionary<Instrument, AudioClip>() {
 			{ Instrument.RockDrums, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums") },
+			{ Instrument.ExoticPercussion, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/RockDrums") },
 			{ Instrument.ElectricGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricGuitar")},
 			{ Instrument.ElectricBass, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
 			{ Instrument.AcousticGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
 			{ Instrument.ClassicalGuitar, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
 			{ Instrument.PipeOrgan, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
-			{ Instrument.Keyboard, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
+			{ Instrument.Keyboard, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")},
+			{ Instrument.Trumpet, Resources.Load<AudioClip>("Audio/Gameplay/Instruments/ElectricBass")}
 		};
 		audioSources = new List<AudioSource>();
 		for (int i=0; i<26; i++) {
@@ -129,7 +138,7 @@ public class InputManager : MonoBehaviour {
 						ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
 						if (Input.GetKeyDown(keyPress)) {
 							int noteIndex;
-							if (inst == Instrument.RockDrums) {
+							if (inst.type == InstrumentType.Percussion) {
 								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[keyPress];
 								if (noteIndex >= 0) {
 									Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
@@ -164,6 +173,13 @@ public class InputManager : MonoBehaviour {
 					Debug.Log(keyToLick.Count);
 					Debug.Log (MusicManager.instance.licks.Count);
 				}*/
+			}
+		} else if (GameManager.instance.currentMode == Mode.Setup) {
+			if (Input.GetMouseButtonDown(0)) {
+				selected = EventSystem.current.currentSelectedGameObject;
+				Debug.Log(selected);
+			} else if (Input.GetMouseButtonUp(0)) {
+				selected = null;
 			}
 		}
 	}

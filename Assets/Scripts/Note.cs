@@ -9,8 +9,8 @@ using UnityEditor;
 
 [System.Serializable]
 public class Note {
-	static float DEFAULT_VOLUME = 1f;
-	static float DEFAULT_DURATION = 1f;
+	const float DEFAULT_VOLUME = 1f;
+	const float DEFAULT_DURATION = 1f;
 	//static char varSeparator = '|';
 	
 	//public AudioClip sound;

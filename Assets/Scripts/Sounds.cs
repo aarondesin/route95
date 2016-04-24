@@ -232,15 +232,62 @@ public class Sounds : MonoBehaviour {
 				"Audio/Instruments/Melodic/Keyboard/Keyboard_C#7"
 			
 			} },
+
+		//Melodic.Trumpet
+		{ "Trumpet", new List<string> () {
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A3",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A#3",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_B3",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_C4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_C#4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_D4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_D#4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_E4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_F4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_F#4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_G4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_G#4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A#4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_B4",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_C5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_C#5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_D5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_D#5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_E5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_F5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_F#5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_G5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_G#5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_A#5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_B5",
+				"Audio/Instruments/Melodic/Trumpet/Trumpet_C6"
+
+			} },
 		
 
 		// Percussion.RockDrums
 		{ "RockDrums", new List<string> () {
-			"Audio/Instruments/Percussion/RockDrums_Kick",
-			"Audio/Instruments/Percussion/RockDrums_Snare",
-			"Audio/Instruments/Percussion/RockDrums_Tom",
-			"Audio/Instruments/Percussion/RockDrums_Hat",
-			"Audio/Instruments/Percussion/RockDrums_Crash",
-			} }
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_Kick",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_Snare",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_Tom",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_Hat",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_Crash"
+			} 
+		},
+
+		// Percussion.ExoticPercussion
+		{ "ExoticPercussion", new List<string> () {
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2",
+				"Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine"
+			} 
+		}
 	};
 }

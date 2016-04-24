@@ -27,6 +27,8 @@ AudioMixerController:
     - 57cf0fbc75f3210489fb0af4527c92e9
     - b87097a81694bfe4a9f5a5f80f49f6f8
     - cc14e904f9938514884cb3d3331749fa
+    - 88c233345c20a124d804fdaaee334ec7
+    - d64ced3572d237e4ca80a0a061d94ec4
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500003}
@@ -117,6 +119,8 @@ AudioMixerGroupController:
   - {fileID: 24365710}
   - {fileID: 24347808}
   - {fileID: 24399864}
+  - {fileID: 24386718}
+  - {fileID: 24396862}
   m_Volume: b5a92a78d920eee449947c6fa286eb10
   m_Pitch: a20d997af4e8c8e4b83bf607fefc88ad
   m_Effects:
@@ -208,6 +212,40 @@ AudioMixerGroupController:
   m_Pitch: cd9a24a5792267c49a6cb575b057664f
   m_Effects:
   - {fileID: 24436396}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!243 &24386718
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Trumpet
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 88c233345c20a124d804fdaaee334ec7
+  m_Children: []
+  m_Volume: 993b2207ce6ed2e45967bf0a34ca4eb5
+  m_Pitch: e4908437be1b54a4bbbb1ebdac7ca750
+  m_Effects:
+  - {fileID: 24446950}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!243 &24396862
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Exotic Percussion
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: d64ced3572d237e4ca80a0a061d94ec4
+  m_Children: []
+  m_Volume: e90ecaf963088eb48952a375af1ab064
+  m_Pitch: 59d4aed4f590d2944ab9a842ac95ec2f
+  m_Effects:
+  - {fileID: 24466798}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -311,6 +349,19 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!244 &24446950
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: 0063c520ea4092f449deded13ffb9b75
+  m_EffectName: Attenuation
+  m_MixLevel: b963362d56017c440a23a824a4922558
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &24459432
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -346,6 +397,19 @@ AudioMixerEffectController:
   m_EffectID: 66e10d301afbfcf49a113639bc79ab82
   m_EffectName: Attenuation
   m_MixLevel: 8f7fbdc2a20bbe24097449e4c73c15f0
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!244 &24466798
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: 3fa1856316875fb42bc6ac77f93081fe
+  m_EffectName: Attenuation
+  m_MixLevel: 52dca330574fb25479c4b84e5f200ffc
   m_Parameters: []
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
