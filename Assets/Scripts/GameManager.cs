@@ -331,7 +331,8 @@ public class GameManager : MonoBehaviour {
 		EnableMenu(songProgressBar);
 		if (MusicManager.instance.loopSong) EnableMenu(loopIcon);
 		else DisableMenu(loopIcon);
-		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewChase);
+		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewChase);
+		CameraControl.instance.StartLiveMode();
 		MusicManager.instance.StartSong();
 
 		if (!hasShownLiveHelp) {
