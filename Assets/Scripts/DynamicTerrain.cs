@@ -33,7 +33,7 @@ public class DynamicTerrain {
 	public FFTWindow fftWindow = FFTWindow.Rectangular;
 
 	private Dictionary<Chunk, int> chunkPriorities;
-	private int chunkUpdatesPerCycle = 16;
+	private int chunkUpdatesPerCycle = 8;
 
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];

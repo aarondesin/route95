@@ -286,9 +286,10 @@ public class Chunk{
 		float xMax = pos.x + CHUNK_SIZE*1.5f;
 		float zMin = pos.z-CHUNK_SIZE*0.5f;
 		float zMax = pos.z + CHUNK_SIZE*1.5f;
-		float resolution = 100f;
+		float resolution = 4f;
+		float diff = 1f - PlayerMovement.instance.progress;
 		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
-		float progress = 0f;
+		float progress = PlayerMovement.instance.progress;
 		while (progress <= 1f) {
 			Vector3 sample = road.GetPoint (progress);
 			float x = sample.x;
@@ -296,7 +297,7 @@ public class Chunk{
 			if (x >= xMin && x < xMax && z >= zMin && z < zMax) {
 				return true;
 			}
-			progress += 1 / resolution;
+			progress += diff / resolution;
 		}
 		return false;
 	}
@@ -307,9 +308,10 @@ public class Chunk{
 		float xMax = xMin + CHUNK_SIZE;
 		float zMin = pos.z;
 		float zMax = zMin + CHUNK_SIZE;
-		float resolution = 100f;
+		float resolution = 4f;
+		float diff = 1f - PlayerMovement.instance.progress;
 		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
-		float progress = 0f;
+		float progress = PlayerMovement.instance.progress;
 		while (progress <= 1f) {
 			Vector3 sample = road.GetPoint (progress);
 			float x = sample.x;
@@ -317,7 +319,7 @@ public class Chunk{
 			if (x >= xMin && x < xMax && z >= zMin && z < zMax) {
 				return true;
 			}
-			progress += 1 / resolution;
+			progress += diff / resolution;
 		}
 		return false;
 	}
