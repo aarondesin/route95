@@ -7504,7 +7504,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94517106
+  m_Size: 0.94517094
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14700,15 +14700,15 @@ MonoBehaviour:
   audioOut: {fileID: 0}
   road: {fileID: 0}
   timeOfDay: 0
-  primaryDayColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryDayColor: {r: 0, g: 0, b: 0, a: 0}
-  primarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
-  secondarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
-  primaryNightColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryNightColor: {r: 0, g: 0, b: 0, a: 0}
-  primarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
-  secondarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
-  maxSunIntensity: 0
+  primaryDayColor: {r: 1, g: 1, b: 1, a: 1}
+  secondaryDayColor: {r: 0.53333336, g: 0.72156864, b: 0.8705883, a: 1}
+  primarySunsetColor: {r: 1, g: 1, b: 0, a: 1}
+  secondarySunsetColor: {r: 1, g: 0.49019608, b: 0, a: 1}
+  primaryNightColor: {r: 0, g: 0, b: 1, a: 1}
+  secondaryNightColor: {r: 0, g: 0, b: 0, a: 1}
+  primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
+  secondarySunriseColor: {r: 1, g: 0.4901961, b: 0, a: 1}
+  maxSunIntensity: 1
   minSunIntensity: 0
 --- !u!1 &906108765
 GameObject:
@@ -19498,7 +19498,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.5, y: 431}
+  m_AnchoredPosition: {x: 17.5, y: 23.631287}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -24210,8 +24210,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288437015}
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.9793875
+  m_Value: 0.0000017438555
+  m_Size: 0.97938746
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

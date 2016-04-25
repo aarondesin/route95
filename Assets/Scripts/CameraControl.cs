@@ -223,7 +223,7 @@ public class CameraControl : MonoBehaviour {
 				followMode = CameraFollowMode.Shaky
 			},
 
-			// Far top
+			// Distant
 			new CameraView () {
 				name = "Distant",
 				targetPos = PickRandom (10f, 20f),
@@ -239,11 +239,12 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	Vector3 PickRandom (float minHeight, float maxHeight) {
+		float chunkSize = WorldManager.instance.CHUNK_SIZE;
 		Vector3 result = new Vector3 (
-			                 WorldManager.instance.player.transform.position.x + WorldManager.instance.CHUNK_SIZE,
-			                 WorldManager.instance.player.transform.position.y + Random.Range (minHeight, maxHeight),
-			                 WorldManager.instance.player.transform.position.z + WorldManager.instance.CHUNK_SIZE
-		                 );
+			WorldManager.instance.player.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
+			WorldManager.instance.player.transform.position.y + Random.Range (minHeight, maxHeight),
+			WorldManager.instance.player.transform.position.z + Random.Range (-chunkSize / 2f, chunkSize / 2f)
+		);
 		return result;
 	}
 
@@ -270,8 +271,10 @@ public class CameraControl : MonoBehaviour {
 				angle.pos = angle.targetPos;
 				float x = Mathf.PerlinNoise (angle.shake, angle.shake);
 				float y = Mathf.PerlinNoise (angle.shake, angle.shake);
-				angle.rot = Quaternion.FromToRotation (angle.pos, WorldManager.instance.player.transform.position);
-				angle.rot = angle.targetRot * Quaternion.Euler (x, y, 0f);
+				//angle.rot = Quaternion.FromToRotation (angle.pos, WorldManager.instance.player.transform.position);
+				transform.LookAt (WorldManager.instance.player.transform.position, Vector3.up);
+				angle.rot = transform.rotation;
+				//angle.rot = angle.targetRot * Quaternion.Euler (x, y, 0f);
 				break;
 			}
 		}
