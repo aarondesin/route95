@@ -97,6 +97,9 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
 
+		//AudioSource source = MusicManager.instance.instrumentAudioSources [currentRiff.instrument];
+		//source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = currentRiff.distortionLevel;
+
 	}
 
 	// Removes all existing buttons

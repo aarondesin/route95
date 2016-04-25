@@ -16,9 +16,33 @@ public class Riff {
 	public const int MAX_BEATS = 32;
 
 	//Float values from audio effect knobs
-	public float distortionLevel = 0.9f;
-	public float echoDecayRatio = 0.9f;
-	public float echoDelay = 5000;
+
+	[SerializeField]
+	public float distortionLevel;
+	[SerializeField]
+	public float echoDecayRatio;
+	[SerializeField]
+	public float echoDelay;
+	[SerializeField]
+	public float echoDryMix;
+	[SerializeField]
+	public float reverbDecayTime;
+	[SerializeField]
+	public float reverbLevel;
+	[SerializeField]
+	public float fuzzLevel;
+	[SerializeField]
+	public float tremoloRate;
+	[SerializeField]
+	public float chorusDryMix;
+	[SerializeField]
+	public float chorusRate;
+	[SerializeField]
+	public float chorusDepth;
+	[SerializeField]
+	public float flangerDelay;
+	[SerializeField]
+	public float flangerDryMix;
 
 	//
 	// VARIABLES SAVED IN PROJECT
