@@ -68,6 +68,7 @@ public class CameraControl : MonoBehaviour {
 	public Transform WideRear;
 	public Transform WideFront;
 
+	CameraControlMode controlMode = CameraControlMode.Random;
 	CameraView currentAngle;
 	List<CameraView> angles;
 	public float transitionFreq;
@@ -75,6 +76,19 @@ public class CameraControl : MonoBehaviour {
 	public bool liveMode = false;
 
 	bool moving = false;
+
+	public Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
+		{ KeyCode.F1, 0 },
+		{ KeyCode.F2, 1 },
+		{ KeyCode.F3, 2 },
+		{ KeyCode.F4, 3 },
+		{ KeyCode.F5, 4 },
+		{ KeyCode.F6, 5 },
+		{ KeyCode.F7, 6 },
+		{ KeyCode.F8, 7 },
+		{ KeyCode.F9, 8 },
+		{ KeyCode.F10, 9 }
+	};
 
 	public void StartLiveMode () {
 		liveMode = true;
@@ -100,7 +114,11 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	public void ChangeAngle () {
-		currentAngle = angles[Random.Range(0, angles.Count)];
+		ChangeAngle (Random.Range (0, angles.Count));
+	}
+
+	public void ChangeAngle (int camView) {
+		currentAngle = angles[camView];
 		//SnapToPosition (currentAngle.tr);
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
 		Debug.Log(currentAngle.name);
@@ -161,7 +179,7 @@ public class CameraControl : MonoBehaviour {
 				fov = 75f,
 				followMode = CameraFollowMode.Lead,
 				placementMode = CameraPlacementMode.Fixed,
-				lag = 0.05f
+				lag = 0.2f
 			},
 
 			// Front right wheel
@@ -220,7 +238,7 @@ public class CameraControl : MonoBehaviour {
 			},
 
 			// Wide rear
-			new CameraView () {
+			/*new CameraView () {
 				name = "WideRear",
 				transform = WideRear,
 				targetPos = WideRear.position,
@@ -228,10 +246,10 @@ public class CameraControl : MonoBehaviour {
 				fov = 75f,
 				followMode = CameraFollowMode.Static,
 				placementMode = CameraPlacementMode.Fixed
-			},
+			},*/
 
 			// Wide front
-			new CameraView () {
+			/*new CameraView () {
 				name = "WideFront",
 				transform = WideFront,
 				targetPos = WideFront.position,
@@ -239,7 +257,7 @@ public class CameraControl : MonoBehaviour {
 				fov = 75f,
 				followMode = CameraFollowMode.Static,
 				placementMode = CameraPlacementMode.Fixed
-			},
+			},*/
 
 			// Far top
 			new CameraView () {
@@ -287,10 +305,12 @@ public class CameraControl : MonoBehaviour {
 			case CameraFollowMode.Lead:
 				//angle.pos = (angle.tr.position - angle.pos) * angle.lag * Time.deltaTime;
 				//angle.pos =Vector3.MoveTowards (angle.pos, angle.tr.position, Vector3.Distance(angle.pos, angle.tr.position) * angle.lag);
-				Vector3 velocity = Vector3.zero;
-				angle.pos = Vector3.SmoothDamp (angle.pos, angle.targetPos, ref velocity, angle.lag);
+				//Vector3 velocity = Vector3.zero;
+				//angle.pos = Vector3.SmoothDamp (angle.pos, angle.targetPos, ref velocity, angle.lag);
+				//angle.pos = angle.targetPos;
+				angle.pos += (angle.targetPos - angle.pos) * angle.lag;
 				//transform.rotation = Quaternion.Euler (transform.rotation.eulerAngles + (currentAngle.tr.rotation.eulerAngles - transform.rotation.eulerAngles) * currentAngle.lag * Time.deltaTime);
-				angle.rot = Quaternion.LookRotation (WorldManager.instance.player.transform.position + WorldManager.instance.player.transform.forward *20f - angle.pos, Vector3.up);
+				//angle.rot = Quaternion.LookRotation (WorldManager.instance.player.transform.position + WorldManager.instance.player.transform.forward *20f - angle.pos, Vector3.up);
 				break;
 			case CameraFollowMode.Static:
 				angle.pos = angle.targetPos;
@@ -311,15 +331,23 @@ public class CameraControl : MonoBehaviour {
 
 	void Update() {
 		if (liveMode) {
+			foreach (KeyCode key in keyToView.Keys) {
+				if (Input.GetKeyDown (key)) {
+					ChangeAngle (keyToView [key]);
+					controlMode = CameraControlMode.Manual;
+				}
+			}
 			UpdateAngles();
 			//Debug.Log (currentAngle.pos);
 			transform.position = currentAngle.pos;
 			transform.rotation = currentAngle.rot;
-			if (transitionTimer <= 0f) {
-				ChangeAngle();
-				transitionTimer = transitionFreq;
-			} else {
-				transitionTimer--;
+			if (controlMode == CameraControlMode.Random) {
+				if (transitionTimer <= 0f) {
+					ChangeAngle ();
+					transitionTimer = transitionFreq;
+				} else {
+					transitionTimer--;
+				}
 			}
 		} else {
 			if (moving) {

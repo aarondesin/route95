@@ -4255,6 +4255,10 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 312760250}
+--- !u!1 &316425911 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+  m_PrefabInternal: {fileID: 1216750873}
 --- !u!1 &345406320
 GameObject:
   m_ObjectHideFlags: 0
@@ -4932,6 +4936,8 @@ Transform:
   - {fileID: 665833772}
   - {fileID: 1208155515}
   - {fileID: 1403109805}
+  - {fileID: 419966873}
+  - {fileID: 645894582}
   m_Father: {fileID: 0}
   m_RootOrder: 8
 --- !u!114 &371512238
@@ -4953,6 +4959,10 @@ MonoBehaviour:
   particles:
   - {fileID: 419966875}
   - {fileID: 645894584}
+  frontLeftWheel: {fileID: 1471787785}
+  frontRightWheel: {fileID: 664842420}
+  backLeftWheel: {fileID: 493314195}
+  backRightWheel: {fileID: 316425911}
 --- !u!82 &371512239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5909,12 +5919,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 419966872}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00266, y: -0.00455, z: -0.00657}
+  m_LocalRotation: {x: 0.00000011518241, y: 0.70722896, z: 0.7069846, w: -0.00000011522223}
+  m_LocalPosition: {x: -1.2960001, y: -2.247157, z: -2.974773}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 302524264}
-  m_RootOrder: 0
+  m_Father: {fileID: 371512237}
+  m_RootOrder: 33
 --- !u!199 &419966874
 ParticleSystemRenderer:
   m_ObjectHideFlags: 0
@@ -8568,6 +8578,10 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
+--- !u!1 &493314195 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+  m_PrefabInternal: {fileID: 302524263}
 --- !u!1 &497647094
 GameObject:
   m_ObjectHideFlags: 0
@@ -10564,12 +10578,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 645894581}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00266, y: -0.00455, z: -0.00657}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071067}
+  m_LocalPosition: {x: 1.296, y: -2.247, z: -2.0649998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1216750874}
-  m_RootOrder: 0
+  m_Father: {fileID: 371512237}
+  m_RootOrder: 34
 --- !u!199 &645894583
 ParticleSystemRenderer:
   m_ObjectHideFlags: 0
@@ -12256,6 +12270,10 @@ Transform:
   m_Children: []
   m_Father: {fileID: 371512237}
   m_RootOrder: 6
+--- !u!1 &664842420 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+  m_PrefabInternal: {fileID: 202934960}
 --- !u!1 &665833771
 GameObject:
   m_ObjectHideFlags: 0
@@ -25558,6 +25576,10 @@ RectTransform:
   m_AnchoredPosition: {x: 0.00012207031, y: 0.0019836589}
   m_SizeDelta: {x: 1920, y: 1079.5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1471787785 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+  m_PrefabInternal: {fileID: 199396362}
 --- !u!1 &1475340075
 GameObject:
   m_ObjectHideFlags: 0
