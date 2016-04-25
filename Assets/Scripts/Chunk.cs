@@ -215,8 +215,8 @@ public class Chunk{
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		for (int v = 0; v < vertices.Length; v++) {
 			Vector2 c = IntToV2 (v);
-			if (!vertLocked[v]) {
-				if (!Constrained (chunk.transform.position + vertices [v])) {
+			if (!vertLocked[v]) { //if vert is frozen
+				if (!Constrained (chunk.transform.position + vertices [v])) { //if vert is not near the road
 					Vector3 vertPos = chunk.transform.position + vertices [v];
 					float distance = Vector3.Distance (vertPos, player.transform.position);
 					if (checkDist (distance, updateDist, margin)) {
@@ -228,14 +228,14 @@ public class Chunk{
 						float diff = newY - vertices [v].y;
 						vertices [v].y += diff/3f;
 						vertLocked [v] = true;
-						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
+						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) { //flip normal if pointing down
 							chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
 						}
 						chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds ();
 						chunk.GetComponent<MeshCollider> ().sharedMesh = chunk.GetComponent<MeshFilter> ().mesh;
 						//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
-				} else {
+				} else { //if vert is near the road
 					vertices[v].y = 0f;
 					DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
 					if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f) {
@@ -243,7 +243,7 @@ public class Chunk{
 					}
 					vertLocked [v] = true;
 				}
-			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) {
+			} else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) { //if vert is not at it's set height yet
 				float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
 				vertices [v].y += diff/3f;
 			}

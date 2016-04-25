@@ -51,7 +51,7 @@ public class VertexMap {
 	}
 
 	public void SetHeight (int x, int y, float h) {
-		vertices[x][y].SetHeight (h);
+		vertices[x][y].setHeight (h);
 	}
 
 	//
@@ -109,6 +109,7 @@ public class VertexMap {
 		if (!ContainsVertex (x, y)) AddVertex (x, y);
 
 		vertices[x][y].chunkVertices.Add(new KeyValuePair<Mesh, int> (chunkMesh, vertIndex));
+		vertices [x][y].updateNormal();
 	}
 
 	//
@@ -135,6 +136,7 @@ public class Vertex {
 	public int x;
 	public int y;
 	public float height = 0f;
+	public float currHeight = 0f;
 	public float distToRoad = Mathf.Infinity;
 	public Vector3 normal = Vector3.up;
 
@@ -144,20 +146,31 @@ public class Vertex {
 		chunkVertices = new List<KeyValuePair<Mesh, int>>();
 	}
 
-	public void SetHeight (float h) {
-		bool debug = Random.Range (0, 100) == 0;
-		height = h;
-
-		//if (debug) Debug.Log("SetHeight");
+	public void updateNormal () {
+		normal = Vector3.zero;
 		foreach (KeyValuePair<Mesh, int> chunkVert in chunkVertices) {
-			//if (debug) Debug.Log(chunkVert.Key);
+			normal += chunkVert.Key.normals[chunkVert.Value];
+		}
+		normal.Normalize ();
+	}
+
+	public void setHeight (float h) {
+		height = h;
+		foreach (KeyValuePair<Mesh, int> chunkVert in chunkVertices) {
+			/*
 			Vector3[] verts = new Vector3[chunkVert.Key.vertices.Length];
 			for (int i=0; i<verts.Length; i++) {
 				verts[i] = chunkVert.Key.vertices[i];
 				if (i == chunkVert.Value) verts[i].y = height;
 			}
-			chunkVert.Key.vertices = verts;
+			*/
+			chunkVert.Key.vertices [chunkVert.Value].y = height;
+			//chunkVert.Key.vertices = verts;
 		}
 	}
-		
+
+	public void lerpHeight(float factor) {
+		float diff = height - currHeight;
+		currHeight += diff * factor;
+	}
 }
