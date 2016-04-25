@@ -114,7 +114,7 @@ public class Bezier : MonoBehaviour{
 	public Vector3 GetDirection (float t) {
 		return GetVelocity (t).normalized;
 	}
-
+		
 	public Vector3 ClosestPointOnBezier (Vector3 pt) {
 		var npt = ClosestPointOnLine (points [0], points [2], pt);
 		var d = Vector3.Distance (points [0], npt) / Vector3.Distance (points [0], points [2]);
