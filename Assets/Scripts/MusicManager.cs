@@ -55,7 +55,7 @@ public class MusicManager : MonoBehaviour {
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources;
 
 	//public static float tempo = 120f; // tempo in BPM
-	public Tempo tempo;
+	public Tempo tempo = Tempo.Medium;
 	private float BeatTimer;
 	private int beat;
 	public static bool playing = false;
@@ -157,7 +157,7 @@ public class MusicManager : MonoBehaviour {
 
 		}
 		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].volume = 0.25f;
-		instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
+		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.AddComponent<AudioDistortionFilter>();
 		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
 

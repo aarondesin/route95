@@ -182,7 +182,7 @@ public class InputManager : MonoBehaviour {
 					if (selected.GetComponent<DraggableButton>() != null) {
 						selected.GetComponent<DraggableButton>().OnMouseDown();
 					}
-					Debug.Log(selected);
+					//Debug.Log(selected);
 				}
 			} else {
 				if (selected) {
