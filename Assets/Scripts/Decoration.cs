@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum DecorationDistribution {
 	Random, // truly random, based on density
@@ -7,8 +8,22 @@ public enum DecorationDistribution {
 	CloseToRoad // placed close to road (good for small objects)
 }
 
-public class Decoration : MonoBehaviour {
+public enum DecorationGroup {
+	None,
+	Vegetation,
+	Rocks,
+	RoadSigns
+}
 
+[System.Serializable]
+public struct DecoGroupMaxSize {
+	public DecorationGroup group;
+	public int maxActive;
+}
+
+public class Decoration : MonoBehaviour {
+	public static Dictionary<Decoration, int> numDecorations;
+	public DecorationGroup group = DecorationGroup.None;
 	public float density; // 0-1, density of population
 	public DecorationDistribution distribution;
 

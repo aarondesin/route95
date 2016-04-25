@@ -55,7 +55,7 @@ public class MusicManager : MonoBehaviour {
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources;
 
 	//public static float tempo = 120f; // tempo in BPM
-	public Tempo tempo;
+	public Tempo tempo = Tempo.Medium;
 	private float BeatTimer;
 	private int beat;
 	public static bool playing = false;

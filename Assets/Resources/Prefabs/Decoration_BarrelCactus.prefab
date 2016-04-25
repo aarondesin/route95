@@ -74,6 +74,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b8cb4bf408079438b1e6e1dd729279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  group: 1
+  maxActive: 100
   density: 0.4
   distribution: 2
   positionOffset: {x: 0, y: 0, z: 0}

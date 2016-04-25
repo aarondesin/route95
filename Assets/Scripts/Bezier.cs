@@ -19,6 +19,8 @@ public class Bezier : MonoBehaviour{
 	public float ROAD_HEIGHT;
 	public float slope = 0.8f;
 
+	Dictionary<GameObject, float> decorations;
+
 	//public Vector3[] verts;
 	//public Vector2[] UVs;
 	//public int[] tris;
@@ -112,7 +114,7 @@ public class Bezier : MonoBehaviour{
 	public Vector3 GetDirection (float t) {
 		return GetVelocity (t).normalized;
 	}
-
+		
 	public Vector3 ClosestPointOnBezier (Vector3 pt) {
 		var npt = ClosestPointOnLine (points [0], points [2], pt);
 		var d = Vector3.Distance (points [0], npt) / Vector3.Distance (points [0], points [2]);
@@ -250,6 +252,7 @@ public class Bezier : MonoBehaviour{
 		points = new Vector3[0];
 		Reset ();
 		Build();
+		decorations = new Dictionary<GameObject, float>();
 		//AddCurve ();
 		//AddCurve ();
 		//Build ();
@@ -257,6 +260,7 @@ public class Bezier : MonoBehaviour{
 	}
 
 	public void Update () {
+		//if (Time.frameCount % 60 == 0) foreach (GameObject deco in decorations.Keys) Debug.Log(decorations[deco]);
 		if (Vector3.Distance (points [3], WorldManager.instance.player.transform.position) > ROAD_RADIUS) {
 			//remove far away points behind the player
 			//Debug.Log("Removing old points");
@@ -267,6 +271,17 @@ public class Bezier : MonoBehaviour{
 				newPoints [i] = points [i + 3];
 			}
 			WorldManager.instance.player.GetComponent<PlayerMovement> ().progress = numerator / this.CurveCount;
+			List<GameObject> deletes = new List<GameObject>();
+			foreach (GameObject decoration in decorations.Keys) {
+				if (decorations[decoration] < 0f) {
+					GameObject temp = decoration;
+					deletes.Add(temp);
+				}
+			}
+			foreach (GameObject delete in deletes) {
+				decorations.Remove(delete);
+				Destroy(delete);
+			}
 		}
 		if (Vector3.Distance (points [0], WorldManager.instance.player.transform.position) < ROAD_RADIUS) {
 			//create points on the curve behind the player
@@ -290,6 +305,10 @@ public class Bezier : MonoBehaviour{
 			//Array.Resize (ref points, points.Length -3);
 			//Debug.Log ("fucked up second");
 		}
+	}
+
+	public void AddDecoration (GameObject decoration, float prog) {
+		decorations.Add (decoration, prog);
 	}
 
 	public void Build () {
@@ -339,13 +358,13 @@ public class Bezier : MonoBehaviour{
 		//Debug.Log(GetComponent<MeshRenderer>().isVisible);
 	}
 
-	private Vector3 BezDown (Vector3 direction) {
+	public Vector3 BezDown (Vector3 direction) {
 		Vector3 planed = Vector3.ProjectOnPlane (direction, Vector3.up).normalized; // Project direction on X/Z plane
 		planed = Quaternion.Euler(0, -90, 0) * planed;
 		return Vector3.Cross (direction, planed);
 	}
 
-	private Vector3 BezRight (Vector3 direction) {
+	public Vector3 BezRight (Vector3 direction) {
 		Vector3 planed = Vector3.ProjectOnPlane (direction, Vector3.up).normalized;
 		planed = Quaternion.Euler (0, -90, 0) * planed;
 		return planed;
