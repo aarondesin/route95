@@ -1967,7 +1967,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0.000061035156}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &159183757
@@ -4947,7 +4947,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightRight: {fileID: 1080503465}
   lightLeft: {fileID: 1299636034}
-  velocity: 0.2
   moving: 0
   lights: 0
   progress: 0
@@ -7506,7 +7505,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94565505
+  m_Size: 0.94517106
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10172,12 +10171,12 @@ MonoBehaviour:
   arrowIcon: {fileID: 21300000, guid: d609bb3db92815b4f84c54def93896d6, type: 3}
   addIcon: {fileID: 21300000, guid: ed614671d2e9fca49a149b99abdc6eb1, type: 3}
   editIcon: {fileID: 21300000, guid: 73753c5230f1f76498ba0d937217a3f7, type: 3}
-  playIcon: {fileID: 0}
-  pauseIcon: {fileID: 0}
+  playIcon: {fileID: 21300000, guid: 5a63a9880030c94469da624501f0a408, type: 3}
+  pauseIcon: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
   loadIcon: {fileID: 21300000, guid: 771e46b24b8c2b242b1fca076d792aa0, type: 3}
   removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
   circleIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
-  volumeIcon: {fileID: 0}
+  volumeIcon: {fileID: 21300000, guid: a01c201d16be7a94ebf40dec47d5dc41, type: 3}
   loadingSpeed: 3
   loadingScreen: {fileID: 796519848}
   loadingBar: {fileID: 1576480158}
@@ -20569,7 +20568,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1550758007}
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -20938,7 +20937,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -21008,7 +21007,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.5, y: 23.422668}
+  m_AnchoredPosition: {x: 17.5, y: 431}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
