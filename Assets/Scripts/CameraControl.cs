@@ -14,6 +14,12 @@ public enum CameraControlMode {
 	Random
 }
 
+public enum CameraPlacementMode {
+	Fixed,
+	RandomSky,
+	RandomGround
+}
+
 public enum CameraFollowMode {
 	Lead, // Points in front of target
 	Static,
@@ -25,6 +31,7 @@ public class CameraView {
 	public Transform transform;
 	public float fov; // field of view
 	public CameraFollowMode followMode; // type of camera following
+	public CameraPlacementMode placementMode;
 	public Vector3 pos; // current position of camera
 	public Quaternion rot; // current rotation of camera
 
@@ -97,6 +104,16 @@ public class CameraControl : MonoBehaviour {
 		//SnapToPosition (currentAngle.tr);
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
 		Debug.Log(currentAngle.name);
+		switch (currentAngle.placementMode) {
+		case CameraPlacementMode.Fixed:
+			break;
+		case CameraPlacementMode.RandomGround:
+			currentAngle.targetPos = PickRandom (10f, 20f);
+			break;
+		case CameraPlacementMode.RandomSky:
+			currentAngle.targetPos = PickRandom (25f, 50f);
+			break;
+		}
 	}
 
 	void Start() {
@@ -131,6 +148,7 @@ public class CameraControl : MonoBehaviour {
 				targetRot = NearChase.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Lead,
+				placementMode = CameraPlacementMode.Fixed,
 				lag = 0.04f
 			},
 
@@ -142,6 +160,7 @@ public class CameraControl : MonoBehaviour {
 				targetRot = FarChase.rotation,
 				fov = 75f,
 				followMode = CameraFollowMode.Lead,
+				placementMode = CameraPlacementMode.Fixed,
 				lag = 0.05f
 			},
 
@@ -152,7 +171,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = FrontRightWheel.position,
 				targetRot = FrontRightWheel.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Front left wheel
@@ -162,7 +182,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = FrontLeftWheel.position,
 				targetRot = FrontLeftWheel.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Rear right wheel
@@ -172,7 +193,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = RearRightWheel.position,
 				targetRot = RearRightWheel.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Rear left wheel
@@ -182,7 +204,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Rear left wheel
@@ -192,7 +215,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Wide rear
@@ -202,7 +226,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = WideRear.position,
 				targetRot = WideRear.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Wide front
@@ -212,7 +237,8 @@ public class CameraControl : MonoBehaviour {
 				targetPos = WideFront.position,
 				targetRot = WideFront.rotation,
 				fov = 75f,
-				followMode = CameraFollowMode.Static
+				followMode = CameraFollowMode.Static,
+				placementMode = CameraPlacementMode.Fixed
 			},
 
 			// Far top
@@ -220,7 +246,8 @@ public class CameraControl : MonoBehaviour {
 				name = "FarTop",
 				targetPos = PickRandom (25f, 50f),
 				fov = 60f,
-				followMode = CameraFollowMode.Shaky
+				followMode = CameraFollowMode.Shaky,
+				placementMode = CameraPlacementMode.RandomSky
 			},
 
 			// Distant
@@ -228,7 +255,8 @@ public class CameraControl : MonoBehaviour {
 				name = "Distant",
 				targetPos = PickRandom (10f, 20f),
 				fov = 60f,
-				followMode = CameraFollowMode.Shaky
+				followMode = CameraFollowMode.Shaky,
+				placementMode = CameraPlacementMode.RandomGround
 			}
 		};
 
@@ -239,6 +267,7 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	Vector3 PickRandom (float minHeight, float maxHeight) {
+		
 		float chunkSize = WorldManager.instance.CHUNK_SIZE;
 		Vector3 result = new Vector3 (
 			WorldManager.instance.player.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
