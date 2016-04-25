@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
@@ -27,11 +28,22 @@ public class WorldManager : MonoBehaviour {
 	public float MIN_DECORATION_HEIGHT;
 	[SerializeField]
 	private int numDecorations;
+	private Dictionary<DecorationGroup, int> maxActive;
+	[NonSerialized]
 	public List<string> decorationPaths = new List<string>() {
-		"Prefabs/Decoration_Saguaro",
-        "Prefabs/Decoration_BarrelCactus"
+		"Prefabs/Decoration_75MPH",
+		"Prefabs/Decoration_Agave01",
+		"Prefabs/Decoration_BarrelCactus",
+		"Prefabs/Decoration_Boulder01",
+		"Prefabs/Decoration_Boulder02",
+		"Prefabs/Decoration_Boulder03",
+		"Prefabs/Decoration_Chevron",
+		"Prefabs/Decoration_JoshuaTree01",
+		"Prefabs/Decoration_Saguaro"
 	};
 	public List<GameObject> decorations = new List<GameObject>();
+
+	Vector2 roadDistance;
 
 	public float TIME_SCALE;
 	public float LIGHT_X_SCALE;
@@ -73,6 +85,8 @@ public class WorldManager : MonoBehaviour {
 	//bool loadedDecorations = false;
 	//bool decorated = false;
 
+	public DecoGroupMaxSize[] initialMaxActive;
+
 	// Use this for initialization
 	void Start () {
 		instance = this;
@@ -80,7 +94,7 @@ public class WorldManager : MonoBehaviour {
 
 		terrain = new DynamicTerrain (player, CHUNK_SIZE, CHUNK_RESOLUTION, TERRAIN_MATERIAL, LOADED_CHUNK_RADIUS, VERT_UPDATE_DISTANCE, VERT_HEIGHT_SCALE, SMOOTH_FACTOR);
 
-		timeOfDay = Random.Range(0, 2*Mathf.PI);
+		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = createSun();
 		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
@@ -90,8 +104,11 @@ public class WorldManager : MonoBehaviour {
 			ROAD_RADIUS = 1000f;
 		}
 		road.GetComponent<Bezier> ().ROAD_RADIUS = ROAD_RADIUS;
-
-
+		roadDistance  = new Vector2 (ROAD_WIDTH * 1.1f, ROAD_WIDTH * 1.2f);
+		maxActive = new Dictionary<DecorationGroup, int>();
+		foreach (DecoGroupMaxSize groupSize in initialMaxActive) {
+			maxActive[groupSize.group] = groupSize.maxActive;
+		}
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -115,8 +132,8 @@ public class WorldManager : MonoBehaviour {
 		GameManager.instance.ChangeLoadingMessage("Loading world...");
 		terrain.update(freqDataArray);
 		if (DO_DECORATE) {
-			StartCoroutine("LoadDecorations");
-			StartCoroutine("DoDecorate");
+			LoadDecorations();
+			InitialDecorate();
 		}
         NotifyLoadingDone();
 	}
@@ -210,29 +227,41 @@ public class WorldManager : MonoBehaviour {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
+
+	void InitialDecorate () {
+		for (int i=0; i<MAX_DECORATIONS; i++) {
+			AttemptDecorate ();
+		}
+	}
     
 	void AttemptDecorate () {
 		if (DO_DECORATE) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 
 				// Pick a random decoration and decorate with it
-				GameObject decoration = decorations[Random.Range(0, decorations.Count)];
-				switch (decoration.GetComponent<Decoration>().distribution) {
-				case DecorationDistribution.Random:
-					Chunk chunk = terrain.RandomChunk ();
-					while (terrain.activeRoadChunksContains (chunk)) {
-						chunk = terrain.RandomChunk ();
+				GameObject decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
+				Decoration deco = decoration.GetComponent<Decoration>();
+				if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<Decoration, int>();
+				if (!Decoration.numDecorations.ContainsKey(deco))
+					Decoration.numDecorations.Add (deco, 0);
+				if (Decoration.numDecorations[deco] < maxActive[deco.group]) {
+					switch (deco.distribution) {
+					case DecorationDistribution.Random:
+						Chunk chunk = terrain.RandomChunk ();
+						while (terrain.activeRoadChunksContains (chunk)) {
+							chunk = terrain.RandomChunk ();
+						}
+						DecorateRandom (chunk, decoration);
+						break;
+					case DecorationDistribution.Roadside:
+						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
+						DecorateRoadside (bezierProg, decoration);
+						break;
+					case DecorationDistribution.CloseToRoad:
+						DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
+						break;
 					}
-					DecorateRandom (chunk, decoration);
-					break;
-				case DecorationDistribution.Roadside:
-					break;
-				case DecorationDistribution.CloseToRoad:
-					DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
-					break;
-
-
-
+					Decoration.numDecorations[deco]++;
 				}
 			}
 		}
@@ -288,6 +317,24 @@ public class WorldManager : MonoBehaviour {
 				numDecorations++;
 			}
 		}
+	}
+
+	void DecorateRoadside (float prog, GameObject decoration) {
+		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
+		Bezier roadBez = road.GetComponent<Bezier>();
+		Vector3 coordinate = 
+			roadBez.BezRight(roadBez.GetPoint(prog)) * UnityEngine.Random.Range (roadDistance.x, roadDistance.y) * (side == 0 ? 1 : -1);
+		RaycastHit hit;
+		if (Physics.Raycast(new Vector3 (coordinate.x, MAX_DECORATION_HEIGHT, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
+			coordinate.y = hit.point.y;
+		else coordinate.y = 0f;
+		GameObject newDecoration = 
+			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
+		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f));
+		newDecoration.GetComponent<Decoration>().Randomize();
+		newDecoration.transform.parent = road.gameObject.transform;
+		numDecorations++;
+		roadBez.AddDecoration(newDecoration, prog);
 	}
 
 	void LoadDecoration (string path) {
