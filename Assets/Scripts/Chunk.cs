@@ -16,7 +16,7 @@ public class Chunk{
 	private int y; //y position in chunk grid
 
 	public GameObject chunk;
-	private bool[] vertLocked; //if vertex in mesh.vertices has had its height set
+	//private bool[] vertLocked; //if vertex in mesh.vertices has had its height set
 	private bool roadNearby;
 	private Vector3[] dMap; //displacement map, displaces each vertex by a Vector3
 	private Material terrainMaterial;
@@ -37,7 +37,7 @@ public class Chunk{
 
 		//Vector3[] verts = createUniformVertexArray (CHUNK_RESOLUTION);
 		verts = createUniformVertexArray (CHUNK_RESOLUTION);
-		vertLocked = new bool[verts.Length];
+		//vertLocked = new bool[verts.Length];
 		//Vector2[] uvs = createUniformUVArray (CHUNK_RESOLUTION);
 		uvs = createUniformUVArray (CHUNK_RESOLUTION);
 		//int[] triangles = createSquareArrayTriangles (CHUNK_RESOLUTION);
@@ -53,7 +53,27 @@ public class Chunk{
 			IntVector2 coords = IntToV2 (i);
 			VertexMap vmap = DynamicTerrain.instance.vertexmap;
 
+			//bool newCorner = false;
+			//if (coords.IsCorner() && !vmap.ContainsVertex(coords)) newCorner = true;
+			//bool has = vmap.ContainsVertex(coords);
 			vmap.RegisterChunkVertex (coords, this, i);
+			/*if (newCorner) {
+				vmap.SetHeight(coords, Random.Range (-WorldManager.instance.VERT_HEIGHT_SCALE/8f, WorldManager.instance.VERT_HEIGHT_SCALE/8f));
+			} else {
+				if (!has) {
+					if (!vmap.IsConstrained(coords)) {
+						float h = 0f;
+						if (i > 0) h += verts[i-1].y/4f;
+						if (i < CHUNK_RESOLUTION-1) h += verts[i+1].y/4f;
+						if (i >= CHUNK_RESOLUTION) h += verts[i-CHUNK_RESOLUTION].y/4f;
+						if (i < verts.Length - CHUNK_RESOLUTION -1) h += verts[i+CHUNK_RESOLUTION].y/4f;
+						vmap.SetHeight(coords, h +Random.Range (-WorldManager.instance.VERT_HEIGHT_SCALE/8f, WorldManager.instance.VERT_HEIGHT_SCALE/8f));
+					}
+				}
+
+			}*/
+			verts[i].y = vmap.GetHeight(coords);
+
 			//r += "Registered to " + coords.ToString()+"\n";
 			
 			//Vector2 c = IntToV2 (i);
@@ -66,6 +86,8 @@ public class Chunk{
 				//Debug.Log(""+i+"on chunk "+x+","+y+" maps to "+(int)c.x+","+(int)c.y);
 			//}
 		}
+
+		//updateVerts();
 
 		//Debug.Log(r);
 
@@ -81,6 +103,11 @@ public class Chunk{
 		numLockedVertices++;
 		if (numLockedVertices >= CHUNK_RESOLUTION*CHUNK_RESOLUTION)
 			locked = true;
+	}
+
+	public void UnlockVertex () {
+		numLockedVertices--;
+		locked = false;
 	}
 
 	public int getX () {
@@ -240,7 +267,7 @@ public class Chunk{
 		//mesh.RecalculateNormals();
 		chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
 		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
-		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+		chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 	}
 
 	private bool checkDist (float dist, float updateDist, float margin) {
@@ -267,8 +294,10 @@ public class Chunk{
 						float linIntInput = angle / 360f;
 						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
 						if (newY != vertices[v].y) {
+						//if (newY != 0f) {
 							changesMade = true;
 							vmap.SetHeight (coords, newY);
+							//vmap.AddHeight (coords, newY);
 							//if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)  //flip normal if pointing down
 							//	chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
 						}
@@ -280,7 +309,7 @@ public class Chunk{
 						//chunk.GetComponent<MeshCollider> ().sharedMesh = chunk.GetComponent<MeshFilter> ().mesh;
 							//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
-				} else { //if vert is near the road
+				}/* else { //if vert is near the road
 				//vertices[v].y = 0f;
 					if (vmap.GetHeight (coords) != 0f) {
 						changesMade = true;
@@ -290,7 +319,7 @@ public class Chunk{
 					//	chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
 						vmap.Lock (coords);
 					}
-				}
+				}*/
 				if (changesMade) {
 					//chunk.GetComponent<MeshFilter> ().mesh.vertices = vertices;
 					//chunk.GetComponent<MeshFilter> ().mesh.RecalculateNormals();
@@ -314,6 +343,8 @@ public class Chunk{
 			updateVerts (player, updateDist, freqData);
 		}
 	}
+
+
 	public bool Constrained (Vector3 vertex) {
 		if (!roadNearby) {
 			return false;

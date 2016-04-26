@@ -63,6 +63,8 @@ public class WorldManager : MonoBehaviour {
 	public float timeOfDay;
 	private float timeScale = 1;
 
+	public Flare sunFlare;
+
 	private Color primaryColor;
 	private Color secondaryColor;
 
@@ -83,6 +85,7 @@ public class WorldManager : MonoBehaviour {
 
 	float startLoadTime;
     bool loaded = false;
+	public bool loadedTerrain = false;
 	//bool loadedDecorations = false;
 	//bool decorated = false;
 
@@ -104,8 +107,8 @@ public class WorldManager : MonoBehaviour {
 		if (ROAD_RADIUS == 0) {
 			ROAD_RADIUS = 1000f;
 		}
-		road.GetComponent<Bezier> ().ROAD_RADIUS = ROAD_RADIUS;
-		roadDistance  = new Vector2 (ROAD_WIDTH * 1.1f, ROAD_WIDTH * 1.2f);
+		road.GetComponent<Bezier> ().generateRoadRadius = ROAD_RADIUS;
+		roadDistance  = new Vector2 (road.GetComponent<Bezier>().width * 1.1f, road.GetComponent<Bezier>().width * 1.2f);
 		maxActive = new Dictionary<DecorationGroup, int>();
 		foreach (DecoGroupMaxSize groupSize in initialMaxActive) {
 			maxActive[groupSize.group] = groupSize.maxActive;
@@ -131,7 +134,9 @@ public class WorldManager : MonoBehaviour {
 	public void Load () {
 		startLoadTime = Time.realtimeSinceStartup;
 		GameManager.instance.ChangeLoadingMessage("Loading world...");
-		terrain.update(freqDataArray);
+		//terrain.update();
+
+			
 		if (DO_DECORATE) {
 			LoadDecorations();
 			InitialDecorate();
@@ -281,7 +286,7 @@ public class WorldManager : MonoBehaviour {
 		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
-
+		sun.GetComponent<Light>().flare = sunFlare;
 		return sun;
 	}
 
@@ -293,11 +298,12 @@ public class WorldManager : MonoBehaviour {
 		road.GetComponent<MeshRenderer>().material = roadMaterial;
 		road.GetComponent<MeshRenderer>().reflectionProbeUsage = ReflectionProbeUsage.Off;
 		road.AddComponent<Bezier> ();
-		road.GetComponent<Bezier>().ROAD_WIDTH = ROAD_WIDTH;
-		road.GetComponent<Bezier>().ROAD_HEIGHT = ROAD_HEIGHT;
+		road.GetComponent<Bezier>().width = ROAD_WIDTH;
+		road.GetComponent<Bezier>().height = ROAD_HEIGHT;
 	}
 
 	void DecorateRandom (Chunk chunk, GameObject decoration) {
+		if (chunk == null) return;
 		Vector2 coordinate = new Vector2 (
 			chunk.getCoordinate().x*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f),
 			chunk.getCoordinate().y*CHUNK_SIZE+UnityEngine.Random.Range(-CHUNK_SIZE/2f, CHUNK_SIZE/2f)

@@ -206,6 +206,7 @@ public class DynamicTerrain {
 
 	// Gives a random chunk (for decoration testing)
 	public Chunk RandomChunk () {
+		if (activeChunks.Count == 0) return null;
 		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
 	}
 
@@ -215,6 +216,7 @@ public class DynamicTerrain {
 	}
 
 	public Chunk RandomCloseToRoadChunk() {
+		if (activeCloseToRoadChunks.Count == 0) return null;
 		return activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
 	}
 

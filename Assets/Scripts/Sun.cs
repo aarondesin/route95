@@ -14,10 +14,10 @@ public class Sun : MonoBehaviour {
 	//private Color DAWN = Color.red;
 	//private Color DUSK = Color.red;
 	//private Color MIDNIGHT = Color.blue;
-	Color NOON = WorldManager.instance.primaryDayColor;
-	Color DAWN = WorldManager.instance.primarySunriseColor;
-	Color DUSK = WorldManager.instance.primarySunsetColor;
-	Color MIDNIGHT = WorldManager.instance.primaryNightColor;
+	//Color NOON = WorldManager.instance.primaryDayColor;
+	//Color DAWN = WorldManager.instance.primarySunriseColor;
+	//Color DUSK = WorldManager.instance.primarySunsetColor;
+	//Color MIDNIGHT = WorldManager.instance.primaryNightColor;
 
 	private Vector3 sunTarget = new Vector3 (0f, 0f, 0f); // target for the sun to point at: the car or the origin
 

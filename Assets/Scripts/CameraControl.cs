@@ -318,8 +318,8 @@ public class CameraControl : MonoBehaviour {
 				break;
 			case CameraFollowMode.Shaky:
 				angle.pos = angle.targetPos;
-				float x = Mathf.PerlinNoise (angle.shake, angle.shake);
-				float y = Mathf.PerlinNoise (angle.shake, angle.shake);
+				//float x = Mathf.PerlinNoise (angle.shake, angle.shake);
+				//float y = Mathf.PerlinNoise (angle.shake, angle.shake);
 				//angle.rot = Quaternion.FromToRotation (angle.pos, WorldManager.instance.player.transform.position);
 				transform.LookAt (WorldManager.instance.player.transform.position, Vector3.up);
 				angle.rot = transform.rotation;
