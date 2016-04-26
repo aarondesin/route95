@@ -90,11 +90,13 @@ public class Note {
 
 	// Play note on a specific AudioSource
 	public void PlayNote (AudioSource source) {
+		if (!source.enabled) source.enabled = true;
 		source.PlayOneShot(MusicManager.SoundClips[filename], volume*source.volume);
 	}
 
 	// Play note on a specific AudioSource, cutting off?
 	public void PlayNote (AudioSource source, bool cutoff) {
+		if (!source.enabled) source.enabled = true;
 		if (cutoff) source.Stop();
 		source.PlayOneShot(MusicManager.SoundClips[filename], volume*source.volume);
 	}

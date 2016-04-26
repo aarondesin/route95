@@ -43,6 +43,7 @@ public class DynamicTerrain {
 		List<AudioSource> sources = new List<AudioSource>(); //InputManager.instance.audioSources;
 		sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
 		foreach (AudioSource source in sources) {
+			if (!source.enabled) continue;
 			float[] sample = new float[freqSampleSize];
 			source.GetSpectrumData (sample, 0, fftWindow);
 			for (int i = 0; i < freqSampleSize; i++) {
@@ -119,6 +120,7 @@ public class DynamicTerrain {
 		//int max = 0;
 		//Debug.Log ("before scouting");
 		foreach (Chunk chunk in activeChunks) {
+			if (chunk.locked) continue;
 			//Debug.Log ("before heuristic");
 			chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
 			if (chunksToUpdate.Count == 0) {
@@ -135,7 +137,7 @@ public class DynamicTerrain {
 				}
 			}
 		}
-		Debug.Log ("before updating");
+		//Debug.Log ("before updating");
 		for (int i = 0; i < chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
 			chunksToUpdate [i].update (player, VERT_UPDATE_DISTANCE, freqData);
 			chunkPriorities [chunksToUpdate [i]] = 0;

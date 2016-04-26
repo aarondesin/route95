@@ -240,6 +240,7 @@ public class MusicManager : MonoBehaviour {
 						} else {
 							if (currentPlayingSong < currentProject.songs.Count-1) {
 								beat = 0;
+								DisableAllAudioSources();
 								currentPlayingSong++;
 							} else {
 								GameManager.instance.SwitchToPostplay();
@@ -276,6 +277,10 @@ public class MusicManager : MonoBehaviour {
 			}
 		} 
 
+	}
+
+	void DisableAllAudioSources () {
+		foreach (Instrument inst in Instrument.AllInstruments) instrumentAudioSources[inst].enabled = false;
 	}
 
 	public void IncreaseTempo () {
