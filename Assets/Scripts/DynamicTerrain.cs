@@ -343,6 +343,33 @@ public class DynamicTerrain {
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
 		fillDiamondSquare (ref heightmap, corners, height, rough, rangeMin, rangeMax);
+
+		//set vertices
+		int minX = x - width/2;
+		int maxX = x + width / 2;
+		int minY = y - depth / 2;
+		int maxY = y + depth / 2;
+		int mapMax = (int)heightmap.GetLongLength (0) - 1;
+		for (int i = minX; i <= maxX; i++) {
+			float normalizedX = (float)i / (float)(maxX - minX);
+			int xFloor = Mathf.FloorToInt(normalizedX * (float)mapMax);
+			int xCeil = Mathf.FloorToInt (normalizedX * (float)mapMax);
+			float xT = normalizedX % 1f;
+			for (int j = minY; j <= maxY; j++) {
+				if (vmap.ContainsVertex(i, j)) {
+					float normalizedY = (float)j / (float)(maxY - minY);
+					int yFloor = Mathf.FloorToInt (normalizedY * (float)mapMax);
+					int yCeil = Mathf.FloorToInt (normalizedY * (float)mapMax);
+					float yT = normalizedY % 1f;
+					float p00 = getFromHMap(heightmap, xFloor, yFloor);
+					float p10 = getFromHMap(heightmap, xCeil, yFloor);
+					float p01 = getFromHMap(heightmap, xFloor, yCeil);
+					float p11 = getFromHMap(heightmap, xCeil, yCeil);
+					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
+					vmap.SetHeight (i, j ,interpH);
+				} else continue;
+			}
+		}
 	}
 
 	//raises n to the nearest power of 2
