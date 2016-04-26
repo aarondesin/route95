@@ -308,5 +308,160 @@ public class DynamicTerrain {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
-		
+
+	//create a width by depth mountain centered at vertex (x,y) with a maximum altitude of height, a jaggedness of rough, and a min and max percentage of the random scale 
+	public void createMountain (int x, int y, int width, int depth, float height, float rough, float rangeMin = -0.1f, float rangeMax = 1f) {
+		//ensure width and depth are odd
+		if (width % 2 == 0)
+			width++;
+		if (depth % 2 == 0)
+			depth++;
+		VertexMap vmap = DynamicTerrain.instance.vertexmap;
+		int size = Math.Max (width, depth);
+		size--;
+		size = makePowerTwo (size); //size of the Diamond Square Alg array
+		if (size < 2) return;
+		float[,] heightmap = new float[size, size];
+		float[] corners = initializeCorners (vmap, x, y, width, depth);
+		fillDiamondSquare (ref heightmap, corners, height, rough, rangeMin, rangeMax);
+
+		//set vertices
+		int minX = x - width/2;
+		int maxX = x + width / 2;
+		int minY = y - depth / 2;
+		int maxY = y + depth / 2;
+		int mapMax = (int)heightmap.GetLongLength (0) - 1;
+		for (int i = minX; i <= maxX; i++) {
+			float normalizedX = (float)i / (float)(maxX - minX);
+			int xFloor = Mathf.FloorToInt(normalizedX * (float)mapMax);
+			int xCeil = Mathf.FloorToInt (normalizedX * (float)mapMax);
+			float xT = normalizedX % 1f;
+			for (int j = minY; j <= maxY; j++) {
+				if (vmap.ContainsVertex(i, j)) {
+					float normalizedY = (float)j / (float)(maxY - minY);
+					int yFloor = Mathf.FloorToInt (normalizedY * (float)mapMax);
+					int yCeil = Mathf.FloorToInt (normalizedY * (float)mapMax);
+					float yT = normalizedY % 1f;
+					float p00 = getFromHMap(heightmap, xFloor, yFloor);
+					float p10 = getFromHMap(heightmap, xCeil, yFloor);
+					float p01 = getFromHMap(heightmap, xFloor, yCeil);
+					float p11 = getFromHMap(heightmap, xCeil, yCeil);
+					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
+					vmap.SetHeight (i, j ,interpH);
+				} else continue;
+			}
+		}
+	}
+
+	//raises n to the nearest power of 2
+	public int makePowerTwo (int n) {
+		if (n < 2) return -1; // if n is less than 2, return error value -1
+		if ((n != 0) && ((n & (n-1)) != 0)) return n; //if n is already a power of 2, return n
+		int r = 0; //counter of highest power of 2 in n
+		//bit shift n to get place of leading bit, r, which is the log base 2 of n
+		while ((n >>= 1) != 0) {
+			r++;
+		}
+		r++; //raise power of two to next highest
+		return (int)Math.Pow (2, r);
+	}
+
+	//returns the initial corners for the Diamond Square Algorithm
+	public float[] initializeCorners(VertexMap vmap, int x, int y, int width, int depth) {
+		float[] corners = new float[4];
+		//corner lower left
+		int vx = x - (width - 1) / 2; //vertex x
+		int vy = y - (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[0] = 0f;
+		//corner lower right
+		vx = x + (width - 1) / 2; //vertex x
+		vy = y - (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[1] = 0f;
+		//corner upper right
+		vx = x + (width - 1) / 2; //vertex x
+		vy = y + (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[2] = 0f;
+		//corner upper left
+		vx = x - (width - 1) / 2; //vertex x
+		vy = y + (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[3] = 0f;
+		return corners;
+	}
+
+	//fills heightmap with DiamondSquare generated heights, using corners as the seeds, height as the initial center value, and rough as the height offset value
+	void fillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
+		//set middle of hmap
+		int max = (int)heightmap.GetLongLength(0) - 1;
+		heightmap [max + 1, max + 1] = height; //set middle height
+		divide(ref heightmap, max, rough, rangeMin, rangeMax);
+	}
+
+	void square(ref float[,] heightmap, int x, int y, int size, float offset) {
+		float ave = average (new float[] {
+			getFromHMap(heightmap, x - size, y - size), //lower left
+		 	getFromHMap(heightmap, x + size, y - size), //lower right
+			getFromHMap(heightmap, x + size, y + size), //upper right
+			getFromHMap(heightmap, x - size, y + size) //upper left
+		});
+		heightmap [x, y] = ave;
+	}
+
+	void diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
+		float ave = average (new float[] {
+			getFromHMap(heightmap, x, y - size), //bottom
+			getFromHMap(heightmap, x + size, y), //right
+			getFromHMap(heightmap, x, y + size), //top
+			getFromHMap(heightmap, x - size, y) //left
+		});
+		heightmap [x, y] = ave;
+	}
+
+	void divide(ref float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
+		int x, y, half = size / 2;
+		float scale = size * rough;
+		if (half < 1) //past the minimum size
+			return;
+
+		//do squares
+		for (y = half; y < heightmap.GetLongLength(1); y += size) {
+			for (x = half; x < heightmap.GetLongLength(0); x += size) {
+				if (size == heightmap.GetLongLength(0) - 1) { //ignore setting the very center of the mountain
+					continue;
+				}else {
+					square (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+				}
+			}
+		}
+
+		//do diamonds
+		for (y = 0; y <= heightmap.GetLongLength (1); y += half) {
+			for (x = (y + half) % size; x <= heightmap.GetLength (0); x += size) {
+				diamond (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+			}
+		}
+		//recursive call
+		divide (ref heightmap, half, rough, rangeMin, rangeMax);
+	}
+
+	//accesses heightmap and returns -INF for out of bounds vertices
+	float getFromHMap (float [,] heightmap, int x, int y) {
+		if (x < 0 || x >= heightmap.GetLength (0) || y < 0 || y >= heightmap.GetLength (1)) {
+			return float.NegativeInfinity;
+		}
+		return heightmap [x, y];
+	}
+
+	//returns the average of 4 corners, excluding non-legal values
+	float average(float[] corners) {
+		float count = 4f;
+		float sum = 0f;
+		foreach (float corner in corners) {
+			if (float.IsNegativeInfinity (corner)) {
+				count -= 1f;
+				continue;
+			}
+			sum += corner;
+		}
+		return (sum/count);
+	}
 }

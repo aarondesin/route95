@@ -11,11 +11,11 @@ public class EffectButton : MonoBehaviour {
 		source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
-	/*
+
 	public void updateechoDecayRatio(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
-		InstrumentSetup.currentRiff.echoDecayRatio = slider.value;
-		source.gameObject.GetComponent<AudioEchoFilter>().DecayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
+		InstrumentSetup.currentRiff.echoDecayRatio = 1-slider.value;
+		source.gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 	}
 
 
@@ -53,7 +53,7 @@ public class EffectButton : MonoBehaviour {
 
 	public void updatetremoloRate(Slider slider){
 
-		InstrumentSetup.currentRiff.tremoloRate = Slider.value;			
+		//InstrumentSetup.currentRiff.tremoloRate = Slider.value;			
 	}
 
 	public void updatechorusDryMix(Slider slider){
@@ -76,13 +76,13 @@ public class EffectButton : MonoBehaviour {
 
 	public void updateflangerDelay(Slider slider){
 
-		InstrumentSetup.currentRiff.flangerDelay = Slider.value;			
+		//InstrumentSetup.currentRiff.flangerDelay = Slider.value;			
 	}
 		
 
 	public void updateflangerDryMix(Slider slider){
 
-		InstrumentSetup.currentRiff.flangerDryMix = Slider.value;			
-	}*/
+		//InstrumentSetup.currentRiff.flangerDryMix = Slider.value;			
+	}
 }
 
