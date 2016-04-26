@@ -54,7 +54,7 @@ public class Bezier : MonoBehaviour{
 	//
 	// Decoration params
 	//
-	public float decorationRemoveThreshold = 0.5f; // Decorations behind this percent will be removed
+	public float decorationRemoveThreshold = 0.3f; // Decorations behind this percent will be removed
 	Dictionary<GameObject, float> decorations; // Decorations, and their position along the curve
 
 	#region Unity Callbacks

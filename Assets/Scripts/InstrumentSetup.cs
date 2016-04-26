@@ -325,7 +325,7 @@ public class InstrumentSetup : MonoBehaviour {
 		text.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 		text.AddComponent<Text>();
 		text.GetComponent<Text>().text = title;
-		text.GetComponent<Text>().fontSize = 36;
+		text.GetComponent<Text>().fontSize = 30;
 		text.GetComponent<Text>().font = GameManager.instance.font;
 		text.GetComponent<Text>().fontStyle = FontStyle.Normal;
 		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
