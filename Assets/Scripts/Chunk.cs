@@ -207,6 +207,7 @@ public class Chunk{
 		mesh.triangles = triangles;
 		mesh.RecalculateNormals ();
 		mesh.RecalculateBounds ();
+		mesh.MarkDynamic ();
 		chunk.GetComponent<MeshFilter> ().mesh = mesh;
 		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
 
@@ -221,15 +222,16 @@ public class Chunk{
 	}
 
 	public void UpdateVertex (int index, float height) {
-		Mesh mesh = new Mesh ();
-		verts[index].y += (height - verts[index].y)/3f;
-		mesh.vertices = verts;
-		mesh.uv = uvs;
-		mesh.triangles = triangles;
-		mesh.RecalculateNormals();
-		mesh.RecalculateBounds();
-		chunk.GetComponent<MeshFilter> ().mesh = mesh;
-		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
+		//Mesh mesh = new Mesh ();
+		vertices[index].y += (height - vertices[index].y)/3f;
+		chunk.GetComponent<MeshFilter>().mesh.vertices = vertices;
+		//mesh.uv = uvs;
+		//mesh.triangles = triangles;
+		//mesh.RecalculateNormals();
+		chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
+		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 	}
 
 	private bool checkDist (float dist, float updateDist, float margin) {
@@ -258,25 +260,31 @@ public class Chunk{
 							//DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, newY);
 
 						float diff = newY - vertices [v].y;
-						if (diff != 0f) changesMade = true;
+						if (diff != 0f) {
+							changesMade = true;
+							vmap.SetHeight (coords, newY);
+							//if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)  //flip normal if pointing down
+							//	chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
+						}
 						//vertices [v].y += diff/3f;
 						//vmap.Lock (coords);
-						if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)  //flip normal if pointing down
-							chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
-						vmap.SetHeight (coords, newY);
-						chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds ();
-						chunk.GetComponent<MeshCollider> ().sharedMesh = chunk.GetComponent<MeshFilter> ().mesh;
+
+						
+						//chunk.GetComponent<MeshFilter> ().mesh.RecalculateBounds ();
+						//chunk.GetComponent<MeshCollider> ().sharedMesh = chunk.GetComponent<MeshFilter> ().mesh;
 							//Debug.DrawRay (vertPos+new Vector3 (0f, newY, 0f), chunk.GetComponent<MeshFilter>().mesh.normals[v], Color.green);
 					}
 				}
 			} else { //if vert is near the road
 				//vertices[v].y = 0f;
-				if (vmap.GetHeight (coords) != 0f) changesMade = true;
-				vmap.SetHeight (coords, 0f);
-				//DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
-				if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)
-					chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
-				vmap.Lock (coords);
+				if (vmap.GetHeight (coords) != 0f) {
+					changesMade = true;
+					vmap.SetHeight (coords, 0f);
+					//DynamicTerrain.instance.WriteHeightMap ((int)c.x, (int)c.y, 0f);
+					//if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)
+					//	chunk.GetComponent<MeshFilter> ().mesh.normals [v] *= -1;
+					vmap.Lock (coords);
+				}
 			}
 //else if (vertices [v].y != DynamicTerrain.instance.ReadHeightMap ((int)c.x, (int)c.y)) { //if vert is not at it's set height yet
 				//float diff = DynamicTerrain.instance.ReadHeightMap((int)c.x, (int)c.y) - vertices [v].y;
@@ -325,7 +333,7 @@ public class Chunk{
 		float xMax = pos.x + CHUNK_SIZE*1.5f;
 		float zMin = pos.z-CHUNK_SIZE*0.5f;
 		float zMax = pos.z + CHUNK_SIZE*1.5f;
-		float resolution = 10f;
+		float resolution = 4f;
 		float diff = 1f - PlayerMovement.instance.progress;
 		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
 		float progress = PlayerMovement.instance.progress;
@@ -347,7 +355,7 @@ public class Chunk{
 		float xMax = xMin + CHUNK_SIZE;
 		float zMin = pos.z;
 		float zMax = zMin + CHUNK_SIZE;
-		float resolution = 10f;
+		float resolution = 4f;
 		float diff = 1f - PlayerMovement.instance.progress;
 		Bezier road = WorldManager.instance.road.GetComponent<Bezier> ();
 		float progress = PlayerMovement.instance.progress;

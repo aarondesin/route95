@@ -28,6 +28,7 @@ public class DynamicTerrain {
 
 	public Dictionary<int ,Dictionary<int, float>> heightmap;
 	public VertexMap vertexmap;
+	public Dictionary<int, Dictionary<int, bool>> chunkmap;
 
 	public LinInt freqData;
 	public int freqSampleSize = 128;
@@ -35,6 +36,7 @@ public class DynamicTerrain {
 
 	private Dictionary<Chunk, int> chunkPriorities;
 	private int chunkUpdatesPerCycle = 4;
+	List<Chunk> chunksToUpdate;
 
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
@@ -97,9 +99,11 @@ public class DynamicTerrain {
 		vertexmap = new VertexMap();
 		SMOOTH_FACTOR = smoothFactor;
 		chunkPriorities = new Dictionary<Chunk, int>();
+		chunkmap = new Dictionary<int, Dictionary< int, bool>> ();
 	}
 
 	void updateChunks(float[] freqDataArray){
+		//Debug.Log ("updatechunks");
 		//AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
 		//LinInt freqData = new LinInt (freqDataArray);
 		freqData = UpdateFreqData();
@@ -108,22 +112,48 @@ public class DynamicTerrain {
 		createChunkLists (xChunks, yChunks);
 		createChunks (xChunks, yChunks);
 		deleteChunks (xChunks, yChunks);
+		if (chunksToUpdate == null)
+			chunksToUpdate = new List<Chunk> ();
+		else
+			chunksToUpdate.Clear ();
+		//int max = 0;
+		//Debug.Log ("before scouting");
 		foreach (Chunk chunk in activeChunks) {
-			//chunk.update(player, VERT_UPDATE_DISTANCE, freqData);
-			chunkPriorities[chunk] += ChunkHeuristic(chunk) + 1;
+			//Debug.Log ("before heuristic");
+			chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
+			if (chunksToUpdate.Count == 0) {
+				chunksToUpdate.Add (chunk);
+				//max = chunkPriorities [chunk];
+			} else {
+				//Debug.Log ("before insertion");
+				for (int i = 0; i < chunksToUpdate.Count; i++) {
+					if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
+						chunksToUpdate.Insert (i, chunk);
+						break;
+
+					}
+				}
+			}
 		}
-		for (int i=0; i<chunkUpdatesPerCycle; i++) {
+		Debug.Log ("before updating");
+		for (int i = 0; i < chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+			chunksToUpdate [i].update (player, VERT_UPDATE_DISTANCE, freqData);
+			chunkPriorities [chunksToUpdate [i]] = 0;
+		}
+				
+		/*for (int i=0; i<chunkUpdatesPerCycle; i++) {
 			Chunk temp = HighestPriorityChunk();
 			if (temp == null) return;
-			HighestPriorityChunk().update(player, VERT_UPDATE_DISTANCE, freqData);
+			temp.update(player, VERT_UPDATE_DISTANCE, freqData);
 			chunkPriorities[temp] = 0;
-		}
+		}*/
 	}
 
 	Chunk HighestPriorityChunk () {
 		int max = 0;
 		Chunk result = null;
 		foreach (Chunk chunk in activeChunks) {
+			chunkPriorities[chunk] += ChunkHeuristic(chunk) + 1;
 			if (chunkPriorities[chunk] > max) {
 				result = chunk;
 				max = chunkPriorities[chunk];
@@ -203,21 +233,17 @@ public class DynamicTerrain {
 
 	void createChunks(List<int> xChunks, List<int> yChunks){
 		foreach (int x in xChunks) {
+			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, bool>());
 			foreach (int y in yChunks) {
-				bool loaded = false;
-				foreach (Chunk chunk in activeChunks) {
-					if (x == chunk.getX() && y == chunk.getY()) {
-						loaded = true;
-						break;
-					}
-				}
-				if (!loaded) {
+				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, false);
+				if (!chunkmap[x][y]) {
 					Chunk chunk = createChunk (x, y);
 					activeChunks.Add (chunk);
 					if (chunk.nearbyRoad()) {
 						if (chunk.containsRoad()) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 					}
+					chunkmap[x][y] = true;
 				}
 			}
 		}

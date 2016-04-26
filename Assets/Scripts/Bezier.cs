@@ -152,7 +152,7 @@ public class Bezier : MonoBehaviour{
 
 	public void AddCurve () {
 		float scale = 80f;
-		float displacedDirection = scale * 0.8f;
+		float displacedDirection = scale * 0.4f;
 		if (points == null) {
 			points = new Vector3[0];
 		}
