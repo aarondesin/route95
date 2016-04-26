@@ -11,38 +11,44 @@ public class EffectButton : MonoBehaviour {
 		source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
 	}
-
-	/*public void updateechoDecayRatio(Slider slider){
-
-		InstrumentSetup.currentRiff.echoDecayRatio = Slider.value;			
+	/*
+	public void updateechoDecayRatio(Slider slider){
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.echoDecayRatio = slider.value;
+		source.gameObject.GetComponent<AudioEchoFilter>().DecayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 	}
 
 
-	public void echoDelay(Slider slider){
-
-		InstrumentSetup.currentRiff.echoDelay = Slider.value;			
+	public void updateechoDelay(Slider slider){
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.echoDelay = slider.value;
+		source.gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;			
 	}
 
 
 	public void updateechoDryMix(Slider slider){
-
-		InstrumentSetup.currentRiff.echoDryMix = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.echoDryMix = slider.value;
+		source.gameObject.GetComponent<AudioEchoFilter>().dryMix = InstrumentSetup.currentRiff.echoDryMix;		
 	}
 
 	public void updatereverbDecayTime(Slider slider){
-
-		InstrumentSetup.currentRiff.reverbDecayTime = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.reverbDecayTime = slider.value;
+		source.gameObject.GetComponent<AudioReverbFilter>().decayTime = InstrumentSetup.currentRiff.reverbDecayTime;		
 	}
 
 
 	public void updatereverbLevel(Slider slider){
-
-		InstrumentSetup.currentRiff.reverbLevel = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.reverbLevel = slider.value;
+		source.gameObject.GetComponent<AudioReverbFilter>().reverbLevel = InstrumentSetup.currentRiff.reverbLevel;	
 	}
 
-	public void updatefuzzLevel(Slider slider){
-
-		InstrumentSetup.currentRiff.fuzzLevel = Slider.value;			
+	public void updatefuzzLevel(Slider slider){ // getting rid later
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.distortionLevel = slider.value;
+		source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 	}
 
 	public void updatetremoloRate(Slider slider){
@@ -51,18 +57,21 @@ public class EffectButton : MonoBehaviour {
 	}
 
 	public void updatechorusDryMix(Slider slider){
-
-		InstrumentSetup.currentRiff.chorusDryMix = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.chorusDryMix = slider.value;
+		source.gameObject.GetComponent<AudioChorusFilter>().dryMix = InstrumentSetup.currentRiff.chorusDryMix;		
 	}
 
 	public void updatechorusRate(Slider slider){
-
-		InstrumentSetup.currentRiff.chorusRate = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.chorusRate = slider.value;
+		source.gameObject.GetComponent<AudioChorusFilter>().rate = InstrumentSetup.currentRiff.chorusRate;
 	}
 
 	public void updatechorusDepth(Slider slider){
-
-		InstrumentSetup.currentRiff.chorusDepth = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.chorusDepth = slider.value;
+		source.gameObject.GetComponent<AudioChorusFilter>().depth = InstrumentSetup.currentRiff.chorusDepth;
 	}
 
 	public void updateflangerDelay(Slider slider){
