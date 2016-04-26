@@ -327,5 +327,10 @@ public class DynamicTerrain {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
+
+	//create a width by depth mountain at vertex (x,y) with a maximum altitude of height
+	public void createMountain (int x, int y, int width, int depth, float height) {
+
+	}
 		
 }
