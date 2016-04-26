@@ -26,7 +26,6 @@ public class DynamicTerrain {
 	private List<Chunk> activeCloseToRoadChunks;
 	private GameObject player;
 
-	public Dictionary<int ,Dictionary<int, float>> heightmap;
 	public VertexMap vertexmap;
 	public Dictionary<int, Dictionary<int, bool>> chunkmap;
 
@@ -37,6 +36,9 @@ public class DynamicTerrain {
 	private Dictionary<Chunk, int> chunkPriorities;
 	private int chunkUpdatesPerCycle = 4;
 	List<Chunk> chunksToUpdate;
+
+	public bool full = false;
+	public bool randomized = false;
 
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
@@ -96,17 +98,14 @@ public class DynamicTerrain {
 		terrain.transform.position = player.transform.position;
 		VERT_UPDATE_DISTANCE = vertUpdateDist;
 		HEIGHT_SCALE = heightScale;
-		heightmap = new Dictionary<int, Dictionary<int, float>>();
 		vertexmap = new VertexMap();
 		SMOOTH_FACTOR = smoothFactor;
 		chunkPriorities = new Dictionary<Chunk, int>();
 		chunkmap = new Dictionary<int, Dictionary< int, bool>> ();
 	}
 
-	void updateChunks(float[] freqDataArray){
-		//Debug.Log ("updatechunks");
-		//AudioListener.GetSpectrumData (freqDataArray, 0, FFTWindow.Rectangular);
-		//LinInt freqData = new LinInt (freqDataArray);
+	void updateChunks(){
+		if (!MusicManager.instance.loadedAudioSources) return;
 		freqData = UpdateFreqData();
 		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
 		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
@@ -139,6 +138,7 @@ public class DynamicTerrain {
 		}
 		//Debug.Log ("before updating");
 		for (int i = 0; i < chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+			if (chunksToUpdate == null) Debug.Log("shit");
 			chunksToUpdate [i].update (player, VERT_UPDATE_DISTANCE, freqData);
 			chunkPriorities [chunksToUpdate [i]] = 0;
 		}
@@ -234,11 +234,13 @@ public class DynamicTerrain {
 	}
 
 	void createChunks(List<int> xChunks, List<int> yChunks){
+		bool added = false;
 		foreach (int x in xChunks) {
 			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, bool>());
 			foreach (int y in yChunks) {
 				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, false);
 				if (!chunkmap[x][y]) {
+					added = true;
 					Chunk chunk = createChunk (x, y);
 					activeChunks.Add (chunk);
 					if (chunk.nearbyRoad()) {
@@ -249,6 +251,8 @@ public class DynamicTerrain {
 				}
 			}
 		}
+		if (!added) full = true;
+		else full = false;
 	}
 
 	void deleteChunk(Chunk chunk){
@@ -257,6 +261,7 @@ public class DynamicTerrain {
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
+		chunkmap[chunk.getX()][chunk.getY()] = false;
 
 	}
 
@@ -291,33 +296,9 @@ public class DynamicTerrain {
 		}
 	}
 
-	public void update(float[] freqDataArray){
-		updateChunks (freqDataArray);
+	public void update(){
+		updateChunks ();
 	}
-
-	public float ReadHeightMap (int x, int y) {
-		if (!heightmap.ContainsKey(x)) return float.NaN;
-		if (!heightmap[x].ContainsKey(y)) return float.NaN;
-		return heightmap[x][y];
-	}
-
-	/*public float ReadHeightMap (int i) {
-		return ReadHeightMap (i/instance.CHUNK_RESOLUTION, i%CHUNK_RESOLUTION);
-	}*/
-
-	public void WriteHeightMap (int x, int y, float v) {
-		if (!heightmap.ContainsKey(x))
-			heightmap.Add(x, new Dictionary<int, float>());
-		if (!heightmap[x].ContainsKey(y))
-			heightmap[x].Add(y, v);
-		else heightmap[x][y] = v;
-
-		//Vertex.Vertices[x][y].SetHeight(v);
-	}
-
-	/*public void WriteHeightMap (int i, float v) {
-		WriteHeightMap (v);
-	}*/
 
 	float AngularDistance (float angle, float pos) {
 		float d = angle - pos;

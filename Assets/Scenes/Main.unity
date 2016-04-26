@@ -14821,12 +14821,12 @@ MonoBehaviour:
   TERRAIN_MATERIAL: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   DO_RANDOM_HEIGHT_MAPS: 0
   FREQ_ARRAY_SIZE: 256
-  ROAD_RADIUS: 1000
+  ROAD_RADIUS: 800
   ROAD_WIDTH: 10
   ROAD_HEIGHT: 0.2
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   DO_DECORATE: 1
-  MAX_DECORATIONS: 500
+  MAX_DECORATIONS: 1000
   DECORATIONS_PER_STEP: 100
   MAX_DECORATION_HEIGHT: 10
   MIN_DECORATION_HEIGHT: -10
@@ -14840,6 +14840,7 @@ MonoBehaviour:
   audioOut: {fileID: 0}
   road: {fileID: 0}
   timeOfDay: 0
+  sunFlare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
   primaryDayColor: {r: 1, g: 1, b: 1, a: 1}
   secondaryDayColor: {r: 0.5411765, g: 0.7254902, b: 0.8705883, a: 1}
   primarySunsetColor: {r: 1, g: 1, b: 0, a: 1}
@@ -14848,11 +14849,12 @@ MonoBehaviour:
   secondaryNightColor: {r: 0.058823533, g: 0.078431375, b: 0.18823531, a: 1}
   primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
   secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
-  maxSunIntensity: 1
+  maxSunIntensity: 1.5
   minSunIntensity: 0
+  loadedTerrain: 0
   initialMaxActive:
   - group: 1
-    maxActive: 200
+    maxActive: 500
   - group: 2
     maxActive: 200
   - group: 3
@@ -25064,6 +25066,7 @@ MonoBehaviour:
   LoopRiff: {fileID: 0}
   tempo: 0
   maxBeats: 0
+  loadedAudioSources: 0
 --- !u!164 &1664068198
 AudioReverbFilter:
   m_ObjectHideFlags: 0

@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	float velocity;
 	const float velocityToRotation = -20f;
-	float acceleration;
+	//float acceleration;
 	Vector3 target;
 	float offsetH = 0f;
 	float velocityOffset = 0f;
@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour {
 		lights = false;
 		moving = false;
 		velocity = 0f;
-		acceleration = 0f;
+		//acceleration = 0f;
 		target = new Vector3 (0f, 0f, 0f);
 		////if (velocity == 0f)
 			//velocity = 0.2f;
@@ -54,7 +54,8 @@ public class PlayerMovement : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		if (road == null) {
-			road = WorldManager.instance.road.GetComponent<Bezier> ();
+			if (WorldManager.instance.road != null)
+				road = WorldManager.instance.road.GetComponent<Bezier> ();
 		}
 		if (Sun.instance != null) {
 			if (moving && !GameManager.instance.paused) {
@@ -107,8 +108,8 @@ public class PlayerMovement : MonoBehaviour {
 					progress = 1f;
 				
 				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
-				Vector3 offset = new Vector3 (offsetH, 2.27f + road.ROAD_HEIGHT, 0f);
-				transform.position = road.GetPoint (progress) + offset - road.BezRight (road.GetPoint(progress)) * road.ROAD_WIDTH / 3f;
+				Vector3 offset = new Vector3 (offsetH, 2.27f + road.height, 0f);
+				transform.position = road.GetPoint (progress) + offset - road.BezRight (road.GetPoint(progress)) * road.width / 3f;
 				//Quaternion lookRot = Quaternion.FromToRotation (transform.position, road.GetPoint (progress + lookAhead * Time.deltaTime));
 				transform.LookAt (road.GetVelocity (progress) + transform.position);
 				frontLeftWheel.transform.LookAt (transform.position + road.GetVelocity (Mathf.Clamp01 (progress + lookAhead)));
