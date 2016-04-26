@@ -18,31 +18,31 @@ public class Riff {
 	//Float values from audio effect knobs
 
 	[SerializeField]
-	public float distortionLevel;
+	public float distortionLevel = 0;
 	[SerializeField]
-	public float echoDecayRatio;
+	public float echoDecayRatio = 1;
 	[SerializeField]
-	public float echoDelay;
+	public float echoDelay = 0;
 	[SerializeField]
-	public float echoDryMix;
+	public float echoDryMix = 0;
 	[SerializeField]
-	public float reverbDecayTime;
+	public float reverbDecayTime = 0;
 	[SerializeField]
-	public float reverbLevel;
+	public float reverbLevel = 0;
 	[SerializeField]
-	public float fuzzLevel;
+	public float fuzzLevel = 0;
 	[SerializeField]
-	public float tremoloRate;
+	public float tremoloRate = 0;
 	[SerializeField]
-	public float chorusDryMix;
+	public float chorusDryMix = 0;
 	[SerializeField]
-	public float chorusRate;
+	public float chorusRate= 0;
 	[SerializeField]
-	public float chorusDepth;
+	public float chorusDepth = 0;
 	[SerializeField]
-	public float flangerDelay;
+	public float flangerDelay = 0;
 	[SerializeField]
-	public float flangerDryMix;
+	public float flangerDryMix = 0;
 
 	//
 	// VARIABLES SAVED IN PROJECT
