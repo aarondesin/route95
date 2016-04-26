@@ -26,7 +26,7 @@ public class Bezier : MonoBehaviour{
 	[SerializeField]
 	private BezierControlPointMode[] modes;
 
-	public const float CHECK_RESOLUTION = 10f;
+	public const float CHECK_RESOLUTION = 25f;
 
 	//
 	// Road pathing params
@@ -173,7 +173,11 @@ public class Bezier : MonoBehaviour{
 
 	// Marks all points between player and newly created points for leveling
 	public void Bulldoze () {
-		float progress = PlayerMovement.instance.progress;
+		Bulldoze (PlayerMovement.instance.progress);
+	}
+
+	public void Bulldoze (float startProgress) {
+		float progress = startProgress;
 		float diff = 1f - progress;
 		while (progress < 1f) {
 			DynamicTerrain.instance.vertexmap.CheckRoads (GetPoint(progress));

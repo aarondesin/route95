@@ -20,7 +20,7 @@ public class IntVector2 {
 public class VertexMap {
 	public Dictionary<int, Dictionary<int, Vertex>> vertices; 
 
-	const float NEARBY_ROAD_DISTANCE = 80f; // max dist from a road for a vert to be considered nearby a road
+	const float NEARBY_ROAD_DISTANCE = 125f; // max dist from a road for a vert to be considered nearby a road
 
 	public VertexMap () {
 		vertices = new Dictionary<int, Dictionary<int, Vertex>>();
@@ -84,6 +84,7 @@ public class VertexMap {
 	}
 
 	public void SetHeight (int x, int y, float h) {
+		if (vertices[x][y].nearRoad) return;
 		vertices[x][y].setHeight (h);
 	}
 
@@ -258,6 +259,7 @@ public class Vertex {
 	public float currHeight = 0f;
 	public bool nearRoad = false;
 	public Vector3 normal = Vector3.up;
+	public float blendValue = Random.Range (0f, 1.0f);
 
 	public Vertex (int x, int y) {
 		this.x = x;
@@ -281,7 +283,7 @@ public class Vertex {
 	}
 
 	public void setHeight (float h) {
-		if (locked) return;
+		if (locked || nearRoad) return;
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
 		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
@@ -305,6 +307,7 @@ public class Vertex {
 		foreach (KeyValuePair<Chunk, int> delete in deletes)
 			chunkVertices.Remove (delete);
 		updateNormal();
+		WorldManager.instance.TERRAIN_MATERIAL.SetFloat("Blend", Mathf.Abs(h/WorldManager.instance.VERT_HEIGHT_SCALE/2f));
 
 	}
 
@@ -320,9 +323,9 @@ public class Vertex {
 	// Returns the world position of a vertex
 	public Vector3 WorldPos () {
 		return new Vector3 (
-			(float)x / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE + WorldManager.instance.CHUNK_SIZE/2f,
+			(float)x / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE - WorldManager.instance.CHUNK_SIZE/2f,
 			height,
-			(float)y / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE + WorldManager.instance.CHUNK_SIZE/2f
+			(float)y / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE - WorldManager.instance.CHUNK_SIZE/2f
 		);
 	}
 

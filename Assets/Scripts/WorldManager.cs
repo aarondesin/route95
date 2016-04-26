@@ -39,7 +39,8 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/Decoration_Boulder03",
 		"Prefabs/Decoration_Chevron",
 		"Prefabs/Decoration_JoshuaTree01",
-		"Prefabs/Decoration_Saguaro"
+		"Prefabs/Decoration_Saguaro",
+		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 	public List<GameObject> decorations = new List<GameObject>();
 
@@ -64,6 +65,8 @@ public class WorldManager : MonoBehaviour {
 	private float timeScale = 1;
 
 	public Flare sunFlare;
+	//public Sprite moonSprite;
+	public List<Sprite> moonSprites;
 
 	private Color primaryColor;
 	private Color secondaryColor;
@@ -83,13 +86,19 @@ public class WorldManager : MonoBehaviour {
 	public float maxSunIntensity;
 	public float minSunIntensity;
 
+	public float maxMoonIntensity;
+	public float minMoonIntensity;
+
 	float startLoadTime;
     bool loaded = false;
 	public bool loadedTerrain = false;
+	bool hasRandomized = false;
 	//bool loadedDecorations = false;
 	//bool decorated = false;
 
 	public DecoGroupMaxSize[] initialMaxActive;
+
+	public Vector3 wind;
 
 	// Use this for initialization
 	void Start () {
@@ -100,6 +109,7 @@ public class WorldManager : MonoBehaviour {
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = createSun();
+		moon = createMoon();
 		audioOut = Camera.main.GetComponent<AudioListener> ();
 		freqDataArray = new float[FREQ_ARRAY_SIZE];
 
@@ -113,6 +123,8 @@ public class WorldManager : MonoBehaviour {
 		foreach (DecoGroupMaxSize groupSize in initialMaxActive) {
 			maxActive[groupSize.group] = groupSize.maxActive;
 		}
+
+		wind = UnityEngine.Random.insideUnitSphere;
 
 		//Do something else with the moon.  Not an orbiting directional light, maybe one
 		//that is stationary.
@@ -140,6 +152,10 @@ public class WorldManager : MonoBehaviour {
 		if (DO_DECORATE) {
 			LoadDecorations();
 			InitialDecorate();
+			terrain.createMountain(-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+			terrain.createMountain(32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+			terrain.createMountain(32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+			terrain.createMountain(-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		}
         NotifyLoadingDone();
 	}
@@ -166,11 +182,15 @@ public class WorldManager : MonoBehaviour {
 			Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 			GameManager.instance.LoadNext();
 		loaded = true;
+		hasRandomized = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if (loadedTerrain && !hasRandomized) 
+			Load();
 		if (loaded) {
+			
 			terrain.update(freqDataArray);
 			updateTime();
 			UpdateColor();
@@ -184,23 +204,27 @@ public class WorldManager : MonoBehaviour {
 
 		// Sunrise to noon
 		if ((timeOfDay >= 0) && (timeOfDay < (Mathf.PI / 2))) {
+			Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 			float lerpValue = timeOfDay / (Mathf.PI / 2);
 			primaryColor = Color.Lerp (primarySunriseColor, primaryDayColor, lerpValue);
 			secondaryColor = Color.Lerp (secondarySunriseColor, secondaryDayColor, lerpValue);
 		// Noon to sunset
 		} else if ((timeOfDay >= (Mathf.PI / 2)) && (timeOfDay < Mathf.PI)) {
+			Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 			float lerpValue = (timeOfDay - Mathf.PI / 2) / (Mathf.PI / 2);
 			primaryColor = Color.Lerp (primaryDayColor, primarySunsetColor, lerpValue);
 			secondaryColor = Color.Lerp (secondaryDayColor, secondarySunsetColor, lerpValue);
 
 		// Sunset to night
 		} else if ((timeOfDay >= Mathf.PI) && (timeOfDay < ((3f/2f) * Mathf.PI))){
+			Camera.main.GetComponent<SunShafts>().sunTransform = moon.transform;
 			float lerpValue = (timeOfDay - Mathf.PI) / (Mathf.PI / 2);
 			primaryColor = Color.Lerp (primarySunsetColor, primaryNightColor, lerpValue);
 			secondaryColor = Color.Lerp (secondarySunsetColor, secondaryNightColor, lerpValue);
 
 		// Night to sunrise
 		} else if ((timeOfDay >= ((3f/2f) * Mathf.PI)) && (timeOfDay < (2 * Mathf.PI))){
+			Camera.main.GetComponent<SunShafts>().sunTransform = moon.transform;
 			float lerpValue = (timeOfDay - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
 			primaryColor = Color.Lerp (primaryNightColor, primarySunriseColor, lerpValue);
 			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
@@ -208,6 +232,8 @@ public class WorldManager : MonoBehaviour {
 
 		sun.GetComponent<Light>().intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : minSunIntensity;
 		sun.GetComponent<Light>().color = primaryColor;
+		moon.GetComponent<Light>().color = Color.white;
+		moon.GetComponent<Light>().intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : minMoonIntensity;
 		RenderSettings.fogColor = secondaryColor;
 
 		RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
@@ -241,7 +267,7 @@ public class WorldManager : MonoBehaviour {
 	}
     
 	void AttemptDecorate () {
-		if (DO_DECORATE) {
+		if (DO_DECORATE && DynamicTerrain.instance.activeChunks.Count != 0) {
 			for (int i=0; i<DECORATIONS_PER_STEP && numDecorations < MAX_DECORATIONS; i++) {
 
 				// Pick a random decoration and decorate with it
@@ -285,9 +311,21 @@ public class WorldManager : MonoBehaviour {
 			setTimeScale (TIME_SCALE);
 		sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
-		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 		sun.GetComponent<Light>().flare = sunFlare;
 		return sun;
+	}
+
+	GameObject createMoon(){
+		GameObject moon = new GameObject ("Moon");
+		moon.AddComponent<Light> ();
+		moon.AddComponent<Moon> ();
+		if (TIME_SCALE != 0) 
+			setTimeScale (TIME_SCALE);
+		moon.GetComponent<Moon> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
+		moon.GetComponent<Light> ().shadows = LightShadows.Soft;
+		moon.AddComponent<SpriteRenderer>();
+		moon.GetComponent<SpriteRenderer>().sprite = moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
+		return  moon;
 	}
 
 	void createRoad(){

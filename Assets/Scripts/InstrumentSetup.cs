@@ -62,6 +62,8 @@ public class InstrumentSetup : MonoBehaviour {
 	int numNotes;
 	int numButtons;
 
+	public List<GameObject> sliders;
+
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
@@ -69,12 +71,29 @@ public class InstrumentSetup : MonoBehaviour {
 
 	}
 
+	public void HideSliders () {
+		if (sliders != null) {
+			foreach (GameObject slider in sliders) {
+				slider.SetActive(false);
+			}
+		}
+	}
+
+	public void HideSliders (GameObject obj) {
+		bool st = obj.activeSelf;
+		HideSliders();
+		obj.SetActive(!st);
+	}
+
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
+		
 		if (currentRiff == null) {
 			Debug.LogError ("InstrumentSetup.Initialize(): no riff selected!");
 			return;
 		}
+
+		HideSliders ();
 
 		// Clear all previous buttons
 		Cleanup();

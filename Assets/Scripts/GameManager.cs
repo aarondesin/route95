@@ -298,6 +298,7 @@ public class GameManager : MonoBehaviour {
 		Hide (loadPrompt);
 		Hide (prompt);
 		Hide (shortSongWarningPrompt);
+		Hide (liveIcons);
 	}
 		
 	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
@@ -322,10 +323,15 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	public void Toggle (GameObject obj) {
+		obj.SetActive (!obj.activeSelf);
+	}
+
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
 		HideAll ();
 		Hide (songArrangeMenu);
+		Show (liveIcons);
 		paused = false;
 		currentMode = Mode.Live;
 		InputManager.instance.gameObject.SetActive(true);

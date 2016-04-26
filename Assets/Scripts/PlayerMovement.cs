@@ -26,6 +26,8 @@ public class PlayerMovement : MonoBehaviour {
 	float offsetH = 0f;
 	float velocityOffset = 0f;
 
+	public AudioClip engineClip;
+
 	// Use this for initialization
 	void Start () {
 		instance = this;
@@ -38,6 +40,8 @@ public class PlayerMovement : MonoBehaviour {
 			//velocity = 0.2f;
 		progress = 0f;
 		StopMoving();
+		//GetComponent<AudioSource>().clip = engineClip;
+		GetComponent<AudioSource>().pitch = 1f;
 		//road = WorldManager.instance.road.GetComponent<Bezier> ();
 	}
 
@@ -48,6 +52,7 @@ public class PlayerMovement : MonoBehaviour {
 		DynamicTerrain.instance.createMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		DynamicTerrain.instance.createMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		DynamicTerrain.instance.createMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		GetComponent<AudioSource>().volume = 1f;
 	}
 
 	public void StopMoving() {
@@ -130,6 +135,11 @@ public class PlayerMovement : MonoBehaviour {
 
 				frontLeftWheel.transform.Rotate (new Vector3 (0f, 180f, 0f));
 				backLeftWheel.transform.Rotate (new Vector3 (0f, 180f, 0f));
+
+				//if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
+
+				//if (!GetComponent<AudioSource>().isPlaying) Debug.Log("shit");
+				GetComponent<AudioSource>().pitch = velocity / (MusicManager.tempoToFloat [Tempo.Fastest] +0.5f);
 
 				//if (Random.Range(0, 100) == 0) Debug.Log(velocity * velocityToRotation);
 

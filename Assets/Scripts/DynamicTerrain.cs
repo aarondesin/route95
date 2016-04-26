@@ -21,7 +21,7 @@ public class DynamicTerrain {
 	private int MAX_DECORATIONS; // maximum number of decorations
 
 	private GameObject terrain;
-	private List<Chunk> activeChunks; //list of active chunks
+	public List<Chunk> activeChunks; //list of active chunks
 	private List<Chunk> activeRoadChunks; // list of active chunks with road on them
 	private List<Chunk> activeCloseToRoadChunks;
 	private GameObject player;
@@ -259,7 +259,7 @@ public class DynamicTerrain {
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
-
+		chunkmap[chunk.getX()][chunk.getY()] = false;
 	}
 
 	void deleteChunks(List<int> xChunks, List<int> yChunks) {
@@ -369,10 +369,13 @@ public class DynamicTerrain {
 					float p01 = getFromHMap(heightmap, xFloor, yCeil);
 					float p11 = getFromHMap(heightmap, xCeil, yCeil);
 					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
-					vmap.SetHeight (i, j, interpH);
+					if (!vmap.IsConstrained (i, j) && !vmap.IsLocked (i,j))
+						vmap.SetHeight (i, j, interpH);
 				} else continue;
 			}
 		}
+
+		Bezier.instance.Bulldoze(0f);
 	}
 
 	//raises n to the nearest power of 2

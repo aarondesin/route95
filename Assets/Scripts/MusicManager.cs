@@ -290,14 +290,16 @@ public class MusicManager : MonoBehaviour {
 	public void IncreaseTempo () {
 		if ((int)tempo < (int)Tempo.NUM_TEMPOS-1) {
 			tempo = (Tempo)((int)tempo+1);
-			InstrumentSetup.instance.UpdateTempoText();
+			if (InstrumentSetup.instance != null)
+				InstrumentSetup.instance.UpdateTempoText();
 		}
 	}
 
 	public void DecreaseTempo () {
 		if ((int)tempo > 0) {
 			tempo = (Tempo)((int)tempo-1);
-			InstrumentSetup.instance.UpdateTempoText();
+			if (InstrumentSetup.instance != null)
+				InstrumentSetup.instance.UpdateTempoText();
 		}
 	}
 

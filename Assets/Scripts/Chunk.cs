@@ -101,8 +101,8 @@ public class Chunk{
 
 	public void LockVertex () {
 		numLockedVertices++;
-		if (numLockedVertices >= CHUNK_RESOLUTION*CHUNK_RESOLUTION)
-			locked = true;
+		//if (numLockedVertices >= CHUNK_RESOLUTION*CHUNK_RESOLUTION)
+			//locked = true;
 	}
 
 	public void UnlockVertex () {

@@ -90,6 +90,13 @@ public class InputManager : MonoBehaviour {
 			} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
 				MusicManager.instance.DecreaseTempo ();
 			} else {
+				if (Input.GetKeyDown (KeyCode.LeftArrow)) {
+					AudioSource source = MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument];
+					if (source.volume >= 0.1f) source.volume -= 0.1f;
+				} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
+					AudioSource source = MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument];
+					if (source.volume <= 0.9f) source.volume += 0.1f;
+				}
 				// Check for instruments switch
 				foreach (KeyValuePair<KeyCode, Instrument> key in keyToInstrument) {
 					if (Input.GetKeyDown(key.Key)) {
