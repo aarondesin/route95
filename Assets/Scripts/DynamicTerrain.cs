@@ -341,8 +341,9 @@ public class DynamicTerrain {
 		int size = Math.Max (width, depth);
 		size--;
 		size = makePowerTwo (size); //size of the Diamond Square Alg array
+		Debug.Log("Size is: " + size);
 		if (size < 2) return;
-		float[,] heightmap = new float[size, size];
+		float[,] heightmap = new float[size + 1, size + 1];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
 		fillDiamondSquare (ref heightmap, corners, height, rough, rangeMin, rangeMax);
 
@@ -353,22 +354,24 @@ public class DynamicTerrain {
 		int maxY = y + depth / 2;
 		int mapMax = (int)heightmap.GetLongLength (0) - 1;
 		for (int i = minX; i <= maxX; i++) {
-			float normalizedX = (float)i / (float)(maxX - minX);
+			float normalizedX = (float)(i - minX) / (float)(maxX - minX);
 			int xFloor = Mathf.FloorToInt(normalizedX * (float)mapMax);
 			int xCeil = Mathf.FloorToInt (normalizedX * (float)mapMax);
 			float xT = normalizedX % 1f;
 			for (int j = minY; j <= maxY; j++) {
 				if (vmap.ContainsVertex(i, j)) {
-					float normalizedY = (float)j / (float)(maxY - minY);
+					float normalizedY = (float)(j - minY) / (float)(maxY - minY);
 					int yFloor = Mathf.FloorToInt (normalizedY * (float)mapMax);
 					int yCeil = Mathf.FloorToInt (normalizedY * (float)mapMax);
 					float yT = normalizedY % 1f;
+					Debug.Log ("xFloor: " + xFloor + ", xCeil: " + xCeil + ", yFloor:" + yFloor + ", yCeil: " + yCeil);
 					float p00 = getFromHMap(heightmap, xFloor, yFloor);
 					float p10 = getFromHMap(heightmap, xCeil, yFloor);
 					float p01 = getFromHMap(heightmap, xFloor, yCeil);
 					float p11 = getFromHMap(heightmap, xCeil, yCeil);
+					Debug.Log ("p00: " + p00 + ", p10: " + p10 + ", p01:" + p01 + ", p11:" + p11);
 					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
-					vmap.SetHeight (i, j ,interpH);
+					vmap.SetHeight (i, j, interpH);
 				} else continue;
 			}
 		}
@@ -377,13 +380,15 @@ public class DynamicTerrain {
 	//raises n to the nearest power of 2
 	public int makePowerTwo (int n) {
 		if (n < 2) return -1; // if n is less than 2, return error value -1
-		if ((n != 0) && ((n & (n-1)) != 0)) return n; //if n is already a power of 2, return n
+		if ((n != 0) && ((n & (n-1)) == 0)) return n; //if n is already a power of 2, return n
 		int r = 0; //counter of highest power of 2 in n
 		//bit shift n to get place of leading bit, r, which is the log base 2 of n
 		while ((n >>= 1) != 0) {
 			r++;
+			Debug.Log ("r is: " + r);
 		}
 		r++; //raise power of two to next highest
+		Debug.Log("Final r is: " + r);
 		return (int)Math.Pow (2, r);
 	}
 
@@ -413,7 +418,7 @@ public class DynamicTerrain {
 	void fillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
 		//set middle of hmap
 		int max = (int)heightmap.GetLongLength(0) - 1;
-		heightmap [max + 1, max + 1] = height; //set middle height
+		heightmap [max/2 + 1, max/2 + 1] = height; //set middle height
 		divide(ref heightmap, max, rough, rangeMin, rangeMax);
 	}
 
@@ -424,7 +429,7 @@ public class DynamicTerrain {
 			getFromHMap(heightmap, x + size, y + size), //upper right
 			getFromHMap(heightmap, x - size, y + size) //upper left
 		});
-		heightmap [x, y] = ave;
+		heightmap [x, y] = ave + offset;
 	}
 
 	void diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
@@ -434,7 +439,7 @@ public class DynamicTerrain {
 			getFromHMap(heightmap, x, y + size), //top
 			getFromHMap(heightmap, x - size, y) //left
 		});
-		heightmap [x, y] = ave;
+		heightmap [x, y] = ave + offset;
 	}
 
 	void divide(ref float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
@@ -444,8 +449,8 @@ public class DynamicTerrain {
 			return;
 
 		//do squares
-		for (y = half; y < heightmap.GetLongLength(1); y += size) {
-			for (x = half; x < heightmap.GetLongLength(0); x += size) {
+		for (y = half; y < heightmap.GetLongLength(1) - 1; y += size) {
+			for (x = half; x < heightmap.GetLongLength(0) - 1; x += size) {
 				if (size == heightmap.GetLongLength(0) - 1) { //ignore setting the very center of the mountain
 					continue;
 				}else {
@@ -455,8 +460,8 @@ public class DynamicTerrain {
 		}
 
 		//do diamonds
-		for (y = 0; y <= heightmap.GetLongLength (1); y += half) {
-			for (x = (y + half) % size; x <= heightmap.GetLength (0); x += size) {
+		for (y = 0; y <= heightmap.GetLongLength (1) - 1; y += half) {
+			for (x = (y + half) % size; x <= heightmap.GetLength (0) - 1; x += size) {
 				diamond (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
 			}
 		}
