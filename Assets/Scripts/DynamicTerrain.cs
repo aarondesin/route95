@@ -27,13 +27,14 @@ public class DynamicTerrain {
 	private GameObject player;
 
 	public Dictionary<int ,Dictionary<int, float>> heightmap;
+	public VertexMap vertexmap;
 
 	public LinInt freqData;
 	public int freqSampleSize = 128;
 	public FFTWindow fftWindow = FFTWindow.Rectangular;
 
 	private Dictionary<Chunk, int> chunkPriorities;
-	private int chunkUpdatesPerCycle = 8;
+	private int chunkUpdatesPerCycle = 4;
 
 	LinInt UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
@@ -93,6 +94,7 @@ public class DynamicTerrain {
 		VERT_UPDATE_DISTANCE = vertUpdateDist;
 		HEIGHT_SCALE = heightScale;
 		heightmap = new Dictionary<int, Dictionary<int, float>>();
+		vertexmap = new VertexMap();
 		SMOOTH_FACTOR = smoothFactor;
 		chunkPriorities = new Dictionary<Chunk, int>();
 	}
@@ -222,10 +224,12 @@ public class DynamicTerrain {
 	}
 
 	void deleteChunk(Chunk chunk){
+		//vertexmap.UnregisterChunkVertex(
 		chunkPriorities.Remove(chunk);
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
+
 	}
 
 	void deleteChunks(List<int> xChunks, List<int> yChunks) {

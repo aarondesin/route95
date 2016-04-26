@@ -6,6 +6,9 @@ public class IntVector2 {
 	public int x;
 	public int y;
 
+	public string ToString () {
+		return "("+x+","+y+")";
+	}
 }
 
 public class VertexMap {
@@ -101,15 +104,15 @@ public class VertexMap {
 	//
 	// Add a chunk vertex <-> Vertex relationship
 	//
-	public void RegisterChunkVertex (IntVector2 i, Mesh chunkMesh, int vertIndex) {
-		RegisterChunkVertex (i.x, i.y, chunkMesh, vertIndex);
+	public void RegisterChunkVertex (IntVector2 i, Chunk chunk, int vertIndex) {
+		RegisterChunkVertex (i.x, i.y, chunk, vertIndex);
 	}
 
-	public void RegisterChunkVertex (int x, int y, Mesh chunkMesh, int vertIndex) {
+	public void RegisterChunkVertex (int x, int y, Chunk chunk, int vertIndex) {
 		if (!ContainsVertex (x, y)) AddVertex (x, y);
 
-		vertices[x][y].chunkVertices.Add(new KeyValuePair<Mesh, int> (chunkMesh, vertIndex));
-		vertices [x][y].updateNormal();
+		vertices[x][y].chunkVertices.Add(new KeyValuePair<Chunk, int> (chunk, vertIndex));
+		//vertices [x][y].updateNormal();
 	}
 
 	//
@@ -131,7 +134,7 @@ public class VertexMap {
 }
 
 public class Vertex {
-	public List<KeyValuePair<Mesh, int>> chunkVertices;
+	public List<KeyValuePair<Chunk, int>> chunkVertices;
 	public bool locked = false;
 	public int x;
 	public int y;
@@ -143,20 +146,33 @@ public class Vertex {
 	public Vertex (int x, int y) {
 		this.x = x;
 		this.y = y;
-		chunkVertices = new List<KeyValuePair<Mesh, int>>();
+		chunkVertices = new List<KeyValuePair<Chunk, int>>();
 	}
 
 	public void updateNormal () {
 		normal = Vector3.zero;
-		foreach (KeyValuePair<Mesh, int> chunkVert in chunkVertices) {
-			normal += chunkVert.Key.normals[chunkVert.Value];
+		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
+		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
+			if (chunkVert.Key.chunk == null) {
+				deletes.Add (chunkVert);
+				continue;
+			}
+			normal += chunkVert.Key.chunk.GetComponent<MeshFilter>().mesh.normals[chunkVert.Value];
 		}
 		normal.Normalize ();
+		foreach (KeyValuePair<Chunk, int> delete in deletes)
+			chunkVertices.Remove (delete);
 	}
 
 	public void setHeight (float h) {
+		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
-		foreach (KeyValuePair<Mesh, int> chunkVert in chunkVertices) {
+		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
+		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
+			if (chunkVert.Key.chunk == null) {
+				deletes.Add (chunkVert);
+				continue;
+			}
 			/*
 			Vector3[] verts = new Vector3[chunkVert.Key.vertices.Length];
 			for (int i=0; i<verts.Length; i++) {
@@ -164,9 +180,15 @@ public class Vertex {
 				if (i == chunkVert.Value) verts[i].y = height;
 			}
 			*/
-			chunkVert.Key.vertices [chunkVert.Value].y = height;
+			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
+			chunkVert.Key.UpdateVertex (chunkVert.Value, h);
+			//chunkVert.Key.vertices [chunkVert.Value].y = height;
 			//chunkVert.Key.vertices = verts;
 		}
+		foreach (KeyValuePair<Chunk, int> delete in deletes)
+			chunkVertices.Remove (delete);
+		updateNormal();
+		
 	}
 
 	public void lerpHeight(float factor) {
