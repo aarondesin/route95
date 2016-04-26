@@ -342,6 +342,7 @@ public class DynamicTerrain {
 		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
+		fillDiamondSquare (heightmap, rough);
 	}
 
 	//raises n to the nearest power of 2
@@ -379,6 +380,7 @@ public class DynamicTerrain {
 		return corners;
 	}
 
+	public void fillDiamondSquare (float[,] heightmap, float rough){
 
 	}
 }
