@@ -328,9 +328,25 @@ public class DynamicTerrain {
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
 
-	//create a width by depth mountain at vertex (x,y) with a maximum altitude of height
-	public void createMountain (int x, int y, int width, int depth, float height) {
-
+	//create a width by depth mountain at vertex (x,y) with a maximum altitude of height and a jaggedness of rough
+	public void createMountain (int x, int y, int width, int depth, float height, float rough) {
+		VertexMap vmap = DynamicTerrain.instance.vertexmap;
+		int size = Math.Max (width, depth);
+		size--;
+		size = makePowerTwo (size);
+		float[,] heightmap = new float[size, size];
 	}
-		
+
+	//raises n to the nearest power of 2
+	public int makePowerTwo (int n) {
+		if (n < 2) return -1; // if n is less than 2, return error value -1
+		if (n && !(n & (n-1))) return n; //if n is already a power of 2, return n
+		int r = 0; //counter of highest power of 2 in n
+		//bit shift n to get place of leading bit, r, which is the log base 2 of n
+		while (n >>= 1) {
+			r++;
+		}
+		r++; //raise power of two to next highest
+		return Math.Pow (2, r);
+	}
 }
