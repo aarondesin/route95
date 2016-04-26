@@ -342,7 +342,7 @@ public class DynamicTerrain {
 		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
-		fillDiamondSquare (heightmap, corners, rough);
+		fillDiamondSquare (heightmap, corners, height, rough);
 	}
 
 	//raises n to the nearest power of 2
@@ -380,15 +380,20 @@ public class DynamicTerrain {
 		return corners;
 	}
 
-	void fillDiamondSquare (float[,] heightmap, float[] corners, float rough){
+	//fills heightmap with DiamondSquare generated heights, using corners as the seeds, height as the initial center value, and rough as the height offset value
+	void fillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough){
 
 	}
 
-	void square(float[,] heightmap, int x, int y, int size, float offset) {
+	void square(ref float[,] heightmap, int x, int y, int size, float offset) {
 
 	}
 
-	void diamond(float[,] heightmap, int x, int y, int size, float offset) {
+	void diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
+
+	}
+
+	void divide(ref float[,] heightmap, int size) {
 
 	}
 
