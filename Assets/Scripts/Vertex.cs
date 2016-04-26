@@ -77,6 +77,8 @@ public class VertexMap {
 
 	public void Lock (int x, int y) {
 		vertices[x][y].locked = true;
+		foreach (KeyValuePair<Chunk, int> entry in vertices[x][y].chunkVertices)
+			entry.Key.LockVertex();
 	}
 		
 	//

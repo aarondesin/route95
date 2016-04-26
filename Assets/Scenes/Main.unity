@@ -9345,7 +9345,11 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
+<<<<<<< HEAD
   m_Size: 0.9462364
+=======
+  m_Size: 0.9458317
+>>>>>>> origin/master
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -18109,13 +18113,13 @@ ReflectionProbe:
   m_Mode: 1
   m_RefreshMode: 1
   m_TimeSlicingMode: 2
-  m_Resolution: 512
+  m_Resolution: 256
   m_UpdateFrequency: 0
   m_Importance: 1
   m_BoxSize: {x: 10, y: 2.4, z: 10}
   m_BoxOffset: {x: 0, y: -0.20205665, z: 0}
   m_NearClip: 4.1
-  m_FarClip: 100
+  m_FarClip: 50
   m_ShadowDistance: 50
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -19863,7 +19867,11 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
+<<<<<<< HEAD
   m_AnchoredPosition: {x: 0.000091552734, y: 0}
+=======
+  m_AnchoredPosition: {x: -0.00015258789, y: 0}
+>>>>>>> origin/master
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -23539,7 +23547,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -23610,7 +23618,11 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
   m_AnchoredPosition: {x: 17.499878, y: 430.9999}
+=======
+  m_AnchoredPosition: {x: 17.499878, y: 23.346558}
+>>>>>>> origin/master
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -29337,8 +29349,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288437015}
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
+<<<<<<< HEAD
   m_Value: 0
   m_Size: 0.9793877
+=======
+  m_Value: 0.0000017438555
+  m_Size: 0.97938746
+>>>>>>> origin/master
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
