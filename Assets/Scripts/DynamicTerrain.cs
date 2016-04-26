@@ -328,13 +328,20 @@ public class DynamicTerrain {
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
 
-	//create a width by depth mountain at vertex (x,y) with a maximum altitude of height and a jaggedness of rough
+	//create a width by depth mountain centered at vertex (x,y) with a maximum altitude of height and a jaggedness of rough
 	public void createMountain (int x, int y, int width, int depth, float height, float rough) {
+		//ensure width and depth are odd
+		if (width % 2 == 0)
+			width++;
+		if (depth % 2 == 0)
+			depth++;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
 		int size = Math.Max (width, depth);
 		size--;
-		size = makePowerTwo (size);
+		size = makePowerTwo (size); //size of the Diamond Square Alg array
+		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
+		float[] corners = initializeCorners (vmap, x, y, width, depth);
 	}
 
 	//raises n to the nearest power of 2
@@ -348,5 +355,30 @@ public class DynamicTerrain {
 		}
 		r++; //raise power of two to next highest
 		return (int)Math.Pow (2, r);
+	}
+
+	//returns the initial corners for the Diamond Square Algorithm
+	public float[] initializeCorners(VertexMap vmap, int x, int y, int width, int depth) {
+		float[] corners = new float[4];
+		//corner lower left
+		int vx = x - (width - 1) / 2; //vertex x
+		int vy = y - (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[0] = 0f;
+		//corner lower right
+		vx = x + (width - 1) / 2; //vertex x
+		vy = y - (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[1] = 0f;
+		//corner upper right
+		vx = x + (width - 1) / 2; //vertex x
+		vy = y + (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[2] = 0f;
+		//corner upper left
+		vx = x - (width - 1) / 2; //vertex x
+		vy = y + (width - 1) / 2; //vertex y
+		if (!float.IsNaN(corners[1] = vmap.GetHeight(vx, vy))) corners[3] = 0f;
+		return corners;
+	}
+
+
 	}
 }
