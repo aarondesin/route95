@@ -342,7 +342,7 @@ public class DynamicTerrain {
 		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
-		fillDiamondSquare (heightmap, corners, height, rough);
+		fillDiamondSquare (ref heightmap, corners, height, rough);
 	}
 
 	//raises n to the nearest power of 2
@@ -394,7 +394,7 @@ public class DynamicTerrain {
 	}
 
 	void divide(ref float[,] heightmap, int size) {
-
+		int x, y, half = size / 2;
 	}
 
 	//accesses heightmap and returns -INF for out of bounds vertices
