@@ -44,6 +44,10 @@ public class PlayerMovement : MonoBehaviour {
 	public void StartMoving() {
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
+		DynamicTerrain.instance.createMountain (-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.createMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.createMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.createMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 	}
 
 	public void StopMoving() {

@@ -140,10 +140,6 @@ public class WorldManager : MonoBehaviour {
 		if (DO_DECORATE) {
 			LoadDecorations();
 			InitialDecorate();
-			terrain.createMountain (-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-			terrain.createMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-			terrain.createMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-			terrain.createMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		}
         NotifyLoadingDone();
 	}

@@ -40,6 +40,30 @@ public class VertexMap {
 		return true;
 	}
 
+	//to debug
+	public bool ContainsVertex (int x, int y, bool debug) {
+		Debug.Log("Do I contain (" + x + ", " + y + ")");
+		if (vertices == null) {
+			if (debug) {
+				Debug.Log ("No vertices list.");
+			}
+			return false;
+		}
+		if (!vertices.ContainsKey (x)) {
+			if (debug) {
+				Debug.Log ("No x.");
+			}
+			return false;
+		}
+		if (!vertices [x].ContainsKey (y)) {
+			if (debug) {
+				Debug.Log ("No y.");
+			}
+			return false;
+		}
+		return true;
+	}
+
 	//
 	// Check the height of a vertex
 	//
