@@ -233,7 +233,7 @@ public class Chunk{
 	public void UpdateVertex (int index, float height) {
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		//Mesh mesh = new Mesh ();
-		vertices[index].y += (height - vertices[index].y)/3f;
+		vertices[index].y += (height - vertices[index].y)/4f;
 		chunk.GetComponent<MeshFilter>().mesh.vertices = vertices;
 		//mesh.uv = uvs;
 		//mesh.triangles = triangles;
@@ -256,8 +256,8 @@ public class Chunk{
 			
 			IntVector2 coords = IntToV2 (v);
 
-			if (!vmap.IsLocked (coords)) {
-				if (!vmap.IsConstrained(coords)) { //if vert is frozen
+			if (!vmap.IsLocked (coords)) { //if vert is frozen
+				if (!vmap.IsConstrained(coords)) { 
 
 					Vector3 vertPos = chunk.transform.position + vertices [v];
 					float distance = Vector3.Distance (vertPos, player.transform.position);
@@ -266,7 +266,7 @@ public class Chunk{
 						float angle = Vector3.Angle (Vector3.right, angleVector);
 						float linIntInput = angle / 360f;
 						float newY = freqData.getDataPoint (linIntInput) * HEIGHT_SCALE;
-						if (newY == vertices[v].y) {
+						if (newY != vertices[v].y) {
 							changesMade = true;
 							vmap.SetHeight (coords, newY);
 							//if (chunk.GetComponent<MeshFilter> ().mesh.normals [v].y < 0f)  //flip normal if pointing down
