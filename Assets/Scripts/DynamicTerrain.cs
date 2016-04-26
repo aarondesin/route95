@@ -342,7 +342,7 @@ public class DynamicTerrain {
 		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
-		fillDiamondSquare (heightmap, rough);
+		fillDiamondSquare (heightmap, corners, rough);
 	}
 
 	//raises n to the nearest power of 2
@@ -380,7 +380,37 @@ public class DynamicTerrain {
 		return corners;
 	}
 
-	public void fillDiamondSquare (float[,] heightmap, float rough){
+	void fillDiamondSquare (float[,] heightmap, float[] corners, float rough){
 
+	}
+
+	void square(float[,] heightmap, int x, int y, int size, float offset) {
+
+	}
+
+	void diamond(float[,] heightmap, int x, int y, int size, float offset) {
+
+	}
+
+	//accesses heightmap and returns -INF for out of bounds vertices
+	float getFromHMap (float [,] heightmap, int x, int y) {
+		if (x < 0 || x >= heightmap.GetLength (0) || y < 0 || y >= heightmap.GetLength (1)) {
+			return float.NegativeInfinity;
+		}
+		return heightmap [x, y];
+	}
+
+	//returns the average of 4 corners, excluding non-legal values
+	float average(float[] corners) {
+		float count = 4f;
+		float sum = 0f;
+		foreach (float corner in corners) {
+			if (float.IsNegativeInfinity (corner)) {
+				count -= 1f;
+				continue;
+			}
+			sum += corner;
+		}
+		return (sum/count);
 	}
 }
