@@ -340,13 +340,13 @@ public class DynamicTerrain {
 	//raises n to the nearest power of 2
 	public int makePowerTwo (int n) {
 		if (n < 2) return -1; // if n is less than 2, return error value -1
-		if (n && !(n & (n-1))) return n; //if n is already a power of 2, return n
+		if ((n != 0) && ((n & (n-1)) != 0)) return n; //if n is already a power of 2, return n
 		int r = 0; //counter of highest power of 2 in n
 		//bit shift n to get place of leading bit, r, which is the log base 2 of n
-		while (n >>= 1) {
+		while ((n >>= 1) != 0) {
 			r++;
 		}
 		r++; //raise power of two to next highest
-		return Math.Pow (2, r);
+		return (int)Math.Pow (2, r);
 	}
 }
