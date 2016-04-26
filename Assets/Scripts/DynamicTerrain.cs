@@ -328,8 +328,8 @@ public class DynamicTerrain {
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
 
-	//create a width by depth mountain centered at vertex (x,y) with a maximum altitude of height and a jaggedness of rough
-	public void createMountain (int x, int y, int width, int depth, float height, float rough) {
+	//create a width by depth mountain centered at vertex (x,y) with a maximum altitude of height, a jaggedness of rough, and a min and max percentage of the random scale 
+	public void createMountain (int x, int y, int width, int depth, float height, float rough, float rangeMin = -0.1f, float rangeMax = 1f) {
 		//ensure width and depth are odd
 		if (width % 2 == 0)
 			width++;
@@ -342,7 +342,7 @@ public class DynamicTerrain {
 		if (size < 2) return;
 		float[,] heightmap = new float[size, size];
 		float[] corners = initializeCorners (vmap, x, y, width, depth);
-		fillDiamondSquare (ref heightmap, corners, height, rough);
+		fillDiamondSquare (ref heightmap, corners, height, rough, rangeMin, rangeMax);
 	}
 
 	//raises n to the nearest power of 2
@@ -381,20 +381,58 @@ public class DynamicTerrain {
 	}
 
 	//fills heightmap with DiamondSquare generated heights, using corners as the seeds, height as the initial center value, and rough as the height offset value
-	void fillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough){
-
+	void fillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
+		//set middle of hmap
+		int max = (int)heightmap.GetLongLength(0) - 1;
+		heightmap [max + 1, max + 1] = height; //set middle height
+		divide(ref heightmap, max, rough, rangeMin, rangeMax);
 	}
 
 	void square(ref float[,] heightmap, int x, int y, int size, float offset) {
-
+		float ave = average (new float[] {
+			getFromHMap(heightmap, x - size, y - size), //lower left
+		 	getFromHMap(heightmap, x + size, y - size), //lower right
+			getFromHMap(heightmap, x + size, y + size), //upper right
+			getFromHMap(heightmap, x - size, y + size) //upper left
+		});
+		heightmap [x, y] = ave;
 	}
 
 	void diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
-
+		float ave = average (new float[] {
+			getFromHMap(heightmap, x, y - size), //bottom
+			getFromHMap(heightmap, x + size, y), //right
+			getFromHMap(heightmap, x, y + size), //top
+			getFromHMap(heightmap, x - size, y) //left
+		});
+		heightmap [x, y] = ave;
 	}
 
-	void divide(ref float[,] heightmap, int size) {
+	void divide(ref float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
 		int x, y, half = size / 2;
+		float scale = size * rough;
+		if (half < 1) //past the minimum size
+			return;
+
+		//do squares
+		for (y = half; y < heightmap.GetLongLength(1); y += size) {
+			for (x = half; x < heightmap.GetLongLength(0); x += size) {
+				if (size == heightmap.GetLongLength(0) - 1) { //ignore setting the very center of the mountain
+					continue;
+				}else {
+					square (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+				}
+			}
+		}
+
+		//do diamonds
+		for (y = 0; y <= heightmap.GetLongLength (1); y += half) {
+			for (x = (y + half) % size; x <= heightmap.GetLength (0); x += size) {
+				diamond (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+			}
+		}
+		//recursive call
+		divide (ref heightmap, half, rough, rangeMin, rangeMax);
 	}
 
 	//accesses heightmap and returns -INF for out of bounds vertices
