@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour {
 	public GameObject backRightWheel;
 
 	float velocity;
-	const float velocityToRotation = -20f;
+	const float velocityToRotation = -10000f;
 	//float acceleration;
 	Vector3 target;
 	float offsetH = 0f;
@@ -116,15 +116,27 @@ public class PlayerMovement : MonoBehaviour {
 				transform.position = road.GetPoint (progress) + offset - road.BezRight (road.GetPoint(progress)) * road.width / 3f;
 				//Quaternion lookRot = Quaternion.FromToRotation (transform.position, road.GetPoint (progress + lookAhead * Time.deltaTime));
 				transform.LookAt (road.GetVelocity (progress) + transform.position);
+
+
 				frontLeftWheel.transform.LookAt (transform.position + road.GetVelocity (Mathf.Clamp01 (progress + lookAhead)));
 				frontRightWheel.transform.LookAt (transform.position + road.GetVelocity (Mathf.Clamp01 (progress + lookAhead)));
 				backRightWheel.transform.rotation = transform.rotation;
 				backLeftWheel.transform.rotation = transform.rotation;
 
-				frontLeftWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 180f, 0f));
+				frontLeftWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
+				frontRightWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
+				backLeftWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
+				backRightWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
+
+				frontLeftWheel.transform.Rotate (new Vector3 (0f, 180f, 0f));
+				backLeftWheel.transform.Rotate (new Vector3 (0f, 180f, 0f));
+
+				//if (Random.Range(0, 100) == 0) Debug.Log(velocity * velocityToRotation);
+
+				/*frontLeftWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 180f, 0f));
 				frontRightWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
 				backLeftWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 180f, 0f));
-				backRightWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));
+				backRightWheel.transform.Rotate (new Vector3 (velocity * velocityToRotation, 0f, 0f));*/
 				//transform.rotation = Quaternion.Lerp (transform.rotation, lookRot, 0.9f);
 
 			}

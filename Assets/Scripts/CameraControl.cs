@@ -308,9 +308,9 @@ public class CameraControl : MonoBehaviour {
 				//Vector3 velocity = Vector3.zero;
 				//angle.pos = Vector3.SmoothDamp (angle.pos, angle.targetPos, ref velocity, angle.lag);
 				//angle.pos = angle.targetPos;
-				angle.pos += (angle.targetPos - angle.pos) * angle.lag;
+				angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
 				//transform.rotation = Quaternion.Euler (transform.rotation.eulerAngles + (currentAngle.tr.rotation.eulerAngles - transform.rotation.eulerAngles) * currentAngle.lag * Time.deltaTime);
-				//angle.rot = Quaternion.LookRotation (WorldManager.instance.player.transform.position + WorldManager.instance.player.transform.forward *20f - angle.pos, Vector3.up);
+				angle.rot = Quaternion.LookRotation (WorldManager.instance.player.transform.position + WorldManager.instance.player.transform.forward *20f - angle.pos, Vector3.up);
 				break;
 			case CameraFollowMode.Static:
 				angle.pos = angle.targetPos;
