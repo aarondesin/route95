@@ -22,7 +22,7 @@ public struct DecoGroupMaxSize {
 }
 
 public class Decoration : MonoBehaviour {
-	public static Dictionary<Decoration, int> numDecorations;
+	public static Dictionary<DecorationGroup, int> numDecorations;
 	public DecorationGroup group = DecorationGroup.None;
 	public float density; // 0-1, density of population
 	public DecorationDistribution distribution;

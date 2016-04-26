@@ -59,6 +59,7 @@ public class WorldManager : MonoBehaviour {
 	private GameObject sun;
 	private GameObject moon;
 
+	[Range(0f, 2f*Mathf.PI)]
 	public float timeOfDay;
 	private float timeScale = 1;
 
@@ -241,10 +242,10 @@ public class WorldManager : MonoBehaviour {
 				// Pick a random decoration and decorate with it
 				GameObject decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
 				Decoration deco = decoration.GetComponent<Decoration>();
-				if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<Decoration, int>();
-				if (!Decoration.numDecorations.ContainsKey(deco))
-					Decoration.numDecorations.Add (deco, 0);
-				if (Decoration.numDecorations[deco] < maxActive[deco.group]) {
+				if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<DecorationGroup, int>();
+				if (!Decoration.numDecorations.ContainsKey(deco.group))
+					Decoration.numDecorations.Add (deco.group, 0);
+				if (Decoration.numDecorations[deco.group] < maxActive[deco.group]) {
 					switch (deco.distribution) {
 					case DecorationDistribution.Random:
 						Chunk chunk = terrain.RandomChunk ();
@@ -261,7 +262,7 @@ public class WorldManager : MonoBehaviour {
 						DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
 						break;
 					}
-					Decoration.numDecorations[deco]++;
+					Decoration.numDecorations[deco.group]++;
 				}
 			}
 		}

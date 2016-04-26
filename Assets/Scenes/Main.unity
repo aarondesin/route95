@@ -5086,13 +5086,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightRight: {fileID: 1080503465}
   lightLeft: {fileID: 1299636034}
-  velocity: 0.2
   moving: 0
   lights: 0
   progress: 0
   particles:
   - {fileID: 419966875}
   - {fileID: 645894584}
+  frontLeftWheel: {fileID: 0}
+  frontRightWheel: {fileID: 0}
+  backLeftWheel: {fileID: 0}
+  backRightWheel: {fileID: 0}
 --- !u!82 &371512239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7645,7 +7648,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94453293
+  m_Size: 0.94583166
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14824,14 +14827,6 @@ MonoBehaviour:
   MAX_DECORATION_HEIGHT: 10
   MIN_DECORATION_HEIGHT: -10
   numDecorations: 0
-  decorationPaths:
-  - Prefabs/Decoration_Saguaro
-  - Prefabs/Decoration_BarrelCactus
-  - Prefabs/Decoration_Boulder01
-  - Prefabs/Decoration_Boulder02
-  - Prefabs/Decoration_Boulder03
-  - Prefabs/Decoration_Agave01
-  - Prefabs/Decoration_JoshuaTree01
   decorations: []
   TIME_SCALE: 0.01
   LIGHT_X_SCALE: 999999
@@ -14841,16 +14836,23 @@ MonoBehaviour:
   audioOut: {fileID: 0}
   road: {fileID: 0}
   timeOfDay: 0
-  primaryDayColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryDayColor: {r: 0, g: 0, b: 0, a: 0}
-  primarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
-  secondarySunsetColor: {r: 0, g: 0, b: 0, a: 0}
-  primaryNightColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryNightColor: {r: 0, g: 0, b: 0, a: 0}
-  primarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
-  secondarySunriseColor: {r: 0, g: 0, b: 0, a: 0}
-  maxSunIntensity: 0
+  primaryDayColor: {r: 1, g: 1, b: 1, a: 1}
+  secondaryDayColor: {r: 0.5411765, g: 0.7254902, b: 0.8705883, a: 1}
+  primarySunsetColor: {r: 1, g: 1, b: 0, a: 1}
+  secondarySunsetColor: {r: 1, g: 0.49803922, b: 0, a: 1}
+  primaryNightColor: {r: 0.03529412, g: 0.058823533, b: 0.08627451, a: 1}
+  secondaryNightColor: {r: 0.058823533, g: 0.078431375, b: 0.18823531, a: 1}
+  primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
+  secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
+  maxSunIntensity: 1
   minSunIntensity: 0
+  initialMaxActive:
+  - group: 1
+    maxActive: 200
+  - group: 2
+    maxActive: 200
+  - group: 3
+    maxActive: 4
 --- !u!1 &906108765
 GameObject:
   m_ObjectHideFlags: 0
@@ -16379,7 +16381,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: -0.00015258789, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -19200,7 +19202,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1550758007}
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -19568,7 +19570,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -19639,7 +19641,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 848.99994, y: 430.9999}
+  m_AnchoredPosition: {x: 848.9999, y: 431}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
