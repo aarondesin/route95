@@ -14,7 +14,7 @@ public class InstrumentDisplay : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (GameManager.instance.currentMode == Mode.Live && !GameManager.instance.paused) {
+		if (GameManager.instance.currentMode == GameManager.Mode.Live && !GameManager.instance.paused) {
 			Color color = glow.GetComponent<Image>().color;
 			color.a -= fadeSpeed;
 			glow.GetComponent<Image>().color = color;

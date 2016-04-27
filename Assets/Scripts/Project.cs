@@ -51,4 +51,7 @@ public class Project {
 		return songs.Count == 0;
 	}
 
+public void RegisterRiff (Riff riff) {
+}
+
 }

@@ -9,23 +9,23 @@ using System.IO;
 using UnityEditor;
 #endif
 
-public enum Menu {
-	None,
-	Main,
-	KeySelect,
-	SongArrange,
-	RiffEdit,
-	PostPlay
-};
-
-public enum Mode {
-	Loading,
-	Setup,
-	Live,
-	Postplay
-};
-
 public class GameManager : MonoBehaviour {
+
+	public enum Menu {
+		None,
+		Main,
+		KeySelect,
+		SongArrange,
+		RiffEdit,
+		PostPlay
+	};
+
+	public enum Mode {
+		Loading,
+		Setup,
+		Live,
+		Postplay
+	};
 
 	public static GameManager instance;
 
@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour {
 		startLoadTime = Time.realtimeSinceStartup;
 		loadValue = Instrument.AllInstruments.Count+
 			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
-			WorldManager.instance.MAX_DECORATIONS;
+			WorldManager.instance.maxDecorations;
 
 
 		loadingScreen.SetActive(true);
@@ -241,12 +241,12 @@ public class GameManager : MonoBehaviour {
 		HideAll();
 		Show (keySelectMenu);
 		DisableKeySelectConfirmButton();
-		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
 	}
 
 	public void GoToSongArrangeMenu () {
 		HideAll ();
-		CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
+		CameraControl.instance.LerpToPosition(CameraControl.instance.ViewRadio);
 		Show (songArrangeMenu);
 		SongArrangeSetup.instance.Refresh();
 		SongTimeline.instance.RefreshTimeline();
@@ -257,7 +257,7 @@ public class GameManager : MonoBehaviour {
 		if (MusicManager.instance.currentSong.scale == -1) {
 			GoToKeySelectMenu();
 		} else {
-			CameraControl.instance.MoveToPosition (CameraControl.instance.ViewDriving);
+			CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
 			Show (riffEditMenu);
 			InstrumentSetup.instance.Initialize ();
 		}
@@ -374,7 +374,7 @@ public class GameManager : MonoBehaviour {
 		MusicManager.instance.StopPlaying();
 		currentMode = Mode.Setup;
 		SwitchToMenu (Menu.SongArrange);
-		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewRadio);
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewRadio);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		PlayerMovement.instance.StopMoving();
 		DisableMenu(loopIcon);
@@ -387,7 +387,7 @@ public class GameManager : MonoBehaviour {
 		MusicManager.instance.StopPlaying();
 		currentMode = Mode.Setup;
 		SwitchToMenu (Menu.KeySelect);
-		CameraControl.instance.MoveToPosition (CameraControl.instance.ViewOutsideCar);
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		PlayerMovement.instance.StopMoving();
 		DisableMenu(loopIcon);

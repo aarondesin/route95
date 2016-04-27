@@ -224,12 +224,12 @@ public class MusicManager : MonoBehaviour {
 		if (playing && !GameManager.instance.paused) {
 			if (BeatTimer <= 0f) {
 				switch (GameManager.instance.currentMode) {
-				case Mode.Setup:
+				case GameManager.Mode.Setup:
 					InstrumentSetup.currentRiff.PlayRiff (beat++);
 					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
 						beat = 0;
 					break;
-				case Mode.Live:
+				case GameManager.Mode.Live:
 
 
 					//Debug.Log(lickQueue.Count);

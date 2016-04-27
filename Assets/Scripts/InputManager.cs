@@ -82,7 +82,7 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (GameManager.instance.currentMode == Mode.Live) {
+		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
 			if (Input.GetKeyDown (KeyCode.Escape)) {
 				GameManager.instance.TogglePause ();
 			} else if (Input.GetKeyDown (KeyCode.UpArrow)) {
@@ -171,7 +171,7 @@ public class InputManager : MonoBehaviour {
 					Debug.Log (MusicManager.instance.licks.Count);
 				}*/
 			}
-		} else if (GameManager.instance.currentMode == Mode.Setup) {
+		} else if (GameManager.instance.currentMode == GameManager.Mode.Setup) {
 			if (Input.GetMouseButtonUp(0)) {
 				if (selected != null) {
 					if (selected.GetComponent<DraggableButton>() != null) {

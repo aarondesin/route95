@@ -20,12 +20,12 @@ public class PerfInfo {
 
 public class PerfTracker : MonoBehaviour {
 
-	Dictionary<Mode, PerfInfo> perfTracker;
+	Dictionary<GameManager.Mode, PerfInfo> perfTracker;
 	//float currentTime;
 
 	// Use this for initialization
 	void Start () {
-		perfTracker = new Dictionary<Mode, PerfInfo>();
+		perfTracker = new Dictionary<GameManager.Mode, PerfInfo>();
 	
 	}
 	
@@ -50,7 +50,7 @@ public class PerfTracker : MonoBehaviour {
 		if (Debug.isDebugBuild) {
 			DateTime currTime = System.DateTime.Now;
 			string log = currTime.ToString() + "\n";
-			foreach (Mode mode in Enum.GetValues(typeof (Mode))) {
+			foreach (GameManager.Mode mode in Enum.GetValues(typeof (GameManager.Mode))) {
 				if (perfTracker.ContainsKey(mode))
 					log += mode.ToString() + "\n-----\n" + perfTracker[mode].ToString();
 			}

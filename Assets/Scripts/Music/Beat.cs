@@ -2,12 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// Class for a list of notes, between Riffs and Notes
 [System.Serializable]
 public class Beat {
+
+	#region Serialized Vars
 
 	[SerializeField]
 	public List<Note> notes;
 
+	#endregion
+	#region Beat Methods
+
+	// Default constructor
 	public Beat () {
 		notes = new List<Note> ();
 	}
@@ -31,4 +38,6 @@ public class Beat {
 	public int NumNotes () {
 		return notes.Count;
 	}
+
+	#endregion
 }

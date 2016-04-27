@@ -8,8 +8,8 @@ public class IntVector2 {
 
 	public bool IsCorner () {
 		return 
-			(x == 0 || x == WorldManager.instance.CHUNK_RESOLUTION-1) &&
-			(y == 0 || y == WorldManager.instance.CHUNK_RESOLUTION-1);
+			(x == 0 || x == WorldManager.instance.chunkResolution-1) &&
+			(y == 0 || y == WorldManager.instance.chunkResolution-1);
 	}
 
 	public override string ToString () {
@@ -112,14 +112,10 @@ public class VertexMap {
 
 	public void Lock (int x, int y) {
 		vertices[x][y].locked = true;
-		foreach (KeyValuePair<Chunk, int> entry in vertices[x][y].chunkVertices)
-			entry.Key.LockVertex();
 	}
 
 	public void Unlock (int x, int y) {
 		vertices[x][y].locked = false;
-		foreach (KeyValuePair<Chunk, int> entry in vertices[x][y].chunkVertices)
-			entry.Key.UnlockVertex();
 	}
 		
 	//
@@ -238,7 +234,7 @@ public class VertexMap {
 		avgH += (ContainsVertex(x+1, y) ? vertices[x+1][y].height/4f : 0f);
 		avgH += (ContainsVertex(x, y +1) ? vertices[x][y+1].height/4f : 0f);
 		avgH += (ContainsVertex(x, y-1) ? vertices[x][y-1].height/4f : 0f);
-		avgH += Random.Range (-WorldManager.instance.VERT_HEIGHT_SCALE/4f, WorldManager.instance.VERT_HEIGHT_SCALE/4f);
+		avgH += Random.Range (-WorldManager.instance.heightScale/4f, WorldManager.instance.heightScale/4f);
 		//if (Random.Range (0,100) == 0) Debug.Log(avgH);
 		SetHeight (new IntVector2 { x=x, y=y}, avgH);
 	}
@@ -307,7 +303,7 @@ public class Vertex {
 		foreach (KeyValuePair<Chunk, int> delete in deletes)
 			chunkVertices.Remove (delete);
 		updateNormal();
-		WorldManager.instance.TERRAIN_MATERIAL.SetFloat("Blend", Mathf.Abs(h/WorldManager.instance.VERT_HEIGHT_SCALE/2f));
+		WorldManager.instance.terrainMaterial.SetFloat("Blend", Mathf.Abs(h/WorldManager.instance.heightScale/2f));
 
 	}
 
@@ -323,9 +319,9 @@ public class Vertex {
 	// Returns the world position of a vertex
 	public Vector3 WorldPos () {
 		return new Vector3 (
-			(float)x / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE - WorldManager.instance.CHUNK_SIZE/2f,
+			(float)x / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
 			height,
-			(float)y / (float)(WorldManager.instance.CHUNK_RESOLUTION) * WorldManager.instance.CHUNK_SIZE - WorldManager.instance.CHUNK_SIZE/2f
+			(float)y / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
 		);
 	}
 
@@ -333,7 +329,7 @@ public class Vertex {
 	{
 		string result = "Vertex ("+x+","+y+") Height: "+height+" | nearRoad: "+nearRoad;
 		foreach (KeyValuePair<Chunk, int> member in chunkVertices) {
-			result += "\nChunk "+member.Key.getX() +","+member.Key.getY();
+			result += "\nChunk "+member.Key.x +","+member.Key.y;
 		}
 		return result;
 	}

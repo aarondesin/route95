@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour {
 	public bool lights;
 	public float progress;
 	public List<ParticleSystem> particles;
-	Bezier road;
+
 	public GameObject frontLeftWheel;
 	public GameObject frontRightWheel;
 	public GameObject backLeftWheel;
@@ -48,10 +48,10 @@ public class PlayerMovement : MonoBehaviour {
 	public void StartMoving() {
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
-		DynamicTerrain.instance.createMountain (-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.createMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.createMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.createMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.CreateMountain (-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.CreateMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.CreateMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
+		DynamicTerrain.instance.CreateMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		GetComponent<AudioSource>().volume = 1f;
 	}
 
@@ -62,10 +62,7 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (road == null) {
-			if (WorldManager.instance.road != null)
-				road = WorldManager.instance.road.GetComponent<Bezier> ();
-		}
+
 		if (Sun.instance != null) {
 			if (moving && !GameManager.instance.paused) {
 				
@@ -110,21 +107,29 @@ public class PlayerMovement : MonoBehaviour {
 					//Debug.Log ("Target:" + target);
 					//Debug.Log ("offsetH: "+offsetH);
 				}
-				velocityOffset += ((Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, velocityOffset)) - 0.5f) * Time.deltaTime;
+				velocityOffset += (
+					(Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 
+						Random.Range (0f, velocityOffset)) - 0.5f) * 
+					Time.deltaTime;
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
-				progress += velocity * Time.deltaTime / road.CurveCount;
+				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
 				if (progress >= 1f)
 					progress = 1f;
 				
 				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
-				Vector3 offset = new Vector3 (offsetH, 2.27f + road.height, 0f);
-				transform.position = road.GetPoint (progress) + offset - road.BezRight (road.GetPoint(progress)) * road.width / 3f;
+				Vector3 offset = new Vector3 (offsetH, 2.27f + Road.instance.height, 0f);
+				transform.position = Road.instance.GetPoint (progress) + offset - 
+					Road.instance.Right (Road.instance.GetPoint(progress)) * Road.instance.width / 3f;
 				//Quaternion lookRot = Quaternion.FromToRotation (transform.position, road.GetPoint (progress + lookAhead * Time.deltaTime));
-				transform.LookAt (road.GetVelocity (progress) + transform.position);
+				transform.LookAt (Road.instance.GetVelocity (progress) + transform.position);
 
 
-				frontLeftWheel.transform.LookAt (transform.position + road.GetVelocity (Mathf.Clamp01 (progress + lookAhead)));
-				frontRightWheel.transform.LookAt (transform.position + road.GetVelocity (Mathf.Clamp01 (progress + lookAhead)));
+				frontLeftWheel.transform.LookAt (transform.position + 
+					Road.instance.GetVelocity (Mathf.Clamp01 (progress + lookAhead))
+				);
+				frontRightWheel.transform.LookAt (transform.position + 
+					Road.instance.GetVelocity (Mathf.Clamp01 (progress + lookAhead))
+				);
 				backRightWheel.transform.rotation = transform.rotation;
 				backLeftWheel.transform.rotation = transform.rotation;
 

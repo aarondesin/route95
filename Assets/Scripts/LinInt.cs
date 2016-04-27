@@ -22,7 +22,7 @@ public class LinInt {
 		averagedEnds = (keyPoints [0] + keyPoints [keyPoints.Count - 1]) / 2;
 	}
 
-	public void addKeyPoint (float point) {
+	public void AddKeyPoint (float point) {
 		keyPoints.Add(point);
 	}
 
@@ -30,7 +30,7 @@ public class LinInt {
 	 *returns the data value that matches
 	 *the linearly interpreted key points
 	 */
-	public float getDataPoint (float pos){
+	public float GetDataPoint (float pos){
 		//if input is out of bounds
 		if (pos > 1f) {
 			Debug.Log ("Position given to LinInt (" + pos + ") is too large.");

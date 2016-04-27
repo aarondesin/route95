@@ -2,30 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum DecorationDistribution {
-	Random, // truly random, based on density
-	Roadside, // for signs, placed alongside road facing either direction
-	CloseToRoad // placed close to road (good for small objects)
-}
-
-public enum DecorationGroup {
-	None,
-	Vegetation,
-	Rocks,
-	RoadSigns
-}
-
-[System.Serializable]
-public struct DecoGroupMaxSize {
-	public DecorationGroup group;
-	public int maxActive;
-}
-
 public class Decoration : MonoBehaviour {
-	public static Dictionary<DecorationGroup, int> numDecorations;
-	public DecorationGroup group = DecorationGroup.None;
+
+	public enum Distribution {
+		Random, // truly random, based on density
+		Roadside, // for signs, placed alongside road facing either direction
+		CloseToRoad // placed close to road (good for small objects)
+	}
+
+	public enum Group {
+		None,
+		Vegetation,
+		Rocks,
+		RoadSigns
+	}
+
+	[System.Serializable]
+	public struct GroupInfo {
+		public Group group;
+		public int maxActive;
+	}
+
+	#region Decoration Vars
+
+	public static Dictionary<Group, int> numDecorations;
+	public Group group = Group.None;
 	public float density; // 0-1, density of population
-	public DecorationDistribution distribution;
+	public Distribution distribution;
 
 	public Vector3 positionOffset;
 	public Vector3 rotationOffset;
@@ -37,8 +40,8 @@ public class Decoration : MonoBehaviour {
 	public Vector2 yawRange;
 	public Vector2 rollRange;
 
-	void Start () {
-	}
+	#endregion
+	#region Decoration Methods
 
 	// Starts with base position/rotation, and adds variance
 	public void Randomize () {
@@ -47,9 +50,9 @@ public class Decoration : MonoBehaviour {
 
 		// Randomize scale (width and height)
 		GetComponent<Transform>().localScale = new Vector3 (
-			WorldManager.instance.CHUNK_SIZE*Random.Range (widthRange[0], widthRange[1]),
-			WorldManager.instance.CHUNK_SIZE*Random.Range (heightRange[0], heightRange[1]),
-			WorldManager.instance.CHUNK_SIZE*Random.Range (widthRange[0], widthRange[1])
+			WorldManager.instance.chunkSize*Random.Range (widthRange[0], widthRange[1]),
+			WorldManager.instance.chunkSize*Random.Range (heightRange[0], heightRange[1]),
+			WorldManager.instance.chunkSize*Random.Range (widthRange[0], widthRange[1])
 		);
 
 		// Randomize rotation
@@ -59,4 +62,6 @@ public class Decoration : MonoBehaviour {
 			Random.Range (rollRange[0], rollRange[1])
 		), Space.World);
 	}
+
+	#endregion
 }
