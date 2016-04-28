@@ -34,15 +34,14 @@ public class PlayerMovement : MonoBehaviour {
 		lights = false;
 		moving = false;
 		velocity = 0f;
-		//acceleration = 0f;
+
 		target = new Vector3 (0f, 0f, 0f);
-		////if (velocity == 0f)
-			//velocity = 0.2f;
+
 		progress = 0f;
 		StopMoving();
-		//GetComponent<AudioSource>().clip = engineClip;
+
 		GetComponent<AudioSource>().pitch = 1f;
-		//road = WorldManager.instance.road.GetComponent<Bezier> ();
+
 	}
 
 	public void StartMoving() {

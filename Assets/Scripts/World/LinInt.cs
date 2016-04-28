@@ -6,8 +6,13 @@ using System.Collections.Generic;
 //a class that can linearly interpolate between key points of data
 public class LinInt {
 
+	#region LinInt Vars
+
 	List<float> keyPoints;
 	float averagedEnds;
+
+	#endregion
+	#region LinInt Methods
 
 	public LinInt () {
 		keyPoints = new List<float> ();
@@ -16,9 +21,7 @@ public class LinInt {
 
 	public LinInt(float[] data) {
 		keyPoints = new List<float> ();
-		foreach (float f in data) {
-			keyPoints.Add (f);
-		}
+		foreach (float f in data) keyPoints.Add (f);
 		averagedEnds = (keyPoints [0] + keyPoints [keyPoints.Count - 1]) / 2;
 	}
 
@@ -69,4 +72,6 @@ public class LinInt {
 		data = startData + bucketPos * DataDifference;
 		return data;
 	}
+
+	#endregion
 }

@@ -7,13 +7,20 @@ public class KeyManager : MonoBehaviour {
 
 	public static KeyManager instance;
 
+	#region KeyManager Vars
+
 	public Dictionary<Key, Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>> scales;
 	public Dictionary<Instrument, List<string>> percussionSets;
 
+	#endregion
+	#region Unity Callbacks
+
 	void Start () {
 		instance = this;
-
 	}
+
+	#endregion
+	#region KeyManager Methods
 
 	public void BuildScales () {
 		percussionSets = new Dictionary<Instrument, List<string>>() {
@@ -23,18 +30,18 @@ public class KeyManager : MonoBehaviour {
 
 		scales = new Dictionary<Key, Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>>();
 		foreach (Key key in Enum.GetValues(typeof(Key))) {
-			//Debug.Log(key.ToString());
 
 			if (key != Key.None) {
 				scales.Add (key, new Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>());
 				foreach (ScaleInfo scale in ScaleInfo.AllScales) {
-					//Debug.Log(scale.scaleIndex);
-					
+
 					scales[key].Add (scale, new Dictionary<MelodicInstrument, Scale>());
 					foreach (Instrument instrument in Instrument.AllInstruments) {
 						if (instrument.type == Instrument.Type.Melodic) {
-							//Debug.Log(instrument.codeName);
-							scales[key][scale].Add ((MelodicInstrument)instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, ((MelodicInstrument)instrument).startingNote[key]));
+							scales[key][scale].Add (
+								(MelodicInstrument)instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], 
+									scale, ((MelodicInstrument)instrument).startingNote[key])
+							);
 						}
 					}
 
@@ -53,43 +60,36 @@ public class KeyManager : MonoBehaviour {
 				// Add root/octave
 				result.root.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add second
 				i += scale.secondIndex;
 				result.second.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add third
 				i += scale.thirdIndex;
 				result.third.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add fourth
 				i += scale.fourthIndex;
 				result.fourth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add fifth
 				i += scale.fifthIndex;
 				result.fifth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add sixth
 				i += scale.sixthIndex;
 				result.sixth.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Add seventh
 				i += scale.seventhIndex;
 				result.seventh.Add (soundFiles [i]);
 				result.allNotes.Add (soundFiles[i]);
-				//Debug.Log("Adding "+soundFiles[i]);
 
 				// Go to next octave
 				i += scale.rootIndex;
@@ -102,6 +102,8 @@ public class KeyManager : MonoBehaviour {
 			return result;
 		}
 	}
+
+	#endregion
 	  	  
 }
 	

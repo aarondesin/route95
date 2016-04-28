@@ -4,19 +4,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public enum LoadMode {
-	Project,
-	Song
-};
-
 public class LoadPrompt : MonoBehaviour {
+
+	public enum Mode {
+		Project,
+		Song
+	};
+
 	public static LoadPrompt instance;
+
+	#region LoadPrompt Vars
 
 	public RectTransform fileList; // Transform of the actual panel with all of the files listed
 	public GameObject loadButton;
 	public GameObject appendButton;
 
-	private LoadMode loadMode;
+	private Mode loadMode;
 
 	string selectedPath; // Currently selected path
 
@@ -30,12 +33,18 @@ public class LoadPrompt : MonoBehaviour {
 	static float verticalPadding = 4f;
 	static Vector2 buttonSize = new Vector2 (360f, 72f);
 
+	#endregion
+	#region Unity Callbacks
+
 	void Start () {
 		fileButtons = new List<GameObject>();
 		instance = this;
 	}
 
-	public void SetLoadMode (LoadMode newLoadMode) {
+	#endregion
+	#region LoadPrompt Methods
+
+	public void SetLoadMode (Mode newLoadMode) {
 		loadMode = newLoadMode;
 	}
 
@@ -49,10 +58,10 @@ public class LoadPrompt : MonoBehaviour {
 		// Get list of files in save location
 		string[] files = new string[0];
 		switch (loadMode) {
-		case LoadMode.Project:
+		case LoadPrompt.Mode.Project:
 			files = Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension);
 			break;
-		case LoadMode.Song:
+		case LoadPrompt.Mode.Song:
 			files = Directory.GetFiles(GameManager.instance.songSavePath, "*"+SaveLoad.songSaveExtension);
 			break;
 		}
@@ -112,10 +121,10 @@ public class LoadPrompt : MonoBehaviour {
 		//string fullPath = GameManager.instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
 		Debug.Log("LoadPrompt.LoadSelectedPath(): loading "+selectedPath);
 		switch (loadMode) {
-		case LoadMode.Project:
+		case LoadPrompt.Mode.Project:
 			SaveLoad.LoadProject (selectedPath);
 			break;
-		case LoadMode.Song:
+		case LoadPrompt.Mode.Song:
 			SaveLoad.LoadSong (selectedPath);
 			break;
 		}
@@ -128,4 +137,6 @@ public class LoadPrompt : MonoBehaviour {
 			button.GetComponent<Image>().color = new Color (1f, 1f, 1f, 0f);
 		}
 	}
+
+	#endregion
 }

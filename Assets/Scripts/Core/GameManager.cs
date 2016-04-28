@@ -357,13 +357,13 @@ public class GameManager : MonoBehaviour {
 
 	public void ShowLoadPromptForProjects () {
 		Show (loadPrompt);
-		LoadPrompt.instance.SetLoadMode(LoadMode.Project);
+		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Project);
 		LoadPrompt.instance.Refresh();
 	}
 
 	public void ShowLoadPromptForSongs () {
 		Show (loadPrompt);
-		LoadPrompt.instance.SetLoadMode(LoadMode.Song);
+		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Song);
 		LoadPrompt.instance.Refresh();
 	}
 		

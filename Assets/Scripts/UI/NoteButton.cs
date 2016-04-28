@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class NoteButton : DraggableButton {
+
+	#region NoteButton Vars
+
 	const int notesVisible = 10;
 	const float vDragDistance = 128f;
 	const float hDragDistance = 128f;
@@ -12,12 +15,18 @@ public class NoteButton : DraggableButton {
 
 	float oldVolume;
 
+	#endregion
+	#region Unity Callbacks
+
 	void Start () {
 		maxDragDistanceUp = vDragDistance;
 		maxDragDistanceDown = vDragDistance;
 		maxDragDistanceLeft = hDragDistance;
 		maxDragDistanceRight = hDragDistance;
 	}
+
+	#endregion
+	#region NoteButton Methods
 
 	public override void OnMouseDown() {
 		oldVolume = targetNote.volume;
@@ -47,4 +56,6 @@ public class NoteButton : DraggableButton {
 	public override void DragRight (float actionRatio) {
 		targetNote.duration = 1 + (float)(notesVisible-1) * actionRatio;
 	}
+
+	#endregion
 }

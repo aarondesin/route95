@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class InstrumentSetup : MonoBehaviour {
 
 	public static InstrumentSetup instance;
+	public RiffAI riffai;
 
 	#region InstrumentSetup Vars
 
@@ -15,7 +16,40 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public Riff currentRiff; // current riff being edited
 
-	public RiffAI riffai;
+	int numRows;
+	int subdivsShown = 2;
+	int octavesShown = 2;
+	int maxOctaves;
+	int numNotes;
+	int numButtons;
+
+	List<GameObject> buttons = new List<GameObject>();
+	List<List<GameObject>> buttonGrid = new List<List<GameObject>>();
+	List<GameObject> suggestions = new List<GameObject>();
+
+
+	[Header("UI Settings")]
+
+	public float baseButtonScale = 1f;
+	public float buttonWidth = 128f;
+	public float buttonSpacing = 8f;
+
+
+	[Header("UI References")]
+
+	public InputField nameInputField;
+	public Scrollbar scrollBarH;
+	public Scrollbar scrollBarV;
+	public GameObject playRiffButton;
+	public GameObject beatsText;
+	public Text tempoText;
+	public Scrollbar iconBar;
+	public RectTransform iconBar_tr;
+	public List<GameObject> sliders;
+	public Scrollbar beatsBar;
+	public RectTransform beatsBar_tr;
+
+	[Header("UI Art")]
 
 	// Icons for percussion setup buttons
 	public Sprite percussionEmpty;
@@ -27,44 +61,9 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite melodicFilled;
 	public Sprite melodicSuggested;
 
-	public static float baseButtonScale = 1f; // base button sizes
-
-	public static int numRows;
-	public static int subdivsShown = 2; // number of subdivisions to show
-	public int octavesShown = 2;
-	int maxOctaves;
-
-	List<GameObject> buttons = new List<GameObject>();
-	List<List<GameObject>> buttonGrid = new List<List<GameObject>>();
-
-	public Scrollbar scrollBarH;
-	public Scrollbar scrollBarV;
-
-	public InputField nameInputField;
-
-	public GameObject playRiffButton;
-
-	public GameObject beatsText;
-	public Text tempoText;
-
-	float buttonWidth = 128f;
-	float buttonSpacing = 8f;
-
-	List<GameObject> suggestions = new List<GameObject>();
 	public Sprite minorSuggestion;
 	public Sprite powerSuggestion;
 	public Sprite octaveSuggestion;
-
-	public Scrollbar iconBar;
-	public RectTransform iconBar_tr;
-
-	public Scrollbar beatsBar;
-	public RectTransform beatsBar_tr;
-
-	int numNotes;
-	int numButtons;
-
-	public List<GameObject> sliders;
 
 	#endregion
 	#region Unity Callbacks
@@ -72,26 +71,10 @@ public class InstrumentSetup : MonoBehaviour {
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
-		//riffai = new RiffAI ();
-
 	}
 
 	#endregion
 	#region InstrumentSetup Methods
-
-	public void HideSliders () {
-		if (sliders != null) {
-			foreach (GameObject slider in sliders) {
-				slider.SetActive(false);
-			}
-		}
-	}
-
-	public void HideSliders (GameObject obj) {
-		bool st = obj.activeSelf;
-		HideSliders();
-		obj.SetActive(!st);
-	}
 
 	// Calls appropriate Setup() function based on current instrument
 	public void Initialize () {
@@ -123,9 +106,6 @@ public class InstrumentSetup : MonoBehaviour {
 		else if (currentRiff.instrument.type == Instrument.Type.Melodic)
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
-
-		//AudioSource source = MusicManager.instance.instrumentAudioSources [currentRiff.instrument];
-		//source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = currentRiff.distortionLevel;
 
 	}
 
@@ -444,6 +424,20 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public void UpdateTempoText () {
 		tempoText.text = MusicManager.instance.tempo.ToString();
+	}
+
+	public void HideSliders () {
+		if (sliders != null) {
+			foreach (GameObject slider in sliders) {
+				slider.SetActive(false);
+			}
+		}
+	}
+
+	public void HideSliders (GameObject obj) {
+		bool st = obj.activeSelf;
+		HideSliders();
+		obj.SetActive(!st);
 	}
 
 	void Suggest () {

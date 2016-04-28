@@ -4,13 +4,18 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-public class PerfInfo {
-	//int cycles;
-	public float seconds = 0;
-	public float frames = 0;
-	public float avgFPS = 0;
+public struct PerfInfo {
+	public float seconds;
+	public float frames;
+	public float avgFPS;
 
-	public override string ToString() {
+	public PerfInfo (float startSeconds, float startFrames, float startFPS) {
+		seconds = startSeconds;
+		frames = startFrames;
+		avgFPS = startFPS;
+	}
+
+	public string ToString() {
 		return 
 			"Seconds: " + seconds.ToString("##.0000") + "\n" +
 			"Frames: " + frames.ToString ("##.00") + "\n" +
@@ -21,9 +26,9 @@ public class PerfInfo {
 public class PerfTracker : MonoBehaviour {
 
 	Dictionary<GameManager.Mode, PerfInfo> perfTracker;
-	//float currentTime;
 
-	// Use this for initialization
+	#region UnityCallbacks
+
 	void Start () {
 		perfTracker = new Dictionary<GameManager.Mode, PerfInfo>();
 	
@@ -34,14 +39,10 @@ public class PerfTracker : MonoBehaviour {
 		if (!perfTracker.ContainsKey(GameManager.instance.currentMode)) {
 			perfTracker.Add(GameManager.instance.currentMode, new PerfInfo());
 		} else {
-				//float timeDiff = Time.realtimeSinceStartup - currentTime;
-				//perfTracker[currentMode].seconds += timeDiff;
 			PerfInfo perf = perfTracker[GameManager.instance.currentMode];
 			perf.seconds += Time.deltaTime;
 			perf.frames += 1;
 			perf.avgFPS += ((1f/Time.deltaTime) - perf.avgFPS) / perf.frames;
-				//perfTracker[currentMode].frames += timeDiff/Time.deltaTime;
-			//currentTime = Time.realtimeSinceStartup;
 		}
 	
 	}
@@ -65,5 +66,7 @@ public class PerfTracker : MonoBehaviour {
 		}
 	}
 
+
+	#endregion
 
 }

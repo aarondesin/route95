@@ -64,17 +64,14 @@ public class Riff {
 	//
 	[NonSerialized]
 	public Instrument instrument;
-	[NonSerialized]
-	public int copy = 0; // not saved
 
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
 	public Riff () {
 		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++) {
 			beats.Add (new Beat ());
 		}
-		copy = 0;
-		instrument = Instrument.AllInstruments[instrumentIndex];
-		Debug.Log ("Current instrument is " + instrument);
+		//instrument = Instrument.AllInstruments[instrumentIndex];
+		//Debug.Log ("Current instrument is " + instrument);
 	}
 
 	// Constructor to make a riff of a certain number of beats
@@ -82,8 +79,14 @@ public class Riff {
 		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
 			beats.Add (new Beat());
 		}
-		copy = 0;
-		instrument = Instrument.AllInstruments[instrumentIndex];
+		//instrument = Instrument.AllInstruments[instrumentIndex];
+	}
+
+	public Riff (Instrument instrument) {
+		for (int i=0; i<4*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
+			beats.Add (new Beat());
+		}
+		instrumentIndex = Instrument.AllInstruments.IndexOf (instrument);
 	}
 
 	public int Length () {
