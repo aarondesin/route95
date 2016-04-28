@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour {
 				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
 				Vector3 offset = new Vector3 (offsetH, 2.27f + Road.instance.height, 0f);
 				transform.position = Road.instance.GetPoint (progress) + offset - 
-					Road.instance.Right (Road.instance.GetPoint(progress)) * Road.instance.width / 3f;
+					Road.instance.BezRight (Road.instance.GetPoint(progress)) * Road.instance.width / 3f;
 				//Quaternion lookRot = Quaternion.FromToRotation (transform.position, road.GetPoint (progress + lookAhead * Time.deltaTime));
 				transform.LookAt (Road.instance.GetVelocity (progress) + transform.position);
 

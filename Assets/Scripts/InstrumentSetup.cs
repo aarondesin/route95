@@ -9,11 +9,13 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public static InstrumentSetup instance;
 
-	public static Riff currentRiff; // current riff being edited
+	#region InstrumentSetup Vars
+
+	public const int MAX_NUMNOTES = 8;
+
+	public Riff currentRiff; // current riff being edited
 
 	public RiffAI riffai;
-
-	public const int MAX_NUMNOTES = 8; // maximum number of notes (rows)
 
 	// Icons for percussion setup buttons
 	public Sprite percussionEmpty;
@@ -64,12 +66,18 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public List<GameObject> sliders;
 
+	#endregion
+	#region Unity Callbacks
+
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
 		//riffai = new RiffAI ();
 
 	}
+
+	#endregion
+	#region InstrumentSetup Methods
 
 	public void HideSliders () {
 		if (sliders != null) {
@@ -110,9 +118,9 @@ public class InstrumentSetup : MonoBehaviour {
 		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
 
 		// Create note buttons
-		if (currentRiff.instrument.type == InstrumentType.Percussion)
+		if (currentRiff.instrument.type == Instrument.Type.Percussion)
 			InitializePercussionSetup ((PercussionInstrument)currentRiff.instrument);
-		else if (currentRiff.instrument.type == InstrumentType.Melodic)
+		else if (currentRiff.instrument.type == Instrument.Type.Melodic)
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
 
@@ -246,14 +254,14 @@ public class InstrumentSetup : MonoBehaviour {
 			bt.AddComponent<ShowHide>();
 			bt.GetComponent<ShowHide>().objects = new List<GameObject>() { volume};
 			bt.GetComponent<ShowHide>().transitionType = TransitionType.Instant;
-			bt.GetComponent<ShowHide>().enabled = InstrumentSetup.currentRiff.Lookup(note, num);
+			bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
 
 			volume.SetActive(false);
 
 
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				InstrumentSetup.currentRiff.Toggle(note, num);
-				bt.GetComponent<ShowHide>().enabled = InstrumentSetup.currentRiff.Lookup(note, num);
+				currentRiff.Toggle(note, num);
+				bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
 				// (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
 				Toggle(bt.GetComponent<Button>());
 			});
@@ -305,8 +313,8 @@ public class InstrumentSetup : MonoBehaviour {
 				vol = 0.8f;
 			}
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				InstrumentSetup.currentRiff.Toggle(new Note(fileName, vol, 1f), num);
-				if (InstrumentSetup.currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
+				currentRiff.Toggle(new Note(fileName, vol, 1f), num);
+				if (currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
 				else ClearSuggestions();
 				//Suggest ();
 				//SuggestChords(bt);
@@ -476,7 +484,7 @@ public class InstrumentSetup : MonoBehaviour {
 	void Suggest (GameObject button) {
 		Debug.Log ("in Suggest");
 		Sprite img = button.GetComponent<Image>().sprite;
-		if (currentRiff.instrument.type == InstrumentType.Percussion && img != percussionFilled) {
+		if (currentRiff.instrument.type == Instrument.Type.Percussion && img != percussionFilled) {
 			button.GetComponent<Image>().sprite = percussionSuggested;
 		} else if (img != melodicFilled) {
 			button.GetComponent<Image>().sprite  = melodicSuggested;
@@ -555,4 +563,6 @@ public class InstrumentSetup : MonoBehaviour {
 		suggestion.GetComponent<Tooltip>().text = "Octave (neutral)";
 		suggestions.Add(suggestion);
 	}
+
+	#endregion
 }

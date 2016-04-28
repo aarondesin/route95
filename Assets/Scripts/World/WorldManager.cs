@@ -130,7 +130,7 @@ public class WorldManager : MonoBehaviour {
 
 	[Tooltip("Width of generated road.")]
 	[Range(1f, 20f)]
-	public float roadWidth = DEFAULT_ROAD_HEIGHT;
+	public float roadWidth = DEFAULT_ROAD_WIDTH;
 
 	[Tooltip("Height of generated road.")]
 	[Range(0.1f, 0.5f)]
@@ -422,8 +422,8 @@ public class WorldManager : MonoBehaviour {
 		);
 		roadObj.GetComponent<MeshRenderer>().material = roadMaterial;
 		roadObj.GetComponent<MeshRenderer>().reflectionProbeUsage = ReflectionProbeUsage.Off;
-		road.width = roadWidth;
-		road.height = roadHeight;
+		roadObj.GetComponent<Road>().width = roadWidth;
+		roadObj.GetComponent<Road>().height = roadHeight;
 
 		return roadObj.GetComponent<Road>();
 	}
@@ -457,7 +457,7 @@ public class WorldManager : MonoBehaviour {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
 		Road roadBez = road.GetComponent<Road>();
 		Vector3 coordinate = 
-			roadBez.Right(roadBez.GetPoint(prog)) * 1.1f * (side == 0 ? 1 : -1);
+			roadBez.BezRight(roadBez.GetPoint(prog)) * 1.1f * (side == 0 ? 1 : -1);
 		RaycastHit hit;
 		if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
 			coordinate.y = hit.point.y;

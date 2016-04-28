@@ -29,7 +29,58 @@ public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
+	#region GameManager Vars
+
+	[Header("Status")]
+	public bool paused = false;
+	public Menu currentMenu = Menu.None;
+	public Mode currentMode = Mode.Loading;
+
+
+	bool initialized = false;
+	int loadPhase = -1;
+	float startLoadTime;
+	int loadProgress = 0;
+	int loadValue = 0;
+
+	public Dictionary<Menu, GameObject> menus; 
+
+	[Header("UI Settings")]
+
+	[Tooltip("(Live Mode) How long to wait before fading the instrument icons.")]
+	public float fadeWaitTime;
+
+	[Tooltip("(Live Mode) How quickly to fade the instrument icons.")]
+	public float fadeSpeed;
+
+	float fadeTimer;
+	Vector3 prevMouse = new Vector3 (0f,0f,0f);
+
+	[Header("IO Settings")]
+	public string projectSaveFolder = "Projects/";
+	public string songSaveFolder = "Songs/";
+
+	[NonSerialized]
+	public string projectSavePath;
+	[NonSerialized]
+	public string songSavePath;
+
+	[Header("UI Resources")]
+
+	[Tooltip("Font to use for UI.")]
 	public Font font;
+
+	public Sprite arrowIcon;
+	public Sprite addIcon;
+	public Sprite editIcon;
+	public Sprite playIcon;
+	public Sprite pauseIcon;
+	public Sprite loadIcon;
+	public Sprite removeIcon;
+	public Sprite circleIcon;
+	public Sprite volumeIcon;
+
+	[Header("Menu Objects")]
 
 	// Parent objects for all menu UI objects
 	public GameObject mainMenu;
@@ -56,16 +107,6 @@ public class GameManager : MonoBehaviour {
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
 
-	public Sprite arrowIcon;
-	public Sprite addIcon;
-	public Sprite editIcon;
-	public Sprite playIcon;
-	public Sprite pauseIcon;
-	public Sprite loadIcon;
-	public Sprite removeIcon;
-	public Sprite circleIcon;
-	public Sprite volumeIcon;
-
 	public int loadingSpeed;
 	public GameObject loadingScreen;
 	public GameObject loadingBar;
@@ -74,41 +115,12 @@ public class GameManager : MonoBehaviour {
 	public GameObject tooltip;
 	public float tooltipDistance;
 
-	public Dictionary<Menu, GameObject> menus; 
-		
-	public Menu currentMenu = Menu.None;
-	public Mode currentMode = Mode.Loading;
-
-	// Global save path
-	public string projectSavePath;
-	public string songSavePath;
-
-	// Icon fading vars
-	public float fadeWaitTime;
-	public float fadeSpeed;
-	[SerializeField]
-	float fadeTimer;
-	Vector3 prevMouse = new Vector3 (0f,0f,0f);
-
-	public bool paused = false;
-	bool initialized = false;
-	int loadPhase = -1;
-	float startLoadTime;
-	public int loadProgress = 0;
-	int loadValue = 0;
-
-	bool hasShownLiveHelp = false;
-	bool hasShownSongArrangerHelp = false;
-	//bool hasShownRiffEditorHelp = false;
-
-	public GameObject shortSongWarningPrompt;
-	int shortSongWarningThreshold = 6;
+	#endregion
+	#region Unity Callbacks
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
-		projectSavePath = Application.persistentDataPath + "/Projects/";
-		songSavePath = Application.persistentDataPath + "/Songs/";
 			//Sounds.Load();
 
 		// Initialize set of all menus
@@ -121,68 +133,6 @@ public class GameManager : MonoBehaviour {
 		};
 
 		ShowAll ();
-
-	}
-
-	void Initialize () {
-		SongTimeline.instance.MakeColumns();
-		SongTimeline.instance.scrollbar.GetComponent<Scrollbar>().value = 0f;
-		
-		// Hide all menus and display default menu (main)
-		HideAll ();
-		Show (mainMenu);
-		Load();
-		//StartCoroutine("Load");
-		initialized = true;
-	}
-
-	void Load () {
-	//IEnumerator Load () {
-		startLoadTime = Time.realtimeSinceStartup;
-		loadValue = Instrument.AllInstruments.Count+
-			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
-			WorldManager.instance.maxDecorations;
-
-
-		loadingScreen.SetActive(true);
-		LoadNext();
-		//startLoadTime = Time.realtimeSinceStartup;
-
-		//loadingScreen.SetActive(false);
-
-	}
-
-	public void LoadNext() {
-		loadPhase++;
-		switch (loadPhase) {
-		case 0:
-			MusicManager.instance.Load();
-			break;
-		case 1:
-			WorldManager.instance.Load();
-			break;
-		case 2:
-			//Debug.Log("dick");
-			CaseLibrary.initializecases ();
-			FinishLoading();
-			break;
-		}
-	}
-		
-	public void IncrementLoadProgress() {
-		loadProgress++;
-		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadValue;
-	}
-
-	void FinishLoading() {
-		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-		loadingScreen.SetActive(false);
-		//currentTime = 0;
-		currentMode = Mode.Setup;
-	}
-
-	public void ChangeLoadingMessage (string message) {
-		loadingMessage.GetComponent<Text>().text = message;
 	}
 
 	void Update () {
@@ -193,16 +143,11 @@ public class GameManager : MonoBehaviour {
 			if (!paused) {
 				Color temp = livePlayQuitPrompt.color;
 				if (prevMouse != Input.mousePosition) {
-					//temp.a = 1f;
-					//fadeTimer = fadeWaitTime;
 					WakeLiveUI();
 					prevMouse = Input.mousePosition;
 				} else {
-						if (fadeTimer <= 0f) {
-							temp.a -= fadeSpeed;
-					} else {
-							fadeTimer--;
-					}
+					if (fadeTimer <= 0f) temp.a -= fadeSpeed;
+					else fadeTimer--;
 					livePlayQuitPrompt.color = temp;
 					foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
 						image.color = temp;
@@ -227,9 +172,63 @@ public class GameManager : MonoBehaviour {
 				);
 			}
 			livePlayQuitPrompt.color = Color.white;
-			//livePlayQuitPrompt.color = Color.white;
 		}
 
+	}
+
+	#endregion
+	#region GameManager Methods
+
+	void Initialize () {
+		
+		// Hide all menus and display default menu (main)
+		HideAll ();
+		Show (mainMenu);
+		Load();
+		initialized = true;
+	}
+
+	void Load () {
+		startLoadTime = Time.realtimeSinceStartup;
+		loadValue = Instrument.AllInstruments.Count+
+			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
+			WorldManager.instance.maxDecorations;
+
+
+		loadingScreen.SetActive(true);
+		LoadNext();
+
+	}
+
+	public void LoadNext() {
+		loadPhase++;
+		switch (loadPhase) {
+		case 0:
+			MusicManager.instance.Load();
+			break;
+		case 1:
+			WorldManager.instance.Load();
+			break;
+		case 2:
+			CaseLibrary.initializecases ();
+			FinishLoading();
+			break;
+		}
+	}
+		
+	public void IncrementLoadProgress() {
+		loadProgress++;
+		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadValue;
+	}
+
+	void FinishLoading() {
+		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+		loadingScreen.SetActive(false);
+		currentMode = Mode.Setup;
+	}
+
+	public void ChangeLoadingMessage (string message) {
+		loadingMessage.GetComponent<Text>().text = message;
 	}
 
 	public void GoToMainMenu () {
@@ -240,7 +239,8 @@ public class GameManager : MonoBehaviour {
 	public void GoToKeySelectMenu () {
 		HideAll();
 		Show (keySelectMenu);
-		DisableKeySelectConfirmButton();
+		keySelectConfirmButton.GetComponent<Button>().interactable = 
+			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
 		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
 	}
 
@@ -270,6 +270,11 @@ public class GameManager : MonoBehaviour {
 		PlaylistBrowser.instance.RefreshName();
 	}
 
+	public void GoToPostPlayMenu() {
+		HideAll();
+		Show (postPlayMenu);
+	}
+
 	public void Show (GameObject menu) {
 		menu.SetActive(true);
 	}
@@ -281,7 +286,6 @@ public class GameManager : MonoBehaviour {
 		Show (addRiffPrompt);
 		Show (loadPrompt);
 		Show (prompt);
-		Show (shortSongWarningPrompt);
 	}
 
 	public void Hide (GameObject menu) {
@@ -297,102 +301,54 @@ public class GameManager : MonoBehaviour {
 		Hide (addRiffPrompt);
 		Hide (loadPrompt);
 		Hide (prompt);
-		Hide (shortSongWarningPrompt);
 		Hide (liveIcons);
 	}
 		
-	// From a button, call GameManager.instance.SwitchToMenu (Menu.x)
-	public void SwitchToMenu (Menu menu) {
-		if (currentMenu != Menu.None) DisableMenu (menus[currentMenu]);
-		EnableMenu (menus[menu]);
-		currentMenu = menu;
-	}
-
-	// Button inspector-friendly verison
-	public void SwitchToMenu (int menu) {
-		if (currentMenu != Menu.None) DisableMenu (menus[currentMenu]);
-		EnableMenu (menus[(Menu)menu]);
-		currentMenu = (Menu)menu;
-	}
-
-	public void AttemptSwitchToLive () {
-		if (MusicManager.instance.currentSong.songPieces.Count <= shortSongWarningThreshold && !MusicManager.instance.loopSong) {
-			EnableMenu(shortSongWarningPrompt);
-		} else {
-			SwitchToLive();
-		}
-	}
-
 	public void Toggle (GameObject obj) {
 		obj.SetActive (!obj.activeSelf);
 	}
 
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
-		HideAll ();
-		Hide (songArrangeMenu);
-		Show (liveIcons);
-		paused = false;
-		currentMode = Mode.Live;
-		InputManager.instance.gameObject.SetActive(true);
-		InstrumentDisplay.instance.Refresh();
+		//Debug.Log (MusicManager.instance.currentSong.ToString ());
 		MusicManager.instance.currentSong.CompileSong();
-		Debug.Log (MusicManager.instance.currentSong.ToString ());
-		EnableMenu(liveIcons);
-		EnableMenu(songProgressBar);
-		if (MusicManager.instance.loopSong) EnableMenu(loopIcon);
-		else DisableMenu(loopIcon);
-		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewChase);
-		CameraControl.instance.StartLiveMode();
+		if (MusicManager.instance.loopSong) Show(loopIcon);
+		else Hide(loopIcon);
+
+		HideAll ();
+		Show (liveIcons);
+		Show (songProgressBar);
+		paused = false;
+
+		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.StartSong();
-
-		if (!hasShownLiveHelp) {
-			//ShowLiveHelp();
-			hasShownLiveHelp = true;
-		}
-
-		//sets player to moving
+		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
+
+		currentMode = Mode.Live;
 	}
 
 	// Switch from live mode to postplay
 	public void SwitchToPostplay () {
-		paused = false;
-		currentMode = Mode.Postplay;
 		MusicManager.instance.StopPlaying();
-		SwitchToMenu (Menu.PostPlay);
-		//CameraControl.instance.MoveToPosition(CameraControl.instance.ViewRadio);
-		//SwitchToMenu(Menu.SongArrange);
 		PlayerMovement.instance.StopMoving();
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		DisableMenu(liveIcons);
-	}
+		paused = false;
 
-	// Returns to song arrangement
-	public void SwitchToSetup () {
-		paused = false;
-		MusicManager.instance.StopPlaying();
-		currentMode = Mode.Setup;
-		SwitchToMenu (Menu.SongArrange);
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewRadio);
-		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		PlayerMovement.instance.StopMoving();
-		DisableMenu(loopIcon);
-		DisableMenu(liveIcons);
+		GoToPostPlayMenu();
+
+		currentMode = Mode.Postplay;
 	}
 
 	// Returns to key selection
 	public void NewSong () {
-		paused = false;
 		MusicManager.instance.StopPlaying();
-		currentMode = Mode.Setup;
-		SwitchToMenu (Menu.KeySelect);
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
-		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		PlayerMovement.instance.StopMoving();
-		DisableMenu(loopIcon);
+		paused = false;
+
 		MusicManager.instance.currentSong = new Song();
-		SongTimeline.instance.RefreshTimeline();
+		GoToKeySelectMenu();
+
+		currentMode = Mode.Setup;
 	}
 
 	public void SaveCurrentProject () {
@@ -416,21 +372,6 @@ public class GameManager : MonoBehaviour {
 		systemButtons.SetActive(!systemButtons.activeSelf);
 	}
 
-	// Enable visibility of key selection confirm button (after user has clicked a key)
-	public void EnableKeySelectConfirmButton () {
-		keySelectConfirmButton.SetActive(true);
-	}
-
-	// Disable visibility of key selection confirm button (going to key selection menu)
-	public void DisableKeySelectConfirmButton () {
-		keySelectConfirmButton.SetActive(false);
-	} 
-
-	// Hides "Add Riff" prompt
-	public void DisableAddRiffPrompt() {
-		addRiffPrompt.SetActive(false);
-	}
-
 	public void WakeLiveUI () {
 		fadeTimer = fadeWaitTime;
 		Color color = Color.white;
@@ -441,16 +382,6 @@ public class GameManager : MonoBehaviour {
 			if (image.GetComponentInChildren<Text>())
 				image.GetComponentInChildren<Text>().color = color;
 		}
-	}
-
-	// Shows a menu
-	void EnableMenu (GameObject menuObject) {
-		menuObject.SetActive(true);
-	}
-
-	// Hides a menu
-	void DisableMenu (GameObject menuObject) {
-		menuObject.SetActive(false);
 	}
 
 	// Called when the user presses escape
@@ -499,22 +430,5 @@ public class GameManager : MonoBehaviour {
 		Application.Quit();
 	}
 
-	public void ShowLiveHelp() {
-		Prompt.instance.PromptMessage("Live Mode", "Use number keys 1-3 to switch instruments, and letter keys QWERT to play with those instruments (more in the final version!). You can increase your song's tempo by pressing the up or down arrow keys.", "Okay");
-		Pause();
-	}
-
-	public void ShowSongArrangerHelp() {
-		if (!hasShownSongArrangerHelp) {
-			Prompt.instance.PromptMessage("Song Arranger", "Here is where you arrange your song. The timeline in the middle of the screen is for placing your riffs at certain positions in the song.", "Got it");
-			hasShownSongArrangerHelp = true;
-		}
-	}
-		
-	public void ShowRiffEditorHelp() {
-		/*if (!hasShownRiffEditorHelp) {
-			Prompt.instance.PromptMessage("Riff Editor", "Here, you can edit your riff. Click a button to add note at that position in time.", "Alrighty");
-			hasShownRiffEditorHelp = true;
-		}*/
-	}
+	#endregion
 }

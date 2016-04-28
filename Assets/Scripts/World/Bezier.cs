@@ -21,10 +21,10 @@ public class Bezier : MonoBehaviour{
 	// Bezier properties
 	//
 	[SerializeField]
-	private Vector3[] points;
+	protected Vector3[] points;
 
 	[SerializeField]
-	private BezierControlPointMode[] modes;
+	protected BezierControlPointMode[] modes;
 
 	#endregion
 	#region Bezier Operations

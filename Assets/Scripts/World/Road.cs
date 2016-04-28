@@ -3,13 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Road : MonoBehaviour {
+public class Road : Bezier {
 	public static Road instance;
 
 	//
 	// Road pathing params
 	//
-	Bezier path;
 
 	public float generateRoadRadius; // Distance from player to generate road
 	public float placementDistance = 30f; // Marginal distance to add new road
@@ -41,8 +40,7 @@ public class Road : MonoBehaviour {
 
 	void Start () {
 		instance = this;
-		path = new Bezier();
-		path.SetPoints(new Vector3[0]);
+		points = new Vector3[0];
 		decorations = new Dictionary<GameObject, float>();
 
 		generateRoadRadius = WorldManager.instance.roadExtendRadius;
@@ -53,18 +51,17 @@ public class Road : MonoBehaviour {
 	}
 
 	public void Update () {
-		Vector3[] points = path.GetPoints();
 
 		// Remove far away points behind the player
 		if (Vector3.Distance (points[3], PlayerMovement.instance.transform.position) > generateRoadRadius) {
 
 			float progress = PlayerMovement.instance.progress;
-			float numerator = progress * path.CurveCount;
+			float numerator = progress * CurveCount;
 			Vector3[] newPoints = new Vector3[points.Length - 3];
 			for (int i = 0; i < newPoints.Length; i++)
 				newPoints [i] = points [i + 3];
 
-			PlayerMovement.instance.progress = numerator / path.CurveCount;
+			PlayerMovement.instance.progress = numerator / CurveCount;
 
 			// Check for decorations to remove
 			List<GameObject> deletes = new List<GameObject>();
@@ -89,10 +86,10 @@ public class Road : MonoBehaviour {
 		while (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
 			float progress = PlayerMovement.instance.progress;
-			float numerator = progress * path.CurveCount;
+			float numerator = progress * CurveCount;
 
 			AddCurve ();
-			PlayerMovement.instance.progress = numerator / path.CurveCount;
+			PlayerMovement.instance.progress = numerator / CurveCount;
 
 			generated = true;
 		}
@@ -102,27 +99,9 @@ public class Road : MonoBehaviour {
 	#endregion
 	#region Road Functions
 
-	public int CurveCount {
-		get {
-			return (path.CurveCount);
-		}
-	}
-
-	public Vector3 GetPoint (float prog) {
-		return path.GetPoint (prog);
-	}
-
-	public Vector3 GetVelocity (float prog) {
-		return path.GetVelocity (prog);
-	}
-
-	public Vector3 Right (Vector3 dir) {
-		return path.BezRight (dir);
-	}
-
 	// Resets curve to default values
 	public void Reset () {
-		Vector3[] points = new Vector3[4];
+		points = new Vector3[4];
 		points [0] = PlayerMovement.instance.transform.position;
 		points [0].y = 0f; //2.227f;
 		points [1].z = points [0].z;
@@ -134,24 +113,22 @@ public class Road : MonoBehaviour {
 		points [3].z = points [0].z + 150f;
 		points [3].y = points [0].y;
 		points [3].x = points [0].x;
-		path.SetPoints (points);
 
-		Bezier.BezierControlPointMode[] modes = new Bezier.BezierControlPointMode[points.Length / 2];
+
+		modes = new Bezier.BezierControlPointMode[points.Length / 2];
 		for (int i=0; i<modes.Length; i++)
 			modes [i] = Bezier.BezierControlPointMode.Mirrored;
-		path.SetModes (modes);
 	}
 
 	// Adds a new curve to the road bezier
 	public void AddCurve () {
-		Vector3[] points = path.GetPoints();
 		float displacedDirection = placementDistance * placementRange;
 
 		Vector3 point;
 		if (points.Length > 0) point = points [points.Length - 1];
 		else point = PlayerMovement.instance.transform.position;
 
-		Vector3 direction = path.GetDirection (1f) * placementDistance;
+		Vector3 direction = GetDirection (1f) * placementDistance;
 		Array.Resize (ref points, points.Length + 3);
 
 		RaycastHit hit;
@@ -166,15 +143,12 @@ public class Road : MonoBehaviour {
 				0f, 
 				UnityEngine.Random.Range(-displacedDirection, displacedDirection)
 			);
-			points[path.PointsCount - i] = point;
+			points[PointsCount - i] = point;
 		}
-		path.SetPoints(points);
-
-		Bezier.BezierControlPointMode[] modes = path.GetModes();
+			
 		Array.Resize (ref modes, modes.Length + 1);
 		modes[modes.Length - 1] = modes[modes.Length -2];
-		path.SetModes (modes);
-		path.EnforceMode (points.Length - 4);
+		EnforceMode (points.Length - 4);
 		steps += stepsPerCurve;
 		Build();
 		Bulldoze();
@@ -189,7 +163,7 @@ public class Road : MonoBehaviour {
 		float progress = startProgress;
 		float diff = 1f - progress;
 		while (progress < 1f) {
-			DynamicTerrain.instance.vertexmap.CheckRoads (path.GetPoint(progress));
+			DynamicTerrain.instance.vertexmap.CheckRoads (GetPoint(progress));
 			progress += diff / WorldManager.instance.roadPathCheckResolution;
 		}
 	}
@@ -226,26 +200,26 @@ public class Road : MonoBehaviour {
 		List<Vector2> newUVs = new List<Vector2>();
 
 		float progressI = 0f;
-		Vector3 pointI = path.GetPoint (progressI);
+		Vector3 pointI = GetPoint (progressI);
 
-		newVertices.Add(pointI + width * -path.BezRight (path.GetDirection(progressI)));
+		newVertices.Add(pointI + width * -BezRight (GetDirection(progressI)));
 		newUVs.Add(new Vector2(-0.25f, 0f));
 		int leftDownI = 0;
 
-		newVertices.Add(pointI + width * path.BezRight (path.GetDirection(progressI)));
+		newVertices.Add(pointI + width * BezRight (GetDirection(progressI)));
 		newUVs.Add(new Vector2(1.25f, 0f));
 		int rightDownI = 1;
 
 		newVertices.Add(
 			pointI + slope * width * 
-			-path.BezRight (path.GetDirection(progressI)) + height * -path.BezDown(path.GetDirection(progressI))
+			-BezRight (GetDirection(progressI)) + height * -BezDown(GetDirection(progressI))
 		);
 		newUVs.Add(new Vector2(1-slope-0.25f, 0f));
 		int leftUpI = 2;
 
 		newVertices.Add(
 			pointI + slope * width * 
-			path.BezRight (path.GetDirection(progressI)) + height * -path.BezDown(path.GetDirection(progressI))
+			BezRight (GetDirection(progressI)) + height * -BezDown(GetDirection(progressI))
 		);
 		newUVs.Add(new Vector2(slope+0.25f, 1f));
 		int rightUpI = 3;
@@ -256,15 +230,15 @@ public class Road : MonoBehaviour {
 			int num = i;
 
 			float progressF = (float)(num) / (float)steps;
-			Vector3 pointF = path.GetPoint (progressF);
+			Vector3 pointF = GetPoint (progressF);
 
-			newVertices.Add(pointF + width * -path.BezRight (path.GetDirection(progressF)));
+			newVertices.Add(pointF + width * -BezRight (GetDirection(progressF)));
 			newUVs.Add(
 				(flipUVs ? new Vector2(-0.25f, 1f) : new Vector2 (-0.25f, 0f))
 			);
 			int leftDownF = num * 4;
 
-			newVertices.Add(pointF + width * path.BezRight (path.GetDirection(progressF)));
+			newVertices.Add(pointF + width * BezRight (GetDirection(progressF)));
 			newUVs.Add(
 				(flipUVs ? new Vector2(1.25f, 1f) : new Vector2 (1.25f, 0f))
 			);
@@ -272,7 +246,7 @@ public class Road : MonoBehaviour {
 
 			newVertices.Add(
 				pointF + slope * width * 
-				-path.BezRight (path.GetDirection(progressF)) + height * -path.BezDown(path.GetDirection(progressI))
+				-BezRight (GetDirection(progressF)) + height * -BezDown(GetDirection(progressI))
 			);
 			newUVs.Add(
 				(flipUVs ? new Vector2(1-slope-0.25f, 1f) : new Vector2 (1-slope-0.25f, 0f))
@@ -281,7 +255,7 @@ public class Road : MonoBehaviour {
 
 			newVertices.Add(
 				pointF + slope * width * 
-				path.BezRight (path.GetDirection(progressF)) + height * -path.BezDown(path.GetDirection(progressI))
+				BezRight (GetDirection(progressF)) + height * -BezDown(GetDirection(progressI))
 			);
 			newUVs.Add(
 				(flipUVs ? new Vector2(slope+0.25f, 1f) : new Vector2 (slope+0.25f, 0f))

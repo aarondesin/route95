@@ -32,7 +32,7 @@ public class KeyManager : MonoBehaviour {
 					
 					scales[key].Add (scale, new Dictionary<MelodicInstrument, Scale>());
 					foreach (Instrument instrument in Instrument.AllInstruments) {
-						if (instrument.type == InstrumentType.Melodic) {
+						if (instrument.type == Instrument.Type.Melodic) {
 							//Debug.Log(instrument.codeName);
 							scales[key][scale].Add ((MelodicInstrument)instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], scale, ((MelodicInstrument)instrument).startingNote[key]));
 						}

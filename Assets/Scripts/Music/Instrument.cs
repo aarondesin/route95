@@ -3,26 +3,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum InstrumentType {
-	Percussion,
-	Melodic
-};
-
-public enum InstrumentFamily {
-	Percussion,
-	Guitar,
-	Bass,
-	Keyboard,
-	Brass
-};
-	
 public class Instrument {
+
+	public enum Type {
+		Percussion,
+		Melodic
+	};
+
+	public enum Family {
+		Percussion,
+		Guitar,
+		Bass,
+		Keyboard,
+		Brass
+	};
+
+	#region Instrument Vars
 
 	public string name; // User-friendly name
 	public string codeName; // Name in code
 	public int index;
-	public InstrumentType type;
-	public InstrumentFamily family;
+	public Type type;
+	public Family family;
 
 	public Sprite icon;
 	protected string iconPath;
@@ -33,19 +35,10 @@ public class Instrument {
 	public AudioClip switchSound;
 	protected string switchSoundPath;
 
-	/*public static List<Instrument> AllInstruments = new List<Instrument> () {
-		PercussionInstrument.RockDrums,
-		PercussionInstrument.ExoticPercussion,
-		MelodicInstrument.ElectricGuitar,
-		MelodicInstrument.ElectricBass,
-		MelodicInstrument.AcousticGuitar,
-		MelodicInstrument.ClassicalGuitar,
-		MelodicInstrument.PipeOrgan,
-		MelodicInstrument.Keyboard,
-		MelodicInstrument.Trumpet
-	};*/
-
 	public static List<Instrument> AllInstruments;
+
+	#endregion
+	#region Instrument Methods
 
 	public virtual void Load () {
 		icon = Resources.Load<Sprite>(iconPath);
@@ -68,12 +61,19 @@ public class Instrument {
 		foreach (Instrument instrument in AllInstruments)
 			instrument.Load();
 	}
+
+	#endregion
 }
 	
 public class PercussionInstrument : Instrument {
 
+	#region Percussioninstrument Vars
+
 	public Dictionary <string, Sprite> icons;
 	Dictionary <string, string> iconPaths;
+
+	#endregion
+	#region PercussionInstrument Methods
 
 	public override void Load () {
 		base.Load();
@@ -88,12 +88,15 @@ public class PercussionInstrument : Instrument {
 		}
 	}
 
+	#endregion
+	#region PercussionInstrument Instruments
+
 	public static PercussionInstrument RockDrums = new PercussionInstrument {
 		name = "Rock Drums",
 		codeName = "RockDrums",
 		index = 0,
-		type = InstrumentType.Percussion,
-		family = InstrumentFamily.Percussion,
+		type = Type.Percussion,
+		family = Family.Percussion,
 		iconPath = "UI/Instrument_RockDrums",
 		glowPath = "UI/Instrument_RockDrums_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
@@ -110,8 +113,8 @@ public class PercussionInstrument : Instrument {
 		name = "Exotic Percussion",
 		codeName = "ExoticPercussion",
 		index = 1,
-		type = InstrumentType.Percussion,
-		family = InstrumentFamily.Percussion,
+		type = Type.Percussion,
+		family = Family.Percussion,
 		iconPath = "UI/Instrument_ExoticPercussion",
 		glowPath = "UI/Instrument_ExoticPercussion",
 		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
@@ -126,19 +129,26 @@ public class PercussionInstrument : Instrument {
 			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "UI/Percussion_Tambourine" }
 		}
 	};
+
+	#endregion
 			
 }
 
 public class MelodicInstrument : Instrument {
 
+	#region MelodicInstrument Vars
+
 	public Dictionary<Key, int> startingNote;
+
+	#endregion
+	#region MelodicInstrument Methods
 
 	public static MelodicInstrument ElectricGuitar = new MelodicInstrument {
 		name = "Electric Guitar",
 		codeName = "ElectricGuitar",
 		index = 2,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Guitar,
+		type = Type.Melodic,
+		family = Family.Guitar,
 		iconPath = "UI/Instrument_ElectricGuitar",
 		glowPath = "UI/Instrument_ElectricGuitar_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -162,8 +172,8 @@ public class MelodicInstrument : Instrument {
 		name = "Electric Bass",
 		codeName = "ElectricBass",
 		index = 3,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Bass,
+		type = Type.Melodic,
+		family = Family.Bass,
 		iconPath = "UI/Instrument_ElectricBass",
 		glowPath = "UI/Instrument_ElectricBass_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricBass",
@@ -187,8 +197,8 @@ public class MelodicInstrument : Instrument {
 		name = "Acoustic Guitar",
 		codeName = "AcousticGuitar",
 		index = 4,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Guitar,
+		type = Type.Melodic,
+		family = Family.Guitar,
 		iconPath = "UI/Instrument_AcousticGuitar",
 		glowPath = "UI/Instrument_AcousticGuitar_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -212,8 +222,8 @@ public class MelodicInstrument : Instrument {
 		name = "Classical Guitar",
 		codeName = "ClassicalGuitar",
 		index = 5,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Guitar,
+		type = Type.Melodic,
+		family = Family.Guitar,
 		iconPath = "UI/Instrument_ClassicalGuitar",
 		glowPath = "UI/Instrument_ClassicalGuitar_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -237,8 +247,8 @@ public class MelodicInstrument : Instrument {
 		name = "Pipe Organ",
 		codeName = "PipeOrgan",
 		index = 6,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Keyboard,
+		type = Type.Melodic,
+		family = Family.Keyboard,
 		iconPath = "UI/Instrument_PipeOrgan",
 		glowPath = "UI/Instrument_PipeOrgan_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -262,8 +272,8 @@ public class MelodicInstrument : Instrument {
 		name = "Keyboard",
 		codeName = "Keyboard",
 		index = 7,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Keyboard,
+		type = Type.Melodic,
+		family = Family.Keyboard,
 		iconPath = "UI/Instrument_Keyboard",
 		glowPath = "UI/Instrument_Keyboard_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -287,8 +297,8 @@ public class MelodicInstrument : Instrument {
 		name = "Trumpet",
 		codeName = "Trumpet",
 		index = 8,
-		type = InstrumentType.Melodic,
-		family = InstrumentFamily.Brass,
+		type = Type.Melodic,
+		family = Family.Brass,
 		iconPath = "UI/Instrument_Trumpet",
 		glowPath = "UI/Instrument_Trumpet_Glow",
 		switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
@@ -307,5 +317,7 @@ public class MelodicInstrument : Instrument {
 			{ Key.B, 2 }
 		}
 	};
+
+	#endregion
 
 }

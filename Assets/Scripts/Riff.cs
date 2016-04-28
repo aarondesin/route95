@@ -51,7 +51,7 @@ public class Riff {
 	[SerializeField]
 	public string name; // user-defined name of the riff
 	[SerializeField]
-	public int instrumentIndex; // instrument used for this riff
+	public int instrumentIndex = 0; // instrument used for this riff
 	[SerializeField]
 	public List<Beat> beats = new List<Beat>(); // contains notes
 	[SerializeField]
