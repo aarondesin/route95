@@ -67,7 +67,8 @@ public class AddRiffPrompt : MonoBehaviour {
 		temp.instrument = Instrument.AllInstruments[dropdown.value];
 		temp.name = inputField.text;
 		MusicManager.instance.currentProject.RegisterRiff (temp);
-
+		InstrumentSetup.currentRiff = temp;
+		SongArrangeSetup.instance.selectedRiffIndex = MusicManager.instance.currentProject.riffs.Count-1;
 		GameManager.instance.Hide (gameObject);
 		GameManager.instance.GoToRiffEditor();
 	}

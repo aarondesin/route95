@@ -94,7 +94,7 @@ public class UI : MonoBehaviour {
 			typeof (CanvasRenderer),
 			typeof (Text)
 		);
-		text.GetComponent<Text>().resizeTextForBestFit = true;
+		//text.GetComponent<Text>().resizeTextForBestFit = true;
 		return text;
 	}
 

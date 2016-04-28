@@ -19,6 +19,7 @@ public class Moon : MonoBehaviour {
 		instance = this;
 		this.GetComponent<Light> ().range = 100f;
 		this.GetComponent<Light> ().type = LightType.Directional;
+		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
 		transform.SetParent (PlayerMovement.instance.transform);
 	}
 

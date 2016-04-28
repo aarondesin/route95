@@ -58,6 +58,8 @@ public class Riff {
 	public bool cutSelf = true; // if true, sounds will cut themselves off
 	[SerializeField]
 	public int beatsShown = 4;
+	[SerializeField]
+	public float volume = 1f;
 
 	//
 	// VARIABLES NOT SAVED IN PROJECT
@@ -161,7 +163,8 @@ public class Riff {
 			if (beats[pos].NumNotes() != 0) {
 				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
 				foreach (Note note in beats[pos].notes) {
-					note.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
+					AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+					note.PlayNote(source, volume);
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {

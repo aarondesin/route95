@@ -51,6 +51,11 @@ public class Note {
 		source.PlayOneShot(MusicManager.SoundClips[filename], volume*source.volume);
 	}
 
+	public void PlayNote (AudioSource source, float newVolume) {
+		if (!source.enabled) source.enabled = true;
+		source.PlayOneShot(MusicManager.SoundClips[filename], newVolume*volume*source.volume);
+	}
+
 	// Play note on a specific AudioSource, cutting off?
 	public void PlayNote (AudioSource source, bool cutoff) {
 		if (!source.enabled) source.enabled = true;

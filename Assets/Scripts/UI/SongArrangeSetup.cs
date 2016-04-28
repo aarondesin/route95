@@ -37,14 +37,12 @@ public class SongArrangeSetup : MonoBehaviour {
 		dropdown.AddOptions (options);
 
 		if (MusicManager.instance.currentProject.riffs.Count == 0) {
-			InstrumentSetup.instance.currentRiff = null;
+			//InstrumentSetup.instance.currentRiff = null;
 			dropdown.interactable = false;
 			editRiffButton.GetComponent<Button>().interactable = false;
 			playRiffButton.GetComponent<Button> ().interactable = false;
 		} else {
 			dropdown.interactable = true;
-			if (InstrumentSetup.instance.currentRiff == null)
-				InstrumentSetup.instance.currentRiff = MusicManager.instance.currentProject.riffs[0];
 			editRiffButton.GetComponent<Button>().interactable = true;
 			playRiffButton.GetComponent<Button> ().interactable = true;
 		}
@@ -59,7 +57,7 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	public void UpdateValue () {
 		selectedRiffIndex = dropdown.value;
-		InstrumentSetup.instance.currentRiff = MusicManager.instance.currentProject.riffs[selectedRiffIndex];
+		InstrumentSetup.currentRiff = MusicManager.instance.currentProject.riffs[selectedRiffIndex];
 	}
 
 	public void SetValue () {

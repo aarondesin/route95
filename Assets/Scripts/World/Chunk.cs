@@ -123,7 +123,8 @@ public class Chunk {
 		GameObject chunk = new GameObject ("chunk", 
 			typeof(MeshFilter), 
 			typeof(MeshRenderer),
-			typeof(MeshCollider)
+			typeof(MeshCollider),
+			typeof(Rigidbody)
 		);
 		chunk.transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
 
@@ -144,6 +145,11 @@ public class Chunk {
 		chunk.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
 		chunk.GetComponent<MeshCollider>().convex = false;
+
+		chunk.GetComponent<Rigidbody>().freezeRotation = true;
+		chunk.GetComponent<Rigidbody>().isKinematic = true;
+		chunk.GetComponent<Rigidbody>().useGravity = false;
+		chunk.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
 		return chunk;
 	}

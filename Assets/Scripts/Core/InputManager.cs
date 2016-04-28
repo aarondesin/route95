@@ -133,10 +133,10 @@ public class InputManager : MonoBehaviour {
 									note.PlayNote(audioSources[keyToNote[keyPress]], true);
 								}
 						}
-
+						break;
 					} else if (Input.GetKeyUp(keyPress) && inst.type != Instrument.Type.Percussion)
 						audioSources[keyToNote[keyPress]].Stop();
-					break;
+					
 				}
 						
 			}

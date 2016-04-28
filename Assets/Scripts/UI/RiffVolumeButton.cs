@@ -2,18 +2,17 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class NoteButton : DraggableButton {
+public class RiffVolumeButton : DraggableButton {
 
-	#region NoteButton Vars
+	#region RiffVolumeButton Vars
 
-	const int notesVisible = 10;
 	const float vDragDistance = 128f;
 	const float hDragDistance = 128f;
 
-	public Note targetNote;
-	public Image volumeImage;
-
 	float oldVolume;
+
+	Image img;
+	Riff targetRiff;
 
 	#endregion
 	#region Unity Callbacks
@@ -23,13 +22,16 @@ public class NoteButton : DraggableButton {
 		maxDragDistanceDown = vDragDistance;
 		maxDragDistanceLeft = hDragDistance;
 		maxDragDistanceRight = hDragDistance;
+
+		img = GetComponent<Image>();
 	}
 
 	#endregion
-	#region NoteButton Methods
+	#region RiffVolumeButton Methods
 
 	public override void OnMouseDown() {
-		oldVolume = targetNote.volume;
+		targetRiff = InstrumentSetup.currentRiff;
+		oldVolume = targetRiff.volume;
 	}
 
 	public override void OnMouseUp() {
@@ -38,23 +40,23 @@ public class NoteButton : DraggableButton {
 
 	public override void DragDown (float actionRatio) {
 		//targetNote.volume += 0.5f - (actionRatio / 2f);
-		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);
-		volumeImage.fillAmount = targetNote.volume;//0.5f - (actionRatio / 2f);
+		targetRiff.volume = Mathf.Clamp01 (oldVolume - actionRatio);
+		img.fillAmount = targetRiff.volume;//0.5f - (actionRatio / 2f);
 		//Debug.Log("DragDown("+actionRatio+")");
 	}
 
 	public override void DragUp (float actionRatio) {
 		//targetNote.volume = 0.5f + (actionRatio / 2f);
-		targetNote.volume = Mathf.Clamp01 (oldVolume + actionRatio);
-		volumeImage.fillAmount = targetNote.volume;
+		targetRiff.volume = Mathf.Clamp01 (oldVolume + actionRatio);
+		img.fillAmount = targetRiff.volume;
 	}
 
 	public override void DragLeft (float actionRatio) {
-		targetNote.duration = 1f;
+		//targetNote.duration = 1f;
 	}
 
 	public override void DragRight (float actionRatio) {
-		targetNote.duration = 1 + (float)(notesVisible-1) * actionRatio;
+		//targetNote.duration = 1 + (float)(notesVisible-1) * actionRatio;
 	}
 
 	#endregion

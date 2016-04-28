@@ -63,6 +63,8 @@ public class SaveLoad {
 				SongArrangeSetup.instance.Refresh();
 				SongTimeline.instance.RefreshTimeline();
 
+				GameManager.instance.GoToPlaylistMenu();
+
 				Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
 			} catch (SerializationException) {
 				Debug.LogError ("SaveLoad.LoadFile(): Failed to deserialize file, probably empty.");

@@ -63,10 +63,32 @@ public class RadialKeyMenu : MonoBehaviour {
 			Image img = button.GetComponent<Image>();
 			img.sprite = GameManager.instance.circleIcon;
 
+			if (key == MusicManager.instance.currentSong.key) {
+				text.color = Color.gray;
+				img.color = Color.gray;
+			}
+
 			button.GetComponent<Button>().onClick.AddListener (delegate {
 				MusicManager.instance.currentSong.key = key;
 				Refresh();
 			});
+
+			ShowHide sh = button.AddComponent<ShowHide>();
+			GameObject highlight = UI.MakeImage (key.ToString() + "_Highlight");
+			tr = highlight.GetComponent<RectTransform>();
+			tr.SetParent (button.GetComponent<RectTransform>());
+			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.anchorMin = new Vector2 (0.5f, 0.5f);
+			tr.anchorMax = new Vector2 (0.5f, 0.5f);
+			tr.anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			highlight.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
+			highlight.GetComponent<Image>().color = new Color (1f, 1f, 1f, 1f);
+
+			sh.objects = new List<GameObject>();
+			sh.objects.Add (highlight);
+
+			highlight.SetActive(false);
 
 			objects.Add (button);
 		}
@@ -100,10 +122,32 @@ public class RadialKeyMenu : MonoBehaviour {
 			Image img = button.GetComponent<Image>();
 			img.sprite = GameManager.instance.circleIcon;
 
+			if (i == MusicManager.instance.currentSong.scale) {
+				text.color = Color.gray;
+				img.color = Color.gray;
+			}
+
 			button.GetComponent<Button>().onClick.AddListener (delegate {
 				MusicManager.instance.currentSong.scale = scalei.scaleIndex;
 				Refresh();
 			});
+
+			ShowHide sh = button.AddComponent<ShowHide>();
+			GameObject highlight = UI.MakeImage (scalei.name + "_Highlight");
+			tr = highlight.GetComponent<RectTransform>();
+			tr.SetParent (button.GetComponent<RectTransform>());
+			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.anchorMin = new Vector2 (0.5f, 0.5f);
+			tr.anchorMax = new Vector2 (0.5f, 0.5f);
+			tr.anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			highlight.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
+			highlight.GetComponent<Image>().color = new Color (1f, 1f, 1f, 1f);
+
+			sh.objects = new List<GameObject>();
+			sh.objects.Add (highlight);
+
+			highlight.SetActive(false);
 
 			objects.Add (button);
 				
@@ -112,9 +156,12 @@ public class RadialKeyMenu : MonoBehaviour {
 		// Confirm button
 		if (MusicManager.instance.currentSong.key != Key.None &&
 			MusicManager.instance.currentSong.scale != -1) {
+			//confirmButton.GetComponent<Fadeable>().UnFade();
+			confirmButton.GetComponent<Button>().interactable = true;
 			confirmButton.SetActive (true);
 		} else
 			confirmButton.SetActive (false);
+			//confirmButton.GetComponent<Fadeable>().Fade();
 
 	}
 

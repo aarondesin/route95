@@ -15,7 +15,7 @@ public struct PerfInfo {
 		avgFPS = startFPS;
 	}
 
-	public string ToString() {
+	public override string ToString() {
 		return 
 			"Seconds: " + seconds.ToString("##.0000") + "\n" +
 			"Frames: " + frames.ToString ("##.00") + "\n" +

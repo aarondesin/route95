@@ -117,9 +117,9 @@ public class MusicManager : MonoBehaviour {
 
 	void GetAudioEffect () {
 		//currentInstrument = InstrumentSetup.currentRiff.instrument;
-		currentInstrument = Instrument.AllInstruments[InstrumentSetup.instance.currentRiff.instrumentIndex];
+		currentInstrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
 		//Debug.Log ("Calling getAudioEffect " + currentInstrument);
-		instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.instance.currentRiff.distortionLevel;
+		instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
 	}
@@ -195,7 +195,7 @@ public class MusicManager : MonoBehaviour {
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
-			instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.instance.currentRiff.instrumentIndex]].Stop();
+			instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 		} else {
 			playing = true;
 			loop = true;
@@ -206,7 +206,7 @@ public class MusicManager : MonoBehaviour {
 		playing = false;
 		loop = false;
 		beat = 0;
-		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.instance.currentRiff.instrumentIndex]].Stop();
+		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 	}
 
 	void FixedUpdate(){
@@ -214,8 +214,8 @@ public class MusicManager : MonoBehaviour {
 			if (BeatTimer <= 0f) {
 				switch (GameManager.instance.currentMode) {
 				case GameManager.Mode.Setup:
-					InstrumentSetup.instance.currentRiff.PlayRiff (beat++);
-					if (beat >= InstrumentSetup.instance.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
+					InstrumentSetup.currentRiff.PlayRiff (beat++);
+					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
 						beat = 0;
 					break;
 				case GameManager.Mode.Live:
@@ -275,7 +275,7 @@ public class MusicManager : MonoBehaviour {
 	public Riff AddRiff () {
 		//Debug.Log("added");
 		Riff temp = new Riff ();
-		InstrumentSetup.instance.currentRiff = temp;
+		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = currentProject.riffs.Count;
 		currentProject.riffs.Add (temp);
 		SongArrangeSetup.instance.Refresh();

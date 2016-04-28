@@ -46,7 +46,7 @@ public class CameraControl : MonoBehaviour {
 	// Camera interp vars
 	Transform start;
 	Transform target;
-	float speed;
+	float speed = 1f;
 	float sTime;
 	bool moving = false;
 
@@ -256,6 +256,7 @@ public class CameraControl : MonoBehaviour {
 		} else {
 			
 			if (moving) {
+
 				if (Vector3.Distance(start.position, target.position) != 0f) {
 
 					float progress = (Time.time-sTime) *speed * Time.deltaTime / 

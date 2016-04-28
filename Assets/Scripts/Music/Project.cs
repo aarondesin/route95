@@ -52,6 +52,7 @@ public class Project {
 	}
 
 public void RegisterRiff (Riff riff) {
+	riffs.Add (riff);
 }
 
 }

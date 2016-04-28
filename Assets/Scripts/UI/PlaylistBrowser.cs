@@ -61,6 +61,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			tr.SetParent (playlist);
 			tr.sizeDelta = new Vector2 (playlist.GetComponent<RectTransform>().rect.width, buttonHeight);
 			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 			tr.anchorMin = new Vector2 (0f, 1f);
 			tr.anchorMax = new Vector2 (0f, 1f);
 			tr.anchoredPosition3D = new Vector3 (
@@ -72,7 +73,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 			Image img = listing.GetComponent<Image>();
 			img.sprite = fillSprite;
-			img.color = new Color (1f, 1f, 1f, 0f);
+			img.color = new Color (0f, 0f, 1f, 0f);
 
 
 			//
@@ -83,6 +84,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			bgtr.SetParent (playlist);
 			bgtr.sizeDelta = new Vector2 (tr.sizeDelta.x - 2f * horizontalPadding, tr.sizeDelta.y);
 			bgtr.localScale = new Vector3 (1f, 1f, 1f);
+			bgtr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 			bgtr.anchorMin = new Vector2 (0f, 1f);
 			bgtr.anchorMax = new Vector2 (0f, 1f);
 			bgtr.anchoredPosition3D = new Vector3 (
@@ -95,7 +97,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			Image bgimg = listing_bg.GetComponent<Image>();
 			bgimg.raycastTarget = false;
 			bgimg.sprite = fillSprite;
-			bgimg.color = new Color (1f, 1f, 1f, 0.5f);
+			bgimg.color = new Color (1f, 1f, 1f, 0.0f);
 
 			listings.Add(listing_bg);
 
@@ -108,6 +110,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			ttr.SetParent(tr);
 			ttr.sizeDelta = tr.sizeDelta;
 			ttr.localScale = new Vector3 (1f, 1f, 1f);
+			ttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 			ttr.anchorMin = new Vector2 (0.5f, 0.5f);
 			ttr.anchorMin = new Vector2 (0.5f, 0.5f);
 			ttr.anchoredPosition3D = new Vector3 (
@@ -117,9 +120,10 @@ public class PlaylistBrowser : MonoBehaviour {
 			);
 
 			Text ttxt = listing_text.GetComponent<Text>();
+			//ttxt.text = (i+1).ToString() + ". " + song.name + " M: "+song.NumMeasures();
 			ttxt.text = (i+1).ToString() + ". " + song.name;
 			ttxt.fontSize = fontSize;
-			ttxt.color = Color.white;
+			ttxt.color = Color.black;
 			ttxt.font = font;
 			ttxt.fontStyle = FontStyle.Normal;
 			ttxt.alignment = TextAnchor.MiddleLeft;
@@ -134,6 +138,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			rtr.SetParent(tr);
 			rtr.sizeDelta = new Vector2 (iconScale * tr.sizeDelta.y, iconScale * tr.sizeDelta.y);
 			rtr.localScale = new Vector3 (1f, 1f, 1f);
+			rtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
 			rtr.anchorMin = new Vector2 (1f, 0.5f);
 			rtr.anchorMax = new Vector2 (1f, 0.5f);
 			rtr.anchoredPosition3D = new Vector3 (
@@ -143,6 +148,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			);
 
 			Image rimg = listing_remove.GetComponent<Image>();
+			rimg.color = Color.black;
 			rimg.sprite = GameManager.instance.removeIcon;
 
 			Button rbt = listing_remove.GetComponent<Button>();
@@ -160,6 +166,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			RectTransform etr = listing_edit.GetComponent<RectTransform>();
 			etr.SetParent(tr);
 			etr.sizeDelta = new Vector2 (iconScale * tr.sizeDelta.y, iconScale * tr.sizeDelta.y);
+			etr.localRotation = Quaternion.Euler (1f, 1f, 1f);
 			etr.localScale = new Vector3 (1f, 1f, 1f);
 			etr.anchorMin = new Vector2 (1f, 0.5f);
 			etr.anchorMax = new Vector2 (1f, 0.5f);
@@ -170,6 +177,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			);
 
 			Image eimg = listing_edit.GetComponent<Image>();
+			eimg.color = Color.black;
 			eimg.sprite = GameManager.instance.editIcon;
 
 			Button ebt = listing_edit.GetComponent<Button>();
@@ -197,6 +205,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				utr.SetParent(tr);
 				utr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
 				utr.localScale = new Vector3 (1f, 1f, 1f);
+				utr.localRotation = Quaternion.Euler (1f, 1f, 1f);
 				utr.anchorMin = new Vector2 (0f, 0.5f);
 				utr.anchorMax = new Vector2 (0f, 0.5f);
 				utr.anchoredPosition3D = new Vector3 (
@@ -207,6 +216,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				utr.localRotation = Quaternion.Euler(0f, 0f, 90f);
 
 				Image uimg = listing_up.GetComponent<Image>();
+				uimg.color = Color.black;
 				uimg.sprite = GameManager.instance.arrowIcon;
 
 				Button ubt = listing_up.GetComponent<Button>();
@@ -231,6 +241,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				dtr.SetParent(tr);
 				dtr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
 				dtr.localScale = new Vector3 (1f, 1f, 1f);
+				dtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
 				dtr.anchorMin = new Vector2 (0f, 0.5f);
 				dtr.anchorMax = new Vector2 (0f, 0.5f);
 				dtr.anchoredPosition3D = new Vector3 (
@@ -241,6 +252,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				dtr.localRotation = Quaternion.Euler(0f, 0f, -90f);
 
 				Image dimg = listing_down.GetComponent<Image>();
+				dimg.color = Color.black;
 				dimg.sprite = GameManager.instance.arrowIcon;
 
 				Button dbt = listing_down.GetComponent<Button>();
@@ -267,6 +279,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		ntr.SetParent (playlist);
 		ntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
 		ntr.localScale = new Vector3 (1f, 1f, 1f);
+		ntr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 		ntr.anchorMin = new Vector2 (0f, 1f);
 		ntr.anchorMax = new Vector2 (0f, 1f);
 		ntr.anchoredPosition3D = new Vector3 (
@@ -277,7 +290,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Image nimg = ntr.GetComponent<Image>();
 		nimg.sprite = GameManager.instance.addIcon;
-		nimg.color = new Color (1f, 1f, 1f, 1f);
+		nimg.color = new Color (0f, 0f, 0f, 1f);
 
 		ntr.GetComponent<Button>().onClick.AddListener (delegate {
 			MusicManager.instance.NewSong();
@@ -290,6 +303,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		nttr.SetParent(ntr);
 		nttr.sizeDelta = new Vector2 (playlist.rect.width, ntr.sizeDelta.y);
 		nttr.localScale = new Vector3 (1f, 1f, 1f);
+		nttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 		nttr.anchorMin = new Vector2 (0f, 0.5f);
 		nttr.anchorMin = new Vector2 (0f, 0.5f);
 		nttr.anchoredPosition3D = new Vector3 (
@@ -300,8 +314,9 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Text nttxt = newSong_text.GetComponent<Text>();
 		nttxt.text = "New Song...";
+		nttxt.resizeTextForBestFit = false;
 		nttxt.fontSize = (int)(fontSize * iconScale);
-		nttxt.color = Color.white;
+		nttxt.color = Color.black;
 		nttxt.font = font;
 		nttxt.fontStyle = FontStyle.Normal;
 		nttxt.alignment = TextAnchor.MiddleLeft;
@@ -314,6 +329,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		lntr.SetParent (playlist);
 		lntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
 		lntr.localScale = new Vector3 (1f, 1f, 1f);
+		lntr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 		lntr.anchorMin = new Vector2 (0.5f, 1f);
 		lntr.anchorMax = new Vector2 (0.5f, 1f);
 		lntr.anchoredPosition3D = new Vector3 (
@@ -324,7 +340,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Image lnimg = lntr.GetComponent<Image>();
 		lnimg.sprite = GameManager.instance.loadIcon;
-		lnimg.color = new Color (1f, 1f, 1f, 1f);
+		lnimg.color = new Color (0f, 0f, 0f, 1f);
 
 		lntr.GetComponent<Button>().onClick.AddListener (delegate {
 			GameManager.instance.ShowLoadPromptForSongs();
@@ -336,6 +352,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		lnttr.SetParent(lntr);
 		lnttr.sizeDelta = new Vector2 (playlist.rect.width, ntr.sizeDelta.y);
 		lnttr.localScale = new Vector3 (1f, 1f, 1f);
+		lnttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
 		lnttr.anchorMin = new Vector2 (0f, 0.5f);
 		lnttr.anchorMin = new Vector2 (0f, 0.5f);
 		lnttr.anchoredPosition3D = new Vector3 (
@@ -346,11 +363,36 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		Text lnttxt = loadNewSong_text.GetComponent<Text>();
 		lnttxt.text = "Load Song...";
+		lnttxt.resizeTextForBestFit = false;
 		lnttxt.fontSize = (int)(fontSize * iconScale);
-		lnttxt.color = Color.white;
+		lnttxt.color = Color.black;
 		lnttxt.font = font;
 		lnttxt.fontStyle = FontStyle.Normal;
 		lnttxt.alignment = TextAnchor.MiddleLeft;
+
+		GameObject loadNewSong_highlight = UI.MakeImage ("Load New Song Highlight");
+		listings.Add (loadNewSong_highlight);
+
+		RectTransform lnshtr = loadNewSong_highlight.GetComponent<RectTransform>();
+		lnshtr.SetParent (lntr);
+		lnshtr.sizeDelta = new Vector2 (playlist.rect.width/2f, ntr.sizeDelta.y);
+		lnshtr.localScale = new Vector3 (1f, 1f, 1f);
+		lnshtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
+		lnshtr.anchorMin = new Vector2 (0f, 0.5f);
+		lnshtr.anchorMax = new Vector2 (0f, 0.5f);
+		lnshtr.anchoredPosition3D = new Vector3 (
+			0f, 0f, 0f
+		);
+
+		lnshtr.SetSiblingIndex(-1);
+
+		Image lnshimg = lnshtr.GetComponent<Image>();
+		lnshimg.raycastTarget = false;
+		lnshimg.sprite = fillSprite;
+		lnshimg.color = new Color (1f, 1f, 1f, 0.5f);
+
+		Fadeable lnshf = loadNewSong_highlight.AddComponent<Fadeable>();
+		lnshf.startFaded = true;
 	
 	}
 		

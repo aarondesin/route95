@@ -107,7 +107,26 @@ public class LoadPrompt : MonoBehaviour {
 				appendButton.GetComponent<Button>().interactable = true;
 				button.GetComponent<Image>().color = new Color(1f,1f,1f,0.5f);
 			});
+
+
 			fileButtons.Add(button);
+
+			GameObject highlight = UI.MakeImage (filename+"_Highlight");
+			RectTransform tr = highlight.GetComponent<RectTransform>();
+			tr.SetParent (button.transform);
+			tr.sizeDelta = ((RectTransform)text.GetComponent<RectTransform>().parent).sizeDelta;
+			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.anchorMin = new Vector2 (0.5f, 0.5f);
+			tr.anchorMax = new Vector2 (0.5f, 0.5f);
+			tr.anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			highlight.GetComponent<Image>().color = new Color (1f, 1f, 1f, 0.5f);
+
+			ShowHide sh = button.AddComponent<ShowHide>();
+			sh.objects = new List<GameObject>();
+			sh.objects.Add (highlight);
+
+			fileButtons.Add(highlight);
+			highlight.SetActive (false);
 		}
 
 		// Update size of panel to fit all files

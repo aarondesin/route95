@@ -14,7 +14,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public const int MAX_NUMNOTES = 8;
 
-	public Riff currentRiff; // current riff being edited
+	public static Riff currentRiff; // current riff being edited
 
 	int numRows;
 	int subdivsShown = 2;
@@ -41,7 +41,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public Scrollbar scrollBarH;
 	public Scrollbar scrollBarV;
 	public GameObject playRiffButton;
-	public GameObject beatsText;
+	//public GameObject beatsText;
 	public Text tempoText;
 	public Scrollbar iconBar;
 	public RectTransform iconBar_tr;
@@ -419,7 +419,7 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void UpdateBeatsText() {
-		beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
+		//beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
 	}
 
 	public void UpdateTempoText () {

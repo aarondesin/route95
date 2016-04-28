@@ -42,6 +42,13 @@ public class GameManager : MonoBehaviour {
 	float startLoadTime;
 	int loadProgress = 0;
 	int loadValue = 0;
+	bool casetteMoving = false;
+	public Transform casetteFront;
+	public Transform casetteBack;
+	Transform casetteTarget;
+	Transform casettePosition;
+	public float casetteMoveSpeed = 1f;
+	float sTime;
 
 	public Dictionary<Menu, GameObject> menus; 
 
@@ -79,6 +86,7 @@ public class GameManager : MonoBehaviour {
 	public Sprite removeIcon;
 	public Sprite circleIcon;
 	public Sprite volumeIcon;
+	public Sprite fillSprite;
 
 	[Header("Menu Objects")]
 
@@ -115,13 +123,14 @@ public class GameManager : MonoBehaviour {
 	public GameObject tooltip;
 	public float tooltipDistance;
 
+	public GameObject casette;
+
 	#endregion
 	#region Unity Callbacks
 
 	void Start () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
-			//Sounds.Load();
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
@@ -132,7 +141,12 @@ public class GameManager : MonoBehaviour {
 			{ Menu.PostPlay, postPlayMenu }
 		};
 
+		projectSavePath = Application.persistentDataPath + projectSaveFolder;
+		songSavePath = Application.persistentDataPath + songSaveFolder;
+
 		ShowAll ();
+		//MoveCasetteBack();
+
 	}
 
 	void Update () {
@@ -157,6 +171,17 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 		} else {
+			if (casetteMoving) {
+				float progress = (Time.time - sTime) * casetteMoveSpeed;
+				float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
+				casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
+				casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
+				if (dist >= 1f) {
+					casetteMoving = false;
+					casette.transform.position = casetteTarget.position;
+					casette.transform.rotation = casetteTarget.rotation;
+				}
+			}
 			if (tooltip.activeSelf) {
 				RectTransform tr = tooltip.GetComponent<RectTransform>();
 				Vector2 realPosition = new Vector2 (
@@ -234,17 +259,26 @@ public class GameManager : MonoBehaviour {
 	public void GoToMainMenu () {
 		HideAll ();
 		Show (mainMenu);
+		MoveCasetteBack();
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
 	}
 
 	public void GoToKeySelectMenu () {
+		MoveCasetteBack();
 		HideAll();
 		Show (keySelectMenu);
+		if (RadialKeyMenu.instance == null) {
+			keySelectMenu.GetComponentInChildren<RadialKeyMenu>().Refresh();
+		} else {
+			RadialKeyMenu.instance.Refresh();
+		}
 		keySelectConfirmButton.GetComponent<Button>().interactable = 
 			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
 		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
 	}
 
 	public void GoToSongArrangeMenu () {
+		MoveCasetteBack();
 		HideAll ();
 		CameraControl.instance.LerpToPosition(CameraControl.instance.ViewRadio);
 		Show (songArrangeMenu);
@@ -253,30 +287,43 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GoToRiffEditor () {
+		MoveCasetteBack();
 		HideAll ();
 		if (MusicManager.instance.currentSong.scale == -1) {
 			GoToKeySelectMenu();
 		} else {
 			CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
 			Show (riffEditMenu);
-			InstrumentSetup.instance.Initialize ();
+			if (InstrumentSetup.instance == null) {
+				riffEditMenu.GetComponentInChildren<InstrumentSetup>().Initialize();
+			} else {
+				InstrumentSetup.instance.Initialize ();
+			}
 		}
 	}
 
 	public void GoToPlaylistMenu () {
+		currentMode = Mode.Setup;
+		casette.SetActive(true);
 		HideAll ();
 		Show (playlistMenu);
 		PlaylistBrowser.instance.Refresh();
 		PlaylistBrowser.instance.RefreshName();
+		MoveCasetteFront ();
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
 	}
 
 	public void GoToPostPlayMenu() {
+		MoveCasetteBack();
 		HideAll();
 		Show (postPlayMenu);
+		currentMode = Mode.Postplay;
 	}
 
 	public void Show (GameObject menu) {
 		menu.SetActive(true);
+		if (menu.GetComponent<Fadeable>() != null)
+			menu.GetComponent<Fadeable>().UnFade();
 	}
 
 	public void ShowAll () {
@@ -293,10 +340,15 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void HideAll () {
+		//if (mainMenu.activeSelf) mainMenu.GetComponent<Fadeable>().Fade();
+		//if (playlistMenu.activeSelf) playlistMenu.GetComponent<Fadeable>().Fade();
+		//if (keySelectMenu.activeSelf) keySelectMenu.GetComponent<Fadeable>().Fade();
+		//if (riffEditMenu.activeSelf) riffEditMenu.GetComponent<Fadeable>().Fade();
 		Hide (mainMenu);
 		Hide (playlistMenu);
 		Hide (keySelectMenu);
 		Hide (riffEditMenu);
+		Hide (postPlayMenu);
 
 		Hide (addRiffPrompt);
 		Hide (loadPrompt);
@@ -310,11 +362,14 @@ public class GameManager : MonoBehaviour {
 
 	// Swtich from setup to live mode
 	public void SwitchToLive () {
+		casette.SetActive(false);
+		//casetteMoving = false;
 		//Debug.Log (MusicManager.instance.currentSong.ToString ());
 		MusicManager.instance.currentSong.CompileSong();
 		if (MusicManager.instance.loopSong) Show(loopIcon);
 		else Hide(loopIcon);
 
+		MoveCasetteBack();
 		HideAll ();
 		Show (liveIcons);
 		Show (songProgressBar);
@@ -330,6 +385,7 @@ public class GameManager : MonoBehaviour {
 
 	// Switch from live mode to postplay
 	public void SwitchToPostplay () {
+		casette.SetActive(false);
 		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
@@ -428,6 +484,20 @@ public class GameManager : MonoBehaviour {
 
 	public void Exit () {
 		Application.Quit();
+	}
+
+	public void MoveCasetteFront () {
+		casettePosition = casette.transform;
+		casetteTarget = casetteFront;
+		sTime = Time.time;
+		casetteMoving = true;
+	}
+
+	public void MoveCasetteBack () {
+		casettePosition = casette.transform;
+		casetteTarget = casetteBack;
+		sTime = Time.time;
+		casetteMoving = true;
 	}
 
 	#endregion
