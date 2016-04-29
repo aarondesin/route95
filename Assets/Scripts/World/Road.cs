@@ -189,7 +189,7 @@ public class Road : Bezier {
 			
 		Array.Resize (ref modes, modes.Length + 1);
 		modes[modes.Length - 1] = modes[modes.Length -2];
-		//EnforceMode (points.Length - 4);
+		EnforceMode (points.Length - 4);
 		steps += stepsPerCurve;
 		Build();
 		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
