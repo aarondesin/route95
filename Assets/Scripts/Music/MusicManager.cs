@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;// need for using lists
 using System.IO; // need for path operations
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,6 +38,7 @@ public enum Tempo {
 };
 
 public class MusicManager : MonoBehaviour {
+
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
 	public AudioMixer mixer;
 
@@ -76,6 +78,12 @@ public class MusicManager : MonoBehaviour {
 
 	public bool loadedAudioSources = false;
 
+	int loadedSounds = 0;
+	int loadedInstruments = 0;
+	int loadedScales = 0;
+	int loadProgress;
+	public int loadsToDo;
+
 	#endregion
 	#region Unity Callbacks
 
@@ -90,29 +98,101 @@ public class MusicManager : MonoBehaviour {
 		tempo = Tempo.Medium;
 		Instrument.LoadInstruments ();
 
+
+		loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
+			(Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 	}
 
 	public void Load() {
 		startLoadTime = Time.realtimeSinceStartup;
-		LoadSounds();
-		ScaleInfo.BuildScaleInfo();
-		LoadInstruments();
-		LoadScales();
+		StartCoroutine ("LoadSounds");
+	}
+
+	public void FinishLoading() {
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-		GameManager.instance.LoadNext();
+		WorldManager.instance.Load();
 	}
 
 	#endregion
 	#region MusicManager Callbacks
 
 	// Loads all audio clip paths in soundsToLoad
-	void LoadSounds() {
+	/*void LoadSounds() {
 		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
 		foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
 			foreach (string path in list.Value) {
 				LoadAudioClip(path);
 			}
 		}
+	}*/
+
+	IEnumerator LoadSounds () {
+		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
+		foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
+			foreach (string path in list.Value) {
+				LoadAudioClip(path);
+				numLoaded++;
+				//Debug.Log("loaded "+path);
+
+				if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+					yield return null;
+					startTime = Time.realtimeSinceStartup;
+					GameManager.instance.ReportLoaded (numLoaded);
+					numLoaded = 0;
+				}
+			}
+		}
+
+		yield return StartCoroutine("LoadInstruments");
+	}
+
+	IEnumerator LoadInstruments () {
+		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
+		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
+		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
+
+			Instrument.AllInstruments[i].Load();
+
+			GameObject obj = new GameObject (Instrument.AllInstruments[i].name);
+			AudioSource source = obj.AddComponent<AudioSource>();
+			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
+			instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
+			obj.AddComponent<AudioReverbFilter>();
+			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
+			obj.GetComponent<AudioReverbFilter>().room = GetComponent<AudioReverbFilter>().room;
+			obj.GetComponent<AudioReverbFilter>().roomHF = GetComponent<AudioReverbFilter>().roomHF;
+			obj.GetComponent<AudioReverbFilter>().roomLF = GetComponent<AudioReverbFilter>().roomLF;
+			obj.GetComponent<AudioReverbFilter>().decayTime = GetComponent<AudioReverbFilter>().decayTime;
+			obj.GetComponent<AudioReverbFilter>().decayHFRatio = GetComponent<AudioReverbFilter>().decayHFRatio;
+			obj.GetComponent<AudioReverbFilter>().reflectionsLevel = GetComponent<AudioReverbFilter>().reflectionsLevel;
+			obj.GetComponent<AudioReverbFilter>().reflectionsDelay = GetComponent<AudioReverbFilter>().reflectionsDelay;
+			obj.GetComponent<AudioReverbFilter>().reverbLevel = GetComponent<AudioReverbFilter>().reverbLevel;
+			obj.GetComponent<AudioReverbFilter>().hfReference = GetComponent<AudioReverbFilter>().hfReference;
+			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
+			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
+			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
+			obj.AddComponent<AudioDistortionFilter> ();
+			obj.AddComponent<AudioEchoFilter> ();
+			obj.AddComponent<AudioChorusFilter> ();
+
+			numLoaded++;
+
+			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+				GameManager.instance.ReportLoaded (numLoaded);
+				numLoaded = 0;
+			}
+		}
+
+		if (instrumentAudioSources.Count == Instrument.AllInstruments.Count) KeyManager.instance.DoBuildScales();
+		yield return null;
 	}
 
 	void GetAudioEffect () {
@@ -124,10 +204,8 @@ public class MusicManager : MonoBehaviour {
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
 	}
 
-	void LoadInstruments () {
+	/*void LoadInstruments () {
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
-
-
 
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
 		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
@@ -160,11 +238,11 @@ public class MusicManager : MonoBehaviour {
 
 		loadedAudioSources = true;
 	}
-
-	void LoadScales () {
+*/
+	/*void LoadScales () {
 		GameManager.instance.ChangeLoadingMessage("Loading scales...");
 		KeyManager.instance.BuildScales();
-	}
+	}*/
 
 	public void NewProject () {
 		currentProject = new Project();
@@ -296,6 +374,7 @@ public class MusicManager : MonoBehaviour {
 
 	// Loads a single audio clip
 	void LoadAudioClip (string path) {
+		if (SoundClips.ContainsKey(path)) return;
 		AudioClip sound = (AudioClip) Resources.Load (path);
 		if (sound == null) {
 			Debug.LogError("Failed to load AudioClip at "+path);
@@ -303,7 +382,7 @@ public class MusicManager : MonoBehaviour {
 			//Debug.Log("Loaded "+path);
 			//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
 			SoundClips.Add (path, sound);
-			GameManager.instance.IncrementLoadProgress();
+			//GameManager.instance.IncrementLoadProgress();
 		}
 	}
 

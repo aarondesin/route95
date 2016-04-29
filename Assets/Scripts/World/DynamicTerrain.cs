@@ -14,8 +14,8 @@ public class DynamicTerrain {
 
 	private GameObject terrain;
 	public List<Chunk> activeChunks; //list of active chunks
-	private List<Chunk> activeRoadChunks; // list of active chunks with road on them
-	private List<Chunk> activeCloseToRoadChunks;
+	public List<Chunk> activeRoadChunks; // list of active chunks with road on them
+	public List<Chunk> activeCloseToRoadChunks;
 
 	public VertexMap vertexmap;
 	public Dictionary<int, Dictionary<int, bool>> chunkmap;
@@ -38,6 +38,7 @@ public class DynamicTerrain {
 		instance = this;
 		terrain = new GameObject ("Terrain");
 		terrain.transform.position = new Vector3 (0f, 0f, 0f);
+		//terrain.transform.localScale = new Vector3 (10f, 10f, 10f);
 
 		vertexmap = new VertexMap();
 		chunkmap = new Dictionary<int, Dictionary< int, bool>> ();
@@ -58,6 +59,53 @@ public class DynamicTerrain {
 		chunkPriorities.Add(newChunk, 0);
 		return newChunk;
 	}
+
+	public void DoLoadChunks () {
+		List<int> xChunks = new List<int>();
+		List<int> yChunks = new List<int>();
+		CreateChunkLists (xChunks, yChunks);
+		WorldManager.instance.StartCoroutine(LoadChunks(xChunks, yChunks));
+	}
+
+	IEnumerator LoadChunks (List<int> xChunks, List<int> yChunks) {
+		int chunksToLoad = xChunks.Count * yChunks.Count;
+		GameManager.instance.ChangeLoadingMessage("Loading chunks...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
+		foreach (int x in xChunks) {
+			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, bool>());
+			foreach (int y in yChunks) {
+				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, false);
+				if (!chunkmap[x][y]) {
+					Chunk chunk = CreateChunk (x, y);
+					activeChunks.Add (chunk);
+					chunkmap[x][y] = true;
+					numLoaded++;
+
+					if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
+						GameManager.instance.ReportLoaded(numLoaded);
+						numLoaded = 0;
+					}
+				}
+			}
+		}
+
+
+		if (activeChunks.Count == chunksToLoad) {
+			int res = vertexmap.vertices.Keys.Count;
+			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
+			//CreateMountain (-32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
+			//CreateMountain (32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
+			//CreateMountain (32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
+			//CreateMountain (-32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
+			WorldManager.instance.DoLoadRoad();
+		}
+		yield return null;
+	}
+
 
 	void UpdateChunks(float[] freqDataArray){
 		freqData = UpdateFreqData();
@@ -159,6 +207,17 @@ public class DynamicTerrain {
 		return activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
 	}
 
+	public void CheckAllChunksForRoad() {
+		foreach (Chunk chunk in activeChunks) {
+			chunk.CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+			if (chunk.nearRoad) {
+				//Debug.Log("added");
+				if (chunk.hasRoad) activeRoadChunks.Add(chunk);
+				activeCloseToRoadChunks.Add(chunk);
+			}
+		}
+	}
+
 	//populates lists of chunk coords to be loaded
 	void CreateChunkLists(List<int> xChunks, List<int> yChunks){
 		Vector3 playerPos = PlayerMovement.instance.transform.position;
@@ -245,7 +304,7 @@ public class DynamicTerrain {
 		int size = Math.Max (width, depth);
 		size--;
 		size = MakePowerTwo (size); //size of the Diamond Square Alg array
-		Debug.Log("Size is: " + size);
+		//Debug.Log("Size is: " + size);
 		if (size < 2) return;
 		float[,] heightmap = new float[size + 1, size + 1];
 		float[] corners = InitializeCorners (vmap, x, y, width, depth);
@@ -278,8 +337,9 @@ public class DynamicTerrain {
 				} else continue;
 			}
 		}
+		foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 
-		Road.instance.Bulldoze(0f);
+		//Road.instance.DoBulldoze(0f);
 	}
 
 	//raises n to the nearest power of 2

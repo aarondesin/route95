@@ -4,9 +4,9 @@ using System.Collections;
 public class Sun : MonoBehaviour {
 	public static Sun instance;
 
-	private float xScale = 10;
-	private float yScale = 10;
-	private float zScale = 10;
+	private float xScale = 1000;
+	private float yScale = 1000;
+	private float zScale = 1000;
 
 	private Vector3 sunTarget; // target for the sun to point at: the car or the origin
 
@@ -16,6 +16,7 @@ public class Sun : MonoBehaviour {
 		float newY = yScale * Mathf.Sin(WorldManager.instance.timeOfDay);
 		float newZ = -zScale * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
 		this.transform.position = new Vector3(newX, newY, newZ);
+		transform.localScale = new Vector3 (100f, 100f, 100f);
 
 		this.transform.LookAt (sunTarget);
 	}
@@ -25,6 +26,7 @@ public class Sun : MonoBehaviour {
 		transform.parent = PlayerMovement.instance.transform;
 		this.GetComponent<Light> ().range = 100f;
 		this.GetComponent<Light> ().type = LightType.Directional;
+		GetComponent<Light>().shadowBias = 1f;
 		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
 	}
 	

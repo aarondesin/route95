@@ -75,7 +75,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   group: 1
-  density: 1
+  density: 3
   distribution: 0
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}

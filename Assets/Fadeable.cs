@@ -31,12 +31,12 @@ public class Fadeable : MonoBehaviour {
 
 	public void Fade () {
 		StopCoroutine ("DoUnFade");
-		StartCoroutine("DoFade");
+		if (gameObject.activeSelf) StartCoroutine("DoFade");
 	}
 
 	public void UnFade () {
 		StopCoroutine("DoFade");
-		StartCoroutine("DoUnFade");
+		if (gameObject.activeSelf) StartCoroutine("DoUnFade");
 	}
 
 	IEnumerator DoFade () {

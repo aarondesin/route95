@@ -8,6 +8,8 @@ using UnityStandardAssets.ImageEffects;
 public class WorldManager : MonoBehaviour {
 	public static WorldManager instance;
 
+	public int loadsToDo;
+
 	#region WorldManager Defaults
 
 	// Chunk vars
@@ -96,8 +98,8 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Enable/disable decoration.")]
 	public bool doDecorate = true;
 
-	[Tooltip("Maxmimum number of decorations.")]
-	public int maxDecorations = DEFAULT_MAX_DECORATIONS;
+	//[Tooltip("Maxmimum number of decorations.")]
+	private int maxDecorations; //= DEFAULT_MAX_DECORATIONS;
 
 	[Tooltip("Individual maximums for each decoration group.")]
 	public Decoration.GroupInfo[] initialMaxActive;
@@ -222,14 +224,17 @@ public class WorldManager : MonoBehaviour {
 	void Start () {
 		instance = this;
 
-
+		for (int i = 0; i<initialMaxActive.Length; i++) {
+			maxDecorations += initialMaxActive[i].maxActive;
+		}
+		//Debug.Log(maxDecorations);
 
 		freqDataArray = new float[freqArraySize];
 
 		terrain = new DynamicTerrain ();
 		wind = UnityEngine.Random.insideUnitSphere;
 
-		road = CreateRoad ();
+		road = CreateRoad();
 
 		numDecorations = 0;
 		maxActive = new Dictionary<Decoration.Group, int>();
@@ -240,6 +245,9 @@ public class WorldManager : MonoBehaviour {
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = CreateSun();
 		moon = CreateMoon();
+
+		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
+			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
 	}
 
 	// Update is called once per frame
@@ -260,40 +268,102 @@ public class WorldManager : MonoBehaviour {
 
 	public void Load () {
 		startLoadTime = Time.realtimeSinceStartup;
-		GameManager.instance.ChangeLoadingMessage("Loading world...");
+		//GameManager.instance.ChangeLoadingMessage("Loading world...");
 		//terrain.update();
 
+		//StartCoroutine("LoadChunks");
+		terrain.DoLoadChunks();
+
 			
-		if (doDecorate) {
-			LoadDecorations();
-			InitialDecorate();
-		}
-        NotifyLoadingDone();
+		//if (doDecorate) {
+			//LoadDecorations();
+			//InitialDecorate();
+		//}
+       
 	}
 
-	void LoadDecorations () {
+	public void FinishLoading() {
+		Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+		GameManager.instance.FinishLoading();
+		loaded = true;
+	}
+	public void DoLoadRoad () {
+		//GameManager.instance.ChangeLoadingMessage("Loading road...");
+		road.DoLoad();
+		//road = CreateRoad();
+		//DoLoadDecorations();
+	}
+
+	public void DoLoadDecorations () {
+		StartCoroutine("LoadDecorations");
+	}
+
+	IEnumerator LoadDecorations () {
+		GameManager.instance.ChangeLoadingMessage("Loading decorations...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
 		foreach (string path in decorationPaths) {
 			LoadDecoration (path);
-			GameManager.instance.IncrementLoadProgress();
+			numLoaded++;
+
+			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+				GameManager.instance.ReportLoaded(numLoaded);
+				numLoaded = 0;
+			}
 		}
+
+		if (decorations.Count == decorationPaths.Count)
+			DoInitialDecoration();
+		yield return null;
 	}
 
+	/*void LoadDecorations () {
+		foreach (string path in decorationPaths) {
+			LoadDecoration (path);
+			//GameManager.instance.IncrementLoadProgress();
+		}
+	}*/
+
 	void DoDecorate () {
+			
 		while (numDecorations < maxDecorations) {
 			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
 					//Debug.Log("dick");
 				AttemptDecorate ();
-				GameManager.instance.IncrementLoadProgress();
+				//GameManager.instance.IncrementLoadProgress();
 				//yield return null;
 			}
 		}
 	}
 
-	void NotifyLoadingDone () {
-			Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-			GameManager.instance.LoadNext();
-		loaded = true;
-		hasRandomized = true;
+	public void DoInitialDecoration () {
+		StartCoroutine("InitialDecoration");
+	}
+
+	IEnumerator InitialDecoration () {
+		GameManager.instance.ChangeLoadingMessage("Decorating terrain...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
+		int attempts = 0;
+		for (; numDecorations<maxDecorations; attempts++) {
+			//Debug.Log("about to attempt");
+
+			numLoaded += (AttemptDecorate () ? 1 : 0);
+
+			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+				GameManager.instance.ReportLoaded(numLoaded);
+				numLoaded = 0;
+			}
+		}
+
+		if (numDecorations == maxDecorations) FinishLoading();
+		yield return null;
 	}
 		
 	void UpdateColor() {
@@ -363,7 +433,7 @@ public class WorldManager : MonoBehaviour {
 		}
 	}
     
-	void AttemptDecorate () {
+	bool AttemptDecorate () {
 		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0) {
 			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
 
@@ -377,20 +447,21 @@ public class WorldManager : MonoBehaviour {
 					switch (deco.distribution) {
 					case Decoration.Distribution.Random:
 						Chunk chunk = terrain.RandomChunk ();
-						DecorateRandom (chunk, decoration);
+						return DecorateRandom (chunk, decoration);
 						break;
 					case Decoration.Distribution.Roadside:
 						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
-						DecorateRoadside (bezierProg, decoration);
+						return DecorateRoadside (bezierProg, decoration);
 						break;
 					case Decoration.Distribution.CloseToRoad:
-						DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
+						return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
 						break;
 					}
-					Decoration.numDecorations[deco.group]++;
+					//numDecorations++;
 				}
 			}
 		}
+		return false;
 	}
     
 	GameObject CreateSun(){
@@ -428,15 +499,19 @@ public class WorldManager : MonoBehaviour {
 		return roadObj.GetComponent<Road>();
 	}
 
-	void DecorateRandom (Chunk chunk, GameObject decoration) {
+	bool DecorateRandom (Chunk chunk, GameObject decoration) {
 		chunk.UpdateCollider();
-		if (chunk == null) return;
+
 		Vector2 coordinate = new Vector2 (
 			chunk.x*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f),
 			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
 		);
-		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density) {
-			if (!chunk.Constrained (new Vector3 (coordinate.x, 0f, coordinate.y))) {
+
+		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density / terrain.activeChunks.Count) {
+			//Debug.Log(coordinate);
+			IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
+			//Debug.Log(nearestVertex.ToString());
+			if (!terrain.vertexmap.IsConstrained (nearestVertex)) {
 				RaycastHit hit;
 				float y = 0f;
 				if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
@@ -449,11 +524,17 @@ public class WorldManager : MonoBehaviour {
 				newDecoration.GetComponent<Decoration>().Randomize();
 				newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
+				Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
+				terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);
+				//Debug.Log("placed");
+				return true;
 			}
 		}
+
+		return false;
 	}
 
-	void DecorateRoadside (float prog, GameObject decoration) {
+	bool DecorateRoadside (float prog, GameObject decoration) {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
 		Road roadBez = road.GetComponent<Road>();
 		Vector3 coordinate = 
@@ -468,7 +549,9 @@ public class WorldManager : MonoBehaviour {
 		newDecoration.GetComponent<Decoration>().Randomize();
 		newDecoration.transform.parent = road.gameObject.transform;
 		numDecorations++;
+		Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
 		roadBez.AddDecoration(newDecoration, prog);
+		return true;
 	}
 
 	void LoadDecoration (string path) {
@@ -478,7 +561,7 @@ public class WorldManager : MonoBehaviour {
 		} else {
 			//Debug.Log("Loaded "+path);
 			decorations.Add(decoration);
-			GameManager.instance.IncrementLoadProgress();
+			//GameManager.instance.IncrementLoadProgress();
 		}
 	}
 

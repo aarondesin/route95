@@ -12375,6 +12375,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3125fb541aaab3d48a0daafa855440e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetFrameRate: 60
+  loadPhase: -1
   paused: 0
   currentMenu: 0
   currentMode: 0
@@ -15582,10 +15584,10 @@ RectTransform:
   - {fileID: 1576480159}
   m_Father: {fileID: 1272661861}
   m_RootOrder: 5
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &796519850
 MonoBehaviour:
@@ -16927,15 +16929,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df0c0bcc057f3f42818b120188a7663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadsToDo: 0
   chunkSize: 100
-  chunkResolution: 8
+  chunkResolution: 12
   chunkLoadRadius: 8
-  heightScale: 800
+  heightScale: 200
   vertexUpdateDistance: 600
   wind: {x: 0, y: 0, z: 0}
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   doDecorate: 1
-  maxDecorations: 1000
   initialMaxActive:
   - group: 1
     maxActive: 400
@@ -16944,7 +16946,7 @@ MonoBehaviour:
   - group: 3
     maxActive: 4
   roadWidth: 10
-  roadHeight: 0.2
+  roadHeight: 0.5
   roadExtendRadius: 1000
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
@@ -16968,7 +16970,7 @@ MonoBehaviour:
   chunkUpdatesPerCycle: 4
   freqArraySize: 256
   decorationsPerStep: 100
-  roadPathCheckResolution: 4
+  roadPathCheckResolution: 100
   loadedTerrain: 0
 --- !u!1 &906108765
 GameObject:
@@ -22881,7 +22883,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1277712145
 Transform:
   m_ObjectHideFlags: 0
@@ -22925,8 +22927,8 @@ LineRenderer:
   - {fileID: 2100000, guid: 20ac1b95f9923174f90f192ffb4082c5, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
+  m_UseLightProbes: 0
+  m_ReflectionProbeUsage: 0
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
@@ -22950,7 +22952,7 @@ LineRenderer:
     m_EndColor:
       serializedVersion: 2
       rgba: 4294967295
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
 --- !u!1 &1279084290
 GameObject:
   m_ObjectHideFlags: 0
@@ -23764,7 +23766,7 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
@@ -29184,6 +29186,7 @@ MonoBehaviour:
   tempo: 0
   maxBeats: 0
   loadedAudioSources: 0
+  loadsToDo: 0
 --- !u!164 &1664068198
 AudioReverbFilter:
   m_ObjectHideFlags: 0

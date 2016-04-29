@@ -6,9 +6,9 @@ public class Moon : MonoBehaviour {
 
 	#region Moon Vars
 
-	private float xScale = 10;
-	private float yScale = 10;
-	private float zScale = 10;
+	private float xScale = 100;
+	private float yScale = 100;
+	private float zScale = 100;
 
 	private Vector3 sunTarget; // target for the sun to point at: the car or the origin
 
@@ -19,6 +19,7 @@ public class Moon : MonoBehaviour {
 		instance = this;
 		this.GetComponent<Light> ().range = 100f;
 		this.GetComponent<Light> ().type = LightType.Directional;
+		GetComponent<Light>().shadowBias = 1f;
 		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
 		transform.SetParent (PlayerMovement.instance.transform);
 	}

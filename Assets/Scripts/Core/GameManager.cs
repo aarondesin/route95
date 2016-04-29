@@ -27,20 +27,45 @@ public class GameManager : MonoBehaviour {
 		Postplay
 	};
 
+	public enum LoadPhase {
+		Classes,
+		Sounds,
+		Instruments,
+		Scales,
+		Chunks,
+		Decorations
+	};
+
 	public static GameManager instance;
 
 	#region GameManager Vars
 
 	[Header("Status")]
+
+	public int targetFrameRate = 120;
+
+	private int loadSpeed = 1;
+	private int loadProgress = 0;
+	private int loadsToDo;
+	bool loading = false;
+
+	public LoadPhase loadPhase;
+	private Dictionary <LoadPhase, bool> loadPhases;
+
+	bool classesLoaded = false;
+	bool soundsLoaded = false;
+	bool scaleInfoLoaded = false;
+	bool instrumentsLoaded = false;
+	bool scalesLoaded = false;
+
+
 	public bool paused = false;
 	public Menu currentMenu = Menu.None;
 	public Mode currentMode = Mode.Loading;
 
 
 	bool initialized = false;
-	int loadPhase = -1;
 	float startLoadTime;
-	int loadProgress = 0;
 	int loadValue = 0;
 	bool casetteMoving = false;
 	public Transform casetteFront;
@@ -147,10 +172,42 @@ public class GameManager : MonoBehaviour {
 		ShowAll ();
 		//MoveCasetteBack();
 
+		loadPhases = new Dictionary <LoadPhase, bool> () {
+			{LoadPhase.Classes, false},
+			{LoadPhase.Sounds, false},
+		};
+
+		loadingScreen.SetActive(true);
+
 	}
 
 	void Update () {
-		if (!initialized) Initialize();
+		if (!initialized) {
+			if (!loading) {
+				/*loadPhases [LoadPhase.Classes] = 
+					GameManager.instance != null &&
+					InputManager.instance != null &&
+					KeyManager.instance != null &&
+					MusicManager.instance != null &&
+					AddRiffPrompt.instance != null &&
+					InstrumentSetup.instance != null &&
+					LoadPrompt.instance != null &&
+					PlaylistBrowser.instance != null &&
+					Prompt.instance != null &&
+					RadialKeyMenu.instance != null &&
+					SongArrangeSetup.instance != null &&
+					SongTimeline.instance != null &&
+					WorldManager.instance != null &&
+					PlayerMovement.instance != null;*/
+
+				
+
+				//if (loadPhases [LoadPhase.Classes])  Load();
+				Load();
+			} else {
+				return;
+			}
+		}
 
 		// Fade exit icon
 		if (currentMode == Mode.Live) {
@@ -204,52 +261,29 @@ public class GameManager : MonoBehaviour {
 	#endregion
 	#region GameManager Methods
 
-	void Initialize () {
-		
-		// Hide all menus and display default menu (main)
-		HideAll ();
-		Show (mainMenu);
-		Load();
-		initialized = true;
-	}
-
 	void Load () {
-		startLoadTime = Time.realtimeSinceStartup;
-		loadValue = Instrument.AllInstruments.Count+
-			Sounds.soundsToLoad.Count + WorldManager.instance.decorationPaths.Count +
-			WorldManager.instance.maxDecorations;
+		Debug.Log("GameManager.Load()");
+		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
+		loading = true;
 
-
-		loadingScreen.SetActive(true);
-		LoadNext();
+		MusicManager.instance.Load();
 
 	}
 
-	public void LoadNext() {
-		loadPhase++;
-		switch (loadPhase) {
-		case 0:
-			MusicManager.instance.Load();
-			break;
-		case 1:
-			WorldManager.instance.Load();
-			break;
-		case 2:
-			CaseLibrary.initializecases ();
-			FinishLoading();
-			break;
-		}
-	}
-		
-	public void IncrementLoadProgress() {
-		loadProgress++;
-		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadValue;
-	}
-
-	void FinishLoading() {
-		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+	public void FinishLoading () {
+		// Hide all menus and display default menu (main)
 		loadingScreen.SetActive(false);
 		currentMode = Mode.Setup;
+		HideAll ();
+		Show (mainMenu);
+		loading = false;
+		initialized = true;
+		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+	}
+
+	public void ReportLoaded (int numLoaded) {
+		loadProgress += numLoaded;
+		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadsToDo;
 	}
 
 	public void ChangeLoadingMessage (string message) {
@@ -487,17 +521,19 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void MoveCasetteFront () {
+		casetteMoving = true;
 		casettePosition = casette.transform;
 		casetteTarget = casetteFront;
 		sTime = Time.time;
-		casetteMoving = true;
+
 	}
 
 	public void MoveCasetteBack () {
+		casetteMoving = true;
 		casettePosition = casette.transform;
 		casetteTarget = casetteBack;
 		sTime = Time.time;
-		casetteMoving = true;
+
 	}
 
 	#endregion

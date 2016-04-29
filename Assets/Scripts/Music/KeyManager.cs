@@ -22,7 +22,17 @@ public class KeyManager : MonoBehaviour {
 	#endregion
 	#region KeyManager Methods
 
-	public void BuildScales () {
+	public void DoBuildScales () {
+		//Debug.Log("buildscales");
+		StartCoroutine ("BuildScales");
+	}
+
+	//public void BuildScales () {
+	IEnumerator BuildScales () {
+		GameManager.instance.ChangeLoadingMessage("Loading scales...");
+		float startTime = Time.realtimeSinceStartup;
+		int numLoaded = 0;
+
 		percussionSets = new Dictionary<Instrument, List<string>>() {
 			{ PercussionInstrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
 			{ PercussionInstrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
@@ -42,6 +52,16 @@ public class KeyManager : MonoBehaviour {
 								(MelodicInstrument)instrument, BuildScale (Sounds.soundsToLoad[instrument.codeName], 
 									scale, ((MelodicInstrument)instrument).startingNote[key])
 							);
+							//Debug.Log("Scale["+key.ToString()+"]["+scale.name+"]["+instrument.codeName+"]");
+							numLoaded++;
+
+							if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+								yield return null;
+								startTime = Time.realtimeSinceStartup;
+								GameManager.instance.ReportLoaded(numLoaded);
+
+								numLoaded = 0;
+							}
 						}
 					}
 
@@ -49,6 +69,8 @@ public class KeyManager : MonoBehaviour {
 			}
 
 		}
+		MusicManager.instance.FinishLoading();
+		yield return null;
 
 	}
 

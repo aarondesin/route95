@@ -27,7 +27,9 @@ public class Decoration : MonoBehaviour {
 
 	public static Dictionary<Group, int> numDecorations;
 	public Group group = Group.None;
-	public float density; // 0-1, density of population
+
+	[Tooltip("Average number of this decoration per chunk.")]
+	public float density;
 	public Distribution distribution;
 
 	public Vector3 positionOffset;

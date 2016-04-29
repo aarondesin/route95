@@ -16,6 +16,7 @@ public class Chunk {
 	public int x; //x position in chunk grid
 	public int y; //y position in chunk grid
 
+	bool hasCheckedForRoad = false;
 	public bool hasRoad = false;  // Chunk has road on it
 	public bool nearRoad = false; // Chunk is within one chunk distance of a road
 
@@ -38,8 +39,9 @@ public class Chunk {
 		triangles = CreateSquareArrayTriangles (chunkRes);
 		chunk = CreateChunk (verts, uvs, triangles);
 		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
+		chunk.name += "Position:"+chunk.transform.position.ToString();
 
-		CheckForRoad ();
+		//CheckForRoad (PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 
 		// Register all vertices with vertex map
 		for (int i=0; i<verts.Length; i++) {
@@ -120,7 +122,7 @@ public class Chunk {
 	GameObject CreateChunk (Vector3[] vertices, Vector2[] UVcoords, int[] triangles) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
-		GameObject chunk = new GameObject ("chunk", 
+		GameObject chunk = new GameObject ("Chunk ("+x+","+y+")", 
 			typeof(MeshFilter), 
 			typeof(MeshRenderer),
 			typeof(MeshCollider),
@@ -155,15 +157,19 @@ public class Chunk {
 	}
 
 	public void UpdateCollider () {
-		//chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+		chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
 		chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 	}
 
 	public void UpdateVertex (int index, float height) {
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
-		vertices[index].y += (height - vertices[index].y)/4f;
+		//vertices[index].y += (height - vertices[index].y)/4f;
+		vertices[index].y = height;
 		chunk.GetComponent<MeshFilter>().mesh.vertices = vertices;
+
 	}
+
+
 
 	private bool CheckDist (float dist, float updateDist, float margin) {
 		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
@@ -206,6 +212,9 @@ public class Chunk {
 	}
 
 	public void Update (float updateDist, LinInt freqData){
+		if (!hasCheckedForRoad) {
+			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+		}
 		float chunkSize = WorldManager.instance.chunkSize;
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
 		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
@@ -235,41 +244,46 @@ public class Chunk {
 		return false;
 	}
 
-	public void CheckForRoad () {
+	public void CheckForRoad (float startProgress) {
+		hasCheckedForRoad = true;
 		Vector3 chunkPos = chunk.transform.position;
 		float chunkSize = WorldManager.instance.chunkSize;
-		float checkResolution = WorldManager.instance.roadPathCheckResolution;
+		float checkResolution = (1f - startProgress) * WorldManager.instance.roadPathCheckResolution;
 
 		Vector2 nearMin = new Vector2 (
-			chunkPos.x - chunkSize * 1.5f,
-			chunkPos.z - chunkSize * 1.5f
+			chunkPos.x - chunkSize,
+			chunkPos.z - chunkSize
 		);
 
 		Vector2 nearMax = new Vector2 (
-			chunkPos.x + chunkSize * 1.5f,
-			chunkPos.z - chunkSize * 1.5f
+			chunkPos.x + chunkSize * 2f,
+			chunkPos.z + chunkSize * 2f
 		);
 
 		Vector2 hasMin = new Vector2 (
-			chunkPos.x - chunkSize * 0.5f,
-			chunkPos.z - chunkSize * 0.5f
+			chunkPos.x,
+			chunkPos.z
 		);
 
 		Vector2 hasMax = new Vector2 (
-			chunkPos.x + chunkSize * 0.5f,
-			chunkPos.z + chunkSize * 0.5f
+			chunkPos.x + chunkSize,
+			chunkPos.z + chunkSize
 		);
 
 		Road road = WorldManager.instance.road;
-		float progress = 0f;
+		float distance = Mathf.Infinity;
+		float progress = startProgress;
 		while (progress <= 1f) {
+			
 			Vector3 sample = road.GetPoint(progress);
 			if (sample.x >= nearMin.x && sample.x <= nearMax.x &&
 				sample.z >= nearMin.y && sample.z <= nearMax.y) {
+				if (!nearRoad) chunk.name += "|nearRoad";
 				nearRoad = true;
 				if (sample.x >= hasMin.x && sample.x <= hasMax.x &&
 					sample.z >= hasMin.y && sample.z <= hasMax.y) {
 					hasRoad = true;
+					chunk.name += "|hasRoad";
 					return;
 				}
 			}
@@ -277,14 +291,22 @@ public class Chunk {
 		}
 	}
 
+	public static IntVector2 ToNearestVMapCoords (float x, float y) {
+		float chunkSize = WorldManager.instance.chunkSize;
+		int chunkRes = WorldManager.instance.chunkResolution;
+
+		return new IntVector2 (
+			Mathf.RoundToInt((x-chunkSize/2f) / chunkSize),
+			Mathf.RoundToInt((y-chunkSize/2f) / chunkSize)
+		);
+	}
+
 	IntVector2 IntToV2 (int i) {
 		int chunkRes = WorldManager.instance.chunkResolution;
 
 		int xi = x*chunkRes + i%chunkRes - x;
 		int yi = y*chunkRes + i/chunkRes - y;
-		return new IntVector2 {
-			x = xi, y = yi
-		};
+		return new IntVector2 (xi, yi);
 	}
 
 	// Shifts all decorations on a chunk

@@ -6,6 +6,11 @@ public class IntVector2 {
 	public int x;
 	public int y;
 
+	public IntVector2 (int i, int j) {
+		x = i;
+		y = j;
+	}
+
 	public bool IsCorner () {
 		return 
 			(x == 0 || x == WorldManager.instance.chunkResolution-1) &&
@@ -20,7 +25,7 @@ public class IntVector2 {
 public class VertexMap {
 	public Dictionary<int, Dictionary<int, Vertex>> vertices; 
 
-	const float NEARBY_ROAD_DISTANCE = 125f; // max dist from a road for a vert to be considered nearby a road
+	const float NEARBY_ROAD_DISTANCE = 50f; // max dist from a road for a vert to be considered nearby a road
 
 	public VertexMap () {
 		vertices = new Dictionary<int, Dictionary<int, Vertex>>();
@@ -137,39 +142,60 @@ public class VertexMap {
 	}
 
 	public bool IsConstrained (int x, int y) {
+		if (!ContainsVertex(x,y)) return false;
 		return vertices[x][y].nearRoad;
 	}
-
 	// 
-	public void CheckRoads (Vector3 roadPoint) {
+
+	public void DoCheckRoads (Vector3 roadPoint) {
+		WorldManager.instance.StartCoroutine (CheckRoads(roadPoint));
+	}
+	//public void CheckRoads (Vector3 roadPoint) {
+	IEnumerator CheckRoads (Vector3 roadPoint) {
+		float startTime = Time.realtimeSinceStartup;
+		//Debug.Log("check "+roadPoint);
 		foreach (int x in vertices.Keys) {
 			foreach (int y in vertices[x].Keys) {
-				if (vertices[x][y].nearRoad) continue;
+				if (vertices[x][y].nearRoad) {
+					//Debug.Log("nearRoad: "+vertices[x][y].ToString());
+					continue;
+				}
 				Vector3 worldPos = vertices[x][y].WorldPos();
-				vertices[x][y].nearRoad = 
-					Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z)) <= NEARBY_ROAD_DISTANCE;
+				float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
+				//Debug.Log(dist);
+				vertices[x][y].nearRoad = dist <= NEARBY_ROAD_DISTANCE;
 					//Vector3.Distance (, roadPoint) <= NEARBY_ROAD_DISTANCE;
 				if (vertices[x][y].nearRoad) {
+					//Debug.Log("constrained "+vertices[x][y].ToString());
 					Unlock (x, y);
+					//vertices[x][y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x][y].height - roadPoint.y));
 					vertices[x][y].setHeight(roadPoint.y);
+					foreach (GameObject decoration in vertices[x][y].decorations) {
+						Debug.Log("destroyed", decoration);
+						//MonoBehaviour.Destroy (decoration);
+
+					}
 					Lock (x, y);
 					//Debug.Log(PlayerMovement.instance.progress);
-					//Debug.Log (vertices[x][y].ToString());
+					//Debug.Log ("Bulldozed " +vertices[x][y].ToString());
+				}
+
+				if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+					yield return null;
+					startTime = Time.realtimeSinceStartup;
 				}
 			}
 		}
+		yield return null;
 	}
 
 	public void Randomize (float noise) {
 		int x = vertices.Keys.Count-1;
-		Debug.Log(x);
+		//Debug.Log(x);
 		//return;
 		for (int i=0; i<x; i++) {
 			for (int j=0; j<x; j++) {
-				IntVector2 coords = new IntVector2 () {
-					x=i,
-					y=j
-				};
+				IntVector2 coords = new IntVector2 (i, j);
 				if (!ContainsVertex(coords)) AddVertex(i, j);
 			}
 		}
@@ -210,10 +236,17 @@ public class VertexMap {
 	}
 
 	public void RegisterChunkVertex (int x, int y, Chunk chunk, int vertIndex) {
+		//Debug.Log("register");
 		if (!ContainsVertex (x, y)) AddVertex (x, y);
 
 		vertices[x][y].chunkVertices.Add(new KeyValuePair<Chunk, int> (chunk, vertIndex));
 		//vertices [x][y].updateNormal();
+	}
+
+	public void RegisterDecoration (IntVector2 i, GameObject deco) {
+		if (!ContainsVertex(i.x, i.y)) AddVertex (i.x, i.y);
+
+		vertices[i.x][i.y].decorations.Add (deco);
 	}
 
 	//
@@ -236,7 +269,7 @@ public class VertexMap {
 		avgH += (ContainsVertex(x, y-1) ? vertices[x][y-1].height/4f : 0f);
 		avgH += Random.Range (-WorldManager.instance.heightScale/4f, WorldManager.instance.heightScale/4f);
 		//if (Random.Range (0,100) == 0) Debug.Log(avgH);
-		SetHeight (new IntVector2 { x=x, y=y}, avgH);
+		SetHeight (new IntVector2 (x,y), avgH);
 	}
 
 	//void AddVertex (Vertex vert) {
@@ -256,11 +289,13 @@ public class Vertex {
 	public bool nearRoad = false;
 	public Vector3 normal = Vector3.up;
 	public float blendValue = Random.Range (0f, 1.0f);
+	public List<GameObject> decorations;
 
 	public Vertex (int x, int y) {
 		this.x = x;
 		this.y = y;
 		chunkVertices = new List<KeyValuePair<Chunk, int>>();
+		decorations = new List<GameObject>();
 	}
 
 	public void updateNormal () {
@@ -279,7 +314,7 @@ public class Vertex {
 	}
 
 	public void setHeight (float h) {
-		if (locked || nearRoad) return;
+		//if (locked || nearRoad) return;
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
 		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
@@ -318,11 +353,15 @@ public class Vertex {
 
 	// Returns the world position of a vertex
 	public Vector3 WorldPos () {
-		return new Vector3 (
+		Vector3 result = new Vector3 (
 			(float)x / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
+			//x * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
 			height,
+			//y * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
 			(float)y / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
 		);
+		//Debug.Log(ToString() + result.ToString());
+		return result;
 	}
 
 	public override string ToString ()

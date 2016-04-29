@@ -14,6 +14,8 @@ public class Road : Bezier {
 	public float placementDistance = 30f; // Marginal distance to add new road
 	public float placementRange = 0.4f; // Radius within to place new road node
 
+	public float maxSlope = 0.08f;
+
 	public bool generated = false;
 
 	//
@@ -47,10 +49,12 @@ public class Road : Bezier {
 
 		// Set default points and build mesh
 		Reset ();
-		Build();
+		//Build();
 	}
 
 	public void Update () {
+
+		if (!generated) return;
 
 		// Remove far away points behind the player
 		if (Vector3.Distance (points[3], PlayerMovement.instance.transform.position) > generateRoadRadius) {
@@ -120,8 +124,39 @@ public class Road : Bezier {
 			modes [i] = Bezier.BezierControlPointMode.Mirrored;
 	}
 
+	public void DoLoad () {
+		StartCoroutine("Load");
+	}
+
+	IEnumerator Load () {
+		GameManager.instance.ChangeLoadingMessage("Loading road...");
+		float startTime = Time.realtimeSinceStartup;
+
+		while (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
+
+			float progress = PlayerMovement.instance.progress;
+			float numerator = progress * CurveCount;
+
+			AddCurve();
+			PlayerMovement.instance.progress = numerator / CurveCount;
+
+			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+			}
+
+			generated = true;
+		}
+
+		if (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) >= generateRoadRadius) {
+			DynamicTerrain.instance.CheckAllChunksForRoad();
+			WorldManager.instance.DoLoadDecorations();
+			yield return null;
+		}
+	}
+
 	// Adds a new curve to the road bezier
-	public void AddCurve () {
+	void AddCurve () {
 		float displacedDirection = placementDistance * placementRange;
 
 		Vector3 point;
@@ -133,39 +168,55 @@ public class Road : Bezier {
 
 		RaycastHit hit;
 		for (int i=3; i>0; i--) {
-			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
-			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity))
-				point.y = hit.point.y;
-			//else Debug.LogError ("Bezier.AddCurve(): attempted to place road off map!");
-
 			point += direction + new Vector3(
 				UnityEngine.Random.Range(-displacedDirection, displacedDirection), 
 				0f, 
 				UnityEngine.Random.Range(-displacedDirection, displacedDirection)
 			);
+			//Debug.Log(point);
+			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
+			//Debug.Log(rayStart);
+			float dist = Vector2.Distance (new Vector2 (points [points.Length-4].x, point.x), new Vector2 (points [points.Length-4].z, point.z));
+			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
+				point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
+				//Debug.Log(hit.collider);
+			}
+			//else Debug.LogError ("Bezier.AddCurve(): attempted to place road off map!");
+
+
 			points[PointsCount - i] = point;
 		}
 			
 		Array.Resize (ref modes, modes.Length + 1);
 		modes[modes.Length - 1] = modes[modes.Length -2];
-		EnforceMode (points.Length - 4);
+		//EnforceMode (points.Length - 4);
 		steps += stepsPerCurve;
 		Build();
-		Bulldoze();
+		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 	}
 
 	// Marks all points between player and newly created points for leveling
-	public void Bulldoze () {
-		Bulldoze (PlayerMovement.instance.progress);
+	public void DoBulldoze (float startProgress) {
+		StopCoroutine ("Bulldoze");
+		StartCoroutine("Bulldoze", startProgress);
 	}
 
-	public void Bulldoze (float startProgress) {
+	IEnumerator Bulldoze (float startProgress) {
+		float startTime = Time.realtimeSinceStartup;
 		float progress = startProgress;
 		float diff = 1f - progress;
+		float resolution = WorldManager.instance.roadPathCheckResolution * (1f - startProgress);
 		while (progress < 1f) {
-			DynamicTerrain.instance.vertexmap.CheckRoads (GetPoint(progress));
-			progress += diff / WorldManager.instance.roadPathCheckResolution;
+		//	Debug.Log("Bulldoze|Progress: "+progress+"|Point: "+GetPoint(progress));
+			DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
+			progress += diff / resolution;
+
+			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+			}
 		}
+		yield return null;
 	}
 
 	// Sets the road mesh

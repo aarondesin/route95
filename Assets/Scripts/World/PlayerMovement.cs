@@ -47,10 +47,6 @@ public class PlayerMovement : MonoBehaviour {
 	public void StartMoving() {
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
-		DynamicTerrain.instance.CreateMountain (-32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.CreateMountain (32, -32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.CreateMountain (32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
-		DynamicTerrain.instance.CreateMountain (-32, 32, 21, 43, 300f, 20f, -0.1f, 0.5f);
 		GetComponent<AudioSource>().volume = 1f;
 	}
 

@@ -75,8 +75,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   group: 1
-  maxActive: 100
-  density: 0.4
+  density: 1
   distribution: 2
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}
