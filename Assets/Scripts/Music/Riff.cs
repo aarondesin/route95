@@ -20,7 +20,7 @@ public class Riff {
 	[SerializeField]
 	public float distortionLevel = 0;
 	[SerializeField]
-	public float echoDecayRatio = 1;
+	public float echoDecayRatio = 0;
 	[SerializeField]
 	public float echoDelay = 0;
 	[SerializeField]
