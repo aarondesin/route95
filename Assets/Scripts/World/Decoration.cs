@@ -27,6 +27,7 @@ public class Decoration : MonoBehaviour {
 
 	public static Dictionary<Group, int> numDecorations;
 	public Group group = Group.None;
+	public bool dynamic = false;
 
 	[Tooltip("Average number of this decoration per chunk.")]
 	public float density;
@@ -41,6 +42,13 @@ public class Decoration : MonoBehaviour {
 	public Vector2 pitchRange;
 	public Vector2 yawRange;
 	public Vector2 rollRange;
+
+	#endregion
+	#region Unity Callbacks
+
+	void FixedUpdate () {
+		if (dynamic) GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
+	}
 
 	#endregion
 	#region Decoration Methods

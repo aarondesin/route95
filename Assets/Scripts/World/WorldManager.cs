@@ -135,7 +135,7 @@ public class WorldManager : MonoBehaviour {
 	public float roadWidth = DEFAULT_ROAD_WIDTH;
 
 	[Tooltip("Height of generated road.")]
-	[Range(0.1f, 0.5f)]
+	[Range(0.1f, 1.0f)]
 	public float roadHeight = DEFAULT_ROAD_HEIGHT;
 
 	[Tooltip("Radius within which to extend road.")]
@@ -207,7 +207,7 @@ public class WorldManager : MonoBehaviour {
 	public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
 
 	[Tooltip("The accuracy used in road distance checks.")]
-	[Range(1f, 100f)]
+	[Range(1f, 500f)]
 	public float roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
 
 	float startLoadTime;
@@ -260,6 +260,9 @@ public class WorldManager : MonoBehaviour {
 			UpdateTime();
 			UpdateColor();
 			AttemptDecorate();
+			Vector3 dWind = UnityEngine.Random.insideUnitSphere;
+			wind += dWind * 0.5f;
+			wind.Normalize();
 		}
 
 	}
@@ -349,10 +352,11 @@ public class WorldManager : MonoBehaviour {
 		int numLoaded = 0;
 
 		int attempts = 0;
-		for (; numDecorations<maxDecorations; attempts++) {
+		for (; numDecorations<maxDecorations;) {
 			//Debug.Log("about to attempt");
 
 			numLoaded += (AttemptDecorate () ? 1 : 0);
+			attempts++;
 
 			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
 				yield return null;
@@ -522,7 +526,7 @@ public class WorldManager : MonoBehaviour {
 				GameObject newDecoration = 
 					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
 				newDecoration.GetComponent<Decoration>().Randomize();
-				newDecoration.transform.parent = chunk.chunk.transform;
+				if (newDecoration.GetComponent<Decoration>().dynamic) newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
 				Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
 				terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);

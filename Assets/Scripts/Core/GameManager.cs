@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour {
 
 	[Header("Status")]
 
-	public int targetFrameRate = 120;
+	public int targetFrameRate = 60;
 
 	private int loadSpeed = 1;
 	private int loadProgress = 0;
@@ -409,6 +409,7 @@ public class GameManager : MonoBehaviour {
 		Show (songProgressBar);
 		paused = false;
 
+		MusicManager.instance.currentPlayingSong = 0;
 		InstrumentDisplay.instance.Refresh();
 		MusicManager.instance.StartSong();
 		CameraControl.instance.StartLiveMode();

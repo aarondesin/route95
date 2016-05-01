@@ -25,10 +25,18 @@ public class IntVector2 {
 public class VertexMap {
 	public Dictionary<int, Dictionary<int, Vertex>> vertices; 
 
-	const float NEARBY_ROAD_DISTANCE = 50f; // max dist from a road for a vert to be considered nearby a road
+	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
+	float NEARBY_ROAD_DISTANCE;
+	int activeBulldozeRoutines = 0;
+
+	float chunkSize;
+	int chunkRes;
 
 	public VertexMap () {
 		vertices = new Dictionary<int, Dictionary<int, Vertex>>();
+		chunkSize = WorldManager.instance.chunkSize;
+		chunkRes = WorldManager.instance.chunkResolution;
+		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
 	}
 
 	//
@@ -90,7 +98,7 @@ public class VertexMap {
 
 	public void SetHeight (int x, int y, float h) {
 		if (vertices[x][y].nearRoad) return;
-		vertices[x][y].setHeight (h);
+		vertices[x][y].SetHeight (h);
 	}
 
 	public void AddHeight (IntVector2 i, float h) {
@@ -147,45 +155,55 @@ public class VertexMap {
 	}
 	// 
 
-	public void DoCheckRoads (Vector3 roadPoint) {
-		WorldManager.instance.StartCoroutine (CheckRoads(roadPoint));
+	public void DoCheckRoads (List<Vector3> roadPoints) {
+		WorldManager.instance.StartCoroutine (CheckRoads(roadPoints));
 	}
 	//public void CheckRoads (Vector3 roadPoint) {
-	IEnumerator CheckRoads (Vector3 roadPoint) {
+	IEnumerator CheckRoads (List<Vector3> roadPoints) {
+		activeBulldozeRoutines ++;
 		float startTime = Time.realtimeSinceStartup;
-		//Debug.Log("check "+roadPoint);
-		foreach (int x in vertices.Keys) {
-			foreach (int y in vertices[x].Keys) {
-				if (vertices[x][y].nearRoad) {
-					//Debug.Log("nearRoad: "+vertices[x][y].ToString());
-					continue;
-				}
-				Vector3 worldPos = vertices[x][y].WorldPos();
-				float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
-				//Debug.Log(dist);
-				vertices[x][y].nearRoad = dist <= NEARBY_ROAD_DISTANCE;
-					//Vector3.Distance (, roadPoint) <= NEARBY_ROAD_DISTANCE;
-				if (vertices[x][y].nearRoad) {
-					//Debug.Log("constrained "+vertices[x][y].ToString());
-					Unlock (x, y);
-					//vertices[x][y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x][y].height - roadPoint.y));
-					vertices[x][y].setHeight(roadPoint.y);
-					foreach (GameObject decoration in vertices[x][y].decorations) {
-						Debug.Log("destroyed", decoration);
-						//MonoBehaviour.Destroy (decoration);
-
+		foreach (Vector3 roadPoint in roadPoints) {
+			//Debug.Log("check "+roadPoint);
+			foreach (int x in vertices.Keys) {
+				if (Mathf.Abs(x * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) continue;
+				foreach (int y in vertices[x].Keys) {
+					if (Mathf.Abs(y * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) continue;
+					if (vertices[x][y].locked) continue;
+					if (vertices[x][y].nearRoad) {
+						//Debug.Log("nearRoad: "+vertices[x][y].ToString());
+						//continue;
 					}
-					Lock (x, y);
-					//Debug.Log(PlayerMovement.instance.progress);
-					//Debug.Log ("Bulldozed " +vertices[x][y].ToString());
+					Vector3 worldPos = vertices[x][y].WorldPos();
+					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
+					//Debug.Log(dist);
+					vertices[x][y].nearRoad = dist <= NEARBY_ROAD_DISTANCE;
+						//Vector3.Distance (, roadPoint) <= NEARBY_ROAD_DISTANCE;
+					if (vertices[x][y].nearRoad) {
+						//Debug.Log("constrained "+vertices[x][y].ToString());
+						//Unlock (x, y);
+						//vertices[x][y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x][y].height - roadPoint.y));
+						vertices[x][y].SetHeight(roadPoint.y);
+						foreach (GameObject decoration in vertices[x][y].decorations) {
+							Debug.Log("destroyed", decoration);
+							//MonoBehaviour.Destroy (decoration);
+
+						}
+						Lock (x, y);
+
+						//Debug.Log(PlayerMovement.instance.progress);
+						//Debug.Log ("Bulldozed " +vertices[x][y].ToString());
+					}
+
+					if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
+					}
 				}
 
-				if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
-					yield return null;
-					startTime = Time.realtimeSinceStartup;
-				}
 			}
+
 		}
+		activeBulldozeRoutines --;
 		yield return null;
 	}
 
@@ -201,10 +219,10 @@ public class VertexMap {
 		}
 		while (!Mathf.IsPowerOfTwo(x-1)) x--;
 
-		vertices[0][0].setHeight(Random.Range (-noise, noise));
-		vertices[x][0].setHeight(Random.Range (-noise, noise));
-		vertices[0][x].setHeight(Random.Range (-noise, noise));
-		vertices[x][x].setHeight(Random.Range (-noise, noise));
+		vertices[0][0].SetHeight(Random.Range (-noise, noise));
+		vertices[x][0].SetHeight(Random.Range (-noise, noise));
+		vertices[0][x].SetHeight(Random.Range (-noise, noise));
+		vertices[x][x].SetHeight(Random.Range (-noise, noise));
 		int currRes = x-1;
 		var currNoise = noise;
 		while (currRes%1 == 0 && currRes > 1) {
@@ -215,12 +233,12 @@ public class VertexMap {
 					int midptY = j+currRes/2;
 					float avg = (vertices[i][j].height + vertices[i+currRes][j].height +
 						vertices[i][j+currRes].height + vertices[i+currRes][j+currRes].height)/4f;
-					vertices[midptX][midptY].setHeight (avg + Random.Range(-currNoise, currNoise));
+					vertices[midptX][midptY].SetHeight (avg + Random.Range(-currNoise, currNoise));
 
-					vertices[midptX][j].setHeight ((vertices[i][j].height + vertices[i+currRes][j].height)/2f + Random.Range(0f, currNoise));
-					vertices[midptX][j+currRes].setHeight ((vertices[i][j+currRes].height + vertices[i+currRes][j+currRes].height)/2f+ Random.Range(0f, currNoise));
-					vertices[i][midptY].setHeight ((vertices[i][j].height + vertices[i][j+currRes].height)/2f+ Random.Range(0f, currNoise));
-					vertices[i+currRes][midptY].setHeight ((vertices[i+currRes][j].height + vertices[i+currRes][j+currRes].height)/2f+ Random.Range(0f, currNoise));
+					vertices[midptX][j].SetHeight ((vertices[i][j].height + vertices[i+currRes][j].height)/2f + Random.Range(0f, currNoise));
+					vertices[midptX][j+currRes].SetHeight ((vertices[i][j+currRes].height + vertices[i+currRes][j+currRes].height)/2f+ Random.Range(0f, currNoise));
+					vertices[i][midptY].SetHeight ((vertices[i][j].height + vertices[i][j+currRes].height)/2f+ Random.Range(0f, currNoise));
+					vertices[i+currRes][midptY].SetHeight ((vertices[i+currRes][j].height + vertices[i+currRes][j+currRes].height)/2f+ Random.Range(0f, currNoise));
 				}
 			}
 			currRes /= 2;
@@ -261,7 +279,7 @@ public class VertexMap {
 
 		else
 			Debug.LogError ("VertexMap.Add(): attempted to add a vertex to a filled position!");
-
+		vertices[x][y].map = this;
 		float avgH = 0f;
 		avgH += (ContainsVertex(x-1, y) ? vertices[x-1][y].height/4f : 0f);
 		avgH += (ContainsVertex(x+1, y) ? vertices[x+1][y].height/4f : 0f);
@@ -270,6 +288,7 @@ public class VertexMap {
 		avgH += Random.Range (-WorldManager.instance.heightScale/4f, WorldManager.instance.heightScale/4f);
 		//if (Random.Range (0,100) == 0) Debug.Log(avgH);
 		SetHeight (new IntVector2 (x,y), avgH);
+
 	}
 
 	//void AddVertex (Vertex vert) {
@@ -280,6 +299,7 @@ public class VertexMap {
 }
 
 public class Vertex {
+	public VertexMap map;
 	public List<KeyValuePair<Chunk, int>> chunkVertices;
 	public bool locked = false;
 	public int x;
@@ -288,6 +308,7 @@ public class Vertex {
 	public float currHeight = 0f;
 	public bool nearRoad = false;
 	public Vector3 normal = Vector3.up;
+	public float slope = 0f;
 	public float blendValue = Random.Range (0f, 1.0f);
 	public List<GameObject> decorations;
 
@@ -297,27 +318,33 @@ public class Vertex {
 		chunkVertices = new List<KeyValuePair<Chunk, int>>();
 		decorations = new List<GameObject>();
 	}
-
-	public void updateNormal () {
-		normal = Vector3.zero;
-		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
-		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
-			if (chunkVert.Key.chunk == null) {
-				deletes.Add (chunkVert);
-				continue;
-			}
-			normal += chunkVert.Key.chunk.GetComponent<MeshFilter>().mesh.normals[chunkVert.Value];
-		}
-		normal.Normalize ();
-		foreach (KeyValuePair<Chunk, int> delete in deletes)
-			chunkVertices.Remove (delete);
-	}
-
-	public void setHeight (float h) {
-		//if (locked || nearRoad) return;
+		
+	public void SetHeight (float h) {
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
 		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
+		normal = Vector3.zero;
+		slope = 0f;
+		int numPoints = 0;
+		if (map.ContainsVertex(x-1, y)) {
+			slope += Mathf.Abs(map.vertices[x-1][y].height-height);
+			numPoints++;
+		}
+		if (map.ContainsVertex(x+1, y)) {
+			slope += Mathf.Abs(map.vertices[x+1][y].height-height);
+			numPoints++;
+		}
+		if (map.ContainsVertex(x, y-1)) {
+			slope += Mathf.Abs(map.vertices[x][y-1].height-height);
+			numPoints++;
+		}
+		if (map.ContainsVertex(x, y+1)) {
+			slope += Mathf.Abs(map.vertices[x][y+1].height-height);
+			numPoints++;
+		}
+		slope /= (float)numPoints;
+		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;
+		//if (Random.Range(0, 1000) == 0) Debug.Log(blendValue);
 		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
 			if (chunkVert.Key.chunk == null) {
 				deletes.Add (chunkVert);
@@ -332,18 +359,22 @@ public class Vertex {
 			*/
 			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
 			chunkVert.Key.UpdateVertex (chunkVert.Value, h);
+			normal += chunkVert.Key.chunk.GetComponent<MeshFilter>().mesh.normals[chunkVert.Value];
+			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
 			//chunkVert.Key.vertices [chunkVert.Value].y = height;
 			//chunkVert.Key.vertices = verts;
 		}
+		normal.Normalize();
 		foreach (KeyValuePair<Chunk, int> delete in deletes)
 			chunkVertices.Remove (delete);
-		updateNormal();
-		WorldManager.instance.terrainMaterial.SetFloat("Blend", Mathf.Abs(h/WorldManager.instance.heightScale/2f));
+		//updateNormal();
+
+
 
 	}
 
 	public void AddHeight (float h) {
-		setHeight (height + h);
+		SetHeight (height + h);
 	}
 
 	public void lerpHeight(float factor) {
@@ -354,11 +385,11 @@ public class Vertex {
 	// Returns the world position of a vertex
 	public Vector3 WorldPos () {
 		Vector3 result = new Vector3 (
-			(float)x / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
+			(float)x / (float)(WorldManager.instance.chunkResolution-1) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
 			//x * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
 			height,
 			//y * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
-			(float)y / (float)(WorldManager.instance.chunkResolution) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
+			(float)y / (float)(WorldManager.instance.chunkResolution-1) * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
 		);
 		//Debug.Log(ToString() + result.ToString());
 		return result;

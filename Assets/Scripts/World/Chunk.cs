@@ -23,6 +23,7 @@ public class Chunk {
 	Vector3[] verts;
 	Vector2[] uvs;
 	int[] triangles;
+	Color[] colors;
 
 	#endregion
 	#region Chunk Methods
@@ -37,7 +38,9 @@ public class Chunk {
 		verts = CreateUniformVertexArray (chunkRes);
 		uvs = CreateUniformUVArray (chunkRes);
 		triangles = CreateSquareArrayTriangles (chunkRes);
+		colors = new Color[verts.Length];
 		chunk = CreateChunk (verts, uvs, triangles);
+
 		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
 		chunk.name += "Position:"+chunk.transform.position.ToString();
 
@@ -45,6 +48,7 @@ public class Chunk {
 
 		// Register all vertices with vertex map
 		for (int i=0; i<verts.Length; i++) {
+			colors[i] = new Color (0f, 0f, 0f, 0.5f);
 			IntVector2 coords = IntToV2 (i);
 			VertexMap vmap = DynamicTerrain.instance.vertexmap;
 
@@ -135,6 +139,7 @@ public class Chunk {
 		mesh.vertices = vertices;
 		mesh.uv = UVcoords;
 		mesh.triangles = triangles;
+		mesh.colors = colors;
 		mesh.RecalculateNormals ();
 		mesh.RecalculateBounds ();
 		mesh.MarkDynamic ();
@@ -159,6 +164,7 @@ public class Chunk {
 	public void UpdateCollider () {
 		chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
 		chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+		ReplaceDecorations();
 	}
 
 	public void UpdateVertex (int index, float height) {
@@ -169,17 +175,25 @@ public class Chunk {
 
 	}
 
+	public void UpdateColor (int index, float blendValue) {
+		Color[] colors = chunk.GetComponent<MeshFilter> ().mesh.colors;
+		//vertices[index].y += (height - vertices[index].y)/4f;
+		colors[index].a = blendValue;
+		chunk.GetComponent<MeshFilter>().mesh.colors = colors;
 
+	}
 
 	private bool CheckDist (float dist, float updateDist, float margin) {
 		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
 	}
 
-	private void UpdateVerts(float updateDist, LinInt freqData) {
+	private IEnumerator UpdateVerts(float updateDist, LinInt freqData) {
 		float margin = WorldManager.instance.chunkSize / 2;
 		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
 		bool changesMade = false;
+		float startTime = Time.realtimeSinceStartup;
+
 		for (int v = 0; v < vertices.Length; v++) {
 			
 			IntVector2 coords = IntToV2 (v);
@@ -202,12 +216,14 @@ public class Chunk {
 						}
 					}
 				}
-
-				if (changesMade) {
-					ReplaceDecorations();
-				}
 			//}
+			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+			}
 		}
+
+		if (changesMade) UpdateCollider();
 
 	}
 
@@ -220,7 +236,8 @@ public class Chunk {
 		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
 		//roadNearby = NearbyRoad ();
 		if (CheckDist(distance, updateDist, chunkSize)) {
-			UpdateVerts (updateDist, freqData);
+			//UpdateVerts (updateDist, freqData);
+			WorldManager.instance.StartCoroutine(UpdateVerts(updateDist, freqData));
 		}
 	}
 		
@@ -311,13 +328,13 @@ public class Chunk {
 
 	// Shifts all decorations on a chunk
 	public void ReplaceDecorations () {
-		chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
-			if (tr != chunk.transform) {
-				RaycastHit hit;
-				if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.y), Vector3.down,out hit, Mathf.Infinity)) {
-					tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);
-				}
+			if (tr == chunk.transform) continue;
+			if (tr.gameObject.GetComponent<Decoration>().dynamic) continue;
+			RaycastHit hit;
+			if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z), Vector3.down,out hit, Mathf.Infinity)) {
+				tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);
 			}
 		}
 	}

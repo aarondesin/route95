@@ -120,13 +120,15 @@ public class DynamicTerrain {
 		else chunksToUpdate.Clear ();
 
 		foreach (Chunk chunk in activeChunks) {
-			chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
-			if (chunksToUpdate.Count == 0) chunksToUpdate.Add (chunk);
-			else {
-				for (int i = 0; i < chunksToUpdate.Count; i++) {
-					if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
-						chunksToUpdate.Insert (i, chunk);
-						break;
+			if (DistanceToPlayer(chunk) <= WorldManager.instance.vertexUpdateDistance) {
+				chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
+				if (chunksToUpdate.Count == 0) chunksToUpdate.Add (chunk);
+				else {
+					for (int i = 0; i < chunksToUpdate.Count; i++) {
+						if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
+							chunksToUpdate.Insert (i, chunk);
+							break;
+						}
 					}
 				}
 			}
@@ -148,8 +150,8 @@ public class DynamicTerrain {
 
 	float DistanceToPlayer (Chunk chunk) {
 		return Vector3.Distance (
-			new Vector3 (chunk.x*chunkSize, 0f, chunk.y*chunkSize),
-			new Vector3 (PlayerMovement.instance.transform.position.x, 0f, PlayerMovement.instance.transform.position.y)
+			new Vector3 (chunk.x*chunkSize +chunkSize/2, 0f, chunk.y*chunkSize+chunkSize/2),
+			new Vector3 (PlayerMovement.instance.transform.position.x, 0f, PlayerMovement.instance.transform.position.z)
 		);
 	}
 

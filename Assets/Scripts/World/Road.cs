@@ -14,7 +14,7 @@ public class Road : Bezier {
 	public float placementDistance = 30f; // Marginal distance to add new road
 	public float placementRange = 0.4f; // Radius within to place new road node
 
-	public float maxSlope = 0.08f;
+	public float maxSlope = 0.0015f;
 
 	public bool generated = false;
 
@@ -208,7 +208,16 @@ public class Road : Bezier {
 		float resolution = WorldManager.instance.roadPathCheckResolution * (1f - startProgress);
 		while (progress < 1f) {
 		//	Debug.Log("Bulldoze|Progress: "+progress+"|Point: "+GetPoint(progress));
-			DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
+			Vector3 point = GetPoint(progress);
+			List<Vector3> points = new List<Vector3> () {
+				point,
+				//point+BezRight(point)*width/3f,
+				//point-BezRight(point)*width/3f,
+				point+BezRight(point)*width*2f/3f,
+				point-BezRight(point)*width*2f/3f
+			};
+			//DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
+			DynamicTerrain.instance.vertexmap.DoCheckRoads (points);
 			progress += diff / resolution;
 
 			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {

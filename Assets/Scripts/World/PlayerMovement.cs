@@ -7,11 +7,13 @@ public class PlayerMovement : MonoBehaviour {
 	public GameObject lightRight;
 	public GameObject lightLeft;
 	//public float velocity;
-	const float distPerBeat = 0.0018f;
+	const float distPerBeat = 0.0018f; // Tempo -> velocity
+	const float particlesPerUnit = 100f; // Distance -> particle emission
 	const float lookAhead = 0.01f;
 	public bool moving;
 	public bool lights;
 	public float progress;
+	float roadHeight;
 	public List<ParticleSystem> particles;
 
 	public GameObject frontLeftWheel;
@@ -19,6 +21,7 @@ public class PlayerMovement : MonoBehaviour {
 	public GameObject backLeftWheel;
 	public GameObject backRightWheel;
 
+	float maxVelocity;
 	float velocity;
 	const float velocityToRotation = -10000f;
 	//float acceleration;
@@ -40,11 +43,14 @@ public class PlayerMovement : MonoBehaviour {
 		progress = 0f;
 		StopMoving();
 
+		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
+
 		GetComponent<AudioSource>().pitch = 1f;
 
 	}
 
 	public void StartMoving() {
+		roadHeight = WorldManager.instance.roadHeight;
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
 		GetComponent<AudioSource>().volume = 1f;
@@ -104,7 +110,7 @@ public class PlayerMovement : MonoBehaviour {
 				}
 				velocityOffset += (
 					(Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 
-						Random.Range (0f, velocityOffset)) - 0.5f) * 
+						Random.Range (velocityOffset, velocityOffset)) - 0.5f) * 
 					Time.deltaTime;
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
 				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
@@ -112,7 +118,7 @@ public class PlayerMovement : MonoBehaviour {
 					progress = 1f;
 				
 				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
-				Vector3 offset = new Vector3 (offsetH, 2.27f + Road.instance.height, 0f);
+				Vector3 offset = new Vector3 (offsetH, 2.27f + roadHeight, 0f);
 				transform.position = Road.instance.GetPoint (progress) + offset - 
 					Road.instance.BezRight (Road.instance.GetPoint(progress)) * Road.instance.width / 3f;
 				//Quaternion lookRot = Quaternion.FromToRotation (transform.position, road.GetPoint (progress + lookAhead * Time.deltaTime));
@@ -137,6 +143,13 @@ public class PlayerMovement : MonoBehaviour {
 				backLeftWheel.transform.Rotate (new Vector3 (0f, 180f, 0f));
 
 				//if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().Play();
+
+				foreach (ParticleSystem particle in particles) {
+					var emission = particle.emission;
+					var rate = emission.rate;
+					rate.constantMax = velocity * particlesPerUnit;
+					emission.rate = rate;
+				}
 
 				//if (!GetComponent<AudioSource>().isPlaying) Debug.Log("shit");
 				GetComponent<AudioSource>().pitch = velocity / (MusicManager.tempoToFloat [Tempo.Fastest] +0.5f);
