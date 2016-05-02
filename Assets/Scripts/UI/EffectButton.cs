@@ -14,8 +14,9 @@ public class EffectButton : MonoBehaviour {
 
 	public void updateechoDecayRatio(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
-		InstrumentSetup.currentRiff.echoDecayRatio = 1-slider.value;
+		InstrumentSetup.currentRiff.echoDecayRatio = slider.value;
 		source.gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
+
 	}
 
 
