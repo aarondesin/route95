@@ -231,6 +231,7 @@ public class GameManager : MonoBehaviour {
 			if (casetteMoving) {
 				float progress = (Time.time - sTime) * casetteMoveSpeed;
 				float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
+				if (dist == float.NaN) Debug.Log("casette is broken");
 				casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
 				casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
 				if (dist >= 1f) {

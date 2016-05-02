@@ -18,31 +18,31 @@ public class Riff {
 	//Float values from audio effect knobs
 
 	[SerializeField]
-	public float distortionLevel = 0;
+	public float distortionLevel = 0f;
 	[SerializeField]
-	public float echoDecayRatio = 1;
+	public float echoDecayRatio = 1f;
 	[SerializeField]
-	public float echoDelay = 0;
+	public float echoDelay = 0f;
 	[SerializeField]
-	public float echoDryMix = 0;
+	public float echoDryMix = 0f;
 	[SerializeField]
-	public float reverbDecayTime = 0;
+	public float reverbDecayTime = 0f;
 	[SerializeField]
-	public float reverbLevel = 0;
+	public float reverbLevel = 0f;
 	[SerializeField]
-	public float fuzzLevel = 0;
+	public float fuzzLevel = 0f;
 	[SerializeField]
-	public float tremoloRate = 0;
+	public float tremoloRate = 0f;
 	[SerializeField]
-	public float chorusDryMix = 0;
+	public float chorusDryMix = 0f;
 	[SerializeField]
-	public float chorusRate= 0;
+	public float chorusRate= 0f;
 	[SerializeField]
-	public float chorusDepth = 0;
+	public float chorusDepth = 0f;
 	[SerializeField]
-	public float flangerDelay = 0;
+	public float flangerDelay = 0f;
 	[SerializeField]
-	public float flangerDryMix = 0;
+	public float flangerDryMix = 0f;
 
 	//
 	// VARIABLES SAVED IN PROJECT
@@ -164,6 +164,16 @@ public class Riff {
 				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
 				foreach (Note note in beats[pos].notes) {
 					AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+					source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
+					source.GetComponent<AudioEchoFilter>().decayRatio = echoDecayRatio;
+					source.GetComponent<AudioEchoFilter>().delay = echoDelay;
+					source.GetComponent<AudioEchoFilter>().dryMix = echoDryMix;
+					source.GetComponent<AudioReverbFilter>().decayTime = reverbDecayTime;
+					source.GetComponent<AudioReverbFilter>().reverbLevel = reverbLevel;
+					source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
+					source.GetComponent<AudioChorusFilter>().rate = chorusRate;
+					source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
+
 					note.PlayNote(source, volume);
 				}
 			}

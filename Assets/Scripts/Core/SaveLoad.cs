@@ -59,6 +59,7 @@ public class SaveLoad {
 				else MusicManager.instance.NewSong();
 
 				project.Refresh();
+				foreach (Riff riff in project.riffs) Debug.Log(riff.name);
 				PlaylistBrowser.instance.RefreshName();
 				SongArrangeSetup.instance.Refresh();
 				SongTimeline.instance.RefreshTimeline();

@@ -49,6 +49,8 @@ public class InstrumentSetup : MonoBehaviour {
 	public Scrollbar beatsBar;
 	public RectTransform beatsBar_tr;
 
+	public List<EffectSlider> effectSliders;
+
 	[Header("UI Art")]
 
 	// Icons for percussion setup buttons
@@ -71,6 +73,10 @@ public class InstrumentSetup : MonoBehaviour {
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
+
+		foreach (EffectSlider effectSlider in effectSliders) {
+			effectSlider.Initialize();
+		}
 	}
 
 	#endregion
@@ -83,7 +89,7 @@ public class InstrumentSetup : MonoBehaviour {
 			Debug.LogError ("InstrumentSetup.Initialize(): no riff selected!");
 			return;
 		}
-
+			
 		HideSliders ();
 
 		// Clear all previous buttons
