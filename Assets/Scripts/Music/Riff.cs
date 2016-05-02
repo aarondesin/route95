@@ -16,29 +16,56 @@ public class Riff {
 	public const int MAX_BEATS = 32;
 
 	//Float values from audio effect knobs
-
+	// Distortion
+	[SerializeField]
+	public bool distortionEnabled = false;
 	[SerializeField]
 	public float distortionLevel = 0f;
+
+	// Fuzz
 	[SerializeField]
-	public float echoDecayRatio = 1f;
-	[SerializeField]
-	public float echoDelay = 0f;
-	[SerializeField]
-	public float echoDryMix = 0f;
-	[SerializeField]
-	public float reverbDecayTime = 0f;
-	[SerializeField]
-	public float reverbLevel = 0f;
+	public bool fuzzEnabled = false;
 	[SerializeField]
 	public float fuzzLevel = 0f;
+
+	// Tremolo
+	[SerializeField]
+	public bool tremoloEnabled = false;
 	[SerializeField]
 	public float tremoloRate = 0f;
+	[SerializeField]
+	public float tremoloDepth = 0f;
+
+	// Chorus
+	[SerializeField]
+	public bool chorusEnabled = false;
 	[SerializeField]
 	public float chorusDryMix = 0f;
 	[SerializeField]
 	public float chorusRate= 0f;
 	[SerializeField]
 	public float chorusDepth = 0f;
+
+	// Echo
+	[SerializeField]
+	public bool echoEnabled = false;
+	[SerializeField]
+	public float echoDecayRatio = 1f;
+	[SerializeField]
+	public float echoDelay = 0f;
+	[SerializeField]
+	public float echoDryMix = 0f;
+
+	// Reverb
+	[SerializeField]
+	public bool reverbEnabled = false;
+	[SerializeField]
+	public float reverbDecayTime = 0f;
+	[SerializeField]
+	public float reverbLevel = 0f;
+
+
+
 	[SerializeField]
 	public float flangerDelay = 0f;
 	[SerializeField]
@@ -69,25 +96,19 @@ public class Riff {
 
 	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
 	public Riff () {
-		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++) {
+		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++)
 			beats.Add (new Beat ());
-		}
-		//instrument = Instrument.AllInstruments[instrumentIndex];
-		//Debug.Log ("Current instrument is " + instrument);
 	}
 
 	// Constructor to make a riff of a certain number of beats
 	public Riff (int length) {
-		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
+		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++)
 			beats.Add (new Beat());
-		}
-		//instrument = Instrument.AllInstruments[instrumentIndex];
 	}
 
 	public Riff (Instrument instrument) {
-		for (int i=0; i<4*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++) {
+		for (int i=0; i<4*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++)
 			beats.Add (new Beat());
-		}
 		instrumentIndex = Instrument.AllInstruments.IndexOf (instrument);
 	}
 
@@ -165,6 +186,8 @@ public class Riff {
 				foreach (Note note in beats[pos].notes) {
 					AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
 					source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
+					source.GetComponent<AudioTremoloFilter>().depth = tremoloDepth;
+					source.GetComponent<AudioTremoloFilter>().rate = tremoloRate;
 					source.GetComponent<AudioEchoFilter>().decayRatio = echoDecayRatio;
 					source.GetComponent<AudioEchoFilter>().delay = echoDelay;
 					source.GetComponent<AudioEchoFilter>().dryMix = echoDryMix;

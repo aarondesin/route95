@@ -51,6 +51,14 @@ public class InstrumentSetup : MonoBehaviour {
 
 	public List<EffectSlider> effectSliders;
 
+	public Image distortionButton;
+	public Image fuzzButton;
+	public Image tremoloButton;
+	public Image chorusButton;
+	public Image flangerButton;
+	public Image echoButton;
+	public Image reverbButton;
+
 	[Header("UI Art")]
 
 	// Icons for percussion setup buttons
@@ -73,10 +81,6 @@ public class InstrumentSetup : MonoBehaviour {
 	void Start () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
-
-		foreach (EffectSlider effectSlider in effectSliders) {
-			effectSlider.Initialize();
-		}
 	}
 
 	#endregion
@@ -89,6 +93,20 @@ public class InstrumentSetup : MonoBehaviour {
 			Debug.LogError ("InstrumentSetup.Initialize(): no riff selected!");
 			return;
 		}
+			
+		foreach (EffectSlider effectSlider in effectSliders) {
+			if (effectSlider == null) continue;
+			effectSlider.gameObject.SetActive(true);
+			effectSlider.Initialize();
+		}
+
+		distortionButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
+		fuzzButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
+		tremoloButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioTremoloFilter>().enabled ? percussionFilled : percussionEmpty;
+		chorusButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
+		//flangerButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
+		echoButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioEchoFilter>().enabled ? percussionFilled : percussionEmpty;
+		reverbButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioReverbFilter>().enabled ? percussionFilled : percussionEmpty;
 			
 		HideSliders ();
 

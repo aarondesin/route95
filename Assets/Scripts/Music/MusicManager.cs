@@ -39,11 +39,11 @@ public enum Tempo {
 
 public class MusicManager : MonoBehaviour {
 
-	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
-	public AudioMixer mixer;
-
 	#region MusicManager Vars
 
+	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
+
+	public AudioMixer mixer;
 	public Project currentProject = new Project();
 
 	// --Global Music Properties-- //
@@ -78,9 +78,6 @@ public class MusicManager : MonoBehaviour {
 
 	public bool loadedAudioSources = false;
 
-	int loadedSounds = 0;
-	int loadedInstruments = 0;
-	int loadedScales = 0;
 	int loadProgress;
 	public int loadsToDo;
 
@@ -103,10 +100,7 @@ public class MusicManager : MonoBehaviour {
 			(Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 	}
 
-	public void Load() {
-		startLoadTime = Time.realtimeSinceStartup;
-		StartCoroutine ("LoadSounds");
-	}
+
 
 	public void FinishLoading() {
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
@@ -114,17 +108,17 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	#endregion
-	#region MusicManager Callbacks
+	#region Loading Callbacks
 
-	// Loads all audio clip paths in soundsToLoad
-	/*void LoadSounds() {
-		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
-		foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
-			foreach (string path in list.Value) {
-				LoadAudioClip(path);
-			}
-		}
-	}*/
+	//
+	// LoadSounds (Coroutine)
+	// LoadInstruments (Coroutine)
+	// 
+
+	public void Load() {
+		startLoadTime = Time.realtimeSinceStartup;
+		StartCoroutine ("LoadSounds");
+	}
 
 	IEnumerator LoadSounds () {
 		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
@@ -147,6 +141,17 @@ public class MusicManager : MonoBehaviour {
 		}
 
 		yield return StartCoroutine("LoadInstruments");
+	}
+
+	// Loads a single audio clip
+	void LoadAudioClip (string path) {
+		if (SoundClips.ContainsKey(path)) return;
+		AudioClip sound = (AudioClip) Resources.Load (path);
+		if (sound == null) {
+			Debug.LogError("Failed to load AudioClip at "+path);
+		} else {
+			SoundClips.Add (path, sound);
+		}
 	}
 
 	IEnumerator LoadInstruments () {
@@ -177,9 +182,19 @@ public class MusicManager : MonoBehaviour {
 			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
 			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
 			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
+			obj.GetComponent<AudioReverbFilter>().enabled = false;
+
 			obj.AddComponent<AudioDistortionFilter> ();
+			obj.GetComponent<AudioDistortionFilter>().enabled = false;
+
+			obj.AddComponent<AudioTremoloFilter>();
+			obj.GetComponent<AudioTremoloFilter>().enabled = false;
+
 			obj.AddComponent<AudioEchoFilter> ();
+			obj.GetComponent<AudioEchoFilter>().enabled = false;
+
 			obj.AddComponent<AudioChorusFilter> ();
+			obj.GetComponent<AudioChorusFilter>().enabled = false;
 
 			numLoaded++;
 
@@ -195,54 +210,19 @@ public class MusicManager : MonoBehaviour {
 		yield return null;
 	}
 
-	void GetAudioEffect () {
+	#endregion
+	#region MusicManager Callbacks
+
+
+	/*void GetAudioEffect () {
 		//currentInstrument = InstrumentSetup.currentRiff.instrument;
 		currentInstrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
 		//Debug.Log ("Calling getAudioEffect " + currentInstrument);
 		instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
-	}
-
-	/*void LoadInstruments () {
-		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
-
-		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
-		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
-			GameObject obj = new GameObject ();
-			obj.name = Instrument.AllInstruments[i].name;
-			AudioSource source = obj.AddComponent<AudioSource>();
-			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
-			instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
-			obj.AddComponent<AudioReverbFilter>();
-			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
-			obj.GetComponent<AudioReverbFilter>().room = GetComponent<AudioReverbFilter>().room;
-			obj.GetComponent<AudioReverbFilter>().roomHF = GetComponent<AudioReverbFilter>().roomHF;
-			obj.GetComponent<AudioReverbFilter>().roomLF = GetComponent<AudioReverbFilter>().roomLF;
-			obj.GetComponent<AudioReverbFilter>().decayTime = GetComponent<AudioReverbFilter>().decayTime;
-			obj.GetComponent<AudioReverbFilter>().decayHFRatio = GetComponent<AudioReverbFilter>().decayHFRatio;
-			obj.GetComponent<AudioReverbFilter>().reflectionsLevel = GetComponent<AudioReverbFilter>().reflectionsLevel;
-			obj.GetComponent<AudioReverbFilter>().reflectionsDelay = GetComponent<AudioReverbFilter>().reflectionsDelay;
-			obj.GetComponent<AudioReverbFilter>().reverbLevel = GetComponent<AudioReverbFilter>().reverbLevel;
-			obj.GetComponent<AudioReverbFilter>().hfReference = GetComponent<AudioReverbFilter>().hfReference;
-			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
-			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
-			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
-			obj.AddComponent<AudioDistortionFilter> ();
-			obj.AddComponent<AudioEchoFilter> ();
-			obj.AddComponent<AudioChorusFilter> ();
-
-			GameManager.instance.IncrementLoadProgress();
-
-		}
-
-		loadedAudioSources = true;
-	}
-*/
-	/*void LoadScales () {
-		GameManager.instance.ChangeLoadingMessage("Loading scales...");
-		KeyManager.instance.BuildScales();
 	}*/
+
 
 	public void NewProject () {
 		currentProject = new Project();
@@ -357,7 +337,7 @@ public class MusicManager : MonoBehaviour {
 		SongArrangeSetup.instance.selectedRiffIndex = currentProject.riffs.Count;
 		currentProject.riffs.Add (temp);
 		SongArrangeSetup.instance.Refresh();
-		GetAudioEffect ();
+		//GetAudioEffect ();
 		return temp;
 	}
 
@@ -370,20 +350,6 @@ public class MusicManager : MonoBehaviour {
 			if (riffName == riff.name) return riff;
 		}
 		return null;
-	}
-
-	// Loads a single audio clip
-	void LoadAudioClip (string path) {
-		if (SoundClips.ContainsKey(path)) return;
-		AudioClip sound = (AudioClip) Resources.Load (path);
-		if (sound == null) {
-			Debug.LogError("Failed to load AudioClip at "+path);
-		} else {
-			//Debug.Log("Loaded "+path);
-			//SoundClips.Add (Path.GetFileNameWithoutExtension (path), sound);
-			SoundClips.Add (path, sound);
-			//GameManager.instance.IncrementLoadProgress();
-		}
 	}
 
 	// Remotely toggles looping

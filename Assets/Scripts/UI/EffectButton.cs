@@ -5,6 +5,43 @@ using UnityEngine.Audio;
 
 public class EffectButton : MonoBehaviour {
 
+	public Image image;
+
+	public void ToggleDistortion () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioDistortionFilter>().enabled = !source.GetComponent<AudioDistortionFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioDistortionFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
+	public void ToggleEcho () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioEchoFilter>().enabled = !source.GetComponent<AudioEchoFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioEchoFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
+	public void ToggleReverb () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioReverbFilter>().enabled = !source.GetComponent<AudioReverbFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioReverbFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
+	public void ToggleTremolo () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioTremoloFilter>().enabled = !source.GetComponent<AudioTremoloFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioTremoloFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
+	public void ToggleChorus () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioChorusFilter>().enabled = !source.GetComponent<AudioChorusFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioChorusFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
 	public void updatedistortionLevel(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.distortionLevel = slider.value;
@@ -53,8 +90,15 @@ public class EffectButton : MonoBehaviour {
 	}
 
 	public void updatetremoloRate(Slider slider){
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.tremoloRate = slider.value;		
+		source.gameObject.GetComponent<AudioTremoloFilter>().rate = InstrumentSetup.currentRiff.tremoloRate;
+	}
 
-		//InstrumentSetup.currentRiff.tremoloRate = Slider.value;			
+	public void updatetremoloDepth(Slider slider){
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.tremoloDepth = slider.value;		
+		source.gameObject.GetComponent<AudioTremoloFilter>().depth = InstrumentSetup.currentRiff.tremoloDepth;
 	}
 
 	public void updatechorusDryMix(Slider slider){
