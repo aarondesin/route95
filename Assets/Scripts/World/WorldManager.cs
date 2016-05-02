@@ -526,7 +526,7 @@ public class WorldManager : MonoBehaviour {
 				GameObject newDecoration = 
 					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
 				newDecoration.GetComponent<Decoration>().Randomize();
-				if (newDecoration.GetComponent<Decoration>().dynamic) newDecoration.transform.parent = chunk.chunk.transform;
+				if (!newDecoration.GetComponent<Decoration>().dynamic) newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
 				Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
 				terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);
