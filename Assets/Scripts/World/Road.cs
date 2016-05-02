@@ -150,7 +150,9 @@ public class Road : Bezier {
 
 		if (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) >= generateRoadRadius) {
 			DynamicTerrain.instance.CheckAllChunksForRoad();
-			WorldManager.instance.DoLoadDecorations();
+			if (WorldManager.instance.doDecorate)
+				WorldManager.instance.DoLoadDecorations();
+			else WorldManager.instance.FinishLoading();
 			yield return null;
 		}
 	}
