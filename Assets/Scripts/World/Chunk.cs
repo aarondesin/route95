@@ -30,6 +30,9 @@ public class Chunk {
 	int[] triangles;
 	Color[] colors;
 
+	bool isUpdatingVerts = false;
+	bool needsColliderUpdate = false;
+
 	#endregion
 	#region Chunk Methods
 
@@ -64,7 +67,7 @@ public class Chunk {
 			vmap.RegisterChunkVertex (coords, this, i);
 		}
 
-		UpdateCollider ();
+		//UpdateCollider ();
 	}
 
 	Vector3[] CreateUniformVertexArray (int vertexSize) { 
@@ -182,14 +185,16 @@ public class Chunk {
 		mesh.normals = normals;
 		mesh.RecalculateBounds();
 		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
-		//chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
-		colliderMesh = mesh;
+		chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
 		ReplaceDecorations();
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
 		verts[index].y = height;
 		normals [index] = normal;
+		mesh.vertices = verts;
+		mesh.normals = normals;
+		needsColliderUpdate = true;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
@@ -203,14 +208,15 @@ public class Chunk {
 	}
 
 	private IEnumerator UpdateVerts(float updateDist, LinInt freqData) {
+		isUpdatingVerts = true;
 		float margin = WorldManager.instance.chunkSize / 2;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
-		bool changesMade = false;
 		float startTime = Time.realtimeSinceStartup;
 
-		for (int v = 0; v < numVerts; v++) {
-			if (constrained [v])
-				continue;
+		int v = 0;
+		for (; v < numVerts; v++) {
+			//if (constrained [v])
+				//continue;
 			IntVector2 coords = IntToV2 (v);
 
 			//if (!vmap.IsLocked (coords)) { //if vert is frozen
@@ -226,24 +232,26 @@ public class Chunk {
 					float newY = freqData.GetDataPoint (linIntInput) *
 					              WorldManager.instance.heightScale;
 					if (newY != verts [v].y) {
-						changesMade = true;
 						vmap.SetHeight (coords, newY);
 					}
 				}
-			} else
-				constrained [v] = true;
+			}// else
+				//constrained [v] = true;
 			//}
 			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
 		}
-
-		if (changesMade) UpdateCollider();
+		if (v == numVerts) {
+			yield return null;
+			isUpdatingVerts = false;
+		}
 
 	}
 
 	public void Update (float updateDist, LinInt freqData){
+		if (needsColliderUpdate) UpdateCollider();
 		if (!hasCheckedForRoad) {
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 		}
@@ -251,7 +259,7 @@ public class Chunk {
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
 		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
 		//roadNearby = NearbyRoad ();
-		if (CheckDist(distance, updateDist, chunkSize)) {
+		if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
 			//UpdateVerts (updateDist, freqData);
 			WorldManager.instance.StartCoroutine(UpdateVerts(updateDist, freqData));
 		}

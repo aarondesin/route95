@@ -42,6 +42,13 @@ public class EffectButton : MonoBehaviour {
 		image.sprite = (source.GetComponent<AudioChorusFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
 	}
 
+	public void ToggleFlanger () {
+		GameObject source =
+			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
+		source.GetComponent<AudioFlangerFilter>().enabled = !source.GetComponent<AudioFlangerFilter>().enabled;
+		image.sprite = (source.GetComponent<AudioFlangerFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+	}
+
 	public void updatedistortionLevel(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.distortionLevel = slider.value;
@@ -119,15 +126,17 @@ public class EffectButton : MonoBehaviour {
 		source.gameObject.GetComponent<AudioChorusFilter>().depth = InstrumentSetup.currentRiff.chorusDepth;
 	}
 
-	public void updateflangerDelay(Slider slider){
-
-		//InstrumentSetup.currentRiff.flangerDelay = Slider.value;			
+	public void updateflangerRate(Slider slider){
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.flangerRate = Mathf.PI/32f + Mathf.PI/32f * slider.value;
+		source.gameObject.GetComponent<AudioFlangerFilter>().rate = InstrumentSetup.currentRiff.flangerRate;
 	}
 		
 
 	public void updateflangerDryMix(Slider slider){
-
-		//InstrumentSetup.currentRiff.flangerDryMix = Slider.value;			
+		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
+		InstrumentSetup.currentRiff.flangerDryMix = slider.value;
+		source.gameObject.GetComponent<AudioFlangerFilter>().dryMix = InstrumentSetup.currentRiff.flangerDryMix;
 	}
 }
 

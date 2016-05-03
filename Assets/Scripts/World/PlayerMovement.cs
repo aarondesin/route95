@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour {
 	public GameObject lightRight;
 	public GameObject lightLeft;
 	//public float velocity;
-	const float distPerBeat = 0.0018f; // Tempo -> velocity
+	const float distPerBeat = 0.0012f; // Tempo -> velocity
 	const float particlesPerUnit = 100f; // Distance -> particle emission
 	const float lookAhead = 0.01f;
 	public bool moving;
@@ -34,8 +34,10 @@ public class PlayerMovement : MonoBehaviour {
 	public AudioClip engineClip;
 
 	List<ReflectionProbe> reflectionProbes;
+	Vector3 prevPosition;
 
 	bool initialized = false;
+	float dOffset;
 
 	// Use this for initialization
 	void Start () {
@@ -44,6 +46,7 @@ public class PlayerMovement : MonoBehaviour {
 		moving = false;
 		velocity = 0f;
 
+		prevPosition = Vector3.zero;
 		reflectionProbes = GetComponentsInChildren<ReflectionProbe> ().ToList<ReflectionProbe>();
 
 		target = new Vector3 (0f, 0f, 0f);
@@ -54,7 +57,9 @@ public class PlayerMovement : MonoBehaviour {
 		minVelocity = MusicManager.tempoToFloat [Tempo.Slowest] * distPerBeat;
 		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
 
-		GetComponent<AudioSource>().pitch = 1f;
+		GetComponent<AudioSource>().pitch = 0.4f;
+
+		dOffset = 0f;
 
 
 
@@ -64,12 +69,16 @@ public class PlayerMovement : MonoBehaviour {
 		roadHeight = WorldManager.instance.roadHeight;
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
+		GetComponent<AudioSource>().clip = engineClip;
+		GetComponent<AudioSource>().loop = true;
+		GetComponent<AudioSource>().Play();
 		GetComponent<AudioSource>().volume = 1f;
 	}
 
 	public void StopMoving() {
 		moving = false;
 		foreach (ParticleSystem ps in particles) ps.Pause();
+		GetComponent<AudioSource>().Stop();
 	}
 
 	public void DisableReflections () {
@@ -136,12 +145,12 @@ public class PlayerMovement : MonoBehaviour {
 					//Debug.Log ("Target:" + target);
 					//Debug.Log ("offsetH: "+offsetH);
 				}
-				float dOffset = Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 
-					Random.Range (velocityOffset, velocityOffset) - 0.5f * 
-					Time.deltaTime;
+				dOffset += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 0.5f);
 				velocityOffset = Mathf.Clamp (velocityOffset + dOffset, minVelocity, maxVelocity);
 
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
+				float realVelocity = Vector3.Distance (transform.position, prevPosition) / Time.fixedDeltaTime;
+				prevPosition = transform.position;
 				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
 				if (progress >= 1f)
 					progress = 1f;
@@ -181,7 +190,7 @@ public class PlayerMovement : MonoBehaviour {
 				}
 
 				//if (!GetComponent<AudioSource>().isPlaying) Debug.Log("shit");
-				GetComponent<AudioSource>().pitch = velocity / (MusicManager.tempoToFloat [Tempo.Fastest] +0.5f);
+				GetComponent<AudioSource>().pitch = Mathf.Clamp (0.75f + (velocity - minVelocity) / (maxVelocity - minVelocity), 0.75f, 1.75f);
 
 				//if (Random.Range(0, 100) == 0) Debug.Log(velocity * velocityToRotation);
 

@@ -428,6 +428,7 @@ public class GameManager : MonoBehaviour {
 		casette.SetActive(false);
 		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.StopLiveMode();
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 		paused = false;
 

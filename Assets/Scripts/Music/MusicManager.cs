@@ -41,6 +41,13 @@ public enum Tempo {
 
 public class MusicManager : MonoBehaviour {
 
+	public struct Sound {
+		public AudioClip clip;
+		public AudioSource source;
+		public float volume;
+		public float delay;
+	}
+
 	#region MusicManager Vars
 
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
@@ -85,6 +92,8 @@ public class MusicManager : MonoBehaviour {
 	int loadProgress;
 	public int loadsToDo;
 
+	public List<Sound> soundQueue;
+
 	#endregion
 	#region Unity Callbacks
 
@@ -102,6 +111,8 @@ public class MusicManager : MonoBehaviour {
 
 		loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
 			(Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
+
+		soundQueue = new List<Sound>();
 	}
 
 
@@ -194,6 +205,9 @@ public class MusicManager : MonoBehaviour {
 			obj.AddComponent<AudioTremoloFilter>();
 			obj.GetComponent<AudioTremoloFilter>().enabled = false;
 
+			obj.AddComponent<AudioFlangerFilter>();
+			obj.GetComponent<AudioFlangerFilter>().enabled = false;
+
 			obj.AddComponent<AudioEchoFilter> ();
 			obj.GetComponent<AudioEchoFilter>().enabled = false;
 
@@ -226,6 +240,9 @@ public class MusicManager : MonoBehaviour {
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
 	}*/
+
+	public void QueueSound () {
+	}
 
 
 	public void NewProject () {

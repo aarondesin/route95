@@ -97,6 +97,7 @@ public class DynamicTerrain {
 
 
 		if (initialLoad && activeChunks.Count == chunksToLoad) {
+			foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 			int res = vertexmap.vertices.Keys.Count;
 			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
 			initialLoad = false;

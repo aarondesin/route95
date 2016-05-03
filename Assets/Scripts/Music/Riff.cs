@@ -68,10 +68,11 @@ public class Riff {
 	[SerializeField]
 	public float reverbLevel = 0f;
 
-
-
+	// Flanger
 	[SerializeField]
-	public float flangerDelay = 0f;
+	public bool flangerEnabled = false;
+	[SerializeField]
+	public float flangerRate = Mathf.PI/32f;
 	[SerializeField]
 	public float flangerDryMix = 0f;
 
@@ -192,6 +193,8 @@ public class Riff {
 				source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
 				source.GetComponent<AudioChorusFilter>().rate = chorusRate;
 				source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
+				//source.GetComponent<AudioFlangerFilter>().delay = flangerDelay;
+				source.GetComponent<AudioFlangerFilter>().dryMix = flangerDryMix;
 
 				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
 				foreach (Note note in beat.notes) {

@@ -170,8 +170,8 @@ public class VertexMap {
 				if (Mathf.Abs(x * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) continue;
 				foreach (int y in vertices[x].Keys) {
 					if (Mathf.Abs(y * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) continue;
-					Vertex vert = vertices [x] [y];
-					if (vert.locked) continue;
+					Vertex vert = vertices [x][y];
+					//if (vert.locked) continue;
 					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
 					//Debug.Log(dist);
@@ -187,7 +187,7 @@ public class VertexMap {
 							//MonoBehaviour.Destroy (decoration);
 
 						}
-						vert.locked = true;
+						//vert.locked = true;
 
 						//Debug.Log(PlayerMovement.instance.progress);
 						//Debug.Log ("Bulldozed " +vertices[x][y].ToString());

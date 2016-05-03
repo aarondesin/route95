@@ -285,6 +285,11 @@ public class CameraControl : MonoBehaviour {
 		ChangeAngle();
 	}
 
+	public void StopLiveMode () {
+		liveMode = false;
+		LerpToPosition(ViewChase);
+	}
+
 	// Pick a new random camera angle
 	public void ChangeAngle () {
 		ChangeAngle (Random.Range (0, angles.Count));
@@ -370,6 +375,7 @@ public class CameraControl : MonoBehaviour {
 
 	// Lerp to position
 	public void LerpToPosition (Transform newPosition) {
+		Camera.main.fov = 75f;
 		start = GetComponent<Transform>();
 		sTime = Time.time;
 		target = newPosition;
