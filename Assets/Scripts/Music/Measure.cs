@@ -6,9 +6,12 @@ using System.Collections.Generic;
 public class Measure {
 
 	[SerializeField]
-	public List<Riff> riffs;
+	public int index;
+
+	[SerializeField]
+	public List<int> riffIndices;
 
 	public Measure () {
-		riffs = new List<Riff>();
+		riffIndices = new List<int>();
 	}
 }

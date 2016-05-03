@@ -43,7 +43,7 @@ public class CaseLibrary{
 				new Beat ()
 			}
 		});*/
-		cases.Add( new Riff () {
+		/*cases.Add( new Riff () {
 			name = "Guitarcase1",
 			instrument = MelodicInstrument.ElectricGuitar,
 			beats = new List<Beat>() {
@@ -156,7 +156,7 @@ public class CaseLibrary{
 				new Beat (),
 				new Beat ()
 			}
-		});
+		});*/
 	}
 
 

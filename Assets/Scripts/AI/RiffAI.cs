@@ -19,7 +19,7 @@ public class RiffAI {
 	//This is useful if none of the cases match very well, and you 
 	//want to only highlight hints if you have a good hint.
 	public Riff FindSimilarCase(Riff playerRiff){
-		Dictionary<Riff, int> SimilarityDictionary = new Dictionary<Riff, int>();
+		/*Dictionary<Riff, int> SimilarityDictionary = new Dictionary<Riff, int>();
 		foreach(Riff caseRiff in CaseLibrary.cases) {
 			if (caseRiff.instrumentIndex != playerRiff.instrumentIndex)
 				continue;
@@ -27,10 +27,7 @@ public class RiffAI {
 			//Compare riff in each case to the given riff,
 			//adding points to that case's score in the dicitonary.
 			for (int i = 0; i < playerRiff.beatsShown*4; i++) {
-				/*if (playerRiff.notes[i].Count == caseRiff.notes[i].Count) {
-					SimilarityDictionary [caseRiff] += playerRiff.notes[i].Count + 1;
-				}
-				*/
+
 				for (int j=0; j <playerRiff.beats[i].NumNotes(); j++) {
 					try {
 						//Note test_a = playerRiff.beats[i].notes[j];
@@ -45,12 +42,13 @@ public class RiffAI {
 						SimilarityDictionary [caseRiff] += playerRiff.beats[i].NumNotes() + 1;
 					}
 				}
-			}
-		}
+			}*/
+		return null;
+		//}
 
 		//Select the case that has the highest score, indicating that it is
 		//overall the most similar case.
-		int bestScore = -1;
+		/*int bestScore = -1;
 		Riff bestCase = null;
 		//int bestRhythmScore = -1;
 		//string bestRhythmCase = null;
@@ -70,7 +68,8 @@ public class RiffAI {
 		//else, return null
 		else{
 			return null;
-		}
+		}*/
+
 	}
 
 	//Returns the note to be highlighted.
@@ -82,7 +81,7 @@ public class RiffAI {
 	//until it finds a non-empty note. This non-empty note is the hint
 	//for the next note the player should play.
 	public int FindHintXPosition(Riff playerRiff, int subdivs){
-		int playerPosition = -1;
+		/*int playerPosition = -1;
 		Riff closestCase = FindSimilarCase(playerRiff);
 		if (closestCase == null) {
 			return -1;
@@ -130,11 +129,12 @@ public class RiffAI {
 			return -1;
 
 		}
-		return suggestionPosition;
+		return suggestionPosition;*/
+	return -1;
 	}
 
 	public int FindHintYPosition (Riff playerRiff, Scale scaleDude, int subdivs) {
-		//Debug.Log ("inside findhintY ");
+		/*//Debug.Log ("inside findhintY ");
 		Riff closestCase = FindSimilarCase(playerRiff);
 		if (closestCase == null) {
 			return -1;
@@ -165,7 +165,7 @@ public class RiffAI {
 				Debug.Log ("matchNotes [i]: " + matchNotes [i]);
 				return i;
 			}
-		}
+		}*/
 
 
 

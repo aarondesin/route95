@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 [System.Serializable]
 public class Song {
@@ -21,95 +22,131 @@ public class Song {
 	public int scale = -1; // scale index
 
 	[SerializeField]
-	public List<SongPiece> songPieces = new List<SongPiece>();
+	public List<SongPiece> songPieces;
 
+	[SerializeField]
+	public List<Measure> measures;
+
+	[SerializeField]
+	public List<Riff> riffs;
+
+	[SerializeField]
+	public List<Beat> beats;
+
+	[SerializeField]
+	public List<int> songPieceIndices;
 
 	//
 	// NONSERIALIZED VARIABLES
 	// These will not be saved
 	//
 
-	[NonSerialized]
-	public int measures;
-	[NonSerialized]
-	public int beats;
-
 	// Default constructor creates a song of 4 1-measure song pieces
 	public Song () {
 		name = "New Song";
-		songPieces = new List<SongPiece>() {
-			new SongPiece() { name = "SongPiece1" },
-			new SongPiece() { name = "SongPiece2" },
-			new SongPiece() { name = "SongPiece3" },
-			new SongPiece() { name = "SongPiece4" }
-		};
+		songPieceIndices = new List<int>();
+		songPieces = new List<SongPiece>();
+		measures = new List<Measure>();
+		riffs = new List<Riff>();
+		beats = new List<Beat>();
+	}
+
+	[OnDeserialized()]
+	internal void Refresh (StreamingContext context) {
+		if (songPieceIndices == null) songPieceIndices = new List<int>();
+		if (songPieces == null) songPieces = new List<SongPiece>();
+		if (measures == null) measures = new List<Measure>();
+		if (riffs == null) riffs = new List<Riff>();
+		if (beats == null) beats = new List<Beat>();
+		foreach (Riff riff in riffs) {
+			riff.instrument = Instrument.AllInstruments[riff.instrumentIndex];
+		}
+	}
+
+	public int Beats {
+		get {
+			return songPieceIndices.Count * 16;
+		}
+	}
+
+	public int Measures {
+		get {
+			return songPieceIndices.Count;
+		}
+	}
+
+	public bool Equals (Song other) {
+		return name == other.name;
+	}
+
+	public void RegisterSongPiece (SongPiece songPiece) {
+		songPiece.index = songPieces.Count;
+		songPieces.Add (songPiece);
+	}
+
+	public void RegisterRiff (Riff riff) {
+		riff.index = riffs.Count;
+		riffs.Add (riff);
+		for (int i=0; i<16; i++) {
+			Beat beat = new Beat ();
+			beat.index = beats.Count;
+			riff.beatIndices.Add (beat.index);
+			beats.Add (beat);
+		}
+	}
+
+	public SongPiece NewSongPiece () {
+		SongPiece songPiece = new SongPiece();
+		songPiece.index = songPieces.Count;
+		Measure measure = NewMeasure();
+		songPiece.measureIndices.Add (measure.index);
+		songPieces.Add(songPiece);
+		songPieceIndices.Add (songPiece.index);
+		return songPiece;
+	}
+
+	public Measure NewMeasure () {
+		Measure measure = new Measure();
+		measure.index = measures.Count;
+		measures.Add(measure);
+		return measure;
 	}
 		
 	public void PlaySong (int pos) {
 		try {
+			SongPiece songPiece = songPieces[songPieceIndices[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)]];
+			Measure measure = measures[songPiece.measureIndices[0]];
 			// For now, all song pieces are assumed to be one measure long
-			foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].measures[0].riffs) {
-				riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
+			foreach (int i in measure.riffIndices) {
+				riffs[i].PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
 			}
 		} catch (ArgumentOutOfRangeException) {
 			Debug.LogError ("Song.PlaySong(): index out of range! "+pos);
-		}
-	}
-
-	public void PlaySongExceptFor (int pos, Instrument instrument) {
-		try {
-			// For now, all song pieces are assumed to be one measure long
-			foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].measures[0].riffs) {
-				if (riff.instrument != instrument) riff.PlayRiff(pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2));
-			}
-		} catch (ArgumentOutOfRangeException) {
-			Debug.LogError ("Song.PlaySong(): index out of range! "+pos);
-		}
-	}
-
-	public void RemoveAt (int pos, Instrument inst) {
-		foreach (Riff riff in songPieces[pos/(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].measures[0].riffs) {
-			if (riff.instrument == inst) {
-				riff.beats[pos%(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)].Clear();
-			}
 		}
 	}
 
 	public void ToggleRiff (Riff newRiff, int pos) {
-		foreach (Riff riff in songPieces[pos].measures[0].riffs) {
+		SongPiece songPiece = songPieces[songPieceIndices[pos]];
+		Measure measure = measures[songPiece.measureIndices[0]];
+		foreach (int r in measure.riffIndices) {
+			Riff riff = riffs[r];
 			if (riff.instrument == newRiff.instrument) {
 				if (newRiff == riff) {
 					// Riff is already there
-					songPieces[pos].measures[0].riffs.Remove (newRiff);
+					measure.riffIndices.Remove (newRiff.index);
 				} else {
-					songPieces[pos].measures[0].riffs.Remove (riff);
-					songPieces[pos].measures[0].riffs.Add (newRiff);
+					measure.riffIndices.Remove (riff.index);
+					measure.riffIndices.Add (newRiff.index);
 				}
 				return;
 			}
 		}
 		// Riff not already there
-		songPieces[pos].measures[0].riffs.Add (newRiff);
-	}
-		
-	// Iterates through whole song and and adds number of measures in song pieces
-	public int NumMeasures () {
-		int temp = 0;
-		foreach (SongPiece songPiece in songPieces) {
-			temp += songPiece.measures.Count;
-		}
-		return temp;
+		measure.riffIndices.Add (newRiff.index);
 	}
 
 	public void CompileSong() {
-		measures = NumMeasures();
-		beats = measures*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
-		Debug.Log("Song.CompileSong(): beats: "+beats+ " measures: "+measures);
+		Debug.Log("Song.CompileSong(): beats: "+Beats+ " measures: "+Measures);
 	}
-
-	public void AddNewSongPiece() {
-		songPieces.Add(new SongPiece());
-	}
-
 
 }

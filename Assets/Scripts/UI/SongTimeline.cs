@@ -31,14 +31,16 @@ public class SongTimeline : MonoBehaviour {
 	}
 
 	public void MakeColumns () {
+		Song song = MusicManager.instance.currentSong;
+
 		columns.Clear();
 
 		GetComponent<RectTransform>().sizeDelta = new Vector2 (
-			(MusicManager.instance.currentSong.songPieces.Count+1)*columnWidth,
+			(MusicManager.instance.currentSong.songPieceIndices.Count+1)*columnWidth,
 			columnHeight
 		);
 			
-		for (int i=0; i<MusicManager.instance.currentSong.songPieces.Count; i++) {
+		for (int i=0; i<MusicManager.instance.currentSong.songPieceIndices.Count; i++) {
 			GameObject column = new GameObject();
 			column.name = "Column"+i;
 
@@ -63,9 +65,10 @@ public class SongTimeline : MonoBehaviour {
 			int num = i; // avoid pointer problems
 			column.AddComponent<Button>();
 			column.GetComponent<Button>().onClick.AddListener(()=>{
-				MusicManager.instance.currentSong.ToggleRiff(MusicManager.instance.currentProject.riffs[SongArrangeSetup.instance.selectedRiffIndex], num);
-				RefreshColumn (column, MusicManager.instance.currentSong.songPieces[num]);
-				Debug.Log(MusicManager.instance.currentSong.songPieces[num].ToString());
+				Riff riff = MusicManager.instance.currentSong.riffs[SongArrangeSetup.instance.selectedRiffIndex];
+				song.ToggleRiff (riff, num);
+				RefreshColumn (column, song.songPieces[song.songPieceIndices[num]]);
+				//Debug.Log(MusicManager.instance.currentSong.songPieces[num].ToString());
 			});
 
 			column.AddComponent<Image>();
@@ -73,7 +76,8 @@ public class SongTimeline : MonoBehaviour {
 			column.GetComponent<Image>().sprite = graphic;
 			columns.Add(column);
 		}
-		for (int i=0; i<columns.Count; i++) RefreshColumn (columns[i], MusicManager.instance.currentSong.songPieces[i]);
+		for (int i=0; i<columns.Count; i++)
+			RefreshColumn (columns[i], song.songPieces[song.songPieceIndices[i]]);
 
 		GameObject addColumnButton = new GameObject();
 		addColumnButton.name = "AddColumnButton";
@@ -94,7 +98,7 @@ public class SongTimeline : MonoBehaviour {
 			
 		addColumnButton.AddComponent<Button>();
 		addColumnButton.GetComponent<Button>().onClick.AddListener(()=>{
-			MusicManager.instance.currentSong.AddNewSongPiece();
+			MusicManager.instance.currentSong.NewSongPiece();
 			RefreshTimeline();
 		});
 
@@ -114,18 +118,21 @@ public class SongTimeline : MonoBehaviour {
 	}
 
 	void RefreshColumn (GameObject column, SongPiece songpiece) {
+		Song song = MusicManager.instance.currentSong;
 		foreach (RectTransform child in column.GetComponent<RectTransform>()) {
 			Destroy(child.gameObject);
 		}
 		int i = 0;
-		foreach (Riff riff in songpiece.measures[0].riffs) {
+		Measure measure = song.measures[songpiece.measureIndices[0]];
+		foreach (int r in measure.riffIndices) {
+			Riff riff = song.riffs[r];
 			GameObject label = new GameObject();
 			label.name = riff.name;
 			label.AddComponent<RectTransform>();
 			label.GetComponent<RectTransform>().SetParent(column.GetComponent<RectTransform>());
 			label.GetComponent<RectTransform>().sizeDelta = new Vector2 (
 				column.GetComponent<RectTransform>().rect.width,
-				column.GetComponent<RectTransform>().rect.height/(float)songpiece.measures[0].riffs.Count
+				column.GetComponent<RectTransform>().rect.height/(float)measure.riffIndices.Count
 			);
 			label.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
 			label.AddComponent<CanvasRenderer>();
@@ -140,7 +147,7 @@ public class SongTimeline : MonoBehaviour {
 			label.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.0f);
 			label.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
 				0,
-				(float)(songpiece.measures[0].riffs.Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
+				(float)(measure.riffIndices.Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
 				0f
 			);
 			label.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 0f, 0f);

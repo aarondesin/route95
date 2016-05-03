@@ -9,6 +9,9 @@ public class Beat {
 	#region Serialized Vars
 
 	[SerializeField]
+	public int index;
+
+	[SerializeField]
 	public List<Note> notes;
 
 	#endregion

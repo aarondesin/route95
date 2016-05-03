@@ -28,7 +28,7 @@ public class SongArrangeSetup : MonoBehaviour {
 		// Update the options in the dropdown to include all riffs
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
-		foreach (Riff riff in MusicManager.instance.currentProject.riffs) {
+		foreach (Riff riff in MusicManager.instance.currentSong.riffs) {
 			Sprite sprite = riff.instrument.icon;
 			Dropdown.OptionData option = new Dropdown.OptionData (riff.name, sprite);
 			//Dropdown.OptionData option = new Dropdown.OptionData (MusicManager.instToString[riff.currentInstrument]);
@@ -36,7 +36,7 @@ public class SongArrangeSetup : MonoBehaviour {
 		}
 		dropdown.AddOptions (options);
 
-		if (MusicManager.instance.currentProject.riffs.Count == 0) {
+		if (MusicManager.instance.currentSong.riffs.Count == 0) {
 			//InstrumentSetup.instance.currentRiff = null;
 			dropdown.interactable = false;
 			editRiffButton.GetComponent<Button>().interactable = false;
@@ -57,7 +57,7 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	public void UpdateValue () {
 		selectedRiffIndex = dropdown.value;
-		InstrumentSetup.currentRiff = MusicManager.instance.currentProject.riffs[selectedRiffIndex];
+		InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs[selectedRiffIndex];
 	}
 
 	public void SetValue () {

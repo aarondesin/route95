@@ -144,7 +144,7 @@ public class LoadPrompt : MonoBehaviour {
 			SaveLoad.LoadProject (selectedPath);
 			break;
 		case LoadPrompt.Mode.Song:
-			SaveLoad.LoadSong (selectedPath);
+			SaveLoad.LoadSongToProject (selectedPath);
 			break;
 		}
 	}

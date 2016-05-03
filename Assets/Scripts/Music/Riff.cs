@@ -10,10 +10,14 @@ using UnityEditor;
 
 [System.Serializable]
 public class Riff {
+
 	[NonSerialized]
 	public const int MAX_SUBDIVS = 2;
 	[NonSerialized]
 	public const int MAX_BEATS = 32;
+
+	[SerializeField]
+	public int index;
 
 	//Float values from audio effect knobs
 	// Distortion
@@ -80,7 +84,7 @@ public class Riff {
 	[SerializeField]
 	public int instrumentIndex = 0; // instrument used for this riff
 	[SerializeField]
-	public List<Beat> beats = new List<Beat>(); // contains notes
+	public List<int> beatIndices = new List<int>(); // contains notes
 	[SerializeField]
 	public bool cutSelf = true; // if true, sounds will cut themselves off
 	[SerializeField]
@@ -94,26 +98,8 @@ public class Riff {
 	[NonSerialized]
 	public Instrument instrument;
 
-	// Default constructor makes an empty 4-beat riff (and accounts for all subdivs)
-	public Riff () {
-		for (int i=0; i<(int)Mathf.Pow(2f, (float)MAX_SUBDIVS+2); i++)
-			beats.Add (new Beat ());
-	}
-
-	// Constructor to make a riff of a certain number of beats
-	public Riff (int length) {
-		for (int i=0; i<length*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++)
-			beats.Add (new Beat());
-	}
-
-	public Riff (Instrument instrument) {
-		for (int i=0; i<4*(int)Mathf.Pow(2f, (float)MAX_SUBDIVS); i++)
-			beats.Add (new Beat());
-		instrumentIndex = Instrument.AllInstruments.IndexOf (instrument);
-	}
-
 	public int Length () {
-		return beats.Count;
+		return beatIndices.Count;
 	}
 
 	public bool Lookup (string filename, int pos) {
@@ -123,9 +109,11 @@ public class Riff {
 
 	// Returns true is a note is found at a position
 	public bool Lookup (Note newNote, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
 		try {
 			//return notes[pos].Contains(newNote);
-			foreach (Note note in beats[pos].notes) {
+			foreach (Note note in beat.notes) {
 				if (note.filename == newNote.filename) return true;
 			}
 			return false;
@@ -136,7 +124,9 @@ public class Riff {
 	}
 
 	public float VolumeOfNote(string soundName, int pos) {
-		foreach (Note note in beats[pos].notes) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+		foreach (Note note in beat.notes) {
 			if (note.filename == soundName) {
 				Debug.Log (note.volume);
 				return note.volume;
@@ -147,9 +137,11 @@ public class Riff {
 		
 
 	public void RemoveNote (Note newNote, int pos) {
-		foreach (Note note in beats[pos].notes) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+		foreach (Note note in beat.notes) {
 			if (note.filename == newNote.filename) {
-				beats[pos].notes.Remove(note);
+				beat.notes.Remove(note);
 				return;
 			}
 		}
@@ -157,11 +149,15 @@ public class Riff {
 
 	// Removes all notes at position
 	public void Clear (int pos) {
-		beats[pos].Clear();
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+		beat.Clear();
 	}
 
 	// Adds or removes a note at pos
 	public void Toggle (Note newNote, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
 		// Lookup
 		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
@@ -169,7 +165,7 @@ public class Riff {
 			return;
 		}
 		// Note not already there
-		beats [pos].Add (newNote);
+		beat.Add (newNote);
 		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
 	}
 	public void PlayRiffLoop (AudioClip clip) {
@@ -181,22 +177,25 @@ public class Riff {
 	// Plays all the notes at pos
 	public void PlayRiff (int pos) { 
 		try {
-			if (beats[pos].NumNotes() != 0) {
-				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
-				foreach (Note note in beats[pos].notes) {
-					AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
-					source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
-					source.GetComponent<AudioTremoloFilter>().depth = tremoloDepth;
-					source.GetComponent<AudioTremoloFilter>().rate = tremoloRate;
-					source.GetComponent<AudioEchoFilter>().decayRatio = echoDecayRatio;
-					source.GetComponent<AudioEchoFilter>().delay = echoDelay;
-					source.GetComponent<AudioEchoFilter>().dryMix = echoDryMix;
-					source.GetComponent<AudioReverbFilter>().decayTime = reverbDecayTime;
-					source.GetComponent<AudioReverbFilter>().reverbLevel = reverbLevel;
-					source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
-					source.GetComponent<AudioChorusFilter>().rate = chorusRate;
-					source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
+			Song song = MusicManager.instance.currentSong;
+			Beat beat = song.beats[beatIndices[pos]];
+			if (beat.NumNotes() != 0) {
+				AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+				source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
+				source.GetComponent<AudioTremoloFilter>().depth = tremoloDepth;
+				source.GetComponent<AudioTremoloFilter>().rate = tremoloRate;
+				source.GetComponent<AudioEchoFilter>().decayRatio = echoDecayRatio;
+				source.GetComponent<AudioEchoFilter>().delay = echoDelay;
+				source.GetComponent<AudioEchoFilter>().dryMix = echoDryMix;
+				source.GetComponent<AudioReverbFilter>().decayTime = reverbDecayTime;
+				source.GetComponent<AudioReverbFilter>().reverbLevel = reverbLevel;
+				source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
+				source.GetComponent<AudioChorusFilter>().rate = chorusRate;
+				source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
 
+				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
+				foreach (Note note in beat.notes) {
+					
 					note.PlayNote(source, volume);
 				}
 			}
@@ -204,39 +203,5 @@ public class Riff {
 			Debug.LogError("Tried to play out of range of song! Pos: "+pos);
 		}
 	}
-
-	public void ShowMore () {
-		if (beatsShown < MAX_BEATS) {
-			beatsShown += 4;
-			if (beatsShown > beats.Count/(int)Mathf.Pow(2f, MAX_SUBDIVS)) {
-				for (int i=0; i<4*(int)Mathf.Pow(2f, MAX_SUBDIVS); i++) beats.Add(new Beat());
-			}
-		}
-	}
-
-	public void ShowLess () {
-		if (beatsShown > 4) {
-			beatsShown -= 4;
-		}
-	}
-
-	/*// FORMAT:
-	// name@instrument@cutSelf@beatsShown@beat@notesatbeat@otherbeat@notesatotherbeat@othernotesatotherbeat
-	public override string ToString () {
-		string result = name;
-		if (copy != 0) result += " (" + copy.ToString() + ")";
-		result += save_load.itemSeparator;
-		result += (string)Enum.GetName (typeof(Instrument), (int)instrument) + save_load.itemSeparator;
-		result += cutSelf.ToString () + save_load.itemSeparator;
-		result += beatsShown.ToString() + save_load.itemSeparator;
-		for (int i = 0; i < notes.Count; i++) {
-			result += i.ToString() + save_load.itemSeparator;
-			foreach (Note note in notes[i]) {
-				result += note.ToString () + save_load.noteSeparator;
-			}
-		}
-		Debug.Log("Riff.ToString(): "+result);
-		return result;
-	}*/
 		
 }

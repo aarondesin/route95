@@ -233,9 +233,8 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public void NewSong () {
-		Song newSong = new Song();
-		currentSong = newSong;
-		currentProject.AddSong(newSong);
+		currentSong = new Song();
+		currentProject.songs.Add(currentSong);
 	}
 
 	public void SaveCurrentSong () {
@@ -278,7 +277,7 @@ public class MusicManager : MonoBehaviour {
 					break;
 				case GameManager.Mode.Live:
 					
-					if (beat >= currentSong.beats) {
+					if (beat >= currentSong.Beats) {
 						//Debug.Log("shit");
 						beat = 0;
 
@@ -292,7 +291,7 @@ public class MusicManager : MonoBehaviour {
 					}
 					currentSong.PlaySong(beat);
 	
-					float songTotalTime = currentSong.beats*7200f/tempoToFloat[tempo]/4f;
+					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
 					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 					beat++;
@@ -331,25 +330,12 @@ public class MusicManager : MonoBehaviour {
 
 	// Adds a new riff
 	public Riff AddRiff () {
-		//Debug.Log("added");
 		Riff temp = new Riff ();
 		InstrumentSetup.currentRiff = temp;
-		SongArrangeSetup.instance.selectedRiffIndex = currentProject.riffs.Count;
-		currentProject.riffs.Add (temp);
+		currentSong.RegisterRiff(temp);
+		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
 		SongArrangeSetup.instance.Refresh();
-		//GetAudioEffect ();
 		return temp;
-	}
-
-	public void AddRiff (Riff riff) {
-		currentProject.riffs.Add (riff);
-	}
-
-	public Riff RiffByString (string riffName) {
-		foreach (Riff riff in currentProject.riffs) {
-			if (riffName == riff.name) return riff;
-		}
-		return null;
 	}
 
 	// Remotely toggles looping

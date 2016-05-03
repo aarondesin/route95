@@ -54,15 +54,14 @@ public class SaveLoad {
 			try {
 				Project project = (Project)bf.Deserialize(file);
 				MusicManager.instance.currentProject = project;
-				if (!project.Empty())
-					MusicManager.instance.currentSong = project.songs[0];
-				else MusicManager.instance.NewSong();
+				//if (!project.Empty)
+				//MusicManager.instance.currentSong = project.songs[0];
+				//else MusicManager.instance.NewSong();
 
-				project.Refresh();
-				foreach (Riff riff in project.riffs) Debug.Log(riff.name);
+				//foreach (Riff riff in project.riffs) Debug.Log(riff.name);
 				PlaylistBrowser.instance.RefreshName();
-				SongArrangeSetup.instance.Refresh();
-				SongTimeline.instance.RefreshTimeline();
+				//SongArrangeSetup.instance.Refresh();
+				//SongTimeline.instance.RefreshTimeline();
 
 				GameManager.instance.GoToPlaylistMenu();
 
@@ -73,10 +72,10 @@ public class SaveLoad {
 			} catch (EndOfStreamException) {
 				Debug.LogError ("SaveLoad.LoadFile(): Attempted to read past end of stream, file is wrong format?");
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
-			} catch (ArgumentException) {
+			}/* catch (ArgumentException) {
 				Debug.LogError ("SaveLoad.LoadFile(): Failed to load a riff or song piece. Already exists?");
 				Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
-			} catch (FailedToLoadException f) {
+			}*/ catch (FailedToLoadException f) {
 				Debug.LogError("FailedToLoadException: "+f);
 				MusicManager.instance.currentProject = backupProject;
 				MusicManager.instance.currentSong = backupSong;
@@ -91,7 +90,9 @@ public class SaveLoad {
 	}
 
 	public static void SaveCurrentSong () {
+
 		BinaryFormatter bf = new BinaryFormatter ();
+
 
 		string directoryPath = Application.persistentDataPath + "/Songs/";
 		string filePath = directoryPath + MusicManager.instance.currentSong.name + songSaveExtension;
@@ -105,7 +106,11 @@ public class SaveLoad {
 		Prompt.instance.PromptMessage("Save Project", "Successfully saved Song!", "Okay");
 	}
 
-	public static void LoadSong (string path) {
+	public static void LoadSongToProject (string path) {
+		MusicManager.instance.currentProject.AddSong(LoadSong(path));
+	}
+
+	public static Song LoadSong (string path) {
 		if (File.Exists(path)) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open (path, FileMode.Open);
@@ -114,22 +119,19 @@ public class SaveLoad {
 
 			try {
 				Song song = (Song)bf.Deserialize(file);
-				MusicManager.instance.currentProject.AddSong(song);
-				MusicManager.instance.currentSong = song;
-
-				SongArrangeSetup.instance.Refresh();
-				SongTimeline.instance.RefreshTimeline();
-
+	
 				Prompt.instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
+				return song;
+
 			} catch (SerializationException) {
 				Debug.LogError ("SaveLoad.LoadSong(): Failed to deserialize file, probably empty.");
 				Prompt.instance.PromptMessage("Failed to load song", "File is empty.", "Okay");
 			} catch (EndOfStreamException) {
 				Debug.LogError ("SaveLoad.LoadSong(): Attempted to read past end of stream, file is wrong format?");
 				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
-			} catch (ArgumentException) {
-				Debug.LogError ("SaveLoad.LoadSong(): Failed to load a riff or song piece. Already exists?");
-				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+			//} catch (ArgumentException) {
+				//Debug.LogError ("SaveLoad.LoadSong(): Failed to load a riff or song piece. Already exists?");
+				//Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
 			} catch (FailedToLoadException f) {
 				Debug.LogError("FailedToLoadException: "+f);
 				MusicManager.instance.currentSong = backupSong;
@@ -141,6 +143,7 @@ public class SaveLoad {
 			Debug.LogError ("SaveLoad.LoadSong(): Song \'"+path+"\' doesn't exist.");
 			Prompt.instance.PromptMessage("Failed to load Song", "Could not find file.", "Okay");
 		}
+		return null;
 	}
 		
 

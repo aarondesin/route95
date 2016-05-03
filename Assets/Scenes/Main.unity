@@ -6808,8 +6808,8 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 440, y: -256}
-  m_SizeDelta: {x: 96, y: 96}
+  m_AnchoredPosition: {x: -8, y: -15}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &363390794
 MonoBehaviour:
@@ -9611,7 +9611,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 838191496}
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17326,8 +17326,8 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 440, y: -128}
-  m_SizeDelta: {x: 96, y: 96}
+  m_AnchoredPosition: {x: -8, y: 0}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &867986644
 MonoBehaviour:
@@ -23960,7 +23960,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 849.00006, y: 431.00006}
+  m_AnchoredPosition: {x: 848.99994, y: -431}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -29898,7 +29898,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793874
+  m_Size: 0.9793875
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -30499,13 +30499,16 @@ MonoBehaviour:
   mixer: {fileID: 24100000, guid: f67c1c84114f8a843bf10b57f49b6c12, type: 2}
   currentProject:
     name: New Project
-    songs: []
-    riffs: []
+    songPaths: []
   currentSong:
     name: New Song
     key: 0
     scale: 0
     songPieces: []
+    measures: []
+    riffs: []
+    beats: []
+    songPieceIndices: 
   currentPlayingSong: 0
   loopSong: 0
   OneShot: {fileID: 0}

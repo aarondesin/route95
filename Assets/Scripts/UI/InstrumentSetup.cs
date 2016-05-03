@@ -401,31 +401,6 @@ public class InstrumentSetup : MonoBehaviour {
 		beatsBar.value = scrollBarH.value;
 	}
 
-	public void IncreaseSubdivisions () {
-		if (subdivsShown < Riff.MAX_SUBDIVS) {
-			subdivsShown++;
-			Initialize();
-		}
-	}
-
-	public void DecreaseSubdivisions () {
-		if (subdivsShown > 0) {
-			subdivsShown--;
-			Initialize();
-		}
-	}
-
-	public void IncreaseBeatsShown () {
-		currentRiff.ShowMore();
-		Initialize();
-
-	}
-
-	public void DecreaseBeatsShown () {
-		currentRiff.ShowLess();
-		Initialize();
-	}
-
 	public void IncreaseOctavesShown () {
 		if (octavesShown < maxOctaves) octavesShown++;
 		Initialize();
