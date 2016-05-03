@@ -20,7 +20,12 @@ public class Chunk {
 	public bool hasRoad = false;  // Chunk has road on it
 	public bool nearRoad = false; // Chunk is within one chunk distance of a road
 
+	Mesh colliderMesh;
+	Mesh mesh;
 	Vector3[] verts;
+	bool[] constrained;
+	int numVerts;
+	Vector3[] normals;
 	Vector2[] uvs;
 	int[] triangles;
 	Color[] colors;
@@ -36,6 +41,13 @@ public class Chunk {
 		int chunkRes = WorldManager.instance.chunkResolution;
 		float chunkSize = WorldManager.instance.chunkSize;
 		verts = CreateUniformVertexArray (chunkRes);
+		numVerts = verts.Length;
+		constrained = new bool[numVerts];
+		normals = new Vector3[numVerts];
+		for (int i = 0; i < numVerts; i++) {
+			normals [i] = Vector3.up;
+			constrained [i] = false;
+		}
 		uvs = CreateUniformUVArray (chunkRes);
 		triangles = CreateSquareArrayTriangles (chunkRes);
 		colors = new Color[verts.Length];
@@ -55,6 +67,8 @@ public class Chunk {
 			vmap.RegisterChunkVertex (coords, this, i);
 			verts[i].y = vmap.GetHeight(coords);
 		}
+
+		UpdateCollider ();
 	}
 
 	Vector3[] CreateUniformVertexArray (int vertexSize) { 
@@ -135,16 +149,18 @@ public class Chunk {
 		chunk.transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
 
 		//mesh filter stuff
-		Mesh mesh = new Mesh ();
+		mesh = chunk.GetComponent<MeshFilter> ().mesh;
+		mesh = new Mesh ();
+		colliderMesh = chunk.GetComponent<MeshCollider> ().sharedMesh;
 		mesh.vertices = vertices;
+		mesh.normals = normals;
 		mesh.uv = UVcoords;
 		mesh.triangles = triangles;
 		mesh.colors = colors;
 		mesh.RecalculateNormals ();
-		mesh.RecalculateBounds ();
 		mesh.MarkDynamic ();
-		chunk.GetComponent<MeshFilter> ().mesh = mesh;
-		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+		
+
 
 		//mesh renderer stuff
 		chunk.GetComponent<MeshRenderer> ().material = WorldManager.instance.terrainMaterial;
@@ -162,17 +178,19 @@ public class Chunk {
 	}
 
 	public void UpdateCollider () {
-		chunk.GetComponent<MeshFilter>().mesh.RecalculateBounds();
-		chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
+		mesh.vertices = verts;
+		mesh.normals = normals;
+		mesh.RecalculateBounds();
+		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
+		//chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
+		colliderMesh = mesh;
 		ReplaceDecorations();
 	}
 
-	public void UpdateVertex (int index, float height) {
-		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
+	public void UpdateVertex (int index, float height, Vector3 normal) {
 		//vertices[index].y += (height - vertices[index].y)/4f;
-		vertices[index].y = height;
-		chunk.GetComponent<MeshFilter>().mesh.vertices = vertices;
-
+		verts[index].y = height;
+		normals [index] = normal;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
@@ -189,33 +207,34 @@ public class Chunk {
 
 	private IEnumerator UpdateVerts(float updateDist, LinInt freqData) {
 		float margin = WorldManager.instance.chunkSize / 2;
-		Vector3[] vertices = chunk.GetComponent<MeshFilter> ().mesh.vertices;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
 		bool changesMade = false;
 		float startTime = Time.realtimeSinceStartup;
 
-		for (int v = 0; v < vertices.Length; v++) {
-			
+		for (int v = 0; v < numVerts; v++) {
+			if (constrained [v])
+				continue;
 			IntVector2 coords = IntToV2 (v);
 
 			//if (!vmap.IsLocked (coords)) { //if vert is frozen
-				if (!vmap.IsConstrained(coords)) { 
+			if (!vmap.IsConstrained (coords)) { 
 				Vector3 playerPos = PlayerMovement.instance.transform.position;
 
-					Vector3 vertPos = chunk.transform.position + vertices [v];
-					float distance = Vector3.Distance (vertPos, playerPos);
-					if (CheckDist (distance, updateDist, margin)) {
-						Vector3 angleVector = vertPos - playerPos;
-						float angle = Vector3.Angle (Vector3.right, angleVector);
-						float linIntInput = angle / 360f;
-						float newY = freqData.GetDataPoint (linIntInput) * 
-						WorldManager.instance.heightScale;
-						if (newY != vertices[v].y) {
-							changesMade = true;
-							vmap.SetHeight (coords, newY);
-						}
+				Vector3 vertPos = chunk.transform.position + verts [v];
+				float distance = Vector3.Distance (vertPos, playerPos);
+				if (CheckDist (distance, updateDist, margin)) {
+					Vector3 angleVector = vertPos - playerPos;
+					float angle = Vector3.Angle (Vector3.right, angleVector);
+					float linIntInput = angle / 360f;
+					float newY = freqData.GetDataPoint (linIntInput) *
+					              WorldManager.instance.heightScale;
+					if (newY != verts [v].y) {
+						changesMade = true;
+						vmap.SetHeight (coords, newY);
 					}
 				}
+			} else
+				constrained [v] = true;
 			//}
 			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
 				yield return null;

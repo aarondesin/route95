@@ -3146,7 +3146,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.000061035156}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &177463291
@@ -9612,7 +9612,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9448677
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13153,6 +13153,7 @@ MonoBehaviour:
   tooltip: {fileID: 529178210}
   tooltipDistance: 32
   casette: {fileID: 1730378343}
+  reflectionProbes: []
 --- !u!4 &622006810
 Transform:
   m_ObjectHideFlags: 0
@@ -17690,9 +17691,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loadsToDo: 0
-  chunkSize: 100
+  chunkSize: 200
   chunkResolution: 12
-  chunkLoadRadius: 8
+  chunkLoadRadius: 4
   heightScale: 200
   vertexUpdateDistance: 600
   wind: {x: 0, y: 0, z: 0}
@@ -17727,7 +17728,7 @@ MonoBehaviour:
   secondaryNightColor: {r: 0.058823533, g: 0.078431375, b: 0.18823531, a: 1}
   primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
   secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
-  chunkUpdatesPerCycle: 4
+  chunkUpdatesPerCycle: 2
   freqArraySize: 256
   decorationsPerStep: 100
   roadPathCheckResolution: 500
@@ -20187,7 +20188,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.000061035156, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -23389,7 +23390,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1550758007}
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

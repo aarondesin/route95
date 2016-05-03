@@ -97,8 +97,9 @@ public class VertexMap {
 	}
 
 	public void SetHeight (int x, int y, float h) {
-		if (vertices[x][y].nearRoad) return;
-		vertices[x][y].SetHeight (h);
+		Vertex vert = vertices [x] [y];
+		if (vert.nearRoad) return;
+		vert.SetHeight (h);
 	}
 
 	public void AddHeight (IntVector2 i, float h) {
@@ -168,27 +169,24 @@ public class VertexMap {
 				if (Mathf.Abs(x * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) continue;
 				foreach (int y in vertices[x].Keys) {
 					if (Mathf.Abs(y * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) continue;
-					if (vertices[x][y].locked) continue;
-					if (vertices[x][y].nearRoad) {
-						//Debug.Log("nearRoad: "+vertices[x][y].ToString());
-						//continue;
-					}
-					Vector3 worldPos = vertices[x][y].WorldPos();
+					Vertex vert = vertices [x] [y];
+					if (vert.locked) continue;
+					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
 					//Debug.Log(dist);
-					vertices[x][y].nearRoad = dist <= NEARBY_ROAD_DISTANCE;
+					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
 						//Vector3.Distance (, roadPoint) <= NEARBY_ROAD_DISTANCE;
-					if (vertices[x][y].nearRoad) {
+					if (vert.nearRoad) {
 						//Debug.Log("constrained "+vertices[x][y].ToString());
 						//Unlock (x, y);
 						//vertices[x][y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x][y].height - roadPoint.y));
-						vertices[x][y].SetHeight(roadPoint.y);
-						foreach (GameObject decoration in vertices[x][y].decorations) {
+						vert.SetHeight(roadPoint.y);
+						foreach (GameObject decoration in vert.decorations) {
 							Debug.Log("destroyed", decoration);
 							//MonoBehaviour.Destroy (decoration);
 
 						}
-						Lock (x, y);
+						vert.locked = true;
 
 						//Debug.Log(PlayerMovement.instance.progress);
 						//Debug.Log ("Bulldozed " +vertices[x][y].ToString());
@@ -358,8 +356,10 @@ public class Vertex {
 			}
 			*/
 			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
-			chunkVert.Key.UpdateVertex (chunkVert.Value, h);
+
 			normal += chunkVert.Key.chunk.GetComponent<MeshFilter>().mesh.normals[chunkVert.Value];
+			normal.Normalize ();
+			chunkVert.Key.UpdateVertex (chunkVert.Value, h, normal);
 			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
 			//chunkVert.Key.vertices [chunkVert.Value].y = height;
 			//chunkVert.Key.vertices = verts;

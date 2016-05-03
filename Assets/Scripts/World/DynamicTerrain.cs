@@ -31,6 +31,8 @@ public class DynamicTerrain {
 	int chunkRes;
 	int chunkLoadRadius;
 
+	bool initialLoad = true;
+
 	#endregion
 	#region DynamicTerrain Methods
 
@@ -94,13 +96,14 @@ public class DynamicTerrain {
 		}
 
 
-		if (activeChunks.Count == chunksToLoad) {
+		if (initialLoad && activeChunks.Count == chunksToLoad) {
 			int res = vertexmap.vertices.Keys.Count;
 			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
 			//CreateMountain (-32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
 			//CreateMountain (32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
 			//CreateMountain (32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
 			//CreateMountain (-32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
+			initialLoad = false;
 			WorldManager.instance.DoLoadRoad();
 		}
 		yield return null;
@@ -108,36 +111,38 @@ public class DynamicTerrain {
 
 
 	void UpdateChunks(float[] freqDataArray){
-		freqData = UpdateFreqData();
-		List<int> xChunks = new List<int>(); //x coords of chunks to be loaded
-		List<int> yChunks = new List<int>(); //y coords of chunks to be loaded
-		CreateChunkLists (xChunks, yChunks);
-		CreateChunks (xChunks, yChunks);
-		DeleteChunks (xChunks, yChunks);
+		if (!GameManager.instance.loaded)
+			return;
+		if (chunksToUpdate == null) chunksToUpdate = new List<Chunk> ();
 
-		if (chunksToUpdate == null) 
-			chunksToUpdate = new List<Chunk> ();
-		else chunksToUpdate.Clear ();
+			freqData = UpdateFreqData ();
+			List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
+			List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
+			CreateChunkLists (xChunks, yChunks);
+			CreateChunks (xChunks, yChunks);
+			DeleteChunks (xChunks, yChunks);
 
-		foreach (Chunk chunk in activeChunks) {
-			if (DistanceToPlayer(chunk) <= WorldManager.instance.vertexUpdateDistance) {
-				chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
-				if (chunksToUpdate.Count == 0) chunksToUpdate.Add (chunk);
-				else {
-					for (int i = 0; i < chunksToUpdate.Count; i++) {
-						if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
-							chunksToUpdate.Insert (i, chunk);
-							break;
+			chunksToUpdate.Clear ();
+			foreach (Chunk chunk in activeChunks) {
+				if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
+					chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
+					if (chunksToUpdate.Count == 0)
+						chunksToUpdate.Add (chunk);
+					else {
+						for (int i = 0; i < chunksToUpdate.Count; i++) {
+							if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
+								chunksToUpdate.Insert (i, chunk);
+								break;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
-			chunksToUpdate [i].Update (WorldManager.instance.vertexUpdateDistance, freqData);
-			chunkPriorities [chunksToUpdate [i]] = 0;
-		}
+			for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+				chunksToUpdate [i].Update (WorldManager.instance.vertexUpdateDistance, freqData);
+				chunkPriorities [chunksToUpdate [i]] = 0;
+			}
 			
 	}
 
