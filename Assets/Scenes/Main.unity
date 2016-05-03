@@ -9611,8 +9611,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 838191496}
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9448677
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13154,6 +13154,7 @@ MonoBehaviour:
   tooltipDistance: 32
   casette: {fileID: 1730378343}
   reflectionProbes: []
+  loaded: 0
 --- !u!4 &622006810
 Transform:
   m_ObjectHideFlags: 0
@@ -17698,7 +17699,7 @@ MonoBehaviour:
   vertexUpdateDistance: 600
   wind: {x: 0, y: 0, z: 0}
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
-  doDecorate: 0
+  doDecorate: 1
   initialMaxActive:
   - group: 1
     maxActive: 400
@@ -23961,7 +23962,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 848.99994, y: -431}
+  m_AnchoredPosition: {x: 17.5, y: 0}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391

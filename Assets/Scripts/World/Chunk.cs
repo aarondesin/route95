@@ -21,7 +21,7 @@ public class Chunk {
 	public bool nearRoad = false; // Chunk is within one chunk distance of a road
 
 	Mesh colliderMesh;
-	Mesh mesh;
+	public Mesh mesh;
 	Vector3[] verts;
 	bool[] constrained;
 	int numVerts;
@@ -44,28 +44,24 @@ public class Chunk {
 		numVerts = verts.Length;
 		constrained = new bool[numVerts];
 		normals = new Vector3[numVerts];
-		for (int i = 0; i < numVerts; i++) {
-			normals [i] = Vector3.up;
-			constrained [i] = false;
-		}
+
 		uvs = CreateUniformUVArray (chunkRes);
 		triangles = CreateSquareArrayTriangles (chunkRes);
-		colors = new Color[verts.Length];
-		chunk = CreateChunk (verts, uvs, triangles);
+		colors = new Color[numVerts];
+		chunk = CreateChunk (verts, normals, uvs, triangles);
 
 		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
 		chunk.name += "Position:"+chunk.transform.position.ToString();
 
-		//CheckForRoad (PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
-
+		VertexMap vmap = DynamicTerrain.instance.vertexmap;
+	
 		// Register all vertices with vertex map
-		for (int i=0; i<verts.Length; i++) {
+		for (int i=0; i<numVerts; i++) {
+			normals [i] = Vector3.up;
+			constrained [i] = false;
 			colors[i] = new Color (0f, 0f, 0f, 0.5f);
 			IntVector2 coords = IntToV2 (i);
-			VertexMap vmap = DynamicTerrain.instance.vertexmap;
-
 			vmap.RegisterChunkVertex (coords, this, i);
-			verts[i].y = vmap.GetHeight(coords);
 		}
 
 		UpdateCollider ();
@@ -137,7 +133,7 @@ public class Chunk {
 	}
 
 	//create terrain gameobject with mesh
-	GameObject CreateChunk (Vector3[] vertices, Vector2[] UVcoords, int[] triangles) {
+	GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
 		GameObject chunk = new GameObject ("Chunk ("+x+","+y+")", 
@@ -149,9 +145,8 @@ public class Chunk {
 		chunk.transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
 
 		//mesh filter stuff
-		mesh = chunk.GetComponent<MeshFilter> ().mesh;
-		mesh = new Mesh ();
-		colliderMesh = chunk.GetComponent<MeshCollider> ().sharedMesh;
+		mesh = new Mesh();
+
 		mesh.vertices = vertices;
 		mesh.normals = normals;
 		mesh.uv = UVcoords;
@@ -163,16 +158,21 @@ public class Chunk {
 
 
 		//mesh renderer stuff
+		chunk.GetComponent<MeshFilter>().mesh = mesh;
+
 		chunk.GetComponent<MeshRenderer> ().material = WorldManager.instance.terrainMaterial;
 		chunk.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		chunk.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
+		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
 		chunk.GetComponent<MeshCollider>().convex = false;
 
 		chunk.GetComponent<Rigidbody>().freezeRotation = true;
 		chunk.GetComponent<Rigidbody>().isKinematic = true;
 		chunk.GetComponent<Rigidbody>().useGravity = false;
 		chunk.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+
+
 
 		return chunk;
 	}
@@ -188,16 +188,13 @@ public class Chunk {
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
-		//vertices[index].y += (height - vertices[index].y)/4f;
 		verts[index].y = height;
 		normals [index] = normal;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
-		Color[] colors = chunk.GetComponent<MeshFilter> ().mesh.colors;
-		//vertices[index].y += (height - vertices[index].y)/4f;
 		colors[index].a = blendValue;
-		chunk.GetComponent<MeshFilter>().mesh.colors = colors;
+		mesh.colors = colors;
 
 	}
 

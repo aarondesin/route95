@@ -97,7 +97,8 @@ public class VertexMap {
 	}
 
 	public void SetHeight (int x, int y, float h) {
-		Vertex vert = vertices [x] [y];
+		Vertex vert = vertices [x][y];
+		if (!ContainsVertex(x, y)) AddVertex (x,y);
 		if (vert.nearRoad) return;
 		vert.SetHeight (h);
 	}
@@ -344,7 +345,7 @@ public class Vertex {
 		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;
 		//if (Random.Range(0, 1000) == 0) Debug.Log(blendValue);
 		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
-			if (chunkVert.Key.chunk == null) {
+			if (chunkVert.Key == null || chunkVert.Key.chunk == null) {
 				deletes.Add (chunkVert);
 				continue;
 			}
@@ -356,8 +357,7 @@ public class Vertex {
 			}
 			*/
 			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
-
-			normal += chunkVert.Key.chunk.GetComponent<MeshFilter>().mesh.normals[chunkVert.Value];
+			normal += chunkVert.Key.mesh.normals[chunkVert.Value];
 			normal.Normalize ();
 			chunkVert.Key.UpdateVertex (chunkVert.Value, h, normal);
 			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);

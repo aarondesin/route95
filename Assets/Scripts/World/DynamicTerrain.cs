@@ -99,10 +99,6 @@ public class DynamicTerrain {
 		if (initialLoad && activeChunks.Count == chunksToLoad) {
 			int res = vertexmap.vertices.Keys.Count;
 			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
-			//CreateMountain (-32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
-			//CreateMountain (32, -32, 21, 43, 10f, 20f, -0.1f, 0.1f);
-			//CreateMountain (32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
-			//CreateMountain (-32, 32, 21, 43, 10f, 20f, -0.1f, 0.1f);
 			initialLoad = false;
 			WorldManager.instance.DoLoadRoad();
 		}
