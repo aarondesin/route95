@@ -150,6 +150,9 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject casette;
 
+	public List<ReflectionProbe> reflectionProbes;
+
+	public bool loaded = false;
 	#endregion
 	#region Unity Callbacks
 
@@ -279,6 +282,7 @@ public class GameManager : MonoBehaviour {
 		Show (mainMenu);
 		loading = false;
 		initialized = true;
+		loaded = true;
 		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 	}
 

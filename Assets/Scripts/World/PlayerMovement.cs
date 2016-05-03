@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerMovement : MonoBehaviour {
 	public static PlayerMovement instance;
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour {
 	public GameObject backLeftWheel;
 	public GameObject backRightWheel;
 
+	float minVelocity;
 	float maxVelocity;
 	float velocity;
 	const float velocityToRotation = -10000f;
@@ -31,6 +33,10 @@ public class PlayerMovement : MonoBehaviour {
 
 	public AudioClip engineClip;
 
+	List<ReflectionProbe> reflectionProbes;
+
+	bool initialized = false;
+
 	// Use this for initialization
 	void Start () {
 		instance = this;
@@ -38,14 +44,19 @@ public class PlayerMovement : MonoBehaviour {
 		moving = false;
 		velocity = 0f;
 
+		reflectionProbes = GetComponentsInChildren<ReflectionProbe> ().ToList<ReflectionProbe>();
+
 		target = new Vector3 (0f, 0f, 0f);
 
 		progress = 0f;
 		StopMoving();
 
+		minVelocity = MusicManager.tempoToFloat [Tempo.Slowest] * distPerBeat;
 		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
 
 		GetComponent<AudioSource>().pitch = 1f;
+
+
 
 	}
 
@@ -60,9 +71,26 @@ public class PlayerMovement : MonoBehaviour {
 		moving = false;
 		foreach (ParticleSystem ps in particles) ps.Pause();
 	}
+
+	public void DisableReflections () {
+		foreach (ReflectionProbe probe in reflectionProbes)
+			probe.enabled = false;
+	}
+
+	public void EnableReflections () {
+		foreach (ReflectionProbe probe in reflectionProbes)
+			probe.enabled = true;
+	}
+
+	void Initialize() {
+		DisableReflections ();
+		initialized = true;
+	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		if (!initialized)
+			Initialize ();
 
 		if (Sun.instance != null) {
 			if (moving && !GameManager.instance.paused) {
@@ -108,10 +136,11 @@ public class PlayerMovement : MonoBehaviour {
 					//Debug.Log ("Target:" + target);
 					//Debug.Log ("offsetH: "+offsetH);
 				}
-				velocityOffset += (
-					(Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 
-						Random.Range (velocityOffset, velocityOffset)) - 0.5f) * 
+				float dOffset = Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 
+					Random.Range (velocityOffset, velocityOffset) - 0.5f * 
 					Time.deltaTime;
+				velocityOffset = Mathf.Clamp (velocityOffset + dOffset, minVelocity, maxVelocity);
+
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
 				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
 				if (progress >= 1f)

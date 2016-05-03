@@ -30,9 +30,11 @@ public enum Key {
 
 public enum Tempo {
 	Slowest,
+	Slower,
 	Slow,
 	Medium,
 	Fast,
+	Faster,
 	Fastest,
 	NUM_TEMPOS
 };
@@ -65,11 +67,13 @@ public class MusicManager : MonoBehaviour {
 	public static bool loop = false;
 
 	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
-		{ Tempo.Slowest, 70f },
+		{ Tempo.Slowest, 50f },
+		{ Tempo.Slower, 70f },
 		{ Tempo.Slow, 90f },
 		{ Tempo.Medium, 110f },
 		{ Tempo.Fast, 130f },
-		{ Tempo.Fastest, 150f }
+		{ Tempo.Faster, 150f },
+		{ Tempo.Fastest, 170f }
 	};
 
 	public int maxBeats; // max beats in riff, after subdivisions

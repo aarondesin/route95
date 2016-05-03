@@ -126,9 +126,11 @@ public class SaveLoad {
 			} catch (SerializationException) {
 				Debug.LogError ("SaveLoad.LoadSong(): Failed to deserialize file, probably empty.");
 				Prompt.instance.PromptMessage("Failed to load song", "File is empty.", "Okay");
+				return null;
 			} catch (EndOfStreamException) {
 				Debug.LogError ("SaveLoad.LoadSong(): Attempted to read past end of stream, file is wrong format?");
 				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+				return null;
 			//} catch (ArgumentException) {
 				//Debug.LogError ("SaveLoad.LoadSong(): Failed to load a riff or song piece. Already exists?");
 				//Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
@@ -136,6 +138,7 @@ public class SaveLoad {
 				Debug.LogError("FailedToLoadException: "+f);
 				MusicManager.instance.currentSong = backupSong;
 				Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+				return null;
 			} finally {
 				file.Close ();
 			}
