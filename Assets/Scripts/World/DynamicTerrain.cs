@@ -18,13 +18,13 @@ public class DynamicTerrain {
 	public List<Chunk> activeCloseToRoadChunks;
 
 	public VertexMap vertexmap;
-	public Dictionary<int, Dictionary<int, bool>> chunkmap;
+	public Dictionary<int, Dictionary<int, Chunk>> chunkmap;
 
 	public LinInt freqData;
 	public int freqSampleSize = 128;
 	public FFTWindow fftWindow = FFTWindow.Rectangular;
 
-	private Dictionary<Chunk, int> chunkPriorities;
+	//private Dictionary<Chunk, int> chunkPriorities;
 	List<Chunk> chunksToUpdate;
 
 	float chunkSize;
@@ -43,13 +43,13 @@ public class DynamicTerrain {
 		//terrain.transform.localScale = new Vector3 (10f, 10f, 10f);
 
 		vertexmap = new VertexMap();
-		chunkmap = new Dictionary<int, Dictionary< int, bool>> ();
+		chunkmap = new Dictionary<int, Dictionary< int, Chunk>> ();
 
 		activeChunks = new List<Chunk>();
 		activeRoadChunks = new List<Chunk>();
 		activeCloseToRoadChunks = new List<Chunk>();
 
-		chunkPriorities = new Dictionary<Chunk, int>();
+		//chunkPriorities = new Dictionary<Chunk, int>();
 
 		chunkSize = WorldManager.instance.chunkSize;
 		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
@@ -58,7 +58,7 @@ public class DynamicTerrain {
 	Chunk CreateChunk(int x, int y){
 		Chunk newChunk = new Chunk(x, y);
 		newChunk.chunk.transform.parent = terrain.transform;
-		chunkPriorities.Add(newChunk, 0);
+		//chunkPriorities.Add(newChunk, 0);
 		return newChunk;
 	}
 
@@ -76,13 +76,13 @@ public class DynamicTerrain {
 		int numLoaded = 0;
 
 		foreach (int x in xChunks) {
-			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, bool>());
+			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
 			foreach (int y in yChunks) {
-				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, false);
-				if (!chunkmap[x][y]) {
+				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
+				if (chunkmap[x][y] == null) {
 					Chunk chunk = CreateChunk (x, y);
 					activeChunks.Add (chunk);
-					chunkmap[x][y] = true;
+					chunkmap[x][y] = chunk;
 					numLoaded++;
 
 					if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
@@ -98,7 +98,8 @@ public class DynamicTerrain {
 
 		if (initialLoad && activeChunks.Count == chunksToLoad) {
 			foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
-			int res = vertexmap.vertices.Keys.Count;
+			//int res = vertexmap.vertices.Keys.Count;
+			int res = vertexmap.vertices.GetLength(0);
 			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
 			initialLoad = false;
 			WorldManager.instance.DoLoadRoad();
@@ -112,34 +113,38 @@ public class DynamicTerrain {
 			return;
 		if (chunksToUpdate == null) chunksToUpdate = new List<Chunk> ();
 
-			freqData = UpdateFreqData ();
-			List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
-			List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
-			CreateChunkLists (xChunks, yChunks);
-			CreateChunks (xChunks, yChunks);
-			DeleteChunks (xChunks, yChunks);
+		freqData = UpdateFreqData ();
+		List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
+		List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
+		CreateChunkLists (xChunks, yChunks);
+		CreateChunks (xChunks, yChunks);
+		DeleteChunks (xChunks, yChunks);
 
-			chunksToUpdate.Clear ();
-			foreach (Chunk chunk in activeChunks) {
-				if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
-					chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
-					if (chunksToUpdate.Count == 0)
-						chunksToUpdate.Add (chunk);
-					else {
-						for (int i = 0; i < chunksToUpdate.Count; i++) {
-							if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
-								chunksToUpdate.Insert (i, chunk);
-								break;
-							}
+		chunksToUpdate.Clear ();
+		foreach (Chunk chunk in activeChunks) {
+			if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
+				//chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
+				chunk.priority += ChunkHeuristic (chunk) +1;
+				if (chunksToUpdate.Count == 0)
+					chunksToUpdate.Add (chunk);
+				else {
+					for (int i = 0; i < chunksToUpdate.Count; i++) {
+					//	if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
+						if (chunk.priority > chunksToUpdate[i].priority) {
+							chunksToUpdate.Insert (i, chunk);
+							break;
 						}
 					}
 				}
 			}
+		}
 
-			for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
-				chunksToUpdate [i].Update (WorldManager.instance.vertexUpdateDistance, freqData);
-				chunkPriorities [chunksToUpdate [i]] = 0;
-			}
+		for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+			chunksToUpdate [i].Update (WorldManager.instance.vertexUpdateDistance, freqData);
+		//	chunkPriorities [chunksToUpdate [i]] = 0;
+			chunksToUpdate[i].priority = 0;
+
+		}
 			
 	}
 
@@ -240,17 +245,17 @@ public class DynamicTerrain {
 
 	void CreateChunks(List<int> xChunks, List<int> yChunks){
 		foreach (int x in xChunks) {
-			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, bool>());
+			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
 			foreach (int y in yChunks) {
-				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, false);
-				if (!chunkmap[x][y]) {
+				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
+				if (chunkmap[x][y] == null) {
 					Chunk chunk = CreateChunk (x, y);
 					activeChunks.Add (chunk);
 					if (chunk.nearRoad) {
 						if (chunk.hasRoad) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
 					}
-					chunkmap[x][y] = true;
+					chunkmap[x][y] =chunk;
 				}
 			}
 		}
@@ -258,11 +263,11 @@ public class DynamicTerrain {
 
 	void DeleteChunk(Chunk chunk){
 		//vertexmap.UnregisterChunkVertex(
-		chunkPriorities.Remove(chunk);
+		//chunkPriorities.Remove(chunk);
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
-		chunkmap[chunk.x][chunk.y] = false;
+		chunkmap[chunk.x][chunk.y] = null;
 	}
 
 	void DeleteChunks(List<int> xChunks, List<int> yChunks) {

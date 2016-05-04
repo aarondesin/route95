@@ -9706,8 +9706,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 838191496}
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
-  m_Value: 0.0000013029112
-  m_Size: 0.9456552
+  m_Value: 0
+  m_Size: 0.91781306
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -18000,7 +18000,7 @@ MonoBehaviour:
   grassEmitterTemplate: {fileID: 1684075852}
   roadWidth: 10
   roadHeight: 1
-  roadExtendRadius: 800
+  roadExtendRadius: 250
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
   timeOfDay: 0
@@ -18023,7 +18023,7 @@ MonoBehaviour:
   chunkUpdatesPerCycle: 2
   freqArraySize: 256
   decorationsPerStep: 100
-  grassPerChunk: 75
+  grassPerChunk: 1
   roadPathCheckResolution: 500
   loadedTerrain: 0
 --- !u!1 &906108765
@@ -23974,7 +23974,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9711592
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24550,7 +24550,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.5, y: 23.422638}
+  m_AnchoredPosition: {x: 17.499756, y: 23.422699}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -30763,7 +30763,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793875
+  m_Size: 0.3624851
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

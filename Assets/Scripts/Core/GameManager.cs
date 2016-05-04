@@ -158,6 +158,8 @@ public class GameManager : MonoBehaviour {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
 
+		Profiler.maxNumberOfSamplesPerFrame = -1;
+
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
 			{ Menu.Main, mainMenu },

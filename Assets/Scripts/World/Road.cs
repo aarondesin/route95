@@ -38,6 +38,8 @@ public class Road : Bezier {
 	public float decorationRemoveThreshold = 0.3f; // Decorations behind this percent will be removed
 	Dictionary<GameObject, float> decorations; // Decorations, and their position along the curve
 
+	//public bool loaded = false;
+
 	#region Unity Callbacks
 
 	void Start () {
@@ -46,6 +48,8 @@ public class Road : Bezier {
 		decorations = new Dictionary<GameObject, float>();
 
 		generateRoadRadius = WorldManager.instance.roadExtendRadius;
+
+		generated = false;
 
 		// Set default points and build mesh
 		Reset ();
@@ -95,7 +99,7 @@ public class Road : Bezier {
 			AddCurve ();
 			PlayerMovement.instance.progress = numerator / CurveCount;
 
-			generated = true;
+			//generated = true;
 		}
 
 	}
@@ -132,28 +136,29 @@ public class Road : Bezier {
 		GameManager.instance.ChangeLoadingMessage("Loading road...");
 		float startTime = Time.realtimeSinceStartup;
 
-		while (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
+		while (true) {
+			if (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
-			float progress = PlayerMovement.instance.progress;
-			float numerator = progress * CurveCount;
+				float progress = PlayerMovement.instance.progress;
+				float numerator = progress * CurveCount;
 
-			AddCurve();
-			PlayerMovement.instance.progress = numerator / CurveCount;
+				AddCurve();
+				PlayerMovement.instance.progress = numerator / CurveCount;
 
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
-				yield return null;
-				startTime = Time.realtimeSinceStartup;
+				if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+					yield return null;
+					startTime = Time.realtimeSinceStartup;
+				}
+				generated = false;
+
+			} else {
+				generated = true;
+				DynamicTerrain.instance.CheckAllChunksForRoad();
+				if (WorldManager.instance.doDecorate)
+					WorldManager.instance.DoLoadDecorations();
+				else WorldManager.instance.FinishLoading();
+				yield break;
 			}
-
-			generated = true;
-		}
-
-		if (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) >= generateRoadRadius) {
-			DynamicTerrain.instance.CheckAllChunksForRoad();
-			if (WorldManager.instance.doDecorate)
-				WorldManager.instance.DoLoadDecorations();
-			else WorldManager.instance.FinishLoading();
-			yield return null;
 		}
 	}
 

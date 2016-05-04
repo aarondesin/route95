@@ -16,6 +16,7 @@ public class Chunk {
 	public GameObject grassEmitter;
 	public int x; //x position in chunk grid
 	public int y; //y position in chunk grid
+	public float priority = 0f;
 
 	bool hasCheckedForRoad = false;
 	public bool hasRoad = false;  // Chunk has road on it

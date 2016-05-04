@@ -262,7 +262,7 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		if (loadedTerrain && !hasRandomized) 
 			Load();
-		if (loaded) {
+		if (loaded && road.generated) {
 
 			terrain.Update(freqDataArray);
 			UpdateTime();
@@ -329,25 +329,6 @@ public class WorldManager : MonoBehaviour {
 		if (decorations.Count == decorationPaths.Count)
 			DoInitialDecoration();
 		yield return null;
-	}
-
-	/*void LoadDecorations () {
-		foreach (string path in decorationPaths) {
-			LoadDecoration (path);
-			//GameManager.instance.IncrementLoadProgress();
-		}
-	}*/
-
-	void DoDecorate () {
-			
-		while (numDecorations < maxDecorations) {
-			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
-					//Debug.Log("dick");
-				AttemptDecorate ();
-				//GameManager.instance.IncrementLoadProgress();
-				//yield return null;
-			}
-		}
 	}
 
 	public void DoInitialDecoration () {
@@ -438,15 +419,9 @@ public class WorldManager : MonoBehaviour {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
-
-	void InitialDecorate () {
-		for (int i=0; i<maxDecorations; i++) {
-			AttemptDecorate ();
-		}
-	}
     
 	bool AttemptDecorate () {
-		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0) {
+		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0 && road.generated) {
 			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
 
 				// Pick a random decoration and decorate with it
@@ -461,6 +436,7 @@ public class WorldManager : MonoBehaviour {
 						Chunk chunk = terrain.RandomChunk ();
 						return DecorateRandom (chunk, decoration);
 					case Decoration.Distribution.Roadside:
+						if (!road.generated) return false;
 						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
 						return DecorateRoadside (bezierProg, decoration);
 					case Decoration.Distribution.CloseToRoad:
@@ -545,9 +521,9 @@ public class WorldManager : MonoBehaviour {
 
 	bool DecorateRoadside (float prog, GameObject decoration) {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
-		Road roadBez = road.GetComponent<Road>();
+		Vector3 point = road.GetPoint(prog);
 		Vector3 coordinate = 
-			roadBez.BezRight(roadBez.GetPoint(prog)) * 1.1f * (side == 0 ? 1 : -1);
+			point + road.BezRight(point) * roadWidth * 1.1f * (side == 1 ? 1 : -1);
 		RaycastHit hit;
 		if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
 			coordinate.y = hit.point.y;
@@ -556,10 +532,11 @@ public class WorldManager : MonoBehaviour {
 			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
 		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f));
 		newDecoration.GetComponent<Decoration>().Randomize();
-		newDecoration.transform.parent = road.gameObject.transform;
+		//newDecoration.transform.parent = road.gameObject.transform;
+		newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
 		numDecorations++;
 		Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-		roadBez.AddDecoration(newDecoration, prog);
+		road.AddDecoration(newDecoration, prog);
 		return true;
 	}
 
@@ -572,6 +549,12 @@ public class WorldManager : MonoBehaviour {
 			decorations.Add(decoration);
 			//GameManager.instance.IncrementLoadProgress();
 		}
+	}
+
+	public void RemoveDecoration (Decoration deco) {
+		Decoration.numDecorations[deco.group]--;
+		numDecorations--;
+		Destroy(deco.gameObject);
 	}
 
 	public void DecNumDeco(int n) {
