@@ -92,7 +92,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void Initialize() {
-		DisableReflections ();
+		//DisableReflections ();
 		initialized = true;
 	}
 	

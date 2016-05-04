@@ -122,6 +122,10 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 
+	public Mesh grassModel;
+	public Material vegetationMaterial;
+	public GameObject grassEmitterTemplate;
+
 
 	//
 	[Header("Road Settings")]
@@ -205,6 +209,10 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Maximum number of decorations to place per update cycle.")]
 	[Range(10, 200)]
 	public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
+
+	[Tooltip("Maximum number of grass particles to place per chunk.")]
+	[Range(0,100)]
+	public int grassPerChunk;
 
 	[Tooltip("The accuracy used in road distance checks.")]
 	[Range(1f, 500f)]
@@ -452,14 +460,11 @@ public class WorldManager : MonoBehaviour {
 					case Decoration.Distribution.Random:
 						Chunk chunk = terrain.RandomChunk ();
 						return DecorateRandom (chunk, decoration);
-						break;
 					case Decoration.Distribution.Roadside:
 						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
 						return DecorateRoadside (bezierProg, decoration);
-						break;
 					case Decoration.Distribution.CloseToRoad:
 						return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
-						break;
 					}
 					//numDecorations++;
 				}

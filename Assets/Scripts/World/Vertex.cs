@@ -171,7 +171,7 @@ public class VertexMap {
 				foreach (int y in vertices[x].Keys) {
 					if (Mathf.Abs(y * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) continue;
 					Vertex vert = vertices [x][y];
-					//if (vert.locked) continue;
+					if (vert.locked) continue;
 					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
 					//Debug.Log(dist);
@@ -181,12 +181,13 @@ public class VertexMap {
 						//Debug.Log("constrained "+vertices[x][y].ToString());
 						//Unlock (x, y);
 						//vertices[x][y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x][y].height - roadPoint.y));
-						vert.SetHeight(roadPoint.y);
+						vert.SmoothHeight(roadPoint.y);
 						foreach (GameObject decoration in vert.decorations) {
 							Debug.Log("destroyed", decoration);
 							//MonoBehaviour.Destroy (decoration);
 
 						}
+						vert.locked = true;
 						//vert.locked = true;
 
 						//Debug.Log(PlayerMovement.instance.progress);
@@ -266,6 +267,25 @@ public class VertexMap {
 		vertices[i.x][i.y].decorations.Add (deco);
 	}
 
+	public Vertex LeftNeighbor (Vertex v) {
+		if (ContainsVertex (v.x -1, v.y)) return vertices[v.x-1][v.y];
+		else return null;
+	}
+
+	public Vertex RightNeighbor (Vertex v) {
+		if (ContainsVertex (v.x +1, v.y)) return vertices[v.x+1][v.y];
+		else return null;
+	}
+
+	public Vertex DownNeighbor (Vertex v) {
+		if (ContainsVertex (v.x , v.y-1)) return vertices[v.x][v.y-1];
+		else return null;
+	}
+	public Vertex UpNeighbor (Vertex v) {
+		if (ContainsVertex (v.x, v.y+1)) return vertices[v.x][v.y+1];
+		else return null;
+	}
+
 	//
 
 	void AddVertex (int x, int y) {
@@ -317,6 +337,43 @@ public class Vertex {
 		chunkVertices = new List<KeyValuePair<Chunk, int>>();
 		decorations = new List<GameObject>();
 	}
+
+	public void SmoothHeight (float h) {
+		SetHeight (h);
+		Vertex l = map.LeftNeighbor (this);
+		if (l != null && !l.locked) l.Smooth (h, 0.5f);
+
+		Vertex r = map.RightNeighbor (this);
+		if (r != null && !r.locked) r.Smooth (h, 0.5f);
+
+		Vertex d = map.DownNeighbor (this);
+		if (d != null && !d.locked) d.Smooth (h, 0.5f);
+
+		Vertex u = map.UpNeighbor (this);
+		if (u != null && !u.locked) u.Smooth (h, 0.5f);
+
+		if (u != null) {
+			Vertex ul = map.LeftNeighbor (u);
+			if (ul != null && !ul.locked) ul.Smooth (h, 0.3f);
+
+			Vertex ur = map.RightNeighbor (u);
+			if (ur != null && !ur.locked) ur.Smooth (h, 0.3f);
+		}
+
+		if (d != null) {
+
+			Vertex dl = map.LeftNeighbor (d);
+			if (dl != null && !dl.locked) dl.Smooth (h, 0.3f);
+
+			Vertex dr = map.RightNeighbor (d);
+			if (dr != null && !dr.locked) dr.Smooth (h, 0.3f);
+		}
+	}
+
+	public void Smooth (float h, float factor) {
+		SetHeight (height + (h-height) * factor);
+	}
+
 		
 	public void SetHeight (float h) {
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();

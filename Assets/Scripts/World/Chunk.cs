@@ -13,6 +13,7 @@ public class Chunk {
 	#region Chunk Vars
 
 	public GameObject chunk; // Chunk object/mesh
+	public GameObject grassEmitter;
 	public int x; //x position in chunk grid
 	public int y; //y position in chunk grid
 
@@ -175,18 +176,65 @@ public class Chunk {
 		chunk.GetComponent<Rigidbody>().useGravity = false;
 		chunk.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
+	//	grassEmitter = new GameObject ("Grass Emitter",
+		//	typeof (ParticleSystem)
+		//);
+		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
 
+		//grassEmitter.GetComponent<ParticleSystem>() = grassEmitterTemplate;
+		grassEmitter.transform.parent = chunk.transform;
+		grassEmitter.transform.position += new Vector3 (-chunkSize/2f, 0f, -chunkSize/2f);
+
+		ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
+
+		//sys.loop = true;
+		sys.maxParticles = Random.Range(0,WorldManager.instance.grassPerChunk);
+		sys.playOnAwake = true;
+		//sys.startColor = Color.white;
+		//sys.startDelay = 0f;
+		//sys.startLifetime = 1000f;
+		//sys.startRotation3D = new Vector3 (0f, 0f, 90f*Mathf.Deg2Rad);
+		//sys.startSize = 2f;
+		//ys.startSpeed = 0f;
+		//sys.sizeOverLifetime.size = new ParticleSystem.MinMaxCurve() {
+		//	mode = ParticleSystemCurveMode.TwoCurves,
+		//	curveMax = new AnimationCurve () {
+				
+
+		//ParticleSystem.ShapeModule shape = new ParticleSystem.ShapeModule();
+		ParticleSystem.ShapeModule shape = sys.shape;
+		//shape.enabled = true;
+		//shape.shapeType = ParticleSystemShapeType.Mesh;
+		//shape.meshShapeType = ParticleSystemMeshShapeType.Triangle;
+		shape.mesh = mesh;
+		//shape.randomDirection = false;
+		//shape.useMeshColors = false;
+
+		//ParticleSystem.EmissionModule emit = sys.emission;
+		ParticleSystem.EmissionModule emit = sys.emission;
+		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
+	
+
+		//ParticleSystemRenderer rend = grassEmitter.GetComponent<ParticleSystemRenderer>();
+	//	rend.renderMode = ParticleSystemRenderMode.Mesh;
+		//rend.mesh = WorldManager.instance.grassModel;
+		//rend.material = WorldManager.instance.vegetationMaterial;
+
+		//grassEmitter.GetComponent<ParticleSystem>() = sys;
 
 		return chunk;
 	}
 
 	public void UpdateCollider () {
+		grassEmitter.GetComponent<ParticleSystem>().Clear();
 		mesh.vertices = verts;
 		mesh.normals = normals;
 		mesh.RecalculateBounds();
 		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
 		chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
 		ReplaceDecorations();
+		//grassEmitter.GetComponent<ParticleSystem>().shape.mesh = mesh;
+		grassEmitter.GetComponent<ParticleSystem>().Play();
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
@@ -312,7 +360,7 @@ public class Chunk {
 		);
 
 		Road road = WorldManager.instance.road;
-		float distance = Mathf.Infinity;
+
 		float progress = startProgress;
 		while (progress <= 1f) {
 			
@@ -354,7 +402,7 @@ public class Chunk {
 	public void ReplaceDecorations () {
 		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
-			if (tr == chunk.transform) continue;
+			if (tr == chunk.transform || tr == grassEmitter.transform) continue;
 			if (tr.gameObject.GetComponent<Decoration>().dynamic) continue;
 			RaycastHit hit;
 			if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z), Vector3.down,out hit, Mathf.Infinity)) {
