@@ -14,6 +14,11 @@ public class CameraControl : MonoBehaviour {
 		
 	#region Exposed Vars
 
+	[Header("General camera settings")]
+
+	public float swaySpeed = 1f;
+	public float baseSway = 1f;
+
 	[Tooltip("Initial position for camera")]
 	public Transform initialPosition;
 
@@ -274,6 +279,11 @@ public class CameraControl : MonoBehaviour {
 				}
 			}
 		}
+
+		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway;
+		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway;
+
+		transform.Rotate (bx, by, 0f);
 	}
 
 	#endregion
