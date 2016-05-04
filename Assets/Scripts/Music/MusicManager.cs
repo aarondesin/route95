@@ -57,7 +57,8 @@ public class MusicManager : MonoBehaviour {
 
 	// --Global Music Properties-- //
 	public Instrument currentInstrument = MelodicInstrument.ElectricGuitar;
-	public Song currentSong;
+	[NonSerialized]
+	public Song currentSong = null;
 	public int currentPlayingSong;
 	public bool loopSong = false; // loop song in live mode?
 
@@ -72,6 +73,8 @@ public class MusicManager : MonoBehaviour {
 	private int beat;
 	public static bool playing = false;
 	public static bool loop = false;
+	public bool loopPlaylist = false;
+	public Image loopPlaylistButton;
 
 	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
 		{ Tempo.Slowest, 50f },
@@ -100,8 +103,6 @@ public class MusicManager : MonoBehaviour {
 	void Start () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
-
-		currentSong = new Song ();
 
 		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
 
@@ -270,6 +271,11 @@ public class MusicManager : MonoBehaviour {
 		SetKey ((int)key);
 	}
 
+	public void ToggleLoopPlaylist () {
+		loopPlaylist = !loopPlaylist;
+		loopPlaylistButton.sprite = loopPlaylist ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
+	}
+
 	public void PlayRiffLoop(){
 		if (loop) {
 			StopLooping();
@@ -297,6 +303,7 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 					break;
 				case GameManager.Mode.Live:
+					if (currentSong == null) return;
 					
 					if (beat >= currentSong.Beats) {
 						//Debug.Log("shit");

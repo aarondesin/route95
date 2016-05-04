@@ -86,7 +86,7 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
+		if (GameManager.instance.currentMode == GameManager.Mode.Live && MusicManager.instance.currentSong != null) {
 
 			// Check for pause
 			if (Input.GetKeyDown (KeyCode.Escape)) GameManager.instance.TogglePause ();

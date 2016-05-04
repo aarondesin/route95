@@ -150,8 +150,6 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject casette;
 
-	public List<ReflectionProbe> reflectionProbes;
-
 	public bool loaded = false;
 	#endregion
 	#region Unity Callbacks
@@ -175,11 +173,6 @@ public class GameManager : MonoBehaviour {
 		ShowAll ();
 		//MoveCasetteBack();
 
-		loadPhases = new Dictionary <LoadPhase, bool> () {
-			{LoadPhase.Classes, false},
-			{LoadPhase.Sounds, false},
-		};
-
 		loadingScreen.SetActive(true);
 
 	}
@@ -187,25 +180,6 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		if (!initialized) {
 			if (!loading) {
-				/*loadPhases [LoadPhase.Classes] = 
-					GameManager.instance != null &&
-					InputManager.instance != null &&
-					KeyManager.instance != null &&
-					MusicManager.instance != null &&
-					AddRiffPrompt.instance != null &&
-					InstrumentSetup.instance != null &&
-					LoadPrompt.instance != null &&
-					PlaylistBrowser.instance != null &&
-					Prompt.instance != null &&
-					RadialKeyMenu.instance != null &&
-					SongArrangeSetup.instance != null &&
-					SongTimeline.instance != null &&
-					WorldManager.instance != null &&
-					PlayerMovement.instance != null;*/
-
-				
-
-				//if (loadPhases [LoadPhase.Classes])  Load();
 				Load();
 			} else {
 				return;
@@ -404,8 +378,8 @@ public class GameManager : MonoBehaviour {
 		casette.SetActive(false);
 		//casetteMoving = false;
 		//Debug.Log (MusicManager.instance.currentSong.ToString ());
-		MusicManager.instance.currentSong.CompileSong();
-		if (MusicManager.instance.loopSong) Show(loopIcon);
+
+		if (MusicManager.instance.loopPlaylist) Show(loopIcon);
 		else Hide(loopIcon);
 
 		MoveCasetteBack();
@@ -416,7 +390,10 @@ public class GameManager : MonoBehaviour {
 
 		MusicManager.instance.currentPlayingSong = 0;
 		InstrumentDisplay.instance.Refresh();
-		MusicManager.instance.StartSong();
+		if (MusicManager.instance.currentSong != null) {
+			MusicManager.instance.StartSong();
+			MusicManager.instance.currentSong.CompileSong();
+		}
 		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
 
@@ -435,17 +412,6 @@ public class GameManager : MonoBehaviour {
 		GoToPostPlayMenu();
 
 		currentMode = Mode.Postplay;
-	}
-
-	// Returns to key selection
-	public void NewSong () {
-		MusicManager.instance.StopPlaying();
-		paused = false;
-
-		MusicManager.instance.currentSong = new Song();
-		GoToKeySelectMenu();
-
-		currentMode = Mode.Setup;
 	}
 
 	public void SaveCurrentProject () {
