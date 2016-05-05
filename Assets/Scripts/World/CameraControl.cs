@@ -232,7 +232,7 @@ public class CameraControl : MonoBehaviour {
 	void Update() {
 
 		// If in live mode
-		if (liveMode) {
+		if (liveMode && !GameManager.instance.paused) {
 
 			// Check each mapped key for input
 			foreach (KeyCode key in keyToView.Keys) {

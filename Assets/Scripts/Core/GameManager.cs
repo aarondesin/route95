@@ -299,6 +299,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GoToPlaylistMenu () {
+		MusicManager.instance.StopPlaying();
+		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.StopLiveMode();
 		currentMode = Mode.Setup;
 		casette.SetActive(true);
 		HideAll ();

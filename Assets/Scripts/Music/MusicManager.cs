@@ -304,9 +304,9 @@ public class MusicManager : MonoBehaviour {
 					break;
 				case GameManager.Mode.Live:
 					if (currentSong == null) return;
+					if (currentSong.Beats == 0) return;
 					
 					if (beat >= currentSong.Beats) {
-						//Debug.Log("shit");
 						beat = 0;
 
 							if (currentPlayingSong < currentProject.songs.Count-1) {
