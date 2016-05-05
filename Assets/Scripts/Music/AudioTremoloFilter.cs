@@ -3,8 +3,8 @@ using System.Collections;
 
 public class AudioTremoloFilter : MonoBehaviour {
 
-	[Range(0.01f, Mathf.PI/8f)]
-	public float rate;
+	[Range(Mathf.PI/32f, Mathf.PI/16f)]
+	public float rate = Mathf.PI/32f;
 
 	[Range(0f, 1f)]
 	public float depth;
@@ -33,11 +33,9 @@ public class AudioTremoloFilter : MonoBehaviour {
 
 	void OnAudioFilterRead (float[] data, int channels) {
 
-		float axis = 1f - (1f - depth) / 2f;
-		float amplitude = depth / 2f;
-
-		for (int i=0; i< data.Length; i++) {
-			data[i] = data[i] * (amplitude + Mathf.Cos(r) + axis);
+		for (int i=0; i<data.Length; i++) {
+			data[i] = data[i] *( 1f - (1f-depth)/2f + 0.5f*Mathf.Cos(r));
+			//data[i] = data[i] * Mathf.Cos(r);
 		}
 	}
 }

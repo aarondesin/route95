@@ -90,12 +90,6 @@ public class EffectButton : MonoBehaviour {
 		source.gameObject.GetComponent<AudioReverbFilter>().reverbLevel = InstrumentSetup.currentRiff.reverbLevel;	
 	}
 
-	public void updatefuzzLevel(Slider slider){ // getting rid later
-		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
-		InstrumentSetup.currentRiff.distortionLevel = slider.value;
-		source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
-	}
-
 	public void updatetremoloRate(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.tremoloRate = slider.value;		

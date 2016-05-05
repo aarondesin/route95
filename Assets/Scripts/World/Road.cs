@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿	using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +17,8 @@ public class Road : Bezier {
 	public float maxSlope = 0.0015f;
 
 	public bool generated = false;
+
+	float UVProgress = 0f;
 
 	//
 	// Mesh generation params
@@ -299,34 +301,29 @@ public class Road : Bezier {
 			float progressF = (float)(num) / (float)steps;
 			Vector3 pointF = GetPoint (progressF);
 
+			UVProgress += Vector3.Distance (pointF, pointI);
+			float UVValue = 0.5f + 0.5f * Mathf.Sin(UVProgress);
+
 			newVertices.Add(pointF + width * -BezRight (GetDirection(progressF)));
-			newUVs.Add(
-				(flipUVs ? new Vector2(-0.25f, 1f) : new Vector2 (-0.25f, 0f))
-			);
+			newUVs.Add(new Vector2(-0.25f, UVValue));
 			int leftDownF = num * 4;
 
 			newVertices.Add(pointF + width * BezRight (GetDirection(progressF)));
-			newUVs.Add(
-				(flipUVs ? new Vector2(1.25f, 1f) : new Vector2 (1.25f, 0f))
-			);
+			newUVs.Add(new Vector2(1.25f, UVValue));
 			int rightDownF = num * 4 + 1;
 
 			newVertices.Add(
 				pointF + slope * width * 
 				-BezRight (GetDirection(progressF)) + height * -BezDown(GetDirection(progressI))
 			);
-			newUVs.Add(
-				(flipUVs ? new Vector2(1-slope-0.25f, 1f) : new Vector2 (1-slope-0.25f, 0f))
-			);
+			newUVs.Add(new Vector2(1-slope-0.25f, UVValue));
 			int leftUpF = num * 4 + 2;
 
 			newVertices.Add(
 				pointF + slope * width * 
 				BezRight (GetDirection(progressF)) + height * -BezDown(GetDirection(progressI))
 			);
-			newUVs.Add(
-				(flipUVs ? new Vector2(slope+0.25f, 1f) : new Vector2 (slope+0.25f, 0f))
-			);
+			newUVs.Add(new Vector2(slope+0.25f, UVValue));
 			int rightUpF = num * 4 + 3;
 
 

@@ -26,12 +26,6 @@ public class Riff {
 	[SerializeField]
 	public float distortionLevel = 0f;
 
-	// Fuzz
-	[SerializeField]
-	public bool fuzzEnabled = false;
-	[SerializeField]
-	public float fuzzLevel = 0f;
-
 	// Tremolo
 	[SerializeField]
 	public bool tremoloEnabled = false;

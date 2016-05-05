@@ -52,7 +52,6 @@ public class InstrumentSetup : MonoBehaviour {
 	public List<EffectSlider> effectSliders;
 
 	public Image distortionButton;
-	public Image fuzzButton;
 	public Image tremoloButton;
 	public Image chorusButton;
 	public Image flangerButton;
@@ -101,10 +100,9 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 
 		distortionButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
-		fuzzButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
 		tremoloButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioTremoloFilter>().enabled ? percussionFilled : percussionEmpty;
 		chorusButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
-		//flangerButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
+		flangerButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
 		echoButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioEchoFilter>().enabled ? percussionFilled : percussionEmpty;
 		reverbButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioReverbFilter>().enabled ? percussionFilled : percussionEmpty;
 			
