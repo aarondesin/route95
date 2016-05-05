@@ -33,10 +33,13 @@ public class VertexMap {
 
 	float chunkSize;
 	int chunkRes;
-	int chunkRadius;
+	int chunkRadius; 
+
+	List<GameObject> deletes;
 
 	public VertexMap () {
 		//vertices = new Dictionary<int, Dictionary<int, Vertex>>();
+		deletes = new List<GameObject>();
 
 		chunkSize = WorldManager.instance.chunkSize;
 		chunkRes = WorldManager.instance.chunkResolution;
@@ -144,39 +147,37 @@ public class VertexMap {
 	public void DoCheckRoads (List<Vector3> roadPoints) {
 		WorldManager.instance.StartCoroutine (CheckRoads(roadPoints));
 	}
-	//public void CheckRoads (Vector3 roadPoint) {
+
 	IEnumerator CheckRoads (List<Vector3> roadPoints) {
-		activeBulldozeRoutines ++;
 		float startTime = Time.realtimeSinceStartup;
+
 		foreach (Vector3 roadPoint in roadPoints) {
-			//Debug.Log("check "+roadPoint);
 			for (int x = 0; x<width; x++) {
-				if (Mathf.Abs((x-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) continue;
+
+				// Skip if impossible for a point to be in range
+				if (Mathf.Abs((x-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
+					continue;
+
 				for (int y=0; y<width; y++) {
-					if (Mathf.Abs((y-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) continue;
+
+					// Skip if impossible for a point to be in range
+					if (Mathf.Abs((y-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) 
+						continue;
+					
 					Vertex vert = vertices[x,y];
 					if (vert == null) continue;
 					if (vert.locked) continue;
+
 					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
-					//Debug.Log(dist);
 					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
-						//Vector3.Distance (, roadPoint) <= NEARBY_ROAD_DISTANCE;
+
 					if (vert.nearRoad) {
-						//Debug.Log("constrained "+vertices[x,y].ToString());
-						//Unlock (x, y);
-						//vertices[x,y].setHeight(roadPoint.y + (dist/Mathf.Pow(NEARBY_ROAD_DISTANCE, 3f))*(vertices[x,y].height - roadPoint.y));
 						vert.SmoothHeight(roadPoint.y);
-						foreach (GameObject decoration in vert.decorations) {
-							Debug.Log("destroyed", decoration);
-							//MonoBehaviour.Destroy (decoration);
-
-						}
+						foreach (GameObject decoration in vert.decorations) deletes.Add(decoration);
+						foreach (GameObject decoration in deletes) 
+							WorldManager.instance.RemoveDecoration(decoration.GetComponent<Decoration>());
 						vert.locked = true;
-						//vert.locked = true;
-
-						//Debug.Log(PlayerMovement.instance.progress);
-						//Debug.Log ("Bulldozed " +vertices[x,y].ToString());
 					}
 
 					if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
@@ -188,7 +189,6 @@ public class VertexMap {
 			}
 
 		}
-		activeBulldozeRoutines --;
 		yield return null;
 	}
 
@@ -247,7 +247,7 @@ public class VertexMap {
 
 	public Vertex VertexAt (int x, int y) {
 		if (x+width/2 >= width || y+width/2 >= width) return null;
-		if (Random.Range(0,1000)==0) Debug.Log(x+","+y+" is actually "+(x+width/2)+","+(y+width/2)+" width:"+width);
+		//if (Random.Range(0,1000)==0) Debug.Log(x+","+y+" is actually "+(x+width/2)+","+(y+width/2)+" width:"+width);
 		return vertices[x+width/2, y+width/2];
 	}
 
@@ -304,7 +304,7 @@ public class VertexMap {
 				//vertices[x,y].x += width/2;
 				//vertices[x,y].y += width/2;
 				newMap[x+width/2,y+width/2] = vertices[x,y];
-				if (Random.Range(0,1000) == 0) Debug.Log("newWidth"+width*2+" "+x+","+y+" mapped to "+(x+width)+","+(y+width)+".");
+				//if (Random.Range(0,1000) == 0) Debug.Log("newWidth"+width*2+" "+x+","+y+" mapped to "+(x+width)+","+(y+width)+".");
 			}
 		}
 		vertices = newMap;

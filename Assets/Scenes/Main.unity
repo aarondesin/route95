@@ -3190,7 +3190,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0.000091552734}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &177463291
@@ -9707,7 +9707,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.91781306
+  m_Size: 0.9456551
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17999,7 +17999,7 @@ MonoBehaviour:
   vegetationMaterial: {fileID: 2100000, guid: 7d033ffc71fccf945a013d4bf3503779, type: 2}
   grassEmitterTemplate: {fileID: 1684075852}
   roadWidth: 10
-  roadHeight: 1
+  roadHeight: 0.5
   roadExtendRadius: 250
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
@@ -20584,7 +20584,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -23974,7 +23974,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9711592
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24550,7 +24550,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.499756, y: 23.422699}
+  m_AnchoredPosition: {x: -849, y: 431.00006}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -30762,8 +30762,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288437015}
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.3624851
+  m_Value: 1
+  m_Size: 0.97938746
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

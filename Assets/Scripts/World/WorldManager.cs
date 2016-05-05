@@ -523,20 +523,24 @@ public class WorldManager : MonoBehaviour {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
 		Vector3 point = road.GetPoint(prog);
 		Vector3 coordinate = 
-			point + road.BezRight(point) * roadWidth * 1.1f * (side == 1 ? 1 : -1);
+			point + road.BezRight(point) * roadWidth * 2f * (side == 0 ? 1 : -1);
 		RaycastHit hit;
 		if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
 			coordinate.y = hit.point.y;
 		else coordinate.y = 0f;
 		GameObject newDecoration = 
 			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
-		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f));
 		newDecoration.GetComponent<Decoration>().Randomize();
+
+		Vector3 rot = Quaternion.FromToRotation (coordinate+ road.GetDirection(prog), coordinate ).eulerAngles + new Vector3 (-90f,90f,0f);
+		newDecoration.transform.rotation = Quaternion.Euler(rot);
+	
+		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
 		//newDecoration.transform.parent = road.gameObject.transform;
 		newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
 		numDecorations++;
 		Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-		road.AddDecoration(newDecoration, prog);
+		//road.AddDecoration(newDecoration, prog);
 		return true;
 	}
 
