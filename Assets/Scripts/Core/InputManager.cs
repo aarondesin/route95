@@ -110,6 +110,9 @@ public class InputManager : MonoBehaviour {
 			} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
 				AudioSource source = MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument];
 				if (source.volume <= 0.9f) source.volume += 0.1f;
+
+			} else if (Input.GetKeyDown (KeyCode.Escape)) {
+				GameManager.instance.Pause();
 			} else {
 				
 				// Check for instruments switch

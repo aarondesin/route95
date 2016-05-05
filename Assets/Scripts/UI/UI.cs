@@ -77,7 +77,10 @@ public class UI : MonoBehaviour {
 			typeof (ShowHide),
 			typeof (Image)
 		);
-		button.GetComponent<RectTransform>().localScale = new Vector3 (1f,1f,1f);
+		RectTransform tr = button.GetComponent<RectTransform>();
+		tr.localScale = Vector3.one;
+		tr.localRotation = Quaternion.Euler(Vector3.zero);
+
 		return button;
 	}
 
@@ -102,7 +105,12 @@ public class UI : MonoBehaviour {
 			typeof (CanvasRenderer),
 			typeof (Text)
 		);
-		//text.GetComponent<Text>().resizeTextForBestFit = true;
+		RectTransform tr = text.GetComponent<RectTransform>();
+		tr.localScale = Vector3.one;
+		tr.localRotation = Quaternion.Euler(Vector3.zero);
+		Text txt = text.GetComponent<Text>();
+		txt.resizeTextForBestFit = false;
+		txt.fontStyle = FontStyle.Normal;
 		return text;
 	}
 
@@ -112,8 +120,61 @@ public class UI : MonoBehaviour {
 			typeof (CanvasRenderer),
 			typeof (Image)
 		);
+		RectTransform tr = image.GetComponent<RectTransform>();
+		tr.localScale = Vector3.one;
+		tr.localRotation = Quaternion.Euler(Vector3.zero);
 		return image;
 	}
 
 
+}
+
+public static class UIExtension {
+	/// <summary>
+	/// Anchors at point.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	public static void AnchorAtPoint (this RectTransform tr, float x, float y) {
+		Vector2 anchorPoint = new Vector2 (x, y);
+		tr.anchorMax = anchorPoint;
+		tr.anchorMin = anchorPoint;
+	}
+
+	/// <summary>
+	/// Anchors at point.
+	/// </summary>
+	/// <param name="anchorPoint">Anchor point.</param>
+	public static void AnchorAtPoint (this RectTransform tr, Vector2 anchorPoint) {
+		tr.anchorMax = anchorPoint;
+		tr.anchorMin = anchorPoint;
+	}
+
+	public static void ResetScaleRot (this RectTransform tr) {
+		tr.localScale = Vector3.one;
+		tr.localRotation = Quaternion.Euler(Vector3.zero);
+	}
+}
+
+public static class GameObjectExtension {
+	
+	public static RectTransform RectTransform (this GameObject obj) {
+		return obj.GetComponent<RectTransform>();
+	}
+
+	public static Button Button (this GameObject obj) {
+		return obj.GetComponent<Button>();
+	}
+
+	public static Text Text (this GameObject obj) {
+		return obj.GetComponent<Text>();
+	}
+
+	public static Image Image (this GameObject obj) {
+		return obj.GetComponent<Image>();
+	}
+
+	public static ShowHide ShowHide (this GameObject obj) {
+		return obj.GetComponent<ShowHide>();
+	}
 }

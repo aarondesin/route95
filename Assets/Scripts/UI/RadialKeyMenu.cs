@@ -15,8 +15,14 @@ public class RadialKeyMenu : MonoBehaviour {
 	public float scaleFactor;
 	public GameObject confirmButton;
 
-	void LateStart () {
+	Color gray = new Color (0.8f, 0.8f, 0.8f, 0.8f);
+
+	void Awake () {
 		instance = this;
+		objects = new List<GameObject>();
+	}
+
+	void LateStart () {
 		Refresh();
 	}
 
@@ -26,11 +32,8 @@ public class RadialKeyMenu : MonoBehaviour {
 		
 
 	public void Refresh () {
-		if (objects == null) objects = new List<GameObject>();
-		else {
-			foreach (GameObject obj in objects) Destroy (obj);
-			objects.Clear();
-		}
+		foreach (GameObject obj in objects) Destroy (obj);
+		objects.Clear();
 
 		radius = (GetComponent<RectTransform>().rect.width - baseScale) / 2f;
 		scale = baseScale;
@@ -48,27 +51,38 @@ public class RadialKeyMenu : MonoBehaviour {
 			tr.localScale = new Vector3 (1f, 1f, 1f);
 			tr.anchorMin = new Vector2 (0.5f, 0.5f);
 			tr.anchorMax = new Vector2 (0.5f, 0.5f);
-			tr.anchoredPosition3D = new Vector3 (
-				radius * Mathf.Cos (angle),
-				radius * Mathf.Sin (angle),
-				0f
-			);
+			tr.anchoredPosition3D = new Vector3 ( radius * Mathf.Cos (angle), radius * Mathf.Sin (angle), 0f);
 
 			Text text = button.GetComponentInChildren<Text>();
 			if (key.ToString().Contains("Sharp")) text.text = key.ToString()[0] + "#";
 			text.font = GameManager.instance.font;
 			text.fontSize = (int)(scale/2f);
-			text.color = Color.white;
+			text.color = gray;
 
 			Image img = button.GetComponent<Image>();
 			img.sprite = GameManager.instance.circleIcon;
+			img.color =  gray;
 
 			if (key == MusicManager.instance.currentSong.key) {
-				text.color = Color.gray;
-				img.color = Color.gray;
+				text.color = Color.white;
+				img.color = Color.white;
+
+				GameObject hl = UI.MakeImage (key.ToString() +"_SelectedHighlight");
+				tr = hl.GetComponent<RectTransform>();
+				tr.SetParent (button.GetComponent<RectTransform>());
+				tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+				tr.localScale = Vector3.one;
+				tr.anchorMin = new Vector2 (0.5f, 0.5f);
+				tr.anchorMax = new Vector2 (0.5f, 0.5f);
+				tr.anchoredPosition3D = Vector3.zero;
+
+				img = hl.GetComponent<Image>();
+				img.sprite = GameManager.instance.circleIcon;
+				img.color = Color.white;
 			}
 
 			button.GetComponent<Button>().onClick.AddListener (delegate {
+				GameManager.instance.MenuClick();
 				MusicManager.instance.currentSong.key = key;
 				Refresh();
 			});
@@ -78,10 +92,10 @@ public class RadialKeyMenu : MonoBehaviour {
 			tr = highlight.GetComponent<RectTransform>();
 			tr.SetParent (button.GetComponent<RectTransform>());
 			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
-			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.localScale = Vector3.one;
 			tr.anchorMin = new Vector2 (0.5f, 0.5f);
 			tr.anchorMax = new Vector2 (0.5f, 0.5f);
-			tr.anchoredPosition3D = new Vector3 (0f, 0f, 0f);
+			tr.anchoredPosition3D = Vector3.zero;
 			highlight.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
 			highlight.GetComponent<Image>().color = new Color (1f, 1f, 1f, 1f);
 
@@ -108,26 +122,24 @@ public class RadialKeyMenu : MonoBehaviour {
 			tr.localScale = new Vector3 (1f, 1f, 1f);
 			tr.anchorMin = new Vector2 (0.5f, 0.5f);
 			tr.anchorMax = new Vector2 (0.5f, 0.5f);
-			tr.anchoredPosition3D = new Vector3 (
-				radius * Mathf.Cos (angle),
-				radius * Mathf.Sin (angle),
-				0f
-			);
+			tr.anchoredPosition3D = new Vector3 (radius * Mathf.Cos (angle), radius * Mathf.Sin (angle), 0f);
 
 			Text text = button.GetComponentInChildren<Text>();
 			text.font = GameManager.instance.font;
 			text.fontSize = (int)(baseScale/2f);
-			text.color = Color.white;
+			text.color = gray;
 
 			Image img = button.GetComponent<Image>();
 			img.sprite = GameManager.instance.circleIcon;
+			img.color = gray;
 
 			if (i == MusicManager.instance.currentSong.scale) {
-				text.color = Color.gray;
-				img.color = Color.gray;
+				text.color = Color.white;
+				img.color = Color.white;
 			}
 
 			button.GetComponent<Button>().onClick.AddListener (delegate {
+				GameManager.instance.MenuClick();
 				MusicManager.instance.currentSong.scale = scalei.scaleIndex;
 				Refresh();
 			});

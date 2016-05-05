@@ -60,6 +60,7 @@ public class CameraControl : MonoBehaviour {
 	List<CameraView> angles;
 	float transitionTimer;
 	bool liveMode = false;
+	bool paused = false;
 
 	// Mappings of keys to camera angle indices
 	static Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
@@ -232,7 +233,7 @@ public class CameraControl : MonoBehaviour {
 	void Update() {
 
 		// If in live mode
-		if (liveMode && !GameManager.instance.paused) {
+		if (liveMode && !paused) {
 
 			// Check each mapped key for input
 			foreach (KeyCode key in keyToView.Keys) {
@@ -298,6 +299,14 @@ public class CameraControl : MonoBehaviour {
 	public void StopLiveMode () {
 		liveMode = false;
 		LerpToPosition(ViewChase);
+	}
+
+	public void Pause () {
+		paused = true;
+	}
+
+	public void Unpause () {
+		paused = true;
 	}
 
 	// Pick a new random camera angle

@@ -91,6 +91,10 @@ public class GameManager : MonoBehaviour {
 	public Sprite circleIcon;
 	public Sprite volumeIcon;
 	public Sprite fillSprite;
+	public Sprite scribbleCircle;
+
+	public AudioClip menuClick;
+	//public AudioClip
 
 	[Header("Menu Objects")]
 
@@ -134,7 +138,7 @@ public class GameManager : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
 
@@ -151,12 +155,10 @@ public class GameManager : MonoBehaviour {
 
 		projectSavePath = Application.persistentDataPath + projectSaveFolder;
 		songSavePath = Application.persistentDataPath + songSaveFolder;
+	}
 
-		ShowAll ();
-		//MoveCasetteBack();
-
-		loadingScreen.SetActive(true);
-
+	void Start () {
+		ShowAll();
 	}
 
 	void Update () {
@@ -222,6 +224,10 @@ public class GameManager : MonoBehaviour {
 	#region GameManager Methods
 
 	void Load () {
+		HideAll ();
+		//MoveCasetteBack();
+
+		loadingScreen.SetActive(true);
 		startLoadTime = Time.realtimeSinceStartup;
 		Debug.Log("GameManager.Load()");
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
@@ -326,26 +332,35 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void ShowAll () {
+		Show (mainMenu);
 		Show (playlistMenu);
+		Show (keySelectMenu);
 		Show (songArrangeMenu);
+		Show (riffEditMenu);
+		Show (postPlayMenu);
 
 		Show (addRiffPrompt);
 		Show (loadPrompt);
 		Show (prompt);
+		Show (liveIcons);
 	}
 
 	public void Hide (GameObject menu) {
+		Fadeable fade = menu.GetComponent<Fadeable>();
+		if (fade != null) {
+			if (fade.disableAfterFading) {
+				fade.Fade();
+				return;
+			}
+		}
 		menu.SetActive(false);
 	}
 
 	public void HideAll () {
-		//if (mainMenu.activeSelf) mainMenu.GetComponent<Fadeable>().Fade();
-		//if (playlistMenu.activeSelf) playlistMenu.GetComponent<Fadeable>().Fade();
-		//if (keySelectMenu.activeSelf) keySelectMenu.GetComponent<Fadeable>().Fade();
-		//if (riffEditMenu.activeSelf) riffEditMenu.GetComponent<Fadeable>().Fade();
 		Hide (mainMenu);
 		Hide (playlistMenu);
 		Hide (keySelectMenu);
+		Hide (songArrangeMenu);
 		Hide (riffEditMenu);
 		Hide (postPlayMenu);
 
@@ -447,6 +462,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	public void MenuClick () {
+		MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(menuClick, 1f);
+	}
+
 	// Enables visibility of the tooltip with the given message
 	public void ShowTooltip (string message) {
 		tooltip.SetActive(true);
@@ -467,12 +486,14 @@ public class GameManager : MonoBehaviour {
 		paused = true;
 		pauseMenu.SetActive(true);
 		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.Pause();
 	}
 
 	public void Unpause () {
 		paused = false;
 		pauseMenu.SetActive(false);
 		PlayerMovement.instance.StartMoving();
+		CameraControl.instance.Unpause();
 	}
 
 	public void Exit () {

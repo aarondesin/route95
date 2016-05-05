@@ -236,20 +236,20 @@ public class Chunk {
 		ReplaceDecorations();
 		//grassEmitter.GetComponent<ParticleSystem>().shape.mesh = mesh;
 		grassEmitter.GetComponent<ParticleSystem>().Play();
+		needsColliderUpdate = false;
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
+		if (verts[index].y != height) needsColliderUpdate = true;
 		verts[index].y = height;
 		normals [index] = normal;
 		mesh.vertices = verts;
 		mesh.normals = normals;
-		needsColliderUpdate = true;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
 		colors[index].a = blendValue;
 		mesh.colors = colors;
-
 	}
 
 	private bool CheckDist (float dist, float updateDist, float margin) {

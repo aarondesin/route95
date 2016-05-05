@@ -14,7 +14,7 @@ public class Fadeable : MonoBehaviour {
 	float alpha;
 	Dictionary<MaskableGraphic, Color> originalColors;
 
-	public void Start () {
+	public void Awake () {
 		originalColors = new Dictionary<MaskableGraphic, Color>();
 		if (fadeAllChildren) {
 			List<MaskableGraphic> allGraphics = GetComponentsInChildren<MaskableGraphic>().ToList<MaskableGraphic>();
@@ -42,32 +42,39 @@ public class Fadeable : MonoBehaviour {
 	}
 
 	IEnumerator DoFade () {
-		while (alpha >= fadeSpeed && originalColors != null) {
-			alpha -= fadeSpeed;
+		while (true) {
+			if (alpha >= fadeSpeed && originalColors != null) {
+				alpha -= fadeSpeed;
 
-			foreach (MaskableGraphic graphic in originalColors.Keys) {
-				Color newColor = originalColors[graphic];
-				newColor.a *= alpha;
-				graphic.color = newColor;
+				foreach (MaskableGraphic graphic in originalColors.Keys) {
+					Color newColor = originalColors[graphic];
+					newColor.a *= alpha;
+					graphic.color = newColor;
+				}
+					
+				yield return 0;
+			} else {
+				if (disableAfterFading) gameObject.SetActive(false);
+				yield break;
 			}
-				
-			yield return 0;
 		}
-
-		if (disableAfterFading) gameObject.SetActive(false);
 	}
 
 	IEnumerator DoUnFade () {
-		while (alpha <= 1f-fadeSpeed && originalColors != null) {
-			alpha += fadeSpeed;
+		while (true) {
+			if (alpha <= 1f-fadeSpeed && originalColors != null) {
+				alpha += fadeSpeed;
 
-			foreach (MaskableGraphic graphic in originalColors.Keys) {
-				Color newColor = originalColors[graphic];
-				newColor.a *= alpha;
-				graphic.color = newColor;
+				foreach (MaskableGraphic graphic in originalColors.Keys) {
+					Color newColor = originalColors[graphic];
+					newColor.a *= alpha;
+					graphic.color = newColor;
+				}
+
+				yield return 0;
+			} else {
+				yield break;
 			}
-
-			yield return 0;
 		}
 	}
 }

@@ -77,7 +77,8 @@ public class InstrumentSetup : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
+		Debug.Log("awake");
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
 	}
