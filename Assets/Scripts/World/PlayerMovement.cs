@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour {
 	public AudioClip engineClip;
 
 	List<ReflectionProbe> reflectionProbes;
-	Vector3 prevPosition;
+	//Vector3 prevPosition;
 
 	bool initialized = false;
 	float dOffset;
@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour {
 		moving = false;
 		velocity = 0f;
 
-		prevPosition = Vector3.zero;
+		//prevPosition = Vector3.zero;
 		reflectionProbes = GetComponentsInChildren<ReflectionProbe> ().ToList<ReflectionProbe>();
 
 		target = new Vector3 (0f, 0f, 0f);
@@ -149,8 +149,8 @@ public class PlayerMovement : MonoBehaviour {
 				velocityOffset = Mathf.Clamp (velocityOffset + dOffset, minVelocity, maxVelocity);
 
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
-				float realVelocity = Vector3.Distance (transform.position, prevPosition) / Time.fixedDeltaTime;
-				prevPosition = transform.position;
+				//float realVelocity = Vector3.Distance (transform.position, prevPosition) / Time.fixedDeltaTime;
+				//prevPosition = transform.position;
 				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
 				if (progress >= 1f)
 					progress = 1f;

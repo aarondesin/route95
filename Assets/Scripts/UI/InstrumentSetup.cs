@@ -264,10 +264,15 @@ public class InstrumentSetup : MonoBehaviour {
 
 
 			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				currentRiff.Toggle(note, num);
-				bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
-				// (riffai.FindHintXPosition(riffai.FindSimilarCase (currentRiff), currentRiff));
-				Toggle(bt.GetComponent<Button>());
+				//if (!bt.GetComponent<NoteButton>().isDrag) {
+				if (!InputManager.instance.IsDragging) {
+					bool n = currentRiff.Toggle(note, num);
+					ShowHide sh = bt.GetComponent<ShowHide>();
+					if (!n) sh.Hide();
+					bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
+					bt.GetComponent<Image>().sprite = (n ? percussionFilled : percussionEmpty);
+					if (n) sh.Show();
+				}
 			});
 
 			buttons.Add(bt);

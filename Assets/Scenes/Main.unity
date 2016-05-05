@@ -25589,7 +25589,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swaySpeed: 0.5
-  baseSway: 0.02
+  baseSway: 0.01
   initialPosition: {fileID: 2107393831}
   ViewOutsideCar: {fileID: 2107393831}
   ViewDriving: {fileID: 656372253}

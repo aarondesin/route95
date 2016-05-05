@@ -14,7 +14,6 @@ public class NoteButton : DraggableButton {
 	public Image volumeImage;
 
 	float oldVolume;
-
 	#endregion
 	#region Unity Callbacks
 
@@ -23,6 +22,8 @@ public class NoteButton : DraggableButton {
 		maxDragDistanceDown = vDragDistance;
 		maxDragDistanceLeft = hDragDistance;
 		maxDragDistanceRight = hDragDistance;
+
+		//dragThreshold = 25f;
 	}
 
 	#endregion

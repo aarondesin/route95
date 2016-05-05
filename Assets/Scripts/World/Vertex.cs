@@ -29,7 +29,6 @@ public class VertexMap {
 
 	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
 	float NEARBY_ROAD_DISTANCE;
-	int activeBulldozeRoutines = 0;
 
 	float chunkSize;
 	int chunkRes;

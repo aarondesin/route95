@@ -27,15 +27,6 @@ public class GameManager : MonoBehaviour {
 		Postplay
 	};
 
-	public enum LoadPhase {
-		Classes,
-		Sounds,
-		Instruments,
-		Scales,
-		Chunks,
-		Decorations
-	};
-
 	public static GameManager instance;
 
 	#region GameManager Vars
@@ -44,19 +35,9 @@ public class GameManager : MonoBehaviour {
 
 	public int targetFrameRate = 60;
 
-	private int loadSpeed = 1;
 	private int loadProgress = 0;
 	private int loadsToDo;
 	bool loading = false;
-
-	public LoadPhase loadPhase;
-	private Dictionary <LoadPhase, bool> loadPhases;
-
-	bool classesLoaded = false;
-	bool soundsLoaded = false;
-	bool scaleInfoLoaded = false;
-	bool instrumentsLoaded = false;
-	bool scalesLoaded = false;
 
 
 	public bool paused = false;
@@ -65,8 +46,6 @@ public class GameManager : MonoBehaviour {
 
 
 	bool initialized = false;
-	float startLoadTime;
-	int loadValue = 0;
 	bool casetteMoving = false;
 	public Transform casetteFront;
 	public Transform casetteBack;
@@ -140,6 +119,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
 
+	float startLoadTime;
 	public int loadingSpeed;
 	public GameObject loadingScreen;
 	public GameObject loadingBar;
@@ -210,7 +190,7 @@ public class GameManager : MonoBehaviour {
 			if (casetteMoving) {
 				float progress = (Time.time - sTime) * casetteMoveSpeed;
 				float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
-				if (dist == float.NaN) Debug.Log("casette is broken");
+				//if (dist == float.NaN) Debug.Log("casette is broken");
 				casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
 				casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
 				if (dist >= 1f) {
@@ -242,6 +222,7 @@ public class GameManager : MonoBehaviour {
 	#region GameManager Methods
 
 	void Load () {
+		startLoadTime = Time.realtimeSinceStartup;
 		Debug.Log("GameManager.Load()");
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
 		loading = true;

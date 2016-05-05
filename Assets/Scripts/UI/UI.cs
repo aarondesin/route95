@@ -16,38 +16,46 @@ public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	public float fadeSpeed;
 	List<IEnumerator> activeFades;
 
+	public void Show() {
+		foreach (GameObject obj in objects) {
+			switch (transitionType) {
+			case TransitionType.Instant:
+				obj.SetActive(true);
+				break;
+			case TransitionType.Fade:
+				if (activeFades == null) activeFades = new List<IEnumerator>();
+				IEnumerator temp = Fade(obj);
+				activeFades.Add(temp);
+				StartCoroutine (temp);
+				break;
+			}
+		}
+	}
+
+	public void Hide () {
+		foreach (GameObject obj in objects) {
+			switch (transitionType) {
+			case TransitionType.Instant:
+				obj.SetActive(false);
+				break;
+			case TransitionType.Fade:
+				foreach (IEnumerator fade in activeFades)
+					StopCoroutine (fade);
+				activeFades.Clear();
+				break;
+			}
+		}
+	}
+
 	public void OnPointerEnter (PointerEventData eventData) {
 		if (objects != null && InputManager.instance.selected == null) {
-			foreach (GameObject obj in objects) {
-				switch (transitionType) {
-					case TransitionType.Instant:
-						obj.SetActive(true);
-						break;
-				case TransitionType.Fade:
-					if (activeFades == null) activeFades = new List<IEnumerator>();
-					IEnumerator temp = Fade(obj);
-					activeFades.Add(temp);
-					StartCoroutine (temp);
-					break;
-				}
-			}
+			Show();
 		}
 	}
 
 	public void OnPointerExit (PointerEventData eventData) {
 		if (objects != null && InputManager.instance.selected == null) {
-			foreach (GameObject obj in objects) {
-				switch (transitionType) {
-				case TransitionType.Instant:
-					obj.SetActive(false);
-					break;
-				case TransitionType.Fade:
-					foreach (IEnumerator fade in activeFades)
-						StopCoroutine (fade);
-					activeFades.Clear();
-					break;
-				}
-			}
+			Hide();
 		}
 	}
 

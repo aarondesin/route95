@@ -19,7 +19,9 @@ public class Fadeable : MonoBehaviour {
 		if (fadeAllChildren) {
 			List<MaskableGraphic> allGraphics = GetComponentsInChildren<MaskableGraphic>().ToList<MaskableGraphic>();
 			foreach (MaskableGraphic graphic in allGraphics) originalColors.Add (graphic, graphic.color);
-		} else originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
+		} else if (GetComponent<MaskableGraphic>() != null) {
+			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
+		}
 			
 		alpha = (startFaded ? 0f : 1f);
 		foreach (MaskableGraphic graphic in originalColors.Keys) {

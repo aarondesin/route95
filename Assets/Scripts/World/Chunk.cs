@@ -383,7 +383,7 @@ public class Chunk {
 
 	public static IntVector2 ToNearestVMapCoords (float x, float y) {
 		float chunkSize = WorldManager.instance.chunkSize;
-		int chunkRes = WorldManager.instance.chunkResolution;
+		//int chunkRes = WorldManager.instance.chunkResolution;
 
 		return new IntVector2 (
 			Mathf.RoundToInt((x-chunkSize/2f) / chunkSize),

@@ -21,6 +21,13 @@ public class InputManager : MonoBehaviour {
 	List<AudioSource> audioSources;
 
 
+	public int framesDragged = 0;
+	public bool IsDragging {
+		get {
+			return framesDragged >= 30;
+		}
+	}
+
 
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, PercussionInstrument.RockDrums },
@@ -161,9 +168,12 @@ public class InputManager : MonoBehaviour {
 				}
 			} else {
 				if (selected) {
+					framesDragged++;
 					if (selected.GetComponent<DraggableButton>() != null) {
 						selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - clickPosition);
 					}
+				} else {
+					framesDragged = 0;
 				}
 			}
 		}

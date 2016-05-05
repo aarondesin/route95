@@ -385,7 +385,7 @@ public class CameraControl : MonoBehaviour {
 
 	// Lerp to position
 	public void LerpToPosition (Transform newPosition) {
-		Camera.main.fov = 75f;
+		Camera.main.fieldOfView = 75f;
 		start = GetComponent<Transform>();
 		sTime = Time.time;
 		target = newPosition;
