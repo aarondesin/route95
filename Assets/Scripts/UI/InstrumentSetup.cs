@@ -78,7 +78,6 @@ public class InstrumentSetup : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-		Debug.Log("awake");
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
 	}
@@ -118,8 +117,7 @@ public class InstrumentSetup : MonoBehaviour {
 		MakeBeatNumbers ();
 		UpdateBeatsText();
 		UpdateTempoText();
-		scrollBarH.value = 0.01f;
-		scrollBarV.value = 0.99f;
+
 
 		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
 
@@ -130,6 +128,8 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
 
+		scrollBarH.value = 0.01f;
+		scrollBarV.value = 0.99f;
 	}
 
 	// Removes all existing buttons
@@ -144,7 +144,8 @@ public class InstrumentSetup : MonoBehaviour {
 			buttons.Add(MakeText((i+1).ToString(), beatsBar_tr,
 				new Vector2 (48f, 48f),
 				new Vector2 (
-					buttonWidth*2f + (buttonWidth+buttonSpacing)*(i*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS)),
+					buttonWidth + (buttonWidth+buttonSpacing)*(i*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS)),
+					//buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-beatsBar_tr.rect.height/2f
 				)
 			));
@@ -196,12 +197,15 @@ public class InstrumentSetup : MonoBehaviour {
 		for(int n = 0; n<numButtons; n++) {
 			buttonGrid.Add(new List<GameObject>());
 		}
-		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+		RectTransform tr = gameObject.RectTransform();
+		tr.sizeDelta = new Vector2 (
 			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
 			(row+2)*buttonWidth + row*buttonSpacing
 		);
-		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
-		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
+		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		//beatsBar_tr.offsetMax = Vector2.zero;
+		//beatsBar_tr.offsetMax = new Vector2 (tr.offsetMax.x, beatsBar_tr.offsetMax.y);
 		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
 
 		// Make icon for note
@@ -227,50 +231,52 @@ public class InstrumentSetup : MonoBehaviour {
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
+			RectTransform bt_tr = bt.RectTransform();
 			bt.tag = "StopScrolling";
 			bt.AddComponent<NoteButton>();
 			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
+				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
+				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
 			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
+				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 			}
 				
 			Note note = new Note (soundName, vol, 1f);
 			GameObject volume = UI.MakeImage(title+"_volume");
-			volume.GetComponent<RectTransform>().SetParent(bt.GetComponent<RectTransform>());
-			volume.GetComponent<RectTransform>().sizeDelta = bt.GetComponent<RectTransform>().sizeDelta * 1.3f;
-			volume.GetComponent<RectTransform>().localScale = bt.GetComponent<RectTransform>().localScale * 1.3f;
-			volume.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.5f);
-			volume.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.5f);
-			volume.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f, 0f, 0f);
-			volume.GetComponent<Image>().sprite = GameManager.instance.volumeIcon;
-			volume.GetComponent<Image>().type = Image.Type.Filled;
+			RectTransform volume_tr = volume.RectTransform();
+			volume_tr.SetParent(bt_tr);
+			volume_tr.sizeDelta = bt_tr.sizeDelta * 1.3f;
+			volume_tr.localScale = bt_tr.localScale * 1.3f;
+			volume_tr.AnchorAtPoint(0.5f, 0.5f);
+			volume_tr.anchoredPosition3D = Vector3.zero;
+
+			Image volume_img = volume.Image();
+			volume_img.sprite = GameManager.instance.volumeIcon;
+			volume_img.type = Image.Type.Filled;
 			if (vol != 1f) Debug.Log(vol);
-			volume.GetComponent<Image>().fillAmount = vol;
+			volume_img.fillAmount = vol;
 
 
 			bt.GetComponent<NoteButton>().targetNote = note;
 			bt.GetComponent<NoteButton>().volumeImage = volume.GetComponent<Image>();
 
-			bt.AddComponent<ShowHide>();
-			bt.GetComponent<ShowHide>().objects = new List<GameObject>() { volume};
-			bt.GetComponent<ShowHide>().transitionType = TransitionType.Instant;
-			bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
+			ShowHide bt_sh = bt.AddComponent<ShowHide>();
+			bt_sh.objects = new List<GameObject>() { volume};
+			bt_sh.transitionType = TransitionType.Instant;
+			bt_sh.enabled = currentRiff.Lookup(note, num);
 
 			volume.SetActive(false);
 
 
-			bt.GetComponent<Button>().onClick.AddListener(()=>{
+			bt.Button().onClick.AddListener(()=>{
 				//if (!bt.GetComponent<NoteButton>().isDrag) {
 				if (!InputManager.instance.IsDragging) {
 					bool n = currentRiff.Toggle(note, num);
-					ShowHide sh = bt.GetComponent<ShowHide>();
-					if (!n) sh.Hide();
-					bt.GetComponent<ShowHide>().enabled = currentRiff.Lookup(note, num);
-					bt.GetComponent<Image>().sprite = (n ? percussionFilled : percussionEmpty);
-					if (n) sh.Show();
+					if (!n) bt_sh.Hide();
+					bt_sh.enabled = currentRiff.Lookup(note, num);
+					bt.Image().sprite = (n ? percussionFilled : percussionEmpty);
+					if (n) bt_sh.Show();
 				}
 			});
 
@@ -400,9 +406,14 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
-	public void SyncScrollViews () {
-		iconBar.value = scrollBarV.value;
-		beatsBar.value = scrollBarH.value;
+	public void SyncHorizontalScrollViews (Scrollbar slider) {
+		scrollBarH.value = slider.value;
+		beatsBar.value = slider.value;
+	}
+
+	public void SyncVerticalScrollViews (Scrollbar slider) {
+		scrollBarV.value = slider.value;
+		iconBar.value = slider.value;
 	}
 
 	public void IncreaseOctavesShown () {

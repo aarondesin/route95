@@ -229,7 +229,6 @@ public class GameManager : MonoBehaviour {
 
 		loadingScreen.SetActive(true);
 		startLoadTime = Time.realtimeSinceStartup;
-		Debug.Log("GameManager.Load()");
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
 		loading = true;
 

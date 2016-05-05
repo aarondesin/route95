@@ -306,7 +306,7 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	public void Unpause () {
-		paused = true;
+		paused = false;
 	}
 
 	// Pick a new random camera angle

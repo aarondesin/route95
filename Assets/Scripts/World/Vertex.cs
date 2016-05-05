@@ -165,7 +165,7 @@ public class VertexMap {
 					
 					Vertex vert = vertices[x,y];
 					if (vert == null) continue;
-					if (vert.locked) continue;
+					//if (vert.locked) continue;
 
 					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
