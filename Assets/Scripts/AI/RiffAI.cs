@@ -7,7 +7,7 @@ using System.Linq;
 public class RiffAI {
 
 	//public RiffAI instance;
-	int minimumSimilarityValue = 0;
+//	int minimumSimilarityValue = 0;
 
 	//Compares the given riff to all of the cases in 
 	//melodyCaseList and RhtyhmCaseList, to find the case that

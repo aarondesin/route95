@@ -18,6 +18,7 @@ ModelImporter:
     3300000: //RootNode
     3300002: barrel_cactus
     4300000: barrel_cactus
+    4300002: barrel_cactus._NoNeedles
   materials:
     importMaterials: 1
     materialName: 0

@@ -36,7 +36,7 @@ public class LoadPrompt : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		fileButtons = new List<GameObject>();
 		instance = this;
 	}
@@ -71,57 +71,57 @@ public class LoadPrompt : MonoBehaviour {
 
 			GameObject button = UI.MakeButton(filename);
 
-			button.GetComponent<RectTransform>().SetParent(fileList);
-			float width = ((RectTransform)button.GetComponent<RectTransform>().parent.parent).rect.width;
-			button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, buttonSize.y);
-			button.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-			button.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
-			button.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
-			button.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-				horizontalPadding + button.GetComponent<RectTransform>().sizeDelta.x/2f,
-				((i == 0 ? 0f : verticalPadding) + button.GetComponent<RectTransform>().sizeDelta.y)*-(float)(i+1),
+			RectTransform button_tr = button.RectTransform();
+			button_tr.SetParent(fileList);
+			float width = ((RectTransform)button_tr.parent.parent).rect.width;
+			button_tr.sizeDelta = new Vector2(width, buttonSize.y);
+			button_tr.AnchorAtPoint(0f, 1f);
+			button_tr.anchoredPosition3D = new Vector3 (
+				horizontalPadding + button_tr.sizeDelta.x/2f,
+				((i == 0 ? 0f : verticalPadding) + button_tr.sizeDelta.y)*-(float)(i+1),
 				0f
 			);
+			button_tr.ResetScaleRot();
 
-			button.GetComponent<Image>().sprite = fillSprite;
-			button.GetComponent<Image>().color = new Color(1f,1f,1f,0f);
+			Image button_img = button.Image();
+			button_img.sprite = fillSprite;
+			button_img.color = new Color(1f,1f,1f,0f);
 
 			GameObject text = UI.MakeText(filename+"_Text");
-			text.GetComponent<RectTransform>().SetParent(button.transform);
-			text.GetComponent<RectTransform>().sizeDelta = ((RectTransform)text.GetComponent<RectTransform>().parent).sizeDelta;
-			text.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-			text.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.5f);
-			text.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.5f);
-			text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (0f,0f,0f);
-			text.GetComponent<Text>().text = filename;
-			text.GetComponent<Text>().fontSize = 36;
-			text.GetComponent<Text>().color = Color.white;
-			text.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-			text.GetComponent<Text>().fontStyle = FontStyle.Bold;
-			text.GetComponent<Text>().alignment = TextAnchor.MiddleLeft;
+			RectTransform text_tr = text.RectTransform();
+			text_tr.SetParent(button.transform);
+			text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
+			text_tr.AnchorAtPoint (0.5f, 0.5f);
+			text.GetComponent<RectTransform>().anchoredPosition3D = Vector3.zero;
+			text_tr.ResetScaleRot();
 
-			button.GetComponent<Button>().onClick.AddListener(()=>{
+			Text text_text = text.Text();
+			text_text.text = filename;
+			text_text.fontSize = 36;
+			text_text.color = Color.white;
+			text_text.font = GameManager.instance.font;
+			text_text.alignment = TextAnchor.MiddleLeft;
+
+			button.Button().onClick.AddListener(()=>{
+				GameManager.instance.MenuClick();
 				ResetButtons();
 				selectedPath = path;
-				loadButton.GetComponent<Button>().interactable = true;
-				appendButton.GetComponent<Button>().interactable = true;
-				button.GetComponent<Image>().color = new Color(1f,1f,1f,0.5f);
+				loadButton.Button().interactable = true;
+				button.Image().color = new Color(1f,1f,1f,0.5f);
 			});
-
-
+				
 			fileButtons.Add(button);
 
 			GameObject highlight = UI.MakeImage (filename+"_Highlight");
-			RectTransform tr = highlight.GetComponent<RectTransform>();
-			tr.SetParent (button.transform);
-			tr.sizeDelta = ((RectTransform)text.GetComponent<RectTransform>().parent).sizeDelta;
-			tr.localScale = new Vector3 (1f, 1f, 1f);
-			tr.anchorMin = new Vector2 (0.5f, 0.5f);
-			tr.anchorMax = new Vector2 (0.5f, 0.5f);
-			tr.anchoredPosition3D = new Vector3 (0f, 0f, 0f);
-			highlight.GetComponent<Image>().color = new Color (1f, 1f, 1f, 0.5f);
+			RectTransform highlight_tr = highlight.RectTransform();
+			highlight_tr.SetParent (button_tr);
+			highlight_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
+			highlight_tr.AnchorAtPoint(0.5f, 0.5f);
+			highlight_tr.anchoredPosition3D = Vector3.zero;
+			highlight_tr.ResetScaleRot();
+			highlight.Image().color = new Color (1f, 1f, 1f, 0.5f);
 
-			ShowHide sh = button.AddComponent<ShowHide>();
+			ShowHide sh = button.ShowHide();
 			sh.objects = new List<GameObject>();
 			sh.objects.Add (highlight);
 
@@ -130,7 +130,7 @@ public class LoadPrompt : MonoBehaviour {
 		}
 
 		// Update size of panel to fit all files
-		fileList.GetComponent<RectTransform>().sizeDelta = new Vector2 (fileListSize.x, (float)(fileButtons.Count+1)*(verticalPadding + buttonSize.y));
+		fileList.sizeDelta = new Vector2 (fileListSize.x, (float)(fileButtons.Count+1)*(verticalPadding + buttonSize.y));
 	}
 
 
@@ -151,10 +151,7 @@ public class LoadPrompt : MonoBehaviour {
 
 	// Resets highlighting of all buttons
 	void ResetButtons () {
-		foreach (GameObject button in fileButtons) {
-			//button.GetComponent<Image>().sprite = null;
-			button.GetComponent<Image>().color = new Color (1f, 1f, 1f, 0f);
-		}
+		foreach (GameObject button in fileButtons) button.Image().color = new Color (1f, 1f, 1f, 0f);
 	}
 
 	#endregion

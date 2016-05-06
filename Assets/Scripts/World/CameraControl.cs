@@ -14,6 +14,11 @@ public class CameraControl : MonoBehaviour {
 		
 	#region Exposed Vars
 
+	[Header("General camera settings")]
+
+	public float swaySpeed = 1f;
+	public float baseSway = 1f;
+
 	[Tooltip("Initial position for camera")]
 	public Transform initialPosition;
 
@@ -55,6 +60,7 @@ public class CameraControl : MonoBehaviour {
 	List<CameraView> angles;
 	float transitionTimer;
 	bool liveMode = false;
+	bool paused = false;
 
 	// Mappings of keys to camera angle indices
 	static Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
@@ -227,7 +233,7 @@ public class CameraControl : MonoBehaviour {
 	void Update() {
 
 		// If in live mode
-		if (liveMode) {
+		if (liveMode && !paused) {
 
 			// Check each mapped key for input
 			foreach (KeyCode key in keyToView.Keys) {
@@ -274,6 +280,11 @@ public class CameraControl : MonoBehaviour {
 				}
 			}
 		}
+
+		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway;
+		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway;
+
+		transform.Rotate (bx, by, 0f);
 	}
 
 	#endregion
@@ -288,6 +299,14 @@ public class CameraControl : MonoBehaviour {
 	public void StopLiveMode () {
 		liveMode = false;
 		LerpToPosition(ViewChase);
+	}
+
+	public void Pause () {
+		paused = true;
+	}
+
+	public void Unpause () {
+		paused = false;
 	}
 
 	// Pick a new random camera angle
@@ -375,7 +394,7 @@ public class CameraControl : MonoBehaviour {
 
 	// Lerp to position
 	public void LerpToPosition (Transform newPosition) {
-		Camera.main.fov = 75f;
+		Camera.main.fieldOfView = 75f;
 		start = GetComponent<Transform>();
 		sTime = Time.time;
 		target = newPosition;

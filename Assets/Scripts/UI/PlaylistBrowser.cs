@@ -21,83 +21,89 @@ public class PlaylistBrowser : MonoBehaviour {
 
 	private List<GameObject> listings;
 
-	void Start () {
+	#region Unity Callbacks
+
+	void Awake () {
 		instance = this;
 		projectNameInputField.onEndEdit.AddListener( delegate {
 			MusicManager.instance.currentProject.name = projectNameInputField.text;
 		});
+		listings = new List<GameObject>();
 	}
+
+	#endregion
+	#region PlaylistBrowser Callbacks
 
 	public void RefreshName () {
 		projectNameInputField.text = MusicManager.instance.currentProject.name;
 	}
 
 	public void Refresh () {
+		//
+		// Clear all listings and buttons
+		//
+		foreach (GameObject listing in listings) Destroy (listing);
+		listings.Clear();
 
-		if (listings == null) listings = new List<GameObject>();
-		else {
-			foreach (GameObject listing in listings) Destroy (listing);
-			listings.Clear();
-		}
-
+		//
+		// Resize browser panel
+		//
 		int numSongs = MusicManager.instance.currentProject.songs.Count;
 		playlist.sizeDelta = new Vector2 (
 			playlist.sizeDelta.x,
 			verticalPadding * (numSongs + 2) + buttonHeight * (numSongs + 1)
 		);
 
+		//
 		// Create song listings
-		for (int i=0; i<numSongs; i++) {
+		//
+		for (int i = 0; i < numSongs; i++) {
 			int num = i;
 			Song song = MusicManager.instance.currentProject.songs[num];
 
 			//
-			// Create button for song
+			// Create listing for song
 			//
 			GameObject listing = UI.MakeButton(song.name);
 			listings.Add (listing);
 
-			RectTransform tr = listing.GetComponent<RectTransform>();
-			tr.SetParent (playlist);
-			tr.sizeDelta = new Vector2 (playlist.GetComponent<RectTransform>().rect.width, buttonHeight);
-			tr.localScale = new Vector3 (1f, 1f, 1f);
-			tr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-			tr.anchorMin = new Vector2 (0f, 1f);
-			tr.anchorMax = new Vector2 (0f, 1f);
-			tr.anchoredPosition3D = new Vector3 (
-				horizontalPadding + tr.sizeDelta.x/2f,
-				//((i == 0 ? verticalPadding : verticalPadding + tr.sizeDelta.y)) * -(float)(i+1),
-				- verticalPadding - tr.sizeDelta.y / 2f - (verticalPadding + tr.sizeDelta.y) * (float)i,
+			RectTransform listing_tr = listing.RectTransform();
+			listing_tr.SetParent (playlist);
+			listing_tr.sizeDelta = new Vector2 (playlist.GetComponent<RectTransform>().rect.width, buttonHeight);
+			listing_tr.AnchorAtPoint(0f, 1f);
+			listing_tr.anchoredPosition3D = new Vector3 (
+				horizontalPadding + listing_tr.sizeDelta.x/2f,
+				- verticalPadding - listing_tr.sizeDelta.y / 2f - (verticalPadding + listing_tr.sizeDelta.y) * (float)i,
 				0f
 			);
+			listing_tr.ResetScaleRot();
 
-			Image img = listing.GetComponent<Image>();
-			img.sprite = fillSprite;
-			img.color = new Color (0f, 0f, 1f, 0f);
+			Image listing_img = listing.Image();
+			listing_img.sprite = fillSprite;
+			listing_img.color = new Color (0f, 0f, 1f, 0f);
 
+			ShowHide listing_sh = listing.ShowHide();
 
 			//
 			// Create background for listing
 			//
 			GameObject listing_bg = UI.MakeImage (song.name + "_bg");
-			RectTransform bgtr = listing_bg.GetComponent<RectTransform>();
-			bgtr.SetParent (playlist);
-			bgtr.sizeDelta = new Vector2 (tr.sizeDelta.x - 2f * horizontalPadding, tr.sizeDelta.y);
-			bgtr.localScale = new Vector3 (1f, 1f, 1f);
-			bgtr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-			bgtr.anchorMin = new Vector2 (0f, 1f);
-			bgtr.anchorMax = new Vector2 (0f, 1f);
-			bgtr.anchoredPosition3D = new Vector3 (
-				horizontalPadding + bgtr.sizeDelta.x / 2f,
-				tr.anchoredPosition3D.y,
+			RectTransform listing_bg_tr = listing_bg.RectTransform();
+			listing_bg_tr.SetParent (playlist);
+			listing_bg_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.x - 2f * horizontalPadding, listing_tr.sizeDelta.y);
+			listing_bg_tr.AnchorAtPoint (0f ,1f);
+			listing_bg_tr.anchoredPosition3D = new Vector3 (
+				horizontalPadding + listing_tr.sizeDelta.x / 2f,
+				listing_tr.anchoredPosition3D.y,
 				0f
 			);
-			bgtr.SetSiblingIndex(-1);
+			listing_bg_tr.SetSiblingIndex(-1);
+			listing_bg_tr.ResetScaleRot();
 
-			Image bgimg = listing_bg.GetComponent<Image>();
-			bgimg.raycastTarget = false;
-			bgimg.sprite = fillSprite;
-			bgimg.color = new Color (1f, 1f, 1f, 0.0f);
+			Image listing_bg_img = listing_bg.Image();
+			listing_bg_img.raycastTarget = false;
+			listing_bg_img.sprite = fillSprite;
+			listing_bg_img.color = new Color (1f, 1f, 1f, 0.0f);
 
 			listings.Add(listing_bg);
 
@@ -106,27 +112,19 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			GameObject listing_text = UI.MakeText(song.name+"_text");
 
-			RectTransform ttr = listing_text.GetComponent<RectTransform>();
-			ttr.SetParent(tr);
-			ttr.sizeDelta = tr.sizeDelta;
-			ttr.localScale = new Vector3 (1f, 1f, 1f);
-			ttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-			ttr.anchorMin = new Vector2 (0.5f, 0.5f);
-			ttr.anchorMin = new Vector2 (0.5f, 0.5f);
-			ttr.anchoredPosition3D = new Vector3 (
-				horizontalPadding*1.5f + tr.sizeDelta.y, 
-				0f, 
-				0f
-			);
+			RectTransform listing_text_tr = listing_text.RectTransform();
+			listing_text_tr.SetParent(listing_tr);
+			listing_text_tr.sizeDelta = listing_tr.sizeDelta;
+			listing_text_tr.AnchorAtPoint (0.5f, 0.5f);
+			listing_text_tr.anchoredPosition3D = new Vector3 (horizontalPadding*1.5f + listing_tr.sizeDelta.y, 0f, 0f);
+			listing_text_tr.ResetScaleRot();
 
-			Text ttxt = listing_text.GetComponent<Text>();
-			//ttxt.text = (i+1).ToString() + ". " + song.name + " M: "+song.NumMeasures();
-			ttxt.text = (i+1).ToString() + ". " + song.name;
-			ttxt.fontSize = fontSize;
-			ttxt.color = Color.black;
-			ttxt.font = font;
-			ttxt.fontStyle = FontStyle.Normal;
-			ttxt.alignment = TextAnchor.MiddleLeft;
+			Text listing_text_txt = listing_text.Text();
+			listing_text_txt.text = (i+1).ToString() + ". " + song.name;
+			listing_text_txt.fontSize = fontSize;
+			listing_text_txt.color = Color.black;
+			listing_text_txt.font = font;
+			listing_text_txt.alignment = TextAnchor.MiddleLeft;
 
 
 			//
@@ -134,25 +132,20 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			GameObject listing_remove = UI.MakeButton(song.name+"_remove");
 
-			RectTransform rtr = listing_remove.GetComponent<RectTransform>();
-			rtr.SetParent(tr);
-			rtr.sizeDelta = new Vector2 (iconScale * tr.sizeDelta.y, iconScale * tr.sizeDelta.y);
-			rtr.localScale = new Vector3 (1f, 1f, 1f);
-			rtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
-			rtr.anchorMin = new Vector2 (1f, 0.5f);
-			rtr.anchorMax = new Vector2 (1f, 0.5f);
-			rtr.anchoredPosition3D = new Vector3 (
-				-horizontalPadding - rtr.sizeDelta.x, 
-				0f, 
-				0f
-			);
+			RectTransform listing_remove_tr = listing_remove.RectTransform();
+			listing_remove_tr.SetParent(listing_tr);
+			listing_remove_tr.sizeDelta = new Vector2 (iconScale * listing_tr.sizeDelta.y, iconScale * listing_tr.sizeDelta.y);
+			listing_remove_tr.AnchorAtPoint (1f, 0.5f);
+			listing_remove_tr.anchoredPosition3D = new Vector3 (-horizontalPadding - listing_remove_tr.sizeDelta.x, 0f, 0f);
+			listing_remove_tr.ResetScaleRot();
 
-			Image rimg = listing_remove.GetComponent<Image>();
-			rimg.color = Color.black;
-			rimg.sprite = GameManager.instance.removeIcon;
+			Image listing_remove_img = listing_remove.Image();
+			listing_remove_img.color = Color.black;
+			listing_remove_img.sprite = GameManager.instance.removeIcon;
 
-			Button rbt = listing_remove.GetComponent<Button>();
-			rbt.onClick.AddListener(()=>{
+			Button listing_remove_button = listing_remove.Button();
+			listing_remove_button.onClick.AddListener(()=>{
+				GameManager.instance.MenuClick();
 				MusicManager.instance.currentProject.songs.RemoveAt(num);
 				Refresh();
 			});
@@ -163,31 +156,29 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			GameObject listing_edit = UI.MakeButton(song.name+"_edit");
 
-			RectTransform etr = listing_edit.GetComponent<RectTransform>();
-			etr.SetParent(tr);
-			etr.sizeDelta = new Vector2 (iconScale * tr.sizeDelta.y, iconScale * tr.sizeDelta.y);
-			etr.localRotation = Quaternion.Euler (1f, 1f, 1f);
-			etr.localScale = new Vector3 (1f, 1f, 1f);
-			etr.anchorMin = new Vector2 (1f, 0.5f);
-			etr.anchorMax = new Vector2 (1f, 0.5f);
-			etr.anchoredPosition3D = new Vector3 (
-				rtr.anchoredPosition3D.x -horizontalPadding - etr.sizeDelta.x , 
+			RectTransform listing_edit_tr = listing_edit.RectTransform();
+			listing_edit_tr.SetParent(listing_tr);
+			listing_edit_tr.sizeDelta = new Vector2 (iconScale * listing_tr.sizeDelta.y, iconScale * listing_tr.sizeDelta.y);
+			listing_edit_tr.AnchorAtPoint (1f, 0.5f);
+			listing_edit_tr.anchoredPosition3D = new Vector3 (
+				listing_remove_tr.anchoredPosition3D.x -horizontalPadding - listing_edit_tr.sizeDelta.x , 
 				0f, 
 				0f
 			);
+			listing_edit_tr.ResetScaleRot();
 
-			Image eimg = listing_edit.GetComponent<Image>();
-			eimg.color = Color.black;
-			eimg.sprite = GameManager.instance.editIcon;
+			Image listing_edit_img = listing_edit.Image();
+			listing_edit_img.color = Color.black;
+			listing_edit_img.sprite = GameManager.instance.editIcon;
 
-			Button ebt = listing_edit.GetComponent<Button>();
-			ebt.onClick.AddListener(()=>{
+			Button listing_edit_button = listing_edit.Button();
+			listing_edit_button.onClick.AddListener(()=>{
+				GameManager.instance.MenuClick();
 				MusicManager.instance.currentSong = song;
 				GameManager.instance.GoToSongArrangeMenu();
 			});
-
-			ShowHide sh = listing.GetComponent<ShowHide>(); 
-			sh.objects = new List<GameObject>() {
+				
+			listing_sh.objects = new List<GameObject>() {
 				listing_edit,
 				listing_remove,
 				listing_bg
@@ -201,33 +192,32 @@ public class PlaylistBrowser : MonoBehaviour {
 				Song prevSong = MusicManager.instance.currentProject.songs[i-1];
 				GameObject listing_up = UI.MakeButton(song.name+"_up");
 
-				RectTransform utr = listing_up.GetComponent<RectTransform>();
-				utr.SetParent(tr);
-				utr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
-				utr.localScale = new Vector3 (1f, 1f, 1f);
-				utr.localRotation = Quaternion.Euler (1f, 1f, 1f);
-				utr.anchorMin = new Vector2 (0f, 0.5f);
-				utr.anchorMax = new Vector2 (0f, 0.5f);
-				utr.anchoredPosition3D = new Vector3 (
-					horizontalPadding + utr.sizeDelta.x / 2f, 
-					utr.sizeDelta.y/2f + verticalPadding / 2f, 
+				RectTransform listing_up_tr = listing_up.RectTransform();
+				listing_up_tr.SetParent(listing_tr);
+				listing_up_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
+				listing_up_tr.ResetScaleRot();
+				listing_up_tr.localRotation = Quaternion.Euler(0f, 0f, 90f);
+				listing_up_tr.AnchorAtPoint (0f, 0.5f);
+				listing_up_tr.anchoredPosition3D = new Vector3 (
+					horizontalPadding + listing_up_tr.sizeDelta.x / 2f, 
+					listing_up_tr.sizeDelta.y/2f + verticalPadding / 2f, 
 					0f
 				);
-				utr.localRotation = Quaternion.Euler(0f, 0f, 90f);
+					
+				Image listing_up_img = listing_up.Image();
+				listing_up_img.color = Color.black;
+				listing_up_img.sprite = GameManager.instance.arrowIcon;
 
-				Image uimg = listing_up.GetComponent<Image>();
-				uimg.color = Color.black;
-				uimg.sprite = GameManager.instance.arrowIcon;
-
-				Button ubt = listing_up.GetComponent<Button>();
-				ubt.onClick.AddListener(()=>{
+				Button listing_up_button = listing_up.Button();
+				listing_up_button.onClick.AddListener(()=>{
+					GameManager.instance.MenuClick();
 					Song temp = song;
 					MusicManager.instance.currentProject.songs[num] = prevSong;
 					MusicManager.instance.currentProject.songs[num-1] = temp;
 					Refresh();
 				});
 
-				sh.objects.Add(listing_up);
+				listing_sh.objects.Add(listing_up);
 			}
 
 			//
@@ -237,163 +227,176 @@ public class PlaylistBrowser : MonoBehaviour {
 				Song nextSong = MusicManager.instance.currentProject.songs[i+1];
 				GameObject listing_down = UI.MakeButton(song.name+"_down");
 
-				RectTransform dtr = listing_down.GetComponent<RectTransform>();
-				dtr.SetParent(tr);
-				dtr.sizeDelta = new Vector2 (tr.sizeDelta.y * iconScale / 2f, tr.sizeDelta.y * iconScale / 2f);
-				dtr.localScale = new Vector3 (1f, 1f, 1f);
-				dtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
-				dtr.anchorMin = new Vector2 (0f, 0.5f);
-				dtr.anchorMax = new Vector2 (0f, 0.5f);
-				dtr.anchoredPosition3D = new Vector3 (
-					horizontalPadding + dtr.sizeDelta.x / 2f, 
-					 - dtr.sizeDelta.y / 2f - verticalPadding / 2f, 
+				RectTransform listing_down_tr = listing_down.RectTransform();
+				listing_down_tr.SetParent(listing_tr);
+				listing_down_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
+				listing_down_tr.ResetScaleRot();
+				listing_down_tr.localRotation = Quaternion.Euler(0f, 0f, -90f);
+				listing_down_tr.AnchorAtPoint (0f, 0.5f);
+				listing_down_tr.anchoredPosition3D = new Vector3 (
+					horizontalPadding + listing_down_tr.sizeDelta.x / 2f, 
+					- listing_down_tr.sizeDelta.y / 2f - verticalPadding / 2f, 
 					0f
 				);
-				dtr.localRotation = Quaternion.Euler(0f, 0f, -90f);
+					
+				Image listing_down_img = listing_down.Image();
+				listing_down_img.color = Color.black;
+				listing_down_img.sprite = GameManager.instance.arrowIcon;
 
-				Image dimg = listing_down.GetComponent<Image>();
-				dimg.color = Color.black;
-				dimg.sprite = GameManager.instance.arrowIcon;
-
-				Button dbt = listing_down.GetComponent<Button>();
-				dbt.onClick.AddListener(()=>{
+				Button listing_down_button = listing_down.Button();
+				listing_down_button.onClick.AddListener(()=>{
+					GameManager.instance.MenuClick();
 					Song temp = song;
 					MusicManager.instance.currentProject.songs[num] = nextSong;
 					MusicManager.instance.currentProject.songs[num+1] = temp;
 					Refresh();
 				});
 
-				sh.objects.Add(listing_down);
+				listing_sh.objects.Add(listing_down);
 			}
 
-			foreach (GameObject obj in sh.objects) {
-				obj.SetActive(false);
-			}
+			foreach (GameObject obj in listing_sh.objects) obj.SetActive(false);
 		}
 
+		//
 		// Create new song button
+		//
 		GameObject newSongButton = UI.MakeButton("New Song");
 		listings.Add (newSongButton);
 
-		RectTransform ntr = newSongButton.GetComponent<RectTransform>();
-		ntr.SetParent (playlist);
-		ntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
-		ntr.localScale = new Vector3 (1f, 1f, 1f);
-		ntr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-		ntr.anchorMin = new Vector2 (0f, 1f);
-		ntr.anchorMax = new Vector2 (0f, 1f);
-		ntr.anchoredPosition3D = new Vector3 (
-			horizontalPadding + ntr.sizeDelta.x/2f,
+		RectTransform newSongButton_tr = newSongButton.RectTransform();
+		newSongButton_tr.SetParent (playlist);
+		newSongButton_tr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
+		newSongButton_tr.AnchorAtPoint (0f, 1f);
+		newSongButton_tr.anchoredPosition3D = new Vector3 (
+			horizontalPadding + newSongButton_tr.sizeDelta.x/2f,
 			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);
+		newSongButton_tr.ResetScaleRot();
 
-		Image nimg = ntr.GetComponent<Image>();
-		nimg.sprite = GameManager.instance.addIcon;
-		nimg.color = new Color (0f, 0f, 0f, 1f);
+		Image newSong_img = newSongButton.Image();
+		newSong_img.sprite = GameManager.instance.addIcon;
+		newSong_img.color = Color.black;
 
-		ntr.GetComponent<Button>().onClick.AddListener (delegate {
+		newSongButton.Button().onClick.AddListener (delegate {
+			GameManager.instance.MenuClick();
 			MusicManager.instance.NewSong();
 			GameManager.instance.GoToKeySelectMenu();
 		});
 
 		GameObject newSong_text = UI.MakeText("New Song_text");
 
-		RectTransform nttr = newSong_text.GetComponent<RectTransform>();
-		nttr.SetParent(ntr);
-		nttr.sizeDelta = new Vector2 (playlist.rect.width, ntr.sizeDelta.y);
-		nttr.localScale = new Vector3 (1f, 1f, 1f);
-		nttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-		nttr.anchorMin = new Vector2 (0f, 0.5f);
-		nttr.anchorMin = new Vector2 (0f, 0.5f);
-		nttr.anchoredPosition3D = new Vector3 (
-			nttr.sizeDelta.x/2f + horizontalPadding + ntr.sizeDelta.x,
+		RectTransform newSong_text_tr = newSong_text.RectTransform();
+		newSong_text_tr.SetParent(newSongButton_tr);
+		newSong_text_tr.sizeDelta = new Vector2 (playlist.rect.width/2f - 2f*horizontalPadding, newSongButton_tr.sizeDelta.y);
+		newSong_text_tr.AnchorAtPoint (0f, 0.5f);
+		newSong_text_tr.anchoredPosition3D = new Vector3 (
+			newSong_text_tr.sizeDelta.x/2f + horizontalPadding + newSongButton_tr.sizeDelta.x,
 			0f, 
 			0f
 		);
+		newSong_text_tr.ResetScaleRot();
 
-		Text nttxt = newSong_text.GetComponent<Text>();
-		nttxt.text = "New Song...";
-		nttxt.resizeTextForBestFit = false;
-		nttxt.fontSize = (int)(fontSize * iconScale);
-		nttxt.color = Color.black;
-		nttxt.font = font;
-		nttxt.fontStyle = FontStyle.Normal;
-		nttxt.alignment = TextAnchor.MiddleLeft;
+		Text newSong_text_txt = newSong_text.Text();
+		newSong_text_txt.text = "New Song...";
+		newSong_text_txt.fontSize = (int)(fontSize * iconScale);
+		newSong_text_txt.color = Color.black;
+		newSong_text_txt.font = font;
+		newSong_text_txt.alignment = TextAnchor.MiddleLeft;
 
+		GameObject newSongButton_highlight = UI.MakeImage ("Highlight (New Song Button)");
+		listings.Add (newSongButton_highlight);
+
+		RectTransform newSongButton_highlight_tr = newSongButton_highlight.RectTransform();
+		newSongButton_highlight_tr.SetParent (newSongButton_tr);
+		newSongButton_highlight_tr.sizeDelta = new Vector2 (playlist.rect.width*0.5f - 2f*horizontalPadding, newSongButton_tr.sizeDelta.y*1.5f);
+		newSongButton_highlight_tr.AnchorAtPoint (0f, 0.5f);
+		newSongButton_highlight_tr.anchoredPosition3D = new Vector3 (newSongButton_highlight_tr.sizeDelta.x/3f, 0f, 0f);
+		newSongButton_highlight_tr.ResetScaleRot();
+
+		newSongButton_highlight_tr.SetSiblingIndex(-1);
+
+		Image newSongButton_highlight_img = newSongButton_highlight.Image();
+		newSongButton_highlight_img.raycastTarget = false;
+		newSongButton_highlight_img.sprite = GameManager.instance.scribbleCircle;
+		newSongButton_highlight_img.color = new Color (1f, 1f, 1f, 1f);
+
+		ShowHide newSongButton_sh = newSongButton.ShowHide();
+		newSongButton_sh.objects = new List<GameObject>() { newSongButton_highlight };
+		newSongButton_sh.transitionType = TransitionType.Instant;
+		newSongButton_sh.Hide();
+
+		//
 		// Create load song button
-		GameObject loadNewSongButton = UI.MakeButton("Load New Song");
-		listings.Add (loadNewSongButton);
+		//
+		GameObject loadSongButton = UI.MakeButton("Load Song Button (Playlist Browser)");
+		listings.Add (loadSongButton);
 
-		RectTransform lntr = loadNewSongButton.GetComponent<RectTransform>();
-		lntr.SetParent (playlist);
-		lntr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
-		lntr.localScale = new Vector3 (1f, 1f, 1f);
-		lntr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-		lntr.anchorMin = new Vector2 (0.5f, 1f);
-		lntr.anchorMax = new Vector2 (0.5f, 1f);
-		lntr.anchoredPosition3D = new Vector3 (
-			horizontalPadding + lntr.sizeDelta.x / 2f,
+		RectTransform loadSongButton_tr = loadSongButton.RectTransform();
+		loadSongButton_tr.SetParent (playlist);
+		loadSongButton_tr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
+		loadSongButton_tr.AnchorAtPoint (0.5f, 1f);
+		loadSongButton_tr.anchoredPosition3D = new Vector3 (
+			horizontalPadding + loadSongButton_tr.sizeDelta.x / 2f,
 			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);
+		loadSongButton_tr.ResetScaleRot();
 
-		Image lnimg = lntr.GetComponent<Image>();
-		lnimg.sprite = GameManager.instance.loadIcon;
-		lnimg.color = new Color (0f, 0f, 0f, 1f);
+		Image loadSongButton_img = loadSongButton.Image();
+		loadSongButton_img.sprite = GameManager.instance.loadIcon;
+		loadSongButton_img.color = Color.black;
 
-		lntr.GetComponent<Button>().onClick.AddListener (delegate {
+		loadSongButton.Button().onClick.AddListener (delegate {
+			GameManager.instance.MenuClick();
 			GameManager.instance.ShowLoadPromptForSongs();
 		});
 
-		GameObject loadNewSong_text = UI.MakeText("Load New Song_text");
+		GameObject loadSongButton_text = UI.MakeText("Load New Song_text");
 
-		RectTransform lnttr = loadNewSong_text.GetComponent<RectTransform>();
-		lnttr.SetParent(lntr);
-		lnttr.sizeDelta = new Vector2 (playlist.rect.width, ntr.sizeDelta.y);
-		lnttr.localScale = new Vector3 (1f, 1f, 1f);
-		lnttr.localRotation = Quaternion.Euler (0f, 0f, 0f);
-		lnttr.anchorMin = new Vector2 (0f, 0.5f);
-		lnttr.anchorMin = new Vector2 (0f, 0.5f);
-		lnttr.anchoredPosition3D = new Vector3 (
-			lnttr.sizeDelta.x/2f + horizontalPadding + ntr.sizeDelta.x,
+		RectTransform loadSongButton_text_tr = loadSongButton_text.RectTransform();
+		loadSongButton_text_tr.SetParent(loadSongButton_tr);
+		loadSongButton_text_tr.sizeDelta = new Vector2 (playlist.rect.width/2f-2f*horizontalPadding, loadSongButton_tr.sizeDelta.y);
+		loadSongButton_text_tr.AnchorAtPoint (0f, 0.5f);
+		loadSongButton_text_tr.anchoredPosition3D = new Vector3 (
+			loadSongButton_text_tr.sizeDelta.x/2f + horizontalPadding + loadSongButton_tr.sizeDelta.x,
 			0f, 
 			0f
 		);
+		loadSongButton_text_tr.ResetScaleRot();
 
-		Text lnttxt = loadNewSong_text.GetComponent<Text>();
-		lnttxt.text = "Load Song...";
-		lnttxt.resizeTextForBestFit = false;
-		lnttxt.fontSize = (int)(fontSize * iconScale);
-		lnttxt.color = Color.black;
-		lnttxt.font = font;
-		lnttxt.fontStyle = FontStyle.Normal;
-		lnttxt.alignment = TextAnchor.MiddleLeft;
+		Text loadSongButton_text_txt = loadSongButton_text.Text();
+		loadSongButton_text_txt.text = "Load Song...";
+		loadSongButton_text_txt.fontSize = (int)(fontSize * iconScale);
+		loadSongButton_text_txt.color = Color.black;
+		loadSongButton_text_txt.font = font;
+		loadSongButton_text_txt.alignment = TextAnchor.MiddleLeft;
 
-		GameObject loadNewSong_highlight = UI.MakeImage ("Load New Song Highlight");
-		listings.Add (loadNewSong_highlight);
+		GameObject loadSongButton_highlight = UI.MakeImage ("Load New Song Highlight");
+		listings.Add (loadSongButton_highlight);
 
-		RectTransform lnshtr = loadNewSong_highlight.GetComponent<RectTransform>();
-		lnshtr.SetParent (lntr);
-		lnshtr.sizeDelta = new Vector2 (playlist.rect.width/2f, ntr.sizeDelta.y);
-		lnshtr.localScale = new Vector3 (1f, 1f, 1f);
-		lnshtr.localRotation = Quaternion.Euler (1f, 1f, 1f);
-		lnshtr.anchorMin = new Vector2 (0f, 0.5f);
-		lnshtr.anchorMax = new Vector2 (0f, 0.5f);
-		lnshtr.anchoredPosition3D = new Vector3 (
-			0f, 0f, 0f
-		);
+		RectTransform loadSongButton_highlight_tr = loadSongButton_highlight.RectTransform();
+		loadSongButton_highlight_tr.SetParent (loadSongButton_tr);
+		loadSongButton_highlight_tr.sizeDelta = new Vector2 (playlist.rect.width*0.5f, loadSongButton_tr.sizeDelta.y*1.5f);
+		loadSongButton_highlight_tr.AnchorAtPoint (0f, 0.5f);
+		loadSongButton_highlight_tr.anchoredPosition3D = new Vector3 (loadSongButton_highlight_tr.sizeDelta.x/3f, 0f, 0f);
+		loadSongButton_highlight_tr.ResetScaleRot();
 
-		lnshtr.SetSiblingIndex(-1);
+		loadSongButton_highlight_tr.SetSiblingIndex(-1);
 
-		Image lnshimg = lnshtr.GetComponent<Image>();
-		lnshimg.raycastTarget = false;
-		lnshimg.sprite = fillSprite;
-		lnshimg.color = new Color (1f, 1f, 1f, 0.5f);
+		Image loadSongButton_highlight_img = loadSongButton_highlight.Image();
+		loadSongButton_highlight_img.raycastTarget = false;
+		loadSongButton_highlight_img.sprite = GameManager.instance.scribbleCircle;
+		loadSongButton_highlight_img.color = new Color (1f, 1f, 1f, 1f);
 
-		Fadeable lnshf = loadNewSong_highlight.AddComponent<Fadeable>();
-		lnshf.startFaded = true;
+		ShowHide loadSongButton_sh = loadSongButton.ShowHide();
+		loadSongButton_sh.objects = new List<GameObject>() { loadSongButton_highlight };
+		loadSongButton_sh.transitionType = TransitionType.Instant;
+		loadSongButton_sh.Hide();
 	
 	}
+
+	#endregion
 		
 }

@@ -13,8 +13,10 @@ public class Chunk {
 	#region Chunk Vars
 
 	public GameObject chunk; // Chunk object/mesh
+	public GameObject grassEmitter;
 	public int x; //x position in chunk grid
 	public int y; //y position in chunk grid
+	public float priority = 0f;
 
 	bool hasCheckedForRoad = false;
 	public bool hasRoad = false;  // Chunk has road on it
@@ -23,7 +25,7 @@ public class Chunk {
 	Mesh colliderMesh;
 	public Mesh mesh;
 	Vector3[] verts;
-	bool[] constrained;
+	//bool[] constrained;
 	int numVerts;
 	Vector3[] normals;
 	Vector2[] uvs;
@@ -31,7 +33,7 @@ public class Chunk {
 	Color[] colors;
 
 	bool isUpdatingVerts = false;
-	bool needsColliderUpdate = false;
+	public bool needsColliderUpdate = false;
 
 	#endregion
 	#region Chunk Methods
@@ -45,7 +47,7 @@ public class Chunk {
 		float chunkSize = WorldManager.instance.chunkSize;
 		verts = CreateUniformVertexArray (chunkRes);
 		numVerts = verts.Length;
-		constrained = new bool[numVerts];
+		//constrained = new bool[numVerts];
 		normals = new Vector3[numVerts];
 
 		uvs = CreateUniformUVArray (chunkRes);
@@ -61,12 +63,17 @@ public class Chunk {
 		// Register all vertices with vertex map
 		for (int i=0; i<numVerts; i++) {
 			normals [i] = Vector3.up;
-			constrained [i] = false;
+			//constrained [i] = false;
 			colors[i] = new Color (0f, 0f, 0f, 0.5f);
 			IntVector2 coords = IntToV2 (i);
+			Vertex vert = vmap.VertexAt(coords.x, coords.y);
+			if (vert != null) {
+				//if (UnityEngine.Random.Range(0,100) == 0) Debug.Log("no vert", chunk);
+				UpdateVertex (i, vert.height, vert.normal);
+			}
+
 			vmap.RegisterChunkVertex (coords, this, i);
 		}
-
 		//UpdateCollider ();
 	}
 
@@ -175,39 +182,91 @@ public class Chunk {
 		chunk.GetComponent<Rigidbody>().useGravity = false;
 		chunk.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
+	//	grassEmitter = new GameObject ("Grass Emitter",
+		//	typeof (ParticleSystem)
+		//);
+		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
 
+		//grassEmitter.GetComponent<ParticleSystem>() = grassEmitterTemplate;
+		grassEmitter.transform.parent = chunk.transform;
+		grassEmitter.transform.position += new Vector3 (-chunkSize/2f, 0f, -chunkSize/2f);
+
+		ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
+
+		//sys.loop = true;
+		sys.maxParticles = Random.Range(0,WorldManager.instance.grassPerChunk);
+		sys.playOnAwake = true;
+		//sys.startColor = Color.white;
+		//sys.startDelay = 0f;
+		//sys.startLifetime = 1000f;
+		//sys.startRotation3D = new Vector3 (0f, 0f, 90f*Mathf.Deg2Rad);
+		//sys.startSize = 2f;
+		//ys.startSpeed = 0f;
+		//sys.sizeOverLifetime.size = new ParticleSystem.MinMaxCurve() {
+		//	mode = ParticleSystemCurveMode.TwoCurves,
+		//	curveMax = new AnimationCurve () {
+				
+
+		//ParticleSystem.ShapeModule shape = new ParticleSystem.ShapeModule();
+		ParticleSystem.ShapeModule shape = sys.shape;
+		//shape.enabled = true;
+		//shape.shapeType = ParticleSystemShapeType.Mesh;
+		//shape.meshShapeType = ParticleSystemMeshShapeType.Triangle;
+		shape.mesh = mesh;
+		//shape.randomDirection = false;
+		//shape.useMeshColors = false;
+
+		//ParticleSystem.EmissionModule emit = sys.emission;
+		ParticleSystem.EmissionModule emit = sys.emission;
+		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
+	
+
+		//ParticleSystemRenderer rend = grassEmitter.GetComponent<ParticleSystemRenderer>();
+	//	rend.renderMode = ParticleSystemRenderMode.Mesh;
+		//rend.mesh = WorldManager.instance.grassModel;
+		//rend.material = WorldManager.instance.vegetationMaterial;
+
+		//grassEmitter.GetComponent<ParticleSystem>() = sys;
 
 		return chunk;
 	}
 
 	public void UpdateCollider () {
+		grassEmitter.GetComponent<ParticleSystem>().Clear();
 		mesh.vertices = verts;
 		mesh.normals = normals;
 		mesh.RecalculateBounds();
 		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
 		chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
 		ReplaceDecorations();
+		//grassEmitter.GetComponent<ParticleSystem>().shape.mesh = mesh;
+		grassEmitter.GetComponent<ParticleSystem>().Play();
+		needsColliderUpdate = false;
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
-		verts[index].y = height;
+		if (verts[index].y != height) {
+			needsColliderUpdate = true;
+			verts[index].y = height;
+		}
 		normals [index] = normal;
-		mesh.vertices = verts;
-		mesh.normals = normals;
-		needsColliderUpdate = true;
+		//mesh.vertices = verts;
+		//mesh.normals = normals;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
-		colors[index].a = blendValue;
-		mesh.colors = colors;
-
+		if (colors[index].a != blendValue) {
+			colors[index].a = blendValue;
+			mesh.colors = colors;
+		}
 	}
 
 	private bool CheckDist (float dist, float updateDist, float margin) {
 		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
 	}
 
-	private IEnumerator UpdateVerts(float updateDist, LinInt freqData) {
+	private IEnumerator UpdateVerts() {
+		
 		isUpdatingVerts = true;
 		float margin = WorldManager.instance.chunkSize / 2;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
@@ -219,39 +278,47 @@ public class Chunk {
 				//continue;
 			IntVector2 coords = IntToV2 (v);
 
+			Vertex vert = vmap.VertexAt(coords.x,coords.y);
+			if (vert.height != verts[v].y) {
+				UpdateVertex (v, vert.height, vert.normal);
+				needsColliderUpdate = true;
+			}
 			//if (!vmap.IsLocked (coords)) { //if vert is frozen
-			if (!vmap.IsConstrained (coords)) { 
+			if (!vmap.VertexAt (coords).locked && DynamicTerrain.instance.freqData != null) { 
 				Vector3 playerPos = PlayerMovement.instance.transform.position;
 
 				Vector3 vertPos = chunk.transform.position + verts [v];
 				float distance = Vector3.Distance (vertPos, playerPos);
-				if (CheckDist (distance, updateDist, margin)) {
+				if (CheckDist (distance, WorldManager.instance.vertexUpdateDistance, margin)) {
 					Vector3 angleVector = vertPos - playerPos;
 					float angle = Vector3.Angle (Vector3.right, angleVector);
 					float linIntInput = angle / 360f;
-					float newY = freqData.GetDataPoint (linIntInput) *
+					float newY = DynamicTerrain.instance.freqData.GetDataPoint (linIntInput) *
 					              WorldManager.instance.heightScale;
 					if (newY != verts [v].y) {
 						vmap.SetHeight (coords, newY);
+						needsColliderUpdate = true;
 					}
 				}
-			}// else
+			}
+				// else
 				//constrained [v] = true;
 			//}
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			if (v == numVerts) {
+				isUpdatingVerts = false;
+				yield break;
+			} else if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
+
 		}
-		if (v == numVerts) {
-			yield return null;
-			isUpdatingVerts = false;
-		}
+
 
 	}
 
-	public void Update (float updateDist, LinInt freqData){
-		if (needsColliderUpdate) UpdateCollider();
+	public void Update (){
+		//if (needsColliderUpdate) UpdateCollider();
 		if (!hasCheckedForRoad) {
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 		}
@@ -259,10 +326,10 @@ public class Chunk {
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
 		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
 		//roadNearby = NearbyRoad ();
-		if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
+		//if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
 			//UpdateVerts (updateDist, freqData);
-			WorldManager.instance.StartCoroutine(UpdateVerts(updateDist, freqData));
-		}
+			WorldManager.instance.StartCoroutine(UpdateVerts());
+		//}
 	}
 		
 	public bool Constrained (Vector3 vertex) {
@@ -312,7 +379,7 @@ public class Chunk {
 		);
 
 		Road road = WorldManager.instance.road;
-		float distance = Mathf.Infinity;
+
 		float progress = startProgress;
 		while (progress <= 1f) {
 			
@@ -337,8 +404,8 @@ public class Chunk {
 		int chunkRes = WorldManager.instance.chunkResolution;
 
 		return new IntVector2 (
-			Mathf.RoundToInt((x-chunkSize/2f) / chunkSize),
-			Mathf.RoundToInt((y-chunkSize/2f) / chunkSize)
+			Mathf.RoundToInt((x-chunkSize/2f) * (float)chunkRes / chunkSize),
+			Mathf.RoundToInt((y-chunkSize/2f) * (float)chunkRes / chunkSize)
 		);
 	}
 
@@ -354,7 +421,7 @@ public class Chunk {
 	public void ReplaceDecorations () {
 		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
 		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
-			if (tr == chunk.transform) continue;
+			if (tr == chunk.transform || tr == grassEmitter.transform) continue;
 			if (tr.gameObject.GetComponent<Decoration>().dynamic) continue;
 			RaycastHit hit;
 			if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z), Vector3.down,out hit, Mathf.Infinity)) {

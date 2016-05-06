@@ -27,15 +27,6 @@ public class GameManager : MonoBehaviour {
 		Postplay
 	};
 
-	public enum LoadPhase {
-		Classes,
-		Sounds,
-		Instruments,
-		Scales,
-		Chunks,
-		Decorations
-	};
-
 	public static GameManager instance;
 
 	#region GameManager Vars
@@ -44,19 +35,9 @@ public class GameManager : MonoBehaviour {
 
 	public int targetFrameRate = 60;
 
-	private int loadSpeed = 1;
 	private int loadProgress = 0;
 	private int loadsToDo;
 	bool loading = false;
-
-	public LoadPhase loadPhase;
-	private Dictionary <LoadPhase, bool> loadPhases;
-
-	bool classesLoaded = false;
-	bool soundsLoaded = false;
-	bool scaleInfoLoaded = false;
-	bool instrumentsLoaded = false;
-	bool scalesLoaded = false;
 
 
 	public bool paused = false;
@@ -65,8 +46,6 @@ public class GameManager : MonoBehaviour {
 
 
 	bool initialized = false;
-	float startLoadTime;
-	int loadValue = 0;
 	bool casetteMoving = false;
 	public Transform casetteFront;
 	public Transform casetteBack;
@@ -112,6 +91,10 @@ public class GameManager : MonoBehaviour {
 	public Sprite circleIcon;
 	public Sprite volumeIcon;
 	public Sprite fillSprite;
+	public Sprite scribbleCircle;
+
+	public AudioClip menuClick;
+	//public AudioClip
 
 	[Header("Menu Objects")]
 
@@ -140,6 +123,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
 
+	float startLoadTime;
 	public int loadingSpeed;
 	public GameObject loadingScreen;
 	public GameObject loadingBar;
@@ -150,15 +134,15 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject casette;
 
-	public List<ReflectionProbe> reflectionProbes;
-
 	public bool loaded = false;
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
+
+		Profiler.maxNumberOfSamplesPerFrame = -1;
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
@@ -171,41 +155,15 @@ public class GameManager : MonoBehaviour {
 
 		projectSavePath = Application.persistentDataPath + projectSaveFolder;
 		songSavePath = Application.persistentDataPath + songSaveFolder;
+	}
 
-		ShowAll ();
-		//MoveCasetteBack();
-
-		loadPhases = new Dictionary <LoadPhase, bool> () {
-			{LoadPhase.Classes, false},
-			{LoadPhase.Sounds, false},
-		};
-
-		loadingScreen.SetActive(true);
-
+	void Start () {
+		ShowAll();
 	}
 
 	void Update () {
 		if (!initialized) {
 			if (!loading) {
-				/*loadPhases [LoadPhase.Classes] = 
-					GameManager.instance != null &&
-					InputManager.instance != null &&
-					KeyManager.instance != null &&
-					MusicManager.instance != null &&
-					AddRiffPrompt.instance != null &&
-					InstrumentSetup.instance != null &&
-					LoadPrompt.instance != null &&
-					PlaylistBrowser.instance != null &&
-					Prompt.instance != null &&
-					RadialKeyMenu.instance != null &&
-					SongArrangeSetup.instance != null &&
-					SongTimeline.instance != null &&
-					WorldManager.instance != null &&
-					PlayerMovement.instance != null;*/
-
-				
-
-				//if (loadPhases [LoadPhase.Classes])  Load();
 				Load();
 			} else {
 				return;
@@ -234,7 +192,7 @@ public class GameManager : MonoBehaviour {
 			if (casetteMoving) {
 				float progress = (Time.time - sTime) * casetteMoveSpeed;
 				float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
-				if (dist == float.NaN) Debug.Log("casette is broken");
+				//if (dist == float.NaN) Debug.Log("casette is broken");
 				casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
 				casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
 				if (dist >= 1f) {
@@ -266,7 +224,11 @@ public class GameManager : MonoBehaviour {
 	#region GameManager Methods
 
 	void Load () {
-		Debug.Log("GameManager.Load()");
+		HideAll ();
+		//MoveCasetteBack();
+
+		loadingScreen.SetActive(true);
+		startLoadTime = Time.realtimeSinceStartup;
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
 		loading = true;
 
@@ -342,6 +304,9 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void GoToPlaylistMenu () {
+		MusicManager.instance.StopPlaying();
+		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.StopLiveMode();
 		currentMode = Mode.Setup;
 		casette.SetActive(true);
 		HideAll ();
@@ -366,26 +331,35 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void ShowAll () {
+		Show (mainMenu);
 		Show (playlistMenu);
+		Show (keySelectMenu);
 		Show (songArrangeMenu);
+		Show (riffEditMenu);
+		Show (postPlayMenu);
 
 		Show (addRiffPrompt);
 		Show (loadPrompt);
 		Show (prompt);
+		Show (liveIcons);
 	}
 
 	public void Hide (GameObject menu) {
+		Fadeable fade = menu.GetComponent<Fadeable>();
+		if (fade != null) {
+			if (fade.disableAfterFading) {
+				fade.Fade();
+				return;
+			}
+		}
 		menu.SetActive(false);
 	}
 
 	public void HideAll () {
-		//if (mainMenu.activeSelf) mainMenu.GetComponent<Fadeable>().Fade();
-		//if (playlistMenu.activeSelf) playlistMenu.GetComponent<Fadeable>().Fade();
-		//if (keySelectMenu.activeSelf) keySelectMenu.GetComponent<Fadeable>().Fade();
-		//if (riffEditMenu.activeSelf) riffEditMenu.GetComponent<Fadeable>().Fade();
 		Hide (mainMenu);
 		Hide (playlistMenu);
 		Hide (keySelectMenu);
+		Hide (songArrangeMenu);
 		Hide (riffEditMenu);
 		Hide (postPlayMenu);
 
@@ -404,8 +378,8 @@ public class GameManager : MonoBehaviour {
 		casette.SetActive(false);
 		//casetteMoving = false;
 		//Debug.Log (MusicManager.instance.currentSong.ToString ());
-		MusicManager.instance.currentSong.CompileSong();
-		if (MusicManager.instance.loopSong) Show(loopIcon);
+
+		if (MusicManager.instance.loopPlaylist) Show(loopIcon);
 		else Hide(loopIcon);
 
 		MoveCasetteBack();
@@ -416,7 +390,10 @@ public class GameManager : MonoBehaviour {
 
 		MusicManager.instance.currentPlayingSong = 0;
 		InstrumentDisplay.instance.Refresh();
-		MusicManager.instance.StartSong();
+		if (MusicManager.instance.currentSong != null) {
+			MusicManager.instance.StartSong();
+			MusicManager.instance.currentSong.CompileSong();
+		}
 		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
 
@@ -435,17 +412,6 @@ public class GameManager : MonoBehaviour {
 		GoToPostPlayMenu();
 
 		currentMode = Mode.Postplay;
-	}
-
-	// Returns to key selection
-	public void NewSong () {
-		MusicManager.instance.StopPlaying();
-		paused = false;
-
-		MusicManager.instance.currentSong = new Song();
-		GoToKeySelectMenu();
-
-		currentMode = Mode.Setup;
 	}
 
 	public void SaveCurrentProject () {
@@ -495,6 +461,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	public void MenuClick () {
+		MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(menuClick, 1f);
+	}
+
 	// Enables visibility of the tooltip with the given message
 	public void ShowTooltip (string message) {
 		tooltip.SetActive(true);
@@ -515,12 +485,14 @@ public class GameManager : MonoBehaviour {
 		paused = true;
 		pauseMenu.SetActive(true);
 		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.Pause();
 	}
 
 	public void Unpause () {
 		paused = false;
 		pauseMenu.SetActive(false);
 		PlayerMovement.instance.StartMoving();
+		CameraControl.instance.Unpause();
 	}
 
 	public void Exit () {

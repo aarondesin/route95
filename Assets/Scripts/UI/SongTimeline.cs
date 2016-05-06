@@ -61,6 +61,7 @@ public class SongTimeline : MonoBehaviour {
 				columnHeight/2f,
 				0f
 			);
+			column.GetComponent<RectTransform>().localRotation = Quaternion.Euler(new Vector3 (0f, 0f, 0f));
 
 			int num = i; // avoid pointer problems
 			column.AddComponent<Button>();
@@ -87,6 +88,7 @@ public class SongTimeline : MonoBehaviour {
 		addColumnButton.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
 		addColumnButton.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth/3f, columnHeight/3f);
 		addColumnButton.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
+		addColumnButton.GetComponent<RectTransform>().localRotation = Quaternion.Euler(new Vector3 (0f, 0f, 0f));
 		addColumnButton.GetComponent<RectTransform>().anchorMin = new Vector2 (1f, 0f);
 		addColumnButton.GetComponent<RectTransform>().anchorMax = new Vector2 (1f, 0f);
 		addColumnButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (

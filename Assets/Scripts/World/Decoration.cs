@@ -47,7 +47,10 @@ public class Decoration : MonoBehaviour {
 	#region Unity Callbacks
 
 	void FixedUpdate () {
-		if (dynamic) GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
+		if (dynamic) {
+			GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
+			if (transform.position.y < -WorldManager.instance.heightScale) WorldManager.instance.RemoveDecoration (gameObject);
+		}
 	}
 
 	#endregion

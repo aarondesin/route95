@@ -58,15 +58,15 @@ public class WorldManager : MonoBehaviour {
 	//
 
 	[Tooltip("The length of one side of a chunk.")]
-	[Range(50f, 200f)]
+	[Range(1f, 200f)]
 	public float chunkSize = DEFAULT_CHUNK_SIZE;
 
 	[Tooltip("The number of vertices along one side of a chunk.")]
-	[Range(2, 16)]
+	[Range(2, 32)]
 	public int chunkResolution = DEFAULT_CHUNK_RESOLUTION;
 
 	[Tooltip("The radius around the player within which to draw chunks.")]
-	[Range(2, 16)]
+	[Range(1, 32)]
 	public int chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
 
 
@@ -121,6 +121,10 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/Decoration_Saguaro",
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
+
+	public Mesh grassModel;
+	public Material vegetationMaterial;
+	public GameObject grassEmitterTemplate;
 
 
 	//
@@ -206,6 +210,10 @@ public class WorldManager : MonoBehaviour {
 	[Range(10, 200)]
 	public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
 
+	[Tooltip("Maximum number of grass particles to place per chunk.")]
+	[Range(0,100)]
+	public int grassPerChunk;
+
 	[Tooltip("The accuracy used in road distance checks.")]
 	[Range(1f, 500f)]
 	public float roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
@@ -254,7 +262,7 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		if (loadedTerrain && !hasRandomized) 
 			Load();
-		if (loaded) {
+		if (loaded && road.generated) {
 
 			terrain.Update(freqDataArray);
 			UpdateTime();
@@ -321,25 +329,6 @@ public class WorldManager : MonoBehaviour {
 		if (decorations.Count == decorationPaths.Count)
 			DoInitialDecoration();
 		yield return null;
-	}
-
-	/*void LoadDecorations () {
-		foreach (string path in decorationPaths) {
-			LoadDecoration (path);
-			//GameManager.instance.IncrementLoadProgress();
-		}
-	}*/
-
-	void DoDecorate () {
-			
-		while (numDecorations < maxDecorations) {
-			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
-					//Debug.Log("dick");
-				AttemptDecorate ();
-				//GameManager.instance.IncrementLoadProgress();
-				//yield return null;
-			}
-		}
 	}
 
 	public void DoInitialDecoration () {
@@ -430,15 +419,9 @@ public class WorldManager : MonoBehaviour {
 			d -= 2f * Mathf.PI;
 		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
-
-	void InitialDecorate () {
-		for (int i=0; i<maxDecorations; i++) {
-			AttemptDecorate ();
-		}
-	}
     
 	bool AttemptDecorate () {
-		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0) {
+		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0 && road.generated) {
 			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
 
 				// Pick a random decoration and decorate with it
@@ -452,14 +435,11 @@ public class WorldManager : MonoBehaviour {
 					case Decoration.Distribution.Random:
 						Chunk chunk = terrain.RandomChunk ();
 						return DecorateRandom (chunk, decoration);
-						break;
 					case Decoration.Distribution.Roadside:
 						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
 						return DecorateRoadside (bezierProg, decoration);
-						break;
 					case Decoration.Distribution.CloseToRoad:
 						return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
-						break;
 					}
 					//numDecorations++;
 				}
@@ -505,7 +485,7 @@ public class WorldManager : MonoBehaviour {
 
 	bool DecorateRandom (Chunk chunk, GameObject decoration) {
 		//chunk.UpdateCollider();
-
+		if (chunk == null) return false;
 		Vector2 coordinate = new Vector2 (
 			chunk.x*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f),
 			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
@@ -515,6 +495,7 @@ public class WorldManager : MonoBehaviour {
 			//Debug.Log(coordinate);
 			IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
 			//Debug.Log(nearestVertex.ToString());
+			//if (UnityEngine.Random.Range(0,100) == 0) Debug.Log(coordinate + " maps to "+nearestVertex.ToString());
 			if (!terrain.vertexmap.IsConstrained (nearestVertex)) {
 				RaycastHit hit;
 				float y = 0f;
@@ -529,7 +510,7 @@ public class WorldManager : MonoBehaviour {
 				if (!newDecoration.GetComponent<Decoration>().dynamic) newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
 				Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-				terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);
+				terrain.vertexmap.RegisterDecoration (nearestVertex, newDecoration);
 				//Debug.Log("placed");
 				return true;
 			}
@@ -540,21 +521,26 @@ public class WorldManager : MonoBehaviour {
 
 	bool DecorateRoadside (float prog, GameObject decoration) {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
-		Road roadBez = road.GetComponent<Road>();
+		Vector3 point = road.GetPoint(prog);
 		Vector3 coordinate = 
-			roadBez.BezRight(roadBez.GetPoint(prog)) * 1.1f * (side == 0 ? 1 : -1);
+			point + road.BezRight(point) * roadWidth * 2f * (side == 0 ? 1 : -1);
 		RaycastHit hit;
 		if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
 			coordinate.y = hit.point.y;
 		else coordinate.y = 0f;
 		GameObject newDecoration = 
 			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
-		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f));
 		newDecoration.GetComponent<Decoration>().Randomize();
-		newDecoration.transform.parent = road.gameObject.transform;
+
+		Vector3 rot = Quaternion.FromToRotation (coordinate+ road.GetDirection(prog), coordinate ).eulerAngles + new Vector3 (-90f,90f,0f);
+		newDecoration.transform.rotation = Quaternion.Euler(rot);
+	
+		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
+		//newDecoration.transform.parent = road.gameObject.transform;
+		//newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
 		numDecorations++;
 		Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-		roadBez.AddDecoration(newDecoration, prog);
+		//road.AddDecoration(newDecoration, prog);
 		return true;
 	}
 
@@ -567,6 +553,14 @@ public class WorldManager : MonoBehaviour {
 			decorations.Add(decoration);
 			//GameManager.instance.IncrementLoadProgress();
 		}
+	}
+
+	public void RemoveDecoration (GameObject deco) {
+		if (deco == null) return;
+		Decoration d = deco.GetComponent<Decoration>();
+		Decoration.numDecorations[d.group]--;
+		numDecorations--;
+		Destroy(deco);
 	}
 
 	public void DecNumDeco(int n) {

@@ -21,6 +21,13 @@ public class InputManager : MonoBehaviour {
 	List<AudioSource> audioSources;
 
 
+	public int framesDragged = 0;
+	public bool IsDragging {
+		get {
+			return framesDragged >= 30;
+		}
+	}
+
 
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, PercussionInstrument.RockDrums },
@@ -86,7 +93,8 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
+		if (GameManager.instance.currentMode == GameManager.Mode.Live && MusicManager.instance.currentSong != null &&
+			MusicManager.instance.currentProject.songs[MusicManager.instance.currentPlayingSong].Beats != 0) {
 
 			// Check for pause
 			if (Input.GetKeyDown (KeyCode.Escape)) GameManager.instance.TogglePause ();
@@ -102,6 +110,9 @@ public class InputManager : MonoBehaviour {
 			} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
 				AudioSource source = MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument];
 				if (source.volume <= 0.9f) source.volume += 0.1f;
+
+			} else if (Input.GetKeyDown (KeyCode.Escape)) {
+				GameManager.instance.Pause();
 			} else {
 				
 				// Check for instruments switch
@@ -161,9 +172,12 @@ public class InputManager : MonoBehaviour {
 				}
 			} else {
 				if (selected) {
+					framesDragged++;
 					if (selected.GetComponent<DraggableButton>() != null) {
 						selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - clickPosition);
 					}
+				} else {
+					framesDragged = 0;
 				}
 			}
 		}

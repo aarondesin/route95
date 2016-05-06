@@ -26,12 +26,6 @@ public class Riff {
 	[SerializeField]
 	public float distortionLevel = 0f;
 
-	// Fuzz
-	[SerializeField]
-	public bool fuzzEnabled = false;
-	[SerializeField]
-	public float fuzzLevel = 0f;
-
 	// Tremolo
 	[SerializeField]
 	public bool tremoloEnabled = false;
@@ -156,18 +150,19 @@ public class Riff {
 	}
 
 	// Adds or removes a note at pos
-	public void Toggle (Note newNote, int pos) {
+	public bool Toggle (Note newNote, int pos) {
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		// Lookup
 		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
 			RemoveNote (newNote, pos);
-			return;
+			return false;
 		}
 		// Note not already there
 		beat.Add (newNote);
 		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
+		return true;
 	}
 	public void PlayRiffLoop (AudioClip clip) {
 		MusicManager.instance.LoopRiff.Stop();
