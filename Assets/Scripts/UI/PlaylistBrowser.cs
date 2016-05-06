@@ -76,6 +76,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				- verticalPadding - listing_tr.sizeDelta.y / 2f - (verticalPadding + listing_tr.sizeDelta.y) * (float)i,
 				0f
 			);
+			listing_tr.ResetScaleRot();
 
 			Image listing_img = listing.Image();
 			listing_img.sprite = fillSprite;
@@ -97,6 +98,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				0f
 			);
 			listing_bg_tr.SetSiblingIndex(-1);
+			listing_bg_tr.ResetScaleRot();
 
 			Image listing_bg_img = listing_bg.Image();
 			listing_bg_img.raycastTarget = false;
@@ -115,6 +117,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			listing_text_tr.sizeDelta = listing_tr.sizeDelta;
 			listing_text_tr.AnchorAtPoint (0.5f, 0.5f);
 			listing_text_tr.anchoredPosition3D = new Vector3 (horizontalPadding*1.5f + listing_tr.sizeDelta.y, 0f, 0f);
+			listing_text_tr.ResetScaleRot();
 
 			Text listing_text_txt = listing_text.Text();
 			listing_text_txt.text = (i+1).ToString() + ". " + song.name;
@@ -133,7 +136,8 @@ public class PlaylistBrowser : MonoBehaviour {
 			listing_remove_tr.SetParent(listing_tr);
 			listing_remove_tr.sizeDelta = new Vector2 (iconScale * listing_tr.sizeDelta.y, iconScale * listing_tr.sizeDelta.y);
 			listing_remove_tr.AnchorAtPoint (1f, 0.5f);
-			listing_remove_tr.anchoredPosition3D = new Vector3 (-horizontalPadding - listing_tr.sizeDelta.x, 0f, 0f);
+			listing_remove_tr.anchoredPosition3D = new Vector3 (-horizontalPadding - listing_remove_tr.sizeDelta.x, 0f, 0f);
+			listing_remove_tr.ResetScaleRot();
 
 			Image listing_remove_img = listing_remove.Image();
 			listing_remove_img.color = Color.black;
@@ -141,6 +145,7 @@ public class PlaylistBrowser : MonoBehaviour {
 
 			Button listing_remove_button = listing_remove.Button();
 			listing_remove_button.onClick.AddListener(()=>{
+				GameManager.instance.MenuClick();
 				MusicManager.instance.currentProject.songs.RemoveAt(num);
 				Refresh();
 			});
@@ -160,6 +165,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				0f, 
 				0f
 			);
+			listing_edit_tr.ResetScaleRot();
 
 			Image listing_edit_img = listing_edit.Image();
 			listing_edit_img.color = Color.black;
@@ -189,6 +195,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				RectTransform listing_up_tr = listing_up.RectTransform();
 				listing_up_tr.SetParent(listing_tr);
 				listing_up_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
+				listing_up_tr.ResetScaleRot();
 				listing_up_tr.localRotation = Quaternion.Euler(0f, 0f, 90f);
 				listing_up_tr.AnchorAtPoint (0f, 0.5f);
 				listing_up_tr.anchoredPosition3D = new Vector3 (
@@ -223,6 +230,7 @@ public class PlaylistBrowser : MonoBehaviour {
 				RectTransform listing_down_tr = listing_down.RectTransform();
 				listing_down_tr.SetParent(listing_tr);
 				listing_down_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
+				listing_down_tr.ResetScaleRot();
 				listing_down_tr.localRotation = Quaternion.Euler(0f, 0f, -90f);
 				listing_down_tr.AnchorAtPoint (0f, 0.5f);
 				listing_down_tr.anchoredPosition3D = new Vector3 (

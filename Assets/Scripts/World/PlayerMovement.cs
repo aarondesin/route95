@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour {
 		minVelocity = MusicManager.tempoToFloat [Tempo.Slowest] * distPerBeat;
 		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
 
-		GetComponent<AudioSource>().pitch = 0.4f;
+		GetComponent<AudioSource>().volume = 0.4f;
 
 		dOffset = 0f;
 

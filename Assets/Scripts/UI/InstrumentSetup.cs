@@ -48,6 +48,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public List<GameObject> sliders;
 	public Scrollbar beatsBar;
 	public RectTransform beatsBar_tr;
+	public Slider riffVolumeSlider;
 
 	public List<EffectSlider> effectSliders;
 
@@ -130,6 +131,8 @@ public class InstrumentSetup : MonoBehaviour {
 
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
+
+		riffVolumeSlider.value = currentRiff.volume;
 	}
 
 	// Removes all existing buttons
@@ -339,6 +342,10 @@ public class InstrumentSetup : MonoBehaviour {
 			buttonGrid[num].Add(bt);
 
 		}
+	}
+
+	public void SetRiffVolume (Slider slider) {
+		currentRiff.volume = slider.value;
 	}
 
 	GameObject MakeButton (string title, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
