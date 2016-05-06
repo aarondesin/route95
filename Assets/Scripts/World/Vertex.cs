@@ -46,7 +46,7 @@ public class VertexMap {
 		chunkSize = WorldManager.instance.chunkSize;
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
-		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth/2f;
+		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
 		width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Vertex[width,width];
@@ -152,29 +152,33 @@ public class VertexMap {
 
 	IEnumerator CheckRoads (List<Vector3> roadPoints) {
 		float startTime = Time.realtimeSinceStartup;
+		float xWPos;
+		float yWPos;
 
 		foreach (Vector3 roadPoint in roadPoints) {
 			for (int x = 0; x<width; x++) {
 
 				// Skip if impossible for a point to be in range
-				if (Mathf.Abs((x-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
+				xWPos = (x-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f;
+				if (Mathf.Abs(xWPos - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
 					continue;
 
 				for (int y=0; y<width; y++) {
 
 					// Skip if impossible for a point to be in range
-					if (Mathf.Abs((y-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f - roadPoint.z) > NEARBY_ROAD_DISTANCE) 
+					yWPos = (y-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f ;
+					if (Mathf.Abs(yWPos- roadPoint.z) > NEARBY_ROAD_DISTANCE) 
 						continue;
 					
 					Vertex vert = vertices[x,y];
 					if (vert == null) continue;
 					if (vert.locked) continue;
 
-					Vector3 worldPos = vert.WorldPos();
-					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
+					//Vector3 worldPos = vert.WorldPos();
+					float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
 					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
 
-					if (vert.nearRoad) {
+					if (vert.nearRoad && !vert.locked) {
 						vert.SmoothHeight(roadPoint.y);
 						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
 						foreach (GameObject decoration in decorationDeletes) 
@@ -191,6 +195,10 @@ public class VertexMap {
 
 			}
 
+			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+			}
 		}
 		yield return null;
 	}
@@ -257,6 +265,10 @@ public class VertexMap {
 			Debug.LogError (x + "," + y + " width: "+width+i.Message);
 			return null;
 		}
+	}
+
+	public Vertex VertexAt (IntVector2 i) {
+		return VertexAt(i.x, i.y);
 	}
 
 	public void RegisterDecoration (IntVector2 i, GameObject deco) {
@@ -398,6 +410,7 @@ public class Vertex {
 
 		
 	public void SetHeight (float h) {
+		if (h == height) return;
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
 		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
@@ -436,8 +449,8 @@ public class Vertex {
 			}
 			*/
 			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
-			normal += chunkVert.Key.mesh.normals[chunkVert.Value];
-			normal.Normalize ();
+			//normal += chunkVert.Key.mesh.normals[chunkVert.Value];
+			//normal.Normalize ();
 			chunkVert.Key.UpdateVertex (chunkVert.Value, h, normal);
 			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
 			//chunkVert.Key.vertices [chunkVert.Value].y = height;

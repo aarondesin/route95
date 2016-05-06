@@ -71,12 +71,14 @@ public class PlayerMovement : MonoBehaviour {
 		GetComponent<AudioSource>().loop = true;
 		GetComponent<AudioSource>().Play();
 		GetComponent<AudioSource>().volume = 1f;
+		EnableReflections();
 	}
 
 	public void StopMoving() {
 		moving = false;
 		foreach (ParticleSystem ps in particles) ps.Pause();
 		GetComponent<AudioSource>().Stop();
+		DisableReflections();
 	}
 
 	public void DisableReflections () {

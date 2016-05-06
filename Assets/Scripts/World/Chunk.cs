@@ -25,7 +25,7 @@ public class Chunk {
 	Mesh colliderMesh;
 	public Mesh mesh;
 	Vector3[] verts;
-	bool[] constrained;
+	//bool[] constrained;
 	int numVerts;
 	Vector3[] normals;
 	Vector2[] uvs;
@@ -47,7 +47,7 @@ public class Chunk {
 		float chunkSize = WorldManager.instance.chunkSize;
 		verts = CreateUniformVertexArray (chunkRes);
 		numVerts = verts.Length;
-		constrained = new bool[numVerts];
+		//constrained = new bool[numVerts];
 		normals = new Vector3[numVerts];
 
 		uvs = CreateUniformUVArray (chunkRes);
@@ -63,7 +63,7 @@ public class Chunk {
 		// Register all vertices with vertex map
 		for (int i=0; i<numVerts; i++) {
 			normals [i] = Vector3.up;
-			constrained [i] = false;
+			//constrained [i] = false;
 			colors[i] = new Color (0f, 0f, 0f, 0.5f);
 			IntVector2 coords = IntToV2 (i);
 			Vertex vert = vmap.VertexAt(coords.x, coords.y);
@@ -250,13 +250,15 @@ public class Chunk {
 			verts[index].y = height;
 		}
 		normals [index] = normal;
-		mesh.vertices = verts;
-		mesh.normals = normals;
+		//mesh.vertices = verts;
+		//mesh.normals = normals;
 	}
 
 	public void UpdateColor (int index, float blendValue) {
-		colors[index].a = blendValue;
-		mesh.colors = colors;
+		if (colors[index].a != blendValue) {
+			colors[index].a = blendValue;
+			mesh.colors = colors;
+		}
 	}
 
 	private bool CheckDist (float dist, float updateDist, float margin) {
@@ -282,7 +284,7 @@ public class Chunk {
 				needsColliderUpdate = true;
 			}
 			//if (!vmap.IsLocked (coords)) { //if vert is frozen
-			if (!vmap.IsConstrained (coords) && DynamicTerrain.instance.freqData != null) { 
+			if (!vmap.VertexAt (coords).locked && DynamicTerrain.instance.freqData != null) { 
 				Vector3 playerPos = PlayerMovement.instance.transform.position;
 
 				Vector3 vertPos = chunk.transform.position + verts [v];

@@ -83,8 +83,7 @@ public class DynamicTerrain {
 			List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
 			CreateChunkLists (xChunks, yChunks);
 			if (initialLoad) chunksToLoad = xChunks.Count * yChunks.Count;
-			CreateChunks (xChunks, yChunks);
-			DeleteChunks (xChunks, yChunks);
+
 
 			foreach (int x in xChunks) {
 				if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
@@ -109,6 +108,13 @@ public class DynamicTerrain {
 				}
 			}
 
+			if (!initialLoad) DeleteChunks (xChunks, yChunks);
+
+			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+				yield return null;
+				startTime = Time.realtimeSinceStartup;
+			}
+
 			if (initialLoad && activeChunks.Count == chunksToLoad) {
 				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 				int res = vertexmap.vertices.GetLength(0);
@@ -117,7 +123,7 @@ public class DynamicTerrain {
 				WorldManager.instance.DoLoadRoad();
 
 			} else {
-				if (PlayerMovement.instance.moving) {
+				//if (PlayerMovement.instance.moving) {
 					chunksToUpdate.Clear ();
 					foreach (Chunk chunk in activeChunks) {
 						if (chunk.needsColliderUpdate) chunk.UpdateCollider();
@@ -142,7 +148,12 @@ public class DynamicTerrain {
 						chunksToUpdate[i].priority = 0;
 
 					}
-				}
+
+					if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
+					}
+				//}
 			}
 			yield return null;
 		}
@@ -241,24 +252,6 @@ public class DynamicTerrain {
 			xChunks.Add (playerChunkX - i);
 			yChunks.Add (playerChunkY + i);
 			yChunks.Add (playerChunkY - i);
-		}
-	}
-
-	void CreateChunks(List<int> xChunks, List<int> yChunks){
-		foreach (int x in xChunks) {
-			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
-			foreach (int y in yChunks) {
-				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
-				if (chunkmap[x][y] == null) {
-					Chunk chunk = CreateChunk (x, y);
-					activeChunks.Add (chunk);
-					if (chunk.nearRoad) {
-						if (chunk.hasRoad) activeRoadChunks.Add(activeChunks[activeChunks.Count-1]);
-						activeCloseToRoadChunks.Add(activeChunks[activeChunks.Count-1]);
-					}
-					chunkmap[x][y] =chunk;
-				}
-			}
 		}
 	}
 
