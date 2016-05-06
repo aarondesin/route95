@@ -222,8 +222,8 @@ public class Road : Bezier {
 				point,
 				//point+BezRight(point)*width/3f,
 				//point-BezRight(point)*width/3f,
-				point+BezRight(point)*width*2f/3f,
-				point-BezRight(point)*width*2f/3f
+				point+BezRight(point)*width,
+				point-BezRight(point)*width
 			};
 			//DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
 			DynamicTerrain.instance.vertexmap.DoCheckRoads (points);

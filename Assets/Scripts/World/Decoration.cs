@@ -49,7 +49,7 @@ public class Decoration : MonoBehaviour {
 	void FixedUpdate () {
 		if (dynamic) {
 			GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
-			if (transform.position.y < -WorldManager.instance.heightScale) WorldManager.instance.RemoveDecoration (this);
+			if (transform.position.y < -WorldManager.instance.heightScale) WorldManager.instance.RemoveDecoration (gameObject);
 		}
 	}
 

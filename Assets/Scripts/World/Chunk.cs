@@ -33,7 +33,7 @@ public class Chunk {
 	Color[] colors;
 
 	bool isUpdatingVerts = false;
-	bool needsColliderUpdate = false;
+	public bool needsColliderUpdate = false;
 
 	#endregion
 	#region Chunk Methods
@@ -66,9 +66,14 @@ public class Chunk {
 			constrained [i] = false;
 			colors[i] = new Color (0f, 0f, 0f, 0.5f);
 			IntVector2 coords = IntToV2 (i);
+			Vertex vert = vmap.VertexAt(coords.x, coords.y);
+			if (vert != null) {
+				//if (UnityEngine.Random.Range(0,100) == 0) Debug.Log("no vert", chunk);
+				UpdateVertex (i, vert.height, vert.normal);
+			}
+
 			vmap.RegisterChunkVertex (coords, this, i);
 		}
-
 		//UpdateCollider ();
 	}
 
@@ -240,8 +245,10 @@ public class Chunk {
 	}
 
 	public void UpdateVertex (int index, float height, Vector3 normal) {
-		if (verts[index].y != height) needsColliderUpdate = true;
-		verts[index].y = height;
+		if (verts[index].y != height) {
+			needsColliderUpdate = true;
+			verts[index].y = height;
+		}
 		normals [index] = normal;
 		mesh.vertices = verts;
 		mesh.normals = normals;
@@ -256,7 +263,8 @@ public class Chunk {
 		return ((dist < (updateDist + margin)) && (dist > (updateDist - margin)));
 	}
 
-	private IEnumerator UpdateVerts(float updateDist, LinInt freqData) {
+	private IEnumerator UpdateVerts() {
+		
 		isUpdatingVerts = true;
 		float margin = WorldManager.instance.chunkSize / 2;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
@@ -268,39 +276,47 @@ public class Chunk {
 				//continue;
 			IntVector2 coords = IntToV2 (v);
 
+			Vertex vert = vmap.VertexAt(coords.x,coords.y);
+			if (vert.height != verts[v].y) {
+				UpdateVertex (v, vert.height, vert.normal);
+				needsColliderUpdate = true;
+			}
 			//if (!vmap.IsLocked (coords)) { //if vert is frozen
-			if (!vmap.IsConstrained (coords)) { 
+			if (!vmap.IsConstrained (coords) && DynamicTerrain.instance.freqData != null) { 
 				Vector3 playerPos = PlayerMovement.instance.transform.position;
 
 				Vector3 vertPos = chunk.transform.position + verts [v];
 				float distance = Vector3.Distance (vertPos, playerPos);
-				if (CheckDist (distance, updateDist, margin)) {
+				if (CheckDist (distance, WorldManager.instance.vertexUpdateDistance, margin)) {
 					Vector3 angleVector = vertPos - playerPos;
 					float angle = Vector3.Angle (Vector3.right, angleVector);
 					float linIntInput = angle / 360f;
-					float newY = freqData.GetDataPoint (linIntInput) *
+					float newY = DynamicTerrain.instance.freqData.GetDataPoint (linIntInput) *
 					              WorldManager.instance.heightScale;
 					if (newY != verts [v].y) {
 						vmap.SetHeight (coords, newY);
+						needsColliderUpdate = true;
 					}
 				}
-			}// else
+			}
+				// else
 				//constrained [v] = true;
 			//}
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			if (v == numVerts) {
+				isUpdatingVerts = false;
+				yield break;
+			} else if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
+
 		}
-		if (v == numVerts) {
-			yield return null;
-			isUpdatingVerts = false;
-		}
+
 
 	}
 
-	public void Update (float updateDist, LinInt freqData){
-		if (needsColliderUpdate) UpdateCollider();
+	public void Update (){
+		//if (needsColliderUpdate) UpdateCollider();
 		if (!hasCheckedForRoad) {
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 		}
@@ -308,10 +324,10 @@ public class Chunk {
 		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
 		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
 		//roadNearby = NearbyRoad ();
-		if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
+		//if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
 			//UpdateVerts (updateDist, freqData);
-			WorldManager.instance.StartCoroutine(UpdateVerts(updateDist, freqData));
-		}
+			WorldManager.instance.StartCoroutine(UpdateVerts());
+		//}
 	}
 		
 	public bool Constrained (Vector3 vertex) {
@@ -383,11 +399,11 @@ public class Chunk {
 
 	public static IntVector2 ToNearestVMapCoords (float x, float y) {
 		float chunkSize = WorldManager.instance.chunkSize;
-		//int chunkRes = WorldManager.instance.chunkResolution;
+		int chunkRes = WorldManager.instance.chunkResolution;
 
 		return new IntVector2 (
-			Mathf.RoundToInt((x-chunkSize/2f) / chunkSize),
-			Mathf.RoundToInt((y-chunkSize/2f) / chunkSize)
+			Mathf.RoundToInt((x-chunkSize/2f) * (float)chunkRes / chunkSize),
+			Mathf.RoundToInt((y-chunkSize/2f) * (float)chunkRes / chunkSize)
 		);
 	}
 

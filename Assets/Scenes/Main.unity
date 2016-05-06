@@ -41,7 +41,7 @@ RenderSettings:
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 6
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_LightmapsMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -9507,7 +9507,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9461232
+  m_Size: 0.94578147
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17637,7 +17637,7 @@ MonoBehaviour:
   loadsToDo: 0
   chunkSize: 100
   chunkResolution: 16
-  chunkLoadRadius: 3
+  chunkLoadRadius: 4
   heightScale: 200
   vertexUpdateDistance: 600
   wind: {x: 0, y: 0, z: 0}
@@ -17655,7 +17655,7 @@ MonoBehaviour:
   grassEmitterTemplate: {fileID: 1684075852}
   roadWidth: 10
   roadHeight: 0.5
-  roadExtendRadius: 250
+  roadExtendRadius: 350
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
   timeOfDay: 0
@@ -17675,10 +17675,10 @@ MonoBehaviour:
   secondaryNightColor: {r: 0.058823533, g: 0.078431375, b: 0.18823531, a: 1}
   primarySunriseColor: {r: 1, g: 1, b: 0, a: 1}
   secondarySunriseColor: {r: 1, g: 0.49803925, b: 0, a: 1}
-  chunkUpdatesPerCycle: 1
+  chunkUpdatesPerCycle: 2
   freqArraySize: 256
   decorationsPerStep: 100
-  grassPerChunk: 50
+  grassPerChunk: 5
   roadPathCheckResolution: 500
   loadedTerrain: 0
 --- !u!1 &906108765
@@ -23193,7 +23193,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1550758007}
   m_HandleRect: {fileID: 1550758006}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -23502,7 +23502,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.499878, y: 23.220947}
+  m_AnchoredPosition: {x: 849, y: 430.99997}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -24611,7 +24611,7 @@ MonoBehaviour:
   distanceFog: 1
   excludeFarPixels: 1
   useRadialDistance: 1
-  heightFog: 1
+  heightFog: 0
   height: 1
   heightDensity: 2
   startDistance: 10
@@ -29715,7 +29715,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793876
+  m_Size: 0.9793875
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -35,15 +36,17 @@ public class VertexMap {
 	int chunkRadius; 
 
 	List<GameObject> deletes;
+	List<GameObject> decorationDeletes;
 
 	public VertexMap () {
 		//vertices = new Dictionary<int, Dictionary<int, Vertex>>();
 		deletes = new List<GameObject>();
+		decorationDeletes = new List<GameObject>();
 
 		chunkSize = WorldManager.instance.chunkSize;
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
-		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
+		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth/2f;
 		width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Vertex[width,width];
@@ -165,7 +168,7 @@ public class VertexMap {
 					
 					Vertex vert = vertices[x,y];
 					if (vert == null) continue;
-					//if (vert.locked) continue;
+					if (vert.locked) continue;
 
 					Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (worldPos.x, worldPos.z), new Vector2 (roadPoint.x, roadPoint.z));
@@ -173,9 +176,10 @@ public class VertexMap {
 
 					if (vert.nearRoad) {
 						vert.SmoothHeight(roadPoint.y);
-						foreach (GameObject decoration in vert.decorations) deletes.Add(decoration);
-						foreach (GameObject decoration in deletes) 
-							WorldManager.instance.RemoveDecoration(decoration.GetComponent<Decoration>());
+						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
+						foreach (GameObject decoration in decorationDeletes) 
+							WorldManager.instance.RemoveDecoration(decoration);
+						decorationDeletes.Clear();
 						vert.locked = true;
 					}
 
@@ -203,10 +207,10 @@ public class VertexMap {
 		}
 		while (!Mathf.IsPowerOfTwo(x-1)) x--;
 
-		vertices[0,0].SetHeight(Random.Range (-noise, noise));
-		vertices[x,0].SetHeight(Random.Range (-noise, noise));
-		vertices[0,x].SetHeight(Random.Range (-noise, noise));
-		vertices[x,x].SetHeight(Random.Range (-noise, noise));
+		vertices[0,0].SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices[x,0].SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices[0,x].SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices[x,x].SetHeight(UnityEngine.Random.Range (-noise, noise));
 		int currRes = x-1;
 		var currNoise = noise;
 		while (currRes%1 == 0 && currRes > 1) {
@@ -217,12 +221,12 @@ public class VertexMap {
 					int midptY = j+currRes/2;
 					float avg = (vertices[i,j].height + vertices[i+currRes,j].height +
 						vertices[i,j+currRes].height + vertices[i+currRes,j+currRes].height)/4f;
-					vertices[midptX,midptY].SetHeight (avg + Random.Range(-currNoise, currNoise));
+					vertices[midptX,midptY].SetHeight (avg + UnityEngine.Random.Range(-currNoise, currNoise));
 
-					vertices[midptX,j].SetHeight ((vertices[i,j].height + vertices[i+currRes,j].height)/2f + Random.Range(0f, currNoise));
-					vertices[midptX,j+currRes].SetHeight ((vertices[i,j+currRes].height + vertices[i+currRes,j+currRes].height)/2f+ Random.Range(0f, currNoise));
-					vertices[i,midptY].SetHeight ((vertices[i,j].height + vertices[i,j+currRes].height)/2f+ Random.Range(0f, currNoise));
-					vertices[i+currRes,midptY].SetHeight ((vertices[i+currRes,j].height + vertices[i+currRes,j+currRes].height)/2f+ Random.Range(0f, currNoise));
+					vertices[midptX,j].SetHeight ((vertices[i,j].height + vertices[i+currRes,j].height)/2f + UnityEngine.Random.Range(0f, currNoise));
+					vertices[midptX,j+currRes].SetHeight ((vertices[i,j+currRes].height + vertices[i+currRes,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
+					vertices[i,midptY].SetHeight ((vertices[i,j].height + vertices[i,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
+					vertices[i+currRes,midptY].SetHeight ((vertices[i+currRes,j].height + vertices[i+currRes,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
 				}
 			}
 			currRes /= 2;
@@ -245,9 +249,14 @@ public class VertexMap {
 	}
 
 	public Vertex VertexAt (int x, int y) {
-		if (x+width/2 >= width || y+width/2 >= width) return null;
+		while (x+width/2 >= width || y+width/2 >= width || x+width/2 < 0 || y+width/2 < 0) ResizeMap();
 		//if (Random.Range(0,1000)==0) Debug.Log(x+","+y+" is actually "+(x+width/2)+","+(y+width/2)+" width:"+width);
-		return vertices[x+width/2, y+width/2];
+		try {
+			return vertices[x+width/2, y+width/2];
+		} catch (IndexOutOfRangeException i) {
+			Debug.LogError (x + "," + y + " width: "+width+i.Message);
+			return null;
+		}
 	}
 
 	public void RegisterDecoration (IntVector2 i, GameObject deco) {
@@ -339,7 +348,7 @@ public class Vertex {
 	public bool nearRoad = false;
 	public Vector3 normal = Vector3.up;
 	public float slope = 0f;
-	public float blendValue = Random.Range (0f, 1.0f);
+	public float blendValue = UnityEngine.Random.Range (0f, 1.0f);
 	public List<GameObject> decorations;
 
 	public Vertex (int x, int y) {

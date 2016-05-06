@@ -63,90 +63,91 @@ public class DynamicTerrain {
 	}
 
 	public void DoLoadChunks () {
-		List<int> xChunks = new List<int>();
-		List<int> yChunks = new List<int>();
-		CreateChunkLists (xChunks, yChunks);
-		WorldManager.instance.StartCoroutine(LoadChunks(xChunks, yChunks));
+		WorldManager.instance.StartCoroutine(UpdateChunks());
 	}
 
-	IEnumerator LoadChunks (List<int> xChunks, List<int> yChunks) {
-		int chunksToLoad = xChunks.Count * yChunks.Count;
-		GameManager.instance.ChangeLoadingMessage("Loading chunks...");
+	IEnumerator UpdateChunks () {
+
+		int chunksToLoad = 0;
 		float startTime = Time.realtimeSinceStartup;
 		int numLoaded = 0;
+		chunksToUpdate = new List<Chunk>();
 
-		foreach (int x in xChunks) {
-			if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
-			foreach (int y in yChunks) {
-				if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
-				if (chunkmap[x][y] == null) {
-					Chunk chunk = CreateChunk (x, y);
-					activeChunks.Add (chunk);
-					chunkmap[x][y] = chunk;
-					numLoaded++;
+		if (initialLoad) GameManager.instance.ChangeLoadingMessage("Loading chunks...");
 
-					if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
-						yield return null;
-						startTime = Time.realtimeSinceStartup;
-						GameManager.instance.ReportLoaded(numLoaded);
-						numLoaded = 0;
-					}
-				}
-			}
-		}
+		while (true) {
 
+			if (!initialLoad) freqData = UpdateFreqData ();
 
-		if (initialLoad && activeChunks.Count == chunksToLoad) {
-			foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
-			//int res = vertexmap.vertices.Keys.Count;
-			int res = vertexmap.vertices.GetLength(0);
-			CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
-			initialLoad = false;
-			WorldManager.instance.DoLoadRoad();
-		}
-		yield return null;
-	}
+			List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
+			List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
+			CreateChunkLists (xChunks, yChunks);
+			if (initialLoad) chunksToLoad = xChunks.Count * yChunks.Count;
+			CreateChunks (xChunks, yChunks);
+			DeleteChunks (xChunks, yChunks);
 
+			foreach (int x in xChunks) {
+				if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
+				foreach (int y in yChunks) {
+					if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
+					if (chunkmap[x][y] == null) {
+						Chunk chunk = CreateChunk (x, y);
+						activeChunks.Add (chunk);
+						chunkmap[x][y] = chunk;
 
-	void UpdateChunks(float[] freqDataArray){
-		if (!GameManager.instance.loaded)
-			return;
-		if (chunksToUpdate == null) chunksToUpdate = new List<Chunk> ();
+						if (initialLoad) numLoaded++;
 
-		freqData = UpdateFreqData ();
-		List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
-		List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
-		CreateChunkLists (xChunks, yChunks);
-		CreateChunks (xChunks, yChunks);
-		DeleteChunks (xChunks, yChunks);
-
-		chunksToUpdate.Clear ();
-		foreach (Chunk chunk in activeChunks) {
-			if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
-				//chunkPriorities [chunk] += ChunkHeuristic (chunk) + 1;
-				chunk.priority += ChunkHeuristic (chunk) +1;
-				if (chunksToUpdate.Count == 0)
-					chunksToUpdate.Add (chunk);
-				else {
-					for (int i = 0; i < chunksToUpdate.Count; i++) {
-					//	if (chunkPriorities [chunk] > chunkPriorities [chunksToUpdate [i]]) {
-						if (chunk.priority > chunksToUpdate[i].priority) {
-							chunksToUpdate.Insert (i, chunk);
-							break;
+						if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+							yield return null;
+							startTime = Time.realtimeSinceStartup;
+							if (initialLoad) {
+								GameManager.instance.ReportLoaded(numLoaded);
+								numLoaded = 0;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
-			chunksToUpdate [i].Update (WorldManager.instance.vertexUpdateDistance, freqData);
-		//	chunkPriorities [chunksToUpdate [i]] = 0;
-			chunksToUpdate[i].priority = 0;
+			if (initialLoad && activeChunks.Count == chunksToLoad) {
+				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
+				int res = vertexmap.vertices.GetLength(0);
+				CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
+				initialLoad = false;
+				WorldManager.instance.DoLoadRoad();
 
+			} else {
+				if (PlayerMovement.instance.moving) {
+					chunksToUpdate.Clear ();
+					foreach (Chunk chunk in activeChunks) {
+						if (chunk.needsColliderUpdate) chunk.UpdateCollider();
+						if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
+							chunk.priority += ChunkHeuristic (chunk) +1;
+							if (chunksToUpdate.Count == 0)
+								chunksToUpdate.Add (chunk);
+							else {
+								for (int i = 0; i < chunksToUpdate.Count; i++) {
+									if (chunk.priority > chunksToUpdate[i].priority) {
+										chunksToUpdate.Insert (i, chunk);
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+						chunksToUpdate [i].Update ();
+						//Debug.Log("update",chunksToUpdate[i].chunk);
+						chunksToUpdate[i].priority = 0;
+
+					}
+				}
+			}
+			yield return null;
 		}
-			
 	}
+
 
 	public int ChunkHeuristic (Chunk chunk) {
 		return 
@@ -264,6 +265,12 @@ public class DynamicTerrain {
 	void DeleteChunk(Chunk chunk){
 		//vertexmap.UnregisterChunkVertex(
 		//chunkPriorities.Remove(chunk);
+		activeChunks.Remove(chunk);
+		if (chunk.nearRoad) {
+			activeCloseToRoadChunks.Remove(chunk);
+			if (chunk.hasRoad) activeRoadChunks.Remove(chunk);
+		}
+
 		UnityEngine.Object.Destroy(chunk.chunk);
 		int numChildren = chunk.chunk.transform.childCount;
 		WorldManager.instance.DecNumDeco (numChildren);
@@ -271,25 +278,19 @@ public class DynamicTerrain {
 	}
 
 	void DeleteChunks(List<int> xChunks, List<int> yChunks) {
-		List<Chunk> deletions = new List<Chunk> ();
+		List<Chunk> deletions = new List<Chunk>();
 		foreach (Chunk chunk in activeChunks) {
 			//if chunk is not in chunks to be loaded
 			if (!(xChunks.Contains(chunk.x) && yChunks.Contains(chunk.y))) {
-				DeleteChunk (chunk);
-				deletions.Add (chunk);
+				deletions.Add(chunk);
+
 			}
 		}
-		foreach (Chunk chunk in deletions) {
-			activeChunks.Remove (chunk);
-			if (activeRoadChunks.Contains(chunk))
-				activeRoadChunks.Remove (chunk);
-			if (activeCloseToRoadChunks.Contains(chunk))
-				activeCloseToRoadChunks.Remove(chunk);
-		}
+		foreach (Chunk chunk in deletions) DeleteChunk (chunk);
 	}
 
 	public void Update(float[] freqDataArray){
-		UpdateChunks (freqDataArray);
+		//UpdateChunks (freqDataArray);
 	}
 
 	float AngularDistance (float angle, float pos) {
