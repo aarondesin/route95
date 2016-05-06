@@ -124,36 +124,43 @@ public class DynamicTerrain {
 
 			} else {
 				//if (PlayerMovement.instance.moving) {
-					chunksToUpdate.Clear ();
-					foreach (Chunk chunk in activeChunks) {
-						if (chunk.needsColliderUpdate) chunk.UpdateCollider();
-						if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
-							chunk.priority += ChunkHeuristic (chunk) +1;
-							if (chunksToUpdate.Count == 0)
-								chunksToUpdate.Add (chunk);
-							else {
-								for (int i = 0; i < chunksToUpdate.Count; i++) {
-									if (chunk.priority > chunksToUpdate[i].priority) {
-										chunksToUpdate.Insert (i, chunk);
-										break;
-									}
+				chunksToUpdate.Clear ();
+				foreach (Chunk chunk in activeChunks) {
+					if (chunk.needsColliderUpdate) chunk.UpdateCollider();
+					if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
+						chunk.priority += ChunkHeuristic (chunk) +1;
+						if (chunksToUpdate.Count == 0)
+							chunksToUpdate.Add (chunk);
+						else {
+							for (int i = 0; i < chunksToUpdate.Count; i++) {
+								if (chunk.priority > chunksToUpdate[i].priority) {
+									chunksToUpdate.Insert (i, chunk);
+									break;
 								}
 							}
 						}
 					}
+				}
+					
+				if (chunksToUpdate.Count > 0) {
+					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+						try {
+							chunksToUpdate [i].Update ();
+							//Debug.Log("update",chunksToUpdate[i].chunk);
+							chunksToUpdate[i].priority = 0;
 
-					for (int i = 0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
-						chunksToUpdate [i].Update ();
-						//Debug.Log("update",chunksToUpdate[i].chunk);
-						chunksToUpdate[i].priority = 0;
-
+						}catch (ArgumentOutOfRangeException a) {
+							Debug.LogError (i + " "+a.Message);
+							continue;
+						}
 					}
+				}
+					
 
-					if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
-						yield return null;
-						startTime = Time.realtimeSinceStartup;
-					}
-				//}
+				if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+					yield return null;
+					startTime = Time.realtimeSinceStartup;
+				}
 			}
 			yield return null;
 		}

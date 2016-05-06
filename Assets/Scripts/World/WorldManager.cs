@@ -485,7 +485,7 @@ public class WorldManager : MonoBehaviour {
 
 	bool DecorateRandom (Chunk chunk, GameObject decoration) {
 		//chunk.UpdateCollider();
-
+		if (chunk == null) return false;
 		Vector2 coordinate = new Vector2 (
 			chunk.x*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f),
 			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
