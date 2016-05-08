@@ -96,8 +96,11 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (GameManager.instance.currentMode == GameManager.Mode.Live && MusicManager.instance.currentSong != null &&
-			MusicManager.instance.currentProject.songs[MusicManager.instance.currentPlayingSong].Beats != 0) {
+		
+		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
+			Song song = null;
+			if (MusicManager.instance.currentProject.songs.Count > 0) 
+				song = MusicManager.instance.currentProject.songs[MusicManager.instance.currentPlayingSong];
 
 			// Check for pause
 			if (Input.GetKeyDown (KeyCode.Escape)) GameManager.instance.TogglePause ();
@@ -126,25 +129,29 @@ public class InputManager : MonoBehaviour {
 					}
 				}
 					
+				// Check for note presses
 				foreach (KeyCode keyPress in keyToNote.Keys.ToList()) {
 					Instrument inst = MusicManager.instance.currentInstrument;
-					Key key = MusicManager.instance.currentSong.key;
-					ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
 					if (Input.GetKeyDown(keyPress)) {
 						int noteIndex;
+						AudioSource source = audioSources[keyToNote[keyPress]];
 						if (inst.type == Instrument.Type.Percussion) {
 							noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[keyPress];
 							if (noteIndex >= 0) {
 								Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
-								note.PlayNote(audioSources[keyToNote[keyPress]], false);
+								note.PlayNote(source, false);
+								if (note.IsKick()) WorldManager.instance.LightningStrike(note.volume * source.volume);
 							}
-						} else {
+						} else if (song != null && song.scale != -1 && song.key != Key.None) {
+
+							Key key = MusicManager.instance.currentSong.key;
+							ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
+
 							noteIndex = KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes.Count-1-keyToNote[keyPress];
 							if (noteIndex >= 0) {
 								Note note = new Note(KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes[noteIndex]);
-								//note.PlayNote(MusicManager.instance.instrumentAudioSources[MusicManager.instance.currentInstrument], true);
 								if (note != null)
-									note.PlayNote(audioSources[keyToNote[keyPress]], true);
+									note.PlayNote(source, true);
 								}
 						}
 						break;

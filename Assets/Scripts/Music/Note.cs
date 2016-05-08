@@ -67,5 +67,9 @@ public class Note {
 		return filename == other.filename || (this == null && other == null);
 	}
 
+	public bool IsKick () {
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
+	}
+
 	#endregion
 }

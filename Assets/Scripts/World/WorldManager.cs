@@ -126,6 +126,13 @@ public class WorldManager : MonoBehaviour {
 	public Material vegetationMaterial;
 	public GameObject grassEmitterTemplate;
 
+	//
+	[Header("Effects Settings")]
+	//
+
+	public float baseLightningIntensity = 2f;
+	public GameObject lightningStriker;
+
 
 	//
 	[Header("Road Settings")]
@@ -163,6 +170,7 @@ public class WorldManager : MonoBehaviour {
 	public float timeOfDay;
 
 	private GameObject sun;
+	Light sunLight;
 
 	[Tooltip("Daytime intensity of the sun.")]
 	[Range(0.1f, 1.5f)]
@@ -172,6 +180,7 @@ public class WorldManager : MonoBehaviour {
 	public Flare sunFlare;
 
 	private GameObject moon;
+	Light moonLight;
 
 	[Tooltip("Nighttime intensity of the moon.")]
 	[Range(0.1f, 1.5f)]
@@ -229,7 +238,7 @@ public class WorldManager : MonoBehaviour {
 	#region Unity Callbacks
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		instance = this;
 
 		for (int i = 0; i<initialMaxActive.Length; i++) {
@@ -252,7 +261,11 @@ public class WorldManager : MonoBehaviour {
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = CreateSun();
+		sunLight = sun.Light();
 		moon = CreateMoon();
+		moonLight = moon.Light();
+
+		lightningStriker.SetActive(false);
 
 		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
 			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
@@ -390,10 +403,10 @@ public class WorldManager : MonoBehaviour {
 			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
 		}
 
-		sun.GetComponent<Light>().intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : 0f;
-		sun.GetComponent<Light>().color = primaryColor;
-		moon.GetComponent<Light>().color = Color.white;
-		moon.GetComponent<Light>().intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : 0f;
+		sunLight.intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : 0f;
+		sunLight.color = primaryColor;
+		moonLight.color = Color.white;
+		moonLight.intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : 0f;
 		RenderSettings.fogColor = secondaryColor;
 
 		RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
@@ -565,6 +578,33 @@ public class WorldManager : MonoBehaviour {
 
 	public void DecNumDeco(int n) {
 		numDecorations -= n;
+	}
+
+	/// <summary>
+	/// Creates a lightning strike at a random point in view.
+	/// </summary>
+	public void LightningStrike (float strength) {
+
+		// Find camera forward direction (flat)
+		Vector3 forward = Camera.main.transform.forward;
+		forward.y = 0f;
+		forward.Normalize();
+
+		// Define an offset
+		Vector2 r = UnityEngine.Random.insideUnitCircle;
+		Vector3 offset = new Vector3 (200f*r.x, 250f, 200f*r.y);
+
+		// Pick a point
+		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
+			vertexUpdateDistance + offset;
+
+		// Play sound
+		// TODO
+
+		// Enable lightning striker and move to point
+		lightningStriker.SetActive(true);
+		lightningStriker.transform.position = origin;
+		lightningStriker.Light().intensity = baseLightningIntensity*strength;
 	}
 		
 }

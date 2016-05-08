@@ -100,12 +100,21 @@ public class InstrumentSetup : MonoBehaviour {
 			effectSlider.Initialize();
 		}
 
-		distortionButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
-		tremoloButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioTremoloFilter>().enabled ? percussionFilled : percussionEmpty;
-		chorusButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
-		flangerButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
-		echoButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioEchoFilter>().enabled ? percussionFilled : percussionEmpty;
-		reverbButton.sprite = MusicManager.instance.instrumentAudioSources[currentRiff.instrument].GetComponent<AudioReverbFilter>().enabled ? percussionFilled : percussionEmpty;
+		// Initialize effect status sprites
+		AudioSource source = MusicManager.instance.instrumentAudioSources[currentRiff.instrument];
+
+		distortionButton.sprite = 
+			source.GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
+		tremoloButton.sprite = 
+			source.GetComponent<AudioTremoloFilter>().enabled ? percussionFilled : percussionEmpty;
+		chorusButton.sprite = 
+			source.GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
+		flangerButton.sprite = 
+			source.GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
+		echoButton.sprite = 
+			source.GetComponent<AudioEchoFilter>().enabled ? percussionFilled : percussionEmpty;
+		reverbButton.sprite = 
+			source.GetComponent<AudioReverbFilter>().enabled ? percussionFilled : percussionEmpty;
 			
 		HideSliders ();
 
@@ -118,7 +127,6 @@ public class InstrumentSetup : MonoBehaviour {
 		MakeBeatNumbers ();
 		UpdateBeatsText();
 		UpdateTempoText();
-
 
 		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
 
@@ -273,7 +281,6 @@ public class InstrumentSetup : MonoBehaviour {
 
 
 			bt.Button().onClick.AddListener(()=>{
-				//if (!bt.GetComponent<NoteButton>().isDrag) {
 				if (!InputManager.instance.IsDragging) {
 					bool n = currentRiff.Toggle(note, num);
 					if (!n) bt_sh.Hide();
