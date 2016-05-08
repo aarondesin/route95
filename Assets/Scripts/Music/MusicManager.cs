@@ -130,11 +130,11 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 
 						if (currentPlayingSong < currentProject.songs.Count-1) {
-							beat = 0;
 							DisableAllAudioSources();
 							currentPlayingSong++;
 						} else {
-							GameManager.instance.SwitchToPostplay();
+							if (loopPlaylist) currentPlayingSong = 0;
+							else GameManager.instance.SwitchToPostplay();
 						}
 					}
 					currentSong.PlaySong(beat);
@@ -396,6 +396,10 @@ public class MusicManager : MonoBehaviour {
 	public void StopPlaying () {
 		playing = false;
 		beat = 0;
+	}
+
+	public bool IsKick (Note note) {
+		return note.filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
 	}
 	
 	#endregion

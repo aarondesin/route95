@@ -174,7 +174,15 @@ public static class GameObjectExtension {
 		return obj.GetComponent<Image>();
 	}
 
+	public static SpriteRenderer SpriteRenderer (this GameObject obj) {
+		return obj.GetComponent<SpriteRenderer>();
+	}
+
 	public static ShowHide ShowHide (this GameObject obj) {
 		return obj.GetComponent<ShowHide>();
+	}
+
+	public static Light Light (this GameObject obj) {
+		return obj.GetComponent<Light>();
 	}
 }

@@ -56,8 +56,12 @@ public class Road : Bezier {
 
 		mesh = new Mesh();
 		// Set default points and build mesh
-		Reset ();
+
 		//Build();
+	}
+
+	void Start () {
+		Reset ();
 	}
 
 	public void Update () {
