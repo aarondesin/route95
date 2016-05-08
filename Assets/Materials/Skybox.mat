@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: 78bb880df23180b459999bba220696f9, type: 3}
+  m_Shader: {fileID: 4800000, guid: 553abae4fcc85264d8fe0d5ecb25dfa1, type: 3}
   m_ShaderKeywords: _SUNDISK_HIGH_QUALITY
   m_LightmapFlags: 5
   m_CustomRenderQueue: 1000
