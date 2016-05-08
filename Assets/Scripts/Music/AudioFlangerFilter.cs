@@ -31,7 +31,7 @@ public class AudioFlangerFilter : MonoBehaviour {
 
 	void OnEnable () {
 		r = 0f;
-		time = 0.02f * GameManager.instance.targetFrameRate;
+		time = 0.02f * Application.targetFrameRate;
 	}	
 
 	void MixSignals () {

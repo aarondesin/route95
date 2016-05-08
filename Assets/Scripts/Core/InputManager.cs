@@ -7,9 +7,9 @@ using System.Linq;
 
 public class InputManager : MonoBehaviour {
 
-	public static InputManager instance;
-
 	#region InputManager Vars
+
+	public static InputManager instance;
 
 	[Tooltip("Current selected object.")]
 	public GameObject selected;
@@ -22,12 +22,15 @@ public class InputManager : MonoBehaviour {
 
 
 	public int framesDragged = 0;
+
 	public bool IsDragging {
 		get {
 			return framesDragged >= 30;
 		}
 	}
 
+	#endregion
+	#region Key Mappings
 
 	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
 		{ KeyCode.Alpha1, PercussionInstrument.RockDrums },
@@ -81,7 +84,7 @@ public class InputManager : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		instance = this;
 		audioSources = new List<AudioSource>();
 		for (int i=0; i<26; i++) {
@@ -186,22 +189,30 @@ public class InputManager : MonoBehaviour {
 	#endregion
 	#region InputManager Methods
 
+	/// <summary>
+	/// Freezes all selected scrollviews.
+	/// </summary>
 	void FreezeAllScrollviews () {
 		foreach (ScrollRect scrollview in scrollviews)
 			scrollview.enabled = false;
 	}
 
+	/// <summary>
+	/// Unfreezes all selected scrollviews.
+	/// </summary>
 	void UnfreezeAllScrollviews () {
 		foreach (ScrollRect scrollview in scrollviews)
 			scrollview.enabled = true;
 	}
 
-	// Switches to a new instrument
+	/// <summary>
+	/// Switches the instrument.
+	/// </summary>
+	/// <param name="instrument">Instrument.</param>
 	void SwitchInstrument (Instrument instrument) {
 		if (instrument != MusicManager.instance.currentInstrument) {
 			MusicManager.instance.currentInstrument = instrument;
 			MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(instrument.switchSound);
-			//Debug.Log (MusicManager.instance.currentInstrument);
 			InstrumentDisplay.instance.Refresh();
 		}
 	}

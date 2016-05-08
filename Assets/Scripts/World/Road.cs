@@ -149,7 +149,7 @@ public class Road : Bezier {
 				AddCurve();
 				PlayerMovement.instance.progress = numerator / CurveCount;
 
-				if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}
@@ -234,7 +234,7 @@ public class Road : Bezier {
 			DynamicTerrain.instance.vertexmap.DoCheckRoads (points);
 			progress += diff / resolution;
 
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}

@@ -11,6 +11,8 @@ using UnityEditor;
 
 public class GameManager : MonoBehaviour {
 
+	#region GameManager Enums
+
 	public enum Menu {
 		None,
 		Main,
@@ -27,26 +29,29 @@ public class GameManager : MonoBehaviour {
 		Postplay
 	};
 
-	public static GameManager instance;
-
+	#endregion
 	#region GameManager Vars
 
+	public static GameManager instance;
+
 	[Header("Status")]
-
-	public int targetFrameRate = 60;
-
-	private int loadProgress = 0;
-	private int loadsToDo;
-	bool loading = false;
-
 
 	public bool paused = false;
 	public Menu currentMenu = Menu.None;
 	public Mode currentMode = Mode.Loading;
+	[NonSerialized]
+	public Dictionary<Menu, GameObject> menus; 
 
-
+	// Loading vars
+	private int loadProgress = 0;
+	private int loadsToDo;
+	bool loading = false;
 	bool initialized = false;
+	public bool loaded = false;
+
+	// Casette Vars
 	bool casetteMoving = false;
+	bool willMoveCasette = false;
 	public Transform casetteFront;
 	public Transform casetteBack;
 	Transform casetteTarget;
@@ -54,7 +59,6 @@ public class GameManager : MonoBehaviour {
 	public float casetteMoveSpeed = 1f;
 	float sTime;
 
-	public Dictionary<Menu, GameObject> menus; 
 
 	[Header("UI Settings")]
 
@@ -134,7 +138,6 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject casette;
 
-	public bool loaded = false;
 	#endregion
 	#region Unity Callbacks
 
@@ -143,6 +146,7 @@ public class GameManager : MonoBehaviour {
 		else instance = this;
 
 		Profiler.maxNumberOfSamplesPerFrame = -1;
+		Application.targetFrameRate = 60;
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {
@@ -163,44 +167,15 @@ public class GameManager : MonoBehaviour {
 
 	void Update () {
 		if (!initialized) {
-			if (!loading) {
-				Load();
-			} else {
-				return;
-			}
+			if (!loading) Load();
+			else return;
 		}
 
-		// Fade exit icon
-		if (currentMode == Mode.Live) {
-			if (!paused) {
-				Color temp = livePlayQuitPrompt.color;
-				if (prevMouse != Input.mousePosition) {
-					WakeLiveUI();
-					prevMouse = Input.mousePosition;
-				} else {
-					if (fadeTimer <= 0f) temp.a -= fadeSpeed;
-					else fadeTimer--;
-					livePlayQuitPrompt.color = temp;
-					foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
-						image.color = temp;
-						if(image.GetComponentInChildren<Text>())
-							image.GetComponentInChildren<Text>().color = temp;
-					}
-				}
-			}
-		} else {
-			if (casetteMoving) {
-				float progress = (Time.time - sTime) * casetteMoveSpeed;
-				float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
-				//if (dist == float.NaN) Debug.Log("casette is broken");
-				casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
-				casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
-				if (dist >= 1f) {
-					casetteMoving = false;
-					casette.transform.position = casetteTarget.position;
-					casette.transform.rotation = casetteTarget.rotation;
-				}
-			}
+		switch (currentMode) {
+
+		case Mode.Setup:
+			
+			// Check for tooltip
 			if (tooltip.activeSelf) {
 				RectTransform tr = tooltip.GetComponent<RectTransform>();
 				Vector2 realPosition = new Vector2 (
@@ -215,121 +190,128 @@ public class GameManager : MonoBehaviour {
 					0f
 				);
 			}
-			livePlayQuitPrompt.color = Color.white;
+			break;
+
+		case Mode.Live:
+			if (paused) {
+
+				// Wake/fade UI icons
+				Color temp = livePlayQuitPrompt.color;
+				if (prevMouse != Input.mousePosition) {
+					WakeLiveUI();
+					prevMouse = Input.mousePosition;
+				} else {
+					if (fadeTimer <= 0f) temp.a -= fadeSpeed;
+					else fadeTimer--;
+					livePlayQuitPrompt.color = temp;
+					foreach (Image image in liveIcons.GetComponentsInChildren<Image>()) {
+						image.color = temp;
+						if(image.GetComponentInChildren<Text>())
+							image.GetComponentInChildren<Text>().color = temp;
+					}
+				}
+			} else livePlayQuitPrompt.color = Color.white;
+			break;
+		}
+			
+		// Move casette
+		if (casetteMoving) {
+			float progress = (Time.time - sTime) * casetteMoveSpeed;
+			float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
+			casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
+			casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
+
+			if (dist >= 1f) {
+				casetteMoving = false;
+				casette.transform.position = casetteTarget.position;
+				casette.transform.rotation = casetteTarget.rotation;
+			}
 		}
 
 	}
 
 	#endregion
-	#region GameManager Methods
+	#region GameManager Loading Methods
 
+	/// <summary>
+	/// Load this instance.
+	/// </summary>
 	void Load () {
-		HideAll ();
-		//MoveCasetteBack();
 
+		// Hide all menus
+		HideAll ();
+
+		// Show loading screen
 		loadingScreen.SetActive(true);
-		startLoadTime = Time.realtimeSinceStartup;
+
+		// Calculate operations to do
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
+
+		// Init vars
+		startLoadTime = Time.realtimeSinceStartup;
 		loading = true;
 
+		// Start by loading MusicManager
 		MusicManager.instance.Load();
-
 	}
 
-	public void FinishLoading () {
-		// Hide all menus and display default menu (main)
-		loadingScreen.SetActive(false);
-		currentMode = Mode.Setup;
-		HideAll ();
-		Show (mainMenu);
-		loading = false;
-		initialized = true;
-		loaded = true;
-		Debug.Log("Completed initial load in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-	}
-
+	/// <summary>
+	/// Used to tell GameManager how many items were just loaded.
+	/// </summary>
+	/// <param name="numLoaded">Number loaded.</param>
 	public void ReportLoaded (int numLoaded) {
 		loadProgress += numLoaded;
 		loadingBar.GetComponent<Slider>().value = (float)loadProgress/(float)loadsToDo;
 	}
 
+	/// <summary>
+	/// Changes the message on the loading screen.
+	/// </summary>
+	/// <param name="message">Message.</param>
 	public void ChangeLoadingMessage (string message) {
 		loadingMessage.GetComponent<Text>().text = message;
 	}
 
-	public void GoToMainMenu () {
-		HideAll ();
-		Show (mainMenu);
-		MoveCasetteBack();
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
-	}
+	/// <summary>
+	/// Performs all necessary actions after loading.
+	/// </summary>
+	public void FinishLoading () {
 
-	public void GoToKeySelectMenu () {
-		MoveCasetteBack();
-		HideAll();
-		Show (keySelectMenu);
-		if (RadialKeyMenu.instance == null) {
-			keySelectMenu.GetComponentInChildren<RadialKeyMenu>().Refresh();
-		} else {
-			RadialKeyMenu.instance.Refresh();
-		}
-		keySelectConfirmButton.GetComponent<Button>().interactable = 
-			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
-	}
+		// Report to console
+		Debug.Log("Fully loaded in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 
-	public void GoToSongArrangeMenu () {
-		MoveCasetteBack();
-		HideAll ();
-		CameraControl.instance.LerpToPosition(CameraControl.instance.ViewRadio);
-		Show (songArrangeMenu);
-		SongArrangeSetup.instance.Refresh();
-		SongTimeline.instance.RefreshTimeline();
-	}
+		// Update vars
+		loading = false;
+		initialized = true;
+		loaded = true;
 
-	public void GoToRiffEditor () {
-		MoveCasetteBack();
-		HideAll ();
-		if (MusicManager.instance.currentSong.scale == -1) {
-			GoToKeySelectMenu();
-		} else {
-			CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
-			Show (riffEditMenu);
-			if (InstrumentSetup.instance == null) {
-				riffEditMenu.GetComponentInChildren<InstrumentSetup>().Initialize();
-			} else {
-				InstrumentSetup.instance.Initialize ();
-			}
-		}
-	}
-
-	public void GoToPlaylistMenu () {
-		MusicManager.instance.StopPlaying();
-		PlayerMovement.instance.StopMoving();
-		CameraControl.instance.StopLiveMode();
+		// Change mode
 		currentMode = Mode.Setup;
-		casette.SetActive(true);
+
+		// Hide all menus
+		loadingScreen.SetActive(false);
 		HideAll ();
-		Show (playlistMenu);
-		PlaylistBrowser.instance.Refresh();
-		PlaylistBrowser.instance.RefreshName();
-		MoveCasetteFront ();
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
+
+		// Show main menu
+		Show (mainMenu);
 	}
 
-	public void GoToPostPlayMenu() {
-		MoveCasetteBack();
-		HideAll();
-		Show (postPlayMenu);
-		currentMode = Mode.Postplay;
-	}
+	#endregion
+	#region GameManager Menu Methods
 
+	/// <summary>
+	/// Show the specified menu, fading if possible.
+	/// </summary>
+	/// <param name="menu">Menu to show.</param>
 	public void Show (GameObject menu) {
 		menu.SetActive(true);
 		if (menu.GetComponent<Fadeable>() != null)
 			menu.GetComponent<Fadeable>().UnFade();
 	}
 
+	/// <summary>
+	/// Shows all menus, fading if possible.
+	/// </summary>
 	public void ShowAll () {
 		Show (mainMenu);
 		Show (playlistMenu);
@@ -344,6 +326,10 @@ public class GameManager : MonoBehaviour {
 		Show (liveIcons);
 	}
 
+	/// <summary>
+	/// Hide the specified menu, fading if possible.
+	/// </summary>
+	/// <param name="menu">Menu to hide.</param>
 	public void Hide (GameObject menu) {
 		Fadeable fade = menu.GetComponent<Fadeable>();
 		if (fade != null) {
@@ -355,6 +341,9 @@ public class GameManager : MonoBehaviour {
 		menu.SetActive(false);
 	}
 
+	/// <summary>
+	/// Hides all menus, fading if possible.
+	/// </summary>
 	public void HideAll () {
 		Hide (mainMenu);
 		Hide (playlistMenu);
@@ -368,73 +357,270 @@ public class GameManager : MonoBehaviour {
 		Hide (prompt);
 		Hide (liveIcons);
 	}
+
+	#endregion
+	#region Menu Transition Methods
 		
-	public void Toggle (GameObject obj) {
-		obj.SetActive (!obj.activeSelf);
+	/// <summary>
+	/// Goes to main menu.
+	/// </summary>
+	public void GoToMainMenu () {
+		
+		// Hide other menus
+		HideAll ();
+		MoveCasetteBack();
+
+		// Show main menu
+		Show (mainMenu);
+
+		// Move camera to outside view
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
 	}
 
-	// Swtich from setup to live mode
-	public void SwitchToLive () {
-		casette.SetActive(false);
-		//casetteMoving = false;
-		//Debug.Log (MusicManager.instance.currentSong.ToString ());
+	/// <summary>
+	/// Goes to key select menu.
+	/// </summary>
+	public void GoToKeySelectMenu () {
 
+		// Hide other menus
+		MoveCasetteBack();
+		HideAll();
+
+		// Show key select menu
+		Show (keySelectMenu);
+
+		// Move camera to driving view
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
+
+		// Refresh radial menu
+		RadialKeyMenu.instance.Refresh();
+
+		// Enable/disable confirmation button
+		keySelectConfirmButton.GetComponent<Button>().interactable = 
+			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
+		
+	}
+
+	/// <summary>
+	/// Goes to song arrange menu.
+	/// </summary>
+	public void GoToSongArrangeMenu () {
+
+		// Hide other menus
+		MoveCasetteBack();
+		HideAll ();
+
+		// Show and refresh song arranger menu
+		Show (songArrangeMenu);
+		SongArrangeSetup.instance.Refresh();
+		SongTimeline.instance.RefreshTimeline();
+
+		// Move camera to radio view
+		CameraControl.instance.LerpToPosition(CameraControl.instance.ViewRadio);
+	}
+
+	/// <summary>
+	/// Goes to riff editor.
+	/// </summary>
+	public void GoToRiffEditor () {
+
+		// Hide other menus
+		MoveCasetteBack();
+		HideAll ();
+
+		// If no scale selected, go to key select first
+		if (MusicManager.instance.currentSong.scale == -1) GoToKeySelectMenu();
+
+
+		else {
+
+			// Otherwise show riff editor
+			Show (riffEditMenu);
+			InstrumentSetup.instance.Initialize ();
+
+			// Move camera to driving view
+			CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
+		}
+	}
+
+	/// <summary>
+	/// Goes to playlist menu.
+	/// </summary>
+	public void GoToPlaylistMenu () {
+
+		// Switch modes
+		currentMode = Mode.Setup;
+
+		// Stop music/live mode operations
+		MusicManager.instance.StopPlaying();
+		PlayerMovement.instance.StopMoving();
+		CameraControl.instance.StopLiveMode();
+
+		// Hide other menus
+		HideAll ();
+
+		// Show playlist menu
+		Show (playlistMenu);
+		PlaylistBrowser.instance.Refresh();
+		PlaylistBrowser.instance.RefreshName();
+
+		// Move camera to outside view
+		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
+
+		// Queue casette to move when done moving camera
+		willMoveCasette = true;
+	}
+
+	/// <summary>
+	/// Goes to post play menu.
+	/// </summary>
+	public void GoToPostPlayMenu() {
+
+		// Switch mode
+		currentMode = Mode.Postplay;
+
+		// Hide other menus
+		MoveCasetteBack();
+		HideAll();
+
+		// Show postplay menu
+		Show (postPlayMenu);
+	}
+		
+	#endregion
+	#region Mode Switching Methods
+
+	/// <summary>
+	/// Switches to live mode.
+	/// </summary>
+	public void SwitchToLive () {
+
+		// Switch mode
+		currentMode = Mode.Live;
+		paused = false;
+
+		// Hide menus
+		MoveCasetteBack();
+		HideAll ();
+
+		// Show live menus
+		Show (liveIcons);
+		Show (songProgressBar);
 		if (MusicManager.instance.loopPlaylist) Show(loopIcon);
 		else Hide(loopIcon);
 
-		MoveCasetteBack();
-		HideAll ();
-		Show (liveIcons);
-		Show (songProgressBar);
-		paused = false;
-
+		// Init music
 		MusicManager.instance.currentPlayingSong = 0;
-		InstrumentDisplay.instance.Refresh();
 		if (MusicManager.instance.currentSong != null) {
 			MusicManager.instance.StartSong();
 			MusicManager.instance.currentSong.CompileSong();
 		}
+
+		// Start live operations
+		InstrumentDisplay.instance.Refresh();
 		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
-
-		currentMode = Mode.Live;
 	}
 
-	// Switch from live mode to postplay
+	/// <summary>
+	/// Switches to postplay mode.
+	/// </summary>
 	public void SwitchToPostplay () {
-		casette.SetActive(false);
+
+		// Switch mode
+		currentMode = Mode.Postplay;
+		paused = false;
+
+		// Stop music/live operations
 		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
+
+		// Show prompt
 		livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
-		paused = false;
 
+		// Go to postplay menu
 		GoToPostPlayMenu();
-
-		currentMode = Mode.Postplay;
 	}
 
+	#endregion
+	#region Save/Load Methods
+
+	/// <summary>
+	/// Saves the current project.
+	/// </summary>
 	public void SaveCurrentProject () {
 		SaveLoad.SaveCurrentProject();
 	}
 
+	/// <summary>
+	/// Shows the load prompt for projects.
+	/// </summary>
 	public void ShowLoadPromptForProjects () {
 		Show (loadPrompt);
 		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Project);
 		LoadPrompt.instance.Refresh();
 	}
 
+	/// <summary>
+	/// Shows the load prompt for songs.
+	/// </summary>
 	public void ShowLoadPromptForSongs () {
 		Show (loadPrompt);
 		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Song);
 		LoadPrompt.instance.Refresh();
 	}
+
+	#endregion
+	#region Utility Methods
+
+	/// <summary>
+	/// Moves the casette front.
+	/// </summary>
+	public void MoveCasetteFront () {
+		casetteMoving = true;
+		casettePosition = casette.transform;
+		casetteTarget = casetteFront;
+		sTime = Time.time;
+		willMoveCasette = false;
+	}
+
+	/// <summary>
+	/// Moves the casette back.
+	/// </summary>
+	public void MoveCasetteBack () {
+		casetteMoving = true;
+		casettePosition = casette.transform;
+		casetteTarget = casetteBack;
+		sTime = Time.time;
+		willMoveCasette = false;
+	}
+
+	/// <summary>
+	/// If set to move casette, will do so.
+	/// </summary>
+	public void AttemptMoveCasette () {
+		if (willMoveCasette) MoveCasetteFront();
+	}
+
+	/// <summary>
+	/// Toggles the visibility of an object.
+	/// </summary>
+	/// <param name="obj">Object.</param>
+	public void Toggle (GameObject obj) {
+		obj.SetActive (!obj.activeSelf);
+	}
 		
-	// Toggle visibility of system buttons
+	/// <summary>
+	/// Toggles the system buttons.
+	/// </summary>
 	public void ToggleSystemButtons () {
 		systemButtons.SetActive(!systemButtons.activeSelf);
 	}
 
+	/// <summary>
+	/// Wakes the live UI.
+	/// </summary>
 	public void WakeLiveUI () {
 		fadeTimer = fadeWaitTime;
 		Color color = Color.white;
@@ -447,9 +633,9 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	// Called when the user presses escape
-	// If in setup, it will ask to confirm exit
-	// If in live, it will pause the game
+	/// <summary>
+	/// Attempts to exit the game.
+	/// </summary>
 	public void AttemptExit () {
 		switch (currentMode) {
 		case Mode.Setup: case Mode.Postplay:
@@ -461,26 +647,40 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Plays a click noise.
+	/// </summary>
 	public void MenuClick () {
 		MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(menuClick, 1f);
 	}
 
-	// Enables visibility of the tooltip with the given message
+	/// <summary>
+	/// Shows the tooltip.
+	/// </summary>
+	/// <param name="message">Message.</param>
 	public void ShowTooltip (string message) {
 		tooltip.SetActive(true);
-		tooltip.GetComponent<Text>().text = message;
+		tooltip.Text().text = message;
 	}
 
-	// Hides the tooltip
+	/// <summary>
+	/// Hides the tooltip.
+	/// </summary>
 	public void HideTooltip () {
 		tooltip.SetActive(false);
 	}
 
+	/// <summary>
+	/// Toggles paused status.
+	/// </summary>
 	public void TogglePause () {
 		if (paused) Unpause();
 		else Pause();
 	}
 
+	/// <summary>
+	/// Pause this instance.
+	/// </summary>
 	public void Pause () {
 		paused = true;
 		pauseMenu.SetActive(true);
@@ -488,6 +688,9 @@ public class GameManager : MonoBehaviour {
 		CameraControl.instance.Pause();
 	}
 
+	/// <summary>
+	/// Unpause this instance.
+	/// </summary>
 	public void Unpause () {
 		paused = false;
 		pauseMenu.SetActive(false);
@@ -495,24 +698,11 @@ public class GameManager : MonoBehaviour {
 		CameraControl.instance.Unpause();
 	}
 
+	/// <summary>
+	/// Exit this instance.
+	/// </summary>
 	public void Exit () {
 		Application.Quit();
-	}
-
-	public void MoveCasetteFront () {
-		casetteMoving = true;
-		casettePosition = casette.transform;
-		casetteTarget = casetteFront;
-		sTime = Time.time;
-
-	}
-
-	public void MoveCasetteBack () {
-		casetteMoving = true;
-		casettePosition = casette.transform;
-		casetteTarget = casetteBack;
-		sTime = Time.time;
-
 	}
 
 	#endregion

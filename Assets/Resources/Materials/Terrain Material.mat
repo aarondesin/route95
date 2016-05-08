@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Terrain Material
-  m_Shader: {fileID: 4800000, guid: 341899aca7a660d4b9d863494a04c42a, type: 3}
+  m_Shader: {fileID: 4800000, guid: a52d766211091eb44864af1eccf9306d, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: 2000

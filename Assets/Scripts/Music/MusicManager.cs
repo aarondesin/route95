@@ -53,7 +53,7 @@ public class MusicManager : MonoBehaviour {
 	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
 
 	public AudioMixer mixer;
-	public Project currentProject = new Project();
+	public Project currentProject;
 
 	// --Global Music Properties-- //
 	public Instrument currentInstrument = MelodicInstrument.ElectricGuitar;
@@ -95,12 +95,10 @@ public class MusicManager : MonoBehaviour {
 	int loadProgress;
 	public int loadsToDo;
 
-	public List<Sound> soundQueue;
-
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
 
@@ -113,10 +111,49 @@ public class MusicManager : MonoBehaviour {
 		loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
 			(Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 
-		soundQueue = new List<Sound>();
 	}
 
+	void FixedUpdate(){
+		if (playing && !GameManager.instance.paused) {
+			if (BeatTimer <= 0f) {
+				switch (GameManager.instance.currentMode) {
+				case GameManager.Mode.Setup:
+					InstrumentSetup.currentRiff.PlayRiff (beat++);
+					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
+						beat = 0;
+					break;
+				case GameManager.Mode.Live:
+					if (currentSong == null) return;
+					if (currentSong.Beats == 0) return;
 
+					if (beat >= currentSong.Beats) {
+						beat = 0;
+
+						if (currentPlayingSong < currentProject.songs.Count-1) {
+							beat = 0;
+							DisableAllAudioSources();
+							currentPlayingSong++;
+						} else {
+							GameManager.instance.SwitchToPostplay();
+						}
+					}
+					currentSong.PlaySong(beat);
+
+					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
+					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
+					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
+					beat++;
+					break;
+				}
+				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds
+
+			} else {
+
+				BeatTimer -= 1.667f;
+			}
+		} 
+
+	}
 
 	public void FinishLoading() {
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
@@ -145,9 +182,8 @@ public class MusicManager : MonoBehaviour {
 			foreach (string path in list.Value) {
 				LoadAudioClip(path);
 				numLoaded++;
-				//Debug.Log("loaded "+path);
 
-				if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 					GameManager.instance.ReportLoaded (numLoaded);
@@ -161,13 +197,10 @@ public class MusicManager : MonoBehaviour {
 
 	// Loads a single audio clip
 	void LoadAudioClip (string path) {
-		if (SoundClips.ContainsKey(path)) return;
 		AudioClip sound = (AudioClip) Resources.Load (path);
-		if (sound == null) {
-			Debug.LogError("Failed to load AudioClip at "+path);
-		} else {
-			SoundClips.Add (path, sound);
-		}
+
+		if (sound == null) Debug.LogError("Failed to load AudioClip at "+path);
+		else SoundClips.Add (path, sound);
 	}
 
 	IEnumerator LoadInstruments () {
@@ -181,43 +214,57 @@ public class MusicManager : MonoBehaviour {
 			Instrument.AllInstruments[i].Load();
 
 			GameObject obj = new GameObject (Instrument.AllInstruments[i].name);
+
+			// Group instrument under MusicManager
+			obj.transform.parent = transform.parent;
+
 			AudioSource source = obj.AddComponent<AudioSource>();
 			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
 			instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
-			obj.AddComponent<AudioReverbFilter>();
-			obj.GetComponent<AudioReverbFilter>().dryLevel = GetComponent<AudioReverbFilter>().dryLevel;
-			obj.GetComponent<AudioReverbFilter>().room = GetComponent<AudioReverbFilter>().room;
-			obj.GetComponent<AudioReverbFilter>().roomHF = GetComponent<AudioReverbFilter>().roomHF;
-			obj.GetComponent<AudioReverbFilter>().roomLF = GetComponent<AudioReverbFilter>().roomLF;
-			obj.GetComponent<AudioReverbFilter>().decayTime = GetComponent<AudioReverbFilter>().decayTime;
-			obj.GetComponent<AudioReverbFilter>().decayHFRatio = GetComponent<AudioReverbFilter>().decayHFRatio;
-			obj.GetComponent<AudioReverbFilter>().reflectionsLevel = GetComponent<AudioReverbFilter>().reflectionsLevel;
-			obj.GetComponent<AudioReverbFilter>().reflectionsDelay = GetComponent<AudioReverbFilter>().reflectionsDelay;
-			obj.GetComponent<AudioReverbFilter>().reverbLevel = GetComponent<AudioReverbFilter>().reverbLevel;
-			obj.GetComponent<AudioReverbFilter>().hfReference = GetComponent<AudioReverbFilter>().hfReference;
-			obj.GetComponent<AudioReverbFilter>().lfReference = GetComponent<AudioReverbFilter>().lfReference;
-			obj.GetComponent<AudioReverbFilter>().diffusion = GetComponent<AudioReverbFilter>().diffusion;
-			obj.GetComponent<AudioReverbFilter>().density = GetComponent<AudioReverbFilter>().density;
-			obj.GetComponent<AudioReverbFilter>().enabled = false;
 
-			obj.AddComponent<AudioDistortionFilter> ();
-			obj.GetComponent<AudioDistortionFilter>().enabled = false;
+			// Add distortion filter
+			AudioDistortionFilter distortion = obj.AddComponent<AudioDistortionFilter> ();
+			distortion.enabled = false;
 
-			obj.AddComponent<AudioTremoloFilter>();
-			obj.GetComponent<AudioTremoloFilter>().enabled = false;
+			// Add tremolo filter
+			AudioTremoloFilter tremolo = obj.AddComponent<AudioTremoloFilter>();
+			tremolo.enabled = false;
 
-			obj.AddComponent<AudioFlangerFilter>();
-			obj.GetComponent<AudioFlangerFilter>().enabled = false;
+			// Add chorus filter
+			AudioChorusFilter chorus = obj.AddComponent<AudioChorusFilter> ();
+			chorus.enabled = false;
 
-			obj.AddComponent<AudioEchoFilter> ();
-			obj.GetComponent<AudioEchoFilter>().enabled = false;
+			// Add flanger filter
+			AudioFlangerFilter flanger = obj.AddComponent<AudioFlangerFilter>();
+			flanger.enabled = false;
 
-			obj.AddComponent<AudioChorusFilter> ();
-			obj.GetComponent<AudioChorusFilter>().enabled = false;
+			// Add echo filter
+			AudioEchoFilter echo = obj.AddComponent<AudioEchoFilter> ();
+			echo.enabled = false;
+
+			// Add reverb filter based on MusicManager's reverb filter
+			AudioReverbFilter reverb = obj.AddComponent<AudioReverbFilter>();
+			AudioReverbFilter masterReverb = GetComponent<AudioReverbFilter>();
+			reverb.dryLevel = masterReverb.dryLevel;
+			reverb.room = masterReverb.room;
+			reverb.roomHF = masterReverb.roomHF;
+			reverb.roomLF = masterReverb.roomLF;
+			reverb.decayTime = masterReverb.decayTime;
+			reverb.decayHFRatio = masterReverb.decayHFRatio;
+			reverb.reflectionsLevel = masterReverb.reflectionsLevel;
+			reverb.reflectionsDelay = masterReverb.reflectionsDelay;
+			reverb.reverbLevel = masterReverb.reverbLevel;
+			reverb.hfReference = masterReverb.hfReference;
+			reverb.lfReference = masterReverb.lfReference;
+			reverb.diffusion = masterReverb.diffusion;
+			reverb.density = masterReverb.density;
+			reverb.enabled = false;
+
+
 
 			numLoaded++;
 
-			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 				GameManager.instance.ReportLoaded (numLoaded);
@@ -232,45 +279,55 @@ public class MusicManager : MonoBehaviour {
 	#endregion
 	#region MusicManager Callbacks
 
-
-	/*void GetAudioEffect () {
-		//currentInstrument = InstrumentSetup.currentRiff.instrument;
-		currentInstrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
-		//Debug.Log ("Calling getAudioEffect " + currentInstrument);
-		instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
-		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
-		//instrumentAudioSources[currentInstrument].gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;
-	}*/
-
-	public void QueueSound () {
-	}
-
-
+	/// <summary>
+	/// Creates a new, blank project.
+	/// </summary>
 	public void NewProject () {
 		currentProject = new Project();
 	}
 
+	/// <summary>
+	/// Saves the current project.
+	/// </summary>
 	public void SaveCurrentProject () {
 		SaveLoad.SaveCurrentProject();
 	}
 
+	/// <summary>
+	/// Creates a new blank song and adds
+	/// it to the current project.
+	/// </summary>
 	public void NewSong () {
 		currentSong = new Song();
 		currentProject.songs.Add(currentSong);
 	}
 
+	/// <summary>
+	/// Saves the current song.
+	/// </summary>
 	public void SaveCurrentSong () {
 		SaveLoad.SaveCurrentSong();
 	}
 
+	/// <summary>
+	/// Sets the key of the current song.
+	/// </summary>
+	/// <param name="key">New key (int)</param>
 	public void SetKey (int key) {
 		currentSong.key = (Key)key;
 	}
 
+	/// <summary>
+	/// Sets the key of the current song.
+	/// </summary>
+	/// <param name="key">New key.</param>
 	public void SetKey (Key key) {
 		SetKey ((int)key);
 	}
 
+	/// <summary>
+	/// Toggles whether to loop playlist.
+	/// </summary>
 	public void ToggleLoopPlaylist () {
 		loopPlaylist = !loopPlaylist;
 		loopPlaylistButton.sprite = loopPlaylist ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
@@ -293,47 +350,7 @@ public class MusicManager : MonoBehaviour {
 		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
 	}
 
-	void FixedUpdate(){
-		if (playing && !GameManager.instance.paused) {
-			if (BeatTimer <= 0f) {
-				switch (GameManager.instance.currentMode) {
-				case GameManager.Mode.Setup:
-					InstrumentSetup.currentRiff.PlayRiff (beat++);
-					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
-						beat = 0;
-					break;
-				case GameManager.Mode.Live:
-					if (currentSong == null) return;
-					if (currentSong.Beats == 0) return;
-					
-					if (beat >= currentSong.Beats) {
-						beat = 0;
 
-							if (currentPlayingSong < currentProject.songs.Count-1) {
-								beat = 0;
-								DisableAllAudioSources();
-								currentPlayingSong++;
-							} else {
-								GameManager.instance.SwitchToPostplay();
-							}
-					}
-					currentSong.PlaySong(beat);
-	
-					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
-					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
-					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
-					beat++;
-					break;
-				}
-				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds
-
-			} else {
-	
-				BeatTimer -= 1.667f;
-			}
-		} 
-
-	}
 
 	void DisableAllAudioSources () {
 		foreach (Instrument inst in Instrument.AllInstruments) instrumentAudioSources[inst].enabled = false;

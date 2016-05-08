@@ -57,6 +57,7 @@ public class Project {
 		Debug.Log("Project.UpdatePaths");
 		songPaths.Clear();
 		foreach (Song song in songs) {
+			SaveLoad.SaveSong(song);
 			string path = Application.persistentDataPath + GameManager.instance.songSaveFolder +
 				song.name + SaveLoad.songSaveExtension;
 			songPaths.Add (path);
@@ -64,6 +65,11 @@ public class Project {
 	}
 
 	public void AddSong (Song song) {
+		if (song == null) {
+			Debug.LogError ("Project.AddSong(): tried to add null song!");
+			return;
+		}
+		
 		Song foundSong = null;
 		foreach (Song s in songs) {
 			if (song.Equals (s)) {
@@ -74,18 +80,26 @@ public class Project {
 		if (foundSong != null) {
 			songs.Add(foundSong);
 		} else {
+			if (songs == null) songs = new List<Song>();
 			songs.Add(song);
-			songPieces.AddRange (song.songPieces);
-			measures.AddRange (song.measures);
-			riffs.AddRange (song.riffs);
-			beats.AddRange (song.beats);
+
+			if (songPieces == null) songPieces = new List<SongPiece>();
+			if (song.songPieces != null) songPieces.AddRange (song.songPieces);
+
+			if (measures == null) measures = new List<Measure>();
+			if (song.measures != null) measures.AddRange (song.measures);
+
+			if (riffs == null) riffs = new List<Riff>();
+			if (song.riffs != null) riffs.AddRange (song.riffs);
+
+			if (beats == null) beats = new List<Beat>();
+			if (song.beats != null) beats.AddRange (song.beats);
 		}
 	}
 
 	public bool Empty {
 		get {
-			return songPieces.Count != 0 && measures.Count != 0 &&
-				riffs.Count != 0 && beats.Count != 0;
+			return songs.Count == 0;
 		}
 	}
 

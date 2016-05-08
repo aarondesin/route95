@@ -96,7 +96,7 @@ public class DynamicTerrain {
 
 						if (initialLoad) numLoaded++;
 
-						if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+						if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 							yield return null;
 							startTime = Time.realtimeSinceStartup;
 							if (initialLoad) {
@@ -110,7 +110,7 @@ public class DynamicTerrain {
 
 			if (!initialLoad) DeleteChunks (xChunks, yChunks);
 
-			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -143,21 +143,19 @@ public class DynamicTerrain {
 				}
 					
 				if (chunksToUpdate.Count > 0) {
-					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count; i++) {
+					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
 						try {
 							chunksToUpdate [i].Update ();
-							//Debug.Log("update",chunksToUpdate[i].chunk);
 							chunksToUpdate[i].priority = 0;
-
 						}catch (ArgumentOutOfRangeException a) {
-							Debug.LogError (i + " "+a.Message);
+							Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
 							continue;
 						}
 					}
 				}
 					
 
-				if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}
