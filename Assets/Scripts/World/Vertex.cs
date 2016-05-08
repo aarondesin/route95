@@ -35,12 +35,9 @@ public class VertexMap {
 	int chunkRes;
 	int chunkRadius; 
 
-	List<GameObject> deletes;
 	List<GameObject> decorationDeletes;
 
 	public VertexMap () {
-		//vertices = new Dictionary<int, Dictionary<int, Vertex>>();
-		deletes = new List<GameObject>();
 		decorationDeletes = new List<GameObject>();
 
 		chunkSize = WorldManager.instance.chunkSize;
@@ -187,7 +184,7 @@ public class VertexMap {
 						vert.locked = true;
 					}
 
-					if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+					if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 						yield return null;
 						startTime = Time.realtimeSinceStartup;
 					}
@@ -195,7 +192,7 @@ public class VertexMap {
 
 			}
 
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -410,11 +407,8 @@ public class Vertex {
 
 		
 	public void SetHeight (float h) {
-		if (h == height) return;
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
-		//if (Time.frameCount % 120 == 0) Debug.Log ("set height");
-		normal = Vector3.zero;
 		slope = 0f;
 		int numPoints = 0;
 		if (map.ContainsVertex(x-1, y)) {
@@ -435,33 +429,18 @@ public class Vertex {
 		}
 		slope /= (float)numPoints;
 		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;
-		//if (Random.Range(0, 1000) == 0) Debug.Log(blendValue);
 		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
 			if (chunkVert.Key == null || chunkVert.Key.chunk == null) {
 				deletes.Add (chunkVert);
 				continue;
 			}
-			/*
-			Vector3[] verts = new Vector3[chunkVert.Key.vertices.Length];
-			for (int i=0; i<verts.Length; i++) {
-				verts[i] = chunkVert.Key.vertices[i];
-				if (i == chunkVert.Value) verts[i].y = height;
-			}
-			*/
-			//if (Time.frameCount % 120 == 0) Debug.Log (chunkVert.Key);
-			//normal += chunkVert.Key.mesh.normals[chunkVert.Value];
-			//normal.Normalize ();
-			chunkVert.Key.UpdateVertex (chunkVert.Value, h, normal);
+
+			chunkVert.Key.UpdateVertex (chunkVert.Value, h);
 			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
-			//chunkVert.Key.vertices [chunkVert.Value].y = height;
-			//chunkVert.Key.vertices = verts;
 		}
-		normal.Normalize();
+
 		foreach (KeyValuePair<Chunk, int> delete in deletes)
 			chunkVertices.Remove (delete);
-		//updateNormal();
-
-
 
 	}
 

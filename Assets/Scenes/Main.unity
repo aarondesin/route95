@@ -9507,7 +9507,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9461232
+  m_Size: 0.94612306
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -23502,7 +23502,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.499878, y: 23.220947}
+  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -24633,13 +24633,13 @@ MonoBehaviour:
   movementScale: 0
   rotationScale: 1
   maxVelocity: 10
-  minVelocity: 0.1
+  minVelocity: 0.25
   velocityScale: 0.375
   softZDistance: 0.005
   velocityDownsample: 1
   excludeLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 1536
   shader: {fileID: 4800000, guid: 85a88efa8c871af4a9d17c64791b6f4f, type: 3}
   dx11MotionBlurShader: {fileID: 4800000, guid: f1b13d7a80660504a858ea24cfa418c6,
     type: 3}
@@ -29715,7 +29715,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793876
+  m_Size: 0.9793874
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

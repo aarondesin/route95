@@ -55,7 +55,7 @@ public class KeyManager : MonoBehaviour {
 							//Debug.Log("Scale["+key.ToString()+"]["+scale.name+"]["+instrument.codeName+"]");
 							numLoaded++;
 
-							if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+							if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 								yield return null;
 								startTime = Time.realtimeSinceStartup;
 								GameManager.instance.ReportLoaded(numLoaded);

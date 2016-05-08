@@ -54,8 +54,8 @@ public class SaveLoad {
 			try {
 				Project project = (Project)bf.Deserialize(file);
 				MusicManager.instance.currentProject = project;
-				//if (!project.Empty)
-				//MusicManager.instance.currentSong = project.songs[0];
+				if (!project.Empty)
+					MusicManager.instance.currentSong = project.songs[0];
 				//else MusicManager.instance.NewSong();
 
 				//foreach (Riff riff in project.riffs) Debug.Log(riff.name);
@@ -90,17 +90,26 @@ public class SaveLoad {
 	}
 
 	public static void SaveCurrentSong () {
+		Song song = MusicManager.instance.currentSong;
+		if (song == null) {
+			Debug.LogError ("SaveLoad.SaveCurrentSong(): tried to save null song!");
+			return;
+		}
 
+		SaveSong (song);
+	}
+
+	public static void SaveSong (Song song) {
 		BinaryFormatter bf = new BinaryFormatter ();
 
 
 		string directoryPath = Application.persistentDataPath + "/Songs/";
-		string filePath = directoryPath + MusicManager.instance.currentSong.name + songSaveExtension;
+		string filePath = directoryPath + song.name + songSaveExtension;
 
 		Directory.CreateDirectory (directoryPath);
 		FileStream file = File.Open(filePath, FileMode.Create);
 
-		bf.Serialize (file, MusicManager.instance.currentSong);
+		bf.Serialize (file, song);
 
 		file.Close ();
 		Prompt.instance.PromptMessage("Save Project", "Successfully saved Song!", "Okay");

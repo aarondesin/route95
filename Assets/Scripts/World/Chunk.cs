@@ -42,41 +42,60 @@ public class Chunk {
 		this.x = x;
 		this.y = y;
 
-		// Create chunk mesh
+		VertexMap vmap = DynamicTerrain.instance.vertexmap;
 		int chunkRes = WorldManager.instance.chunkResolution;
 		float chunkSize = WorldManager.instance.chunkSize;
+
+		// Generate vertices
 		verts = CreateUniformVertexArray (chunkRes);
 		numVerts = verts.Length;
-		//constrained = new bool[numVerts];
+
+		// Init normals
 		normals = new Vector3[numVerts];
 
+		// Generate UVs
 		uvs = CreateUniformUVArray (chunkRes);
-		triangles = CreateSquareArrayTriangles (chunkRes);
-		colors = new Color[numVerts];
-		chunk = CreateChunk (verts, normals, uvs, triangles);
 
-		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
+		// Generate triangles
+		triangles = CreateSquareArrayTriangles (chunkRes);
+
+		// Init colors
+		colors = new Color[numVerts];
+
+		// Create GameObject
+		chunk = CreateChunk (verts, normals, uvs, triangles);
 		chunk.name += "Position:"+chunk.transform.position.ToString();
 
-		VertexMap vmap = DynamicTerrain.instance.vertexmap;
-	
-		// Register all vertices with vertex map
-		for (int i=0; i<numVerts; i++) {
-			normals [i] = Vector3.up;
-			//constrained [i] = false;
-			colors[i] = new Color (0f, 0f, 0f, 0.5f);
-			IntVector2 coords = IntToV2 (i);
-			Vertex vert = vmap.VertexAt(coords.x, coords.y);
-			if (vert != null) {
-				//if (UnityEngine.Random.Range(0,100) == 0) Debug.Log("no vert", chunk);
-				UpdateVertex (i, vert.height, vert.normal);
-			}
+		// Move GameObject
+		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
 
+		// Register all vertices with vertex map
+		// Move vertices, generate normals/colors
+		for (int i=0; i<numVerts; i++) {
+
+			// Init normal/color
+			normals [i] = Vector3.up;
+			colors[i] = new Color (0f, 0f, 0f, 0.5f);
+
+			// Get VMap coords
+			IntVector2 coords = IntToV2 (i);
+
+			// Get corresponding vertex
+			Vertex vert = vmap.VertexAt(coords.x, coords.y);
+
+			// Get height from vertex
+			if (vert != null) UpdateVertex (i, vert.height);
+
+			// Register vertex
 			vmap.RegisterChunkVertex (coords, this, i);
 		}
-		//UpdateCollider ();
 	}
 
+	/// <summary>
+	/// Creates a uniform vertex array.
+	/// </summary>
+	/// <returns>The uniform vertex array.</returns>
+	/// <param name="vertexSize">Vertex size.</param>
 	Vector3[] CreateUniformVertexArray (int vertexSize) { 
 		float chunkSize = WorldManager.instance.chunkSize;
 		int chunkRes = WorldManager.instance.chunkResolution;
@@ -89,7 +108,7 @@ public class Chunk {
 		}
 		return uniformArray;
 	}
-
+		
 	//takes the number of vertices per side, returns a uniform array of UV coords for a square vertex array
 	Vector2[] CreateUniformUVArray(int vertexSize) {
 		int numVertices = vertexSize * vertexSize;
@@ -142,119 +161,129 @@ public class Chunk {
 		return triangleArray;
 	}
 
-	//create terrain gameobject with mesh
+	/// <summary>
+	/// Creates the chunk GameObject.
+	/// </summary>
+	/// <returns>The chunk.</returns>
+	/// <param name="vertices">Vertices.</param>
+	/// <param name="normals">Normals.</param>
+	/// <param name="UVcoords">U vcoords.</param>
+	/// <param name="triangles">Triangles.</param>
 	GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
+		// Create GameObject
 		GameObject chunk = new GameObject ("Chunk ("+x+","+y+")", 
 			typeof(MeshFilter), 
 			typeof(MeshRenderer),
 			typeof(MeshCollider),
 			typeof(Rigidbody)
 		);
+
+		// Move GameObject
 		chunk.transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
 
-		//mesh filter stuff
+		// Create mesh
 		mesh = new Mesh();
-
+		mesh.MarkDynamic ();
 		mesh.vertices = vertices;
 		mesh.normals = normals;
 		mesh.uv = UVcoords;
 		mesh.triangles = triangles;
 		mesh.colors = colors;
-		mesh.RecalculateNormals ();
-		mesh.MarkDynamic ();
-		
 
-
-		//mesh renderer stuff
+		// Assign mesh
 		chunk.GetComponent<MeshFilter>().mesh = mesh;
 
-		chunk.GetComponent<MeshRenderer> ().material = WorldManager.instance.terrainMaterial;
-		chunk.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-		chunk.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+		// Assign material
+		MeshRenderer renderer = chunk.GetComponent<MeshRenderer> ();
+		renderer.material = WorldManager.instance.terrainMaterial;
+		renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+		renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
-		chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
-		chunk.GetComponent<MeshCollider>().convex = false;
+		// Assign collision mesh
+		MeshCollider collider = chunk.GetComponent<MeshCollider>();
+		collider.sharedMesh = mesh;
+		collider.convex = false;
 
-		chunk.GetComponent<Rigidbody>().freezeRotation = true;
-		chunk.GetComponent<Rigidbody>().isKinematic = true;
-		chunk.GetComponent<Rigidbody>().useGravity = false;
-		chunk.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+		// Init rigidbody
+		Rigidbody rigidbody = chunk.GetComponent<Rigidbody>();
+		rigidbody.freezeRotation = true;
+		rigidbody.isKinematic = true;
+		rigidbody.useGravity = false;
+		rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
-	//	grassEmitter = new GameObject ("Grass Emitter",
-		//	typeof (ParticleSystem)
-		//);
+		// Add grass system
 		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
-
-		//grassEmitter.GetComponent<ParticleSystem>() = grassEmitterTemplate;
 		grassEmitter.transform.parent = chunk.transform;
 		grassEmitter.transform.position += new Vector3 (-chunkSize/2f, 0f, -chunkSize/2f);
 
+		// Randomize grass density
 		ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
-
-		//sys.loop = true;
 		sys.maxParticles = Random.Range(0,WorldManager.instance.grassPerChunk);
 		sys.playOnAwake = true;
-		//sys.startColor = Color.white;
-		//sys.startDelay = 0f;
-		//sys.startLifetime = 1000f;
-		//sys.startRotation3D = new Vector3 (0f, 0f, 90f*Mathf.Deg2Rad);
-		//sys.startSize = 2f;
-		//ys.startSpeed = 0f;
-		//sys.sizeOverLifetime.size = new ParticleSystem.MinMaxCurve() {
-		//	mode = ParticleSystemCurveMode.TwoCurves,
-		//	curveMax = new AnimationCurve () {
-				
 
-		//ParticleSystem.ShapeModule shape = new ParticleSystem.ShapeModule();
+		// Assign particle system emission shape
 		ParticleSystem.ShapeModule shape = sys.shape;
-		//shape.enabled = true;
-		//shape.shapeType = ParticleSystemShapeType.Mesh;
-		//shape.meshShapeType = ParticleSystemMeshShapeType.Triangle;
 		shape.mesh = mesh;
-		//shape.randomDirection = false;
-		//shape.useMeshColors = false;
-
-		//ParticleSystem.EmissionModule emit = sys.emission;
+	
+		// Assign particle system emission rate
 		ParticleSystem.EmissionModule emit = sys.emission;
 		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
-	
-
-		//ParticleSystemRenderer rend = grassEmitter.GetComponent<ParticleSystemRenderer>();
-	//	rend.renderMode = ParticleSystemRenderMode.Mesh;
-		//rend.mesh = WorldManager.instance.grassModel;
-		//rend.material = WorldManager.instance.vegetationMaterial;
-
-		//grassEmitter.GetComponent<ParticleSystem>() = sys;
 
 		return chunk;
 	}
 
+	/// <summary>
+	/// Updates the physics collider.
+	/// </summary>
 	public void UpdateCollider () {
+		needsColliderUpdate = false;
+
+		// Clear current grass
 		grassEmitter.GetComponent<ParticleSystem>().Clear();
+
+		// Reassign mesh vertices/normals
 		mesh.vertices = verts;
 		mesh.normals = normals;
+
+		// Recalculate bounding box
 		mesh.RecalculateBounds();
-		//chunk.GetComponent<MeshFilter> ().mesh = mesh;
+
+		// Reassign collider mesh
 		chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
+
+		// Replace decorations
 		ReplaceDecorations();
-		//grassEmitter.GetComponent<ParticleSystem>().shape.mesh = mesh;
+
+		// Replace grass
 		grassEmitter.GetComponent<ParticleSystem>().Play();
-		needsColliderUpdate = false;
+
 	}
 
-	public void UpdateVertex (int index, float height, Vector3 normal) {
+	/// <summary>
+	/// Updates a vertex.
+	/// </summary>
+	/// <param name="index">Index.</param>
+	/// <param name="height">Height.</param>
+	/// <param name="normal">Normal.</param>
+	public void UpdateVertex (int index, float height) {
+
+		// Check if height update is needed
 		if (verts[index].y != height) {
 			needsColliderUpdate = true;
 			verts[index].y = height;
 		}
-		normals [index] = normal;
-		//mesh.vertices = verts;
-		//mesh.normals = normals;
 	}
 
+	/// <summary>
+	/// Updates the color.
+	/// </summary>
+	/// <param name="index">Index.</param>
+	/// <param name="blendValue">Blend value.</param>
 	public void UpdateColor (int index, float blendValue) {
+
+		// Check if color update is needed
 		if (colors[index].a != blendValue) {
 			colors[index].a = blendValue;
 			mesh.colors = colors;
@@ -274,40 +303,43 @@ public class Chunk {
 
 		int v = 0;
 		for (; v < numVerts; v++) {
-			//if (constrained [v])
-				//continue;
+	
+			// Get VMap coordinates
 			IntVector2 coords = IntToV2 (v);
 
+			// Get cooresponding vertex
 			Vertex vert = vmap.VertexAt(coords.x,coords.y);
-			if (vert.height != verts[v].y) {
-				UpdateVertex (v, vert.height, vert.normal);
-				needsColliderUpdate = true;
-			}
-			//if (!vmap.IsLocked (coords)) { //if vert is frozen
-			if (!vmap.VertexAt (coords).locked && DynamicTerrain.instance.freqData != null) { 
-				Vector3 playerPos = PlayerMovement.instance.transform.position;
 
+			// Update vertex height
+			UpdateVertex (v, vert.height);
+
+			// If vertex is not locked and there is frequency data to use
+			if (!vmap.VertexAt (coords).locked && DynamicTerrain.instance.freqData != null) { 
+
+				// Distance between player and vertex
+				Vector3 playerPos = PlayerMovement.instance.transform.position;
 				Vector3 vertPos = chunk.transform.position + verts [v];
 				float distance = Vector3.Distance (vertPos, playerPos);
+
+				// If vertex is close enough
 				if (CheckDist (distance, WorldManager.instance.vertexUpdateDistance, margin)) {
+
+					// Calculate new height
 					Vector3 angleVector = vertPos - playerPos;
 					float angle = Vector3.Angle (Vector3.right, angleVector);
 					float linIntInput = angle / 360f;
 					float newY = DynamicTerrain.instance.freqData.GetDataPoint (linIntInput) *
 					              WorldManager.instance.heightScale;
-					if (newY != verts [v].y) {
-						vmap.SetHeight (coords, newY);
-						needsColliderUpdate = true;
-					}
+
+					// If new height, set it
+					if (newY != verts [v].y) vmap.SetHeight (coords, newY);
 				}
 			}
-				// else
-				//constrained [v] = true;
-			//}
+
 			if (v == numVerts) {
 				isUpdatingVerts = false;
 				yield break;
-			} else if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			} else if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -322,13 +354,13 @@ public class Chunk {
 		if (!hasCheckedForRoad) {
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 		}
-		float chunkSize = WorldManager.instance.chunkSize;
-		Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
-		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
+		//float chunkSize = WorldManager.instance.chunkSize;
+		//Vector3 centerOfChunk = chunk.transform.position + new Vector3 (chunkSize / 2, 0f, chunkSize / 2);
+//		float distance = Vector3.Distance (PlayerMovement.instance.transform.position, centerOfChunk);
 		//roadNearby = NearbyRoad ();
 		//if (CheckDist(distance, updateDist, chunkSize) && !isUpdatingVerts) {
 			//UpdateVerts (updateDist, freqData);
-			WorldManager.instance.StartCoroutine(UpdateVerts());
+		if (!isUpdatingVerts) WorldManager.instance.StartCoroutine(UpdateVerts());
 		//}
 	}
 		

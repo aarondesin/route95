@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour {
 		minVelocity = MusicManager.tempoToFloat [Tempo.Slowest] * distPerBeat;
 		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
 
-		GetComponent<AudioSource>().volume = 0.4f;
+		GetComponent<AudioSource>().volume = 0.0f;
 
 		dOffset = 0f;
 
@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour {
 		GetComponent<AudioSource>().clip = engineClip;
 		GetComponent<AudioSource>().loop = true;
 		GetComponent<AudioSource>().Play();
-		GetComponent<AudioSource>().volume = 1f;
+		GetComponent<AudioSource>().volume = 0f;
 		EnableReflections();
 	}
 
@@ -125,8 +125,8 @@ public class PlayerMovement : MonoBehaviour {
 				transform.LookAt (ahead);
 				float rotation = velocity * velocityToRotation;
 
-				Vector2 point2 = new Vector2 (point.x, point.z);
-				Vector2 ahead2 = new Vector2 (ahead.x, ahead.z);
+				//Vector2 point2 = new Vector2 (point.x, point.z);
+				//Vector2 ahead2 = new Vector2 (ahead.x, ahead.z);
 
 				frontLeftWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f), Space.Self);
 				frontRightWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f),Space.Self);

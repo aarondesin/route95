@@ -318,7 +318,7 @@ public class WorldManager : MonoBehaviour {
 			LoadDecoration (path);
 			numLoaded++;
 
-			if (Time.realtimeSinceStartup - startTime > 1f / GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 				GameManager.instance.ReportLoaded(numLoaded);
@@ -347,7 +347,7 @@ public class WorldManager : MonoBehaviour {
 			numLoaded += (AttemptDecorate () ? 1 : 0);
 			attempts++;
 
-			if (Time.realtimeSinceStartup - startTime > 1f/GameManager.instance.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 				GameManager.instance.ReportLoaded(numLoaded);

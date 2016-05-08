@@ -275,6 +275,7 @@ public class CameraControl : MonoBehaviour {
 					transform.rotation = Quaternion.Lerp(start.rotation, target.rotation, progress);
 
 				} else {
+					GameManager.instance.AttemptMoveCasette();
 					start = target;
 					moving = false;
 				}

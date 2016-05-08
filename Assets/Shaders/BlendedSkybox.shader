@@ -1,4 +1,4 @@
-﻿Shader "Skybox/Blended Skybox" {
+﻿Shader "Skybox/BlendedSkybox" {
    Properties {
       _Tint ("Tint Color", Color) = (1.0, 1.0, 1.0, 1.0)
       _Value ("Blend Value", Range (0.0, 1.0)) = 0.0
