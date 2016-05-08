@@ -45,6 +45,8 @@ public class SongArrangeSetup : MonoBehaviour {
 			dropdown.interactable = true;
 			editRiffButton.GetComponent<Button>().interactable = true;
 			playRiffButton.GetComponent<Button> ().interactable = true;
+			if (InstrumentSetup.currentRiff == null)
+				InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs [0];
 		}
 
 		// Refresh song name input field
