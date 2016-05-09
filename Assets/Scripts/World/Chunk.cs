@@ -34,6 +34,7 @@ public class Chunk {
 
 	bool isUpdatingVerts = false;
 	public bool needsColliderUpdate = false;
+	public bool needsColorUpdate = false;
 
 	#endregion
 	#region Chunk Methods
@@ -261,6 +262,11 @@ public class Chunk {
 
 	}
 
+	public void UpdateColors () {
+		mesh.colors = colors;
+		needsColorUpdate = false;
+	}
+
 	/// <summary>
 	/// Updates a vertex.
 	/// </summary>
@@ -286,7 +292,7 @@ public class Chunk {
 		// Check if color update is needed
 		if (colors[index].a != blendValue) {
 			colors[index].a = blendValue;
-			mesh.colors = colors;
+			needsColorUpdate = true;
 		}
 	}
 

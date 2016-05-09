@@ -3586,7 +3586,7 @@ ParticleSystemRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 190642046}
   m_Enabled: 1
-  m_CastShadows: 2
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_Materials:
   - {fileID: 2100000, guid: 4c961044b1fce4b4193dffc8e7898e9b, type: 2}
@@ -19268,7 +19268,7 @@ MonoBehaviour:
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
   timeOfDay: 0
-  maxSunIntensity: 1
+  maxSunIntensity: 0.9
   sunFlare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
   maxMoonIntensity: 0.6
   moonSprites:
@@ -19950,7 +19950,7 @@ ReflectionProbe:
   m_Mode: 1
   m_RefreshMode: 1
   m_TimeSlicingMode: 2
-  m_Resolution: 256
+  m_Resolution: 128
   m_UpdateFrequency: 0
   m_Importance: 1
   m_BoxSize: {x: 10, y: 2.4, z: 10}
@@ -25191,7 +25191,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1277712145
 Transform:
   m_ObjectHideFlags: 0
@@ -26103,7 +26103,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.02
-  far clip plane: 2000
+  far clip plane: 2500
   field of view: 75
   orthographic: 0
   orthographic size: 5

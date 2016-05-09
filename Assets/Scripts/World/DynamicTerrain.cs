@@ -127,6 +127,7 @@ public class DynamicTerrain {
 				chunksToUpdate.Clear ();
 				foreach (Chunk chunk in activeChunks) {
 					if (chunk.needsColliderUpdate) chunk.UpdateCollider();
+					if (chunk.needsColorUpdate) chunk.UpdateColors();
 					if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
 						chunk.priority += ChunkHeuristic (chunk) +1;
 						if (chunksToUpdate.Count == 0)
