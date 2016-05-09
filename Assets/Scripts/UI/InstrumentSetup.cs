@@ -7,10 +7,10 @@ using System.Collections.Generic;
 
 public class InstrumentSetup : MonoBehaviour {
 
+	#region InstrumentSetup Vars
+
 	public static InstrumentSetup instance;
 	public RiffAI riffai;
-
-	#region InstrumentSetup Vars
 
 	public const int MAX_NUMNOTES = 8;
 
@@ -94,6 +94,7 @@ public class InstrumentSetup : MonoBehaviour {
 			return;
 		}
 			
+		// Initialize effect sliders
 		foreach (EffectSlider effectSlider in effectSliders) {
 			if (effectSlider == null) continue;
 			effectSlider.gameObject.SetActive(true);
@@ -103,6 +104,7 @@ public class InstrumentSetup : MonoBehaviour {
 		// Initialize effect status sprites
 		AudioSource source = MusicManager.instance.instrumentAudioSources[currentRiff.instrument];
 
+		// Initialize effect toggle sprites
 		distortionButton.sprite = 
 			source.GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
 		tremoloButton.sprite = 
@@ -129,6 +131,10 @@ public class InstrumentSetup : MonoBehaviour {
 		UpdateTempoText();
 
 		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+
+		// Refresh button grid
+		buttonGrid.Clear ();
+		for(int n = 0; n<numButtons; n++) buttonGrid.Add(new List<GameObject>());
 
 		// Create note buttons
 		if (currentRiff.instrument.type == Instrument.Type.Percussion)
@@ -165,59 +171,70 @@ public class InstrumentSetup : MonoBehaviour {
 
 	// Initializes a percussion setup menu
 	void InitializePercussionSetup (PercussionInstrument percInst) {
+
+		List<string> set = KeyManager.instance.percussionSets[percInst];
+		int numDrums = set.Count;
+
+		// Resize note panel
+		RectTransform tr = gameObject.RectTransform();
+		tr.sizeDelta = new Vector2 (
+			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
+			(numDrums+1)*buttonWidth + numDrums*buttonSpacing
+		);
+
+		// Resize drum icons panel
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
+
+		// Resize beat number panel
+		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
+
 		int i=0;
-		foreach (string note in KeyManager.instance.percussionSets[percInst]) 
+		foreach (string note in set) 
 			MakePercussionButtons (note, i++, note, percInst.icons[note]);
 	}
 
 	// Initializes a melodic setup menu
 	void InitializeMelodicSetup (MelodicInstrument meloInst) {
-		buttonGrid.Clear();
-		for(int n = 0; n<(int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS); n++) {
-			buttonGrid.Add(new List<GameObject>());
-		}
-		//int i = 0;
 
+		// Calculate available octaves
 		maxOctaves = (int)Mathf.CeilToInt( (float)(Sounds.soundsToLoad[currentRiff.instrument.codeName].Count) / 12f);
 		if (maxOctaves < octavesShown) octavesShown = maxOctaves;
 
+		// Gather key/scale info
 		Key key = MusicManager.instance.currentSong.key;
 		ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
-		int startIndex = meloInst.startingNote[key];
-		int totalNotes = Sounds.soundsToLoad[currentRiff.instrument.codeName].Count;
-		numNotes = startIndex + 12 * octavesShown + 1;
 
-		GetComponent<RectTransform>().sizeDelta = new Vector2 (
+		// Find starting note
+		int startIndex = meloInst.startingNote[key];
+
+		// Calculate number of notes
+		int totalNotes = Sounds.soundsToLoad[currentRiff.instrument.codeName].Count;
+		numNotes = 1 + 12 * octavesShown;
+
+		// Resize note button panel
+		RectTransform tr = gameObject.RectTransform();
+		tr.sizeDelta = new Vector2 (
 			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
 			(numNotes+1)*buttonWidth + numNotes*buttonSpacing
 		);
 
-		for (int i = startIndex; i < numNotes && i < totalNotes; i++) {
-			string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i];
+		// Resize note text bar
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
+
+		// Resize beats bar
+		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
+
+		for (int i = 0; i < numNotes && i < totalNotes; i++) {
+			string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i+startIndex];
 			bool inScale = KeyManager.instance.scales[key][scale][meloInst].allNotes.Contains(note);
 			MakeMelodicButtons (note.Split('_')[1], i, note, inScale);
-			//i++;
 		}
 			
 	}
 
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
-		
-		buttonGrid.Clear ();
-		for(int n = 0; n<numButtons; n++) {
-			buttonGrid.Add(new List<GameObject>());
-		}
-		RectTransform tr = gameObject.RectTransform();
-		tr.sizeDelta = new Vector2 (
-			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
-			(row+2)*buttonWidth + row*buttonSpacing
-		);
-		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
-		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
-		//beatsBar_tr.offsetMax = Vector2.zero;
-		//beatsBar_tr.offsetMax = new Vector2 (tr.offsetMax.x, beatsBar_tr.offsetMax.y);
-		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
 
 		// Make icon for note
 		buttons.Add(MakeIcon (title, iconGraphic, 
@@ -227,12 +244,17 @@ public class InstrumentSetup : MonoBehaviour {
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			))
 		);
-
+			
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
 			int num = i;
+
+			// Check if note is already in riff
 			bool noteExists = currentRiff.Lookup(soundName, num);
-			float vol = 1f;
-			if (noteExists) vol = currentRiff.VolumeOfNote(soundName, num);
+
+			// Get volume if so
+			float vol = noteExists ? currentRiff.VolumeOfNote(soundName, num) : 1f;
+
+			// Create note button
 			GameObject bt = MakeButton(title+"_"+i, 
 				(currentRiff.Lookup(soundName, num) ? percussionFilled : percussionEmpty),
 				GetComponent<RectTransform>(),
@@ -242,18 +264,23 @@ public class InstrumentSetup : MonoBehaviour {
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
+
+			// Change scale based on beat
 			RectTransform bt_tr = bt.RectTransform();
-			bt.tag = "StopScrolling";
-			bt.AddComponent<NoteButton>();
-			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
+			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) // Down beat
 				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
+			else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) // Half beat
 				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
+			else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) // Quarter beat
 				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-			}
-				
+
+			// Add StopScrolling tag
+			bt.tag = "StopScrolling";
+
+			// Create note
 			Note note = new Note (soundName, vol, 1f);
+
+			// Create volume slider
 			GameObject volume = UI.MakeImage(title+"_volume");
 			RectTransform volume_tr = volume.RectTransform();
 			volume_tr.SetParent(bt_tr);
@@ -265,31 +292,34 @@ public class InstrumentSetup : MonoBehaviour {
 			Image volume_img = volume.Image();
 			volume_img.sprite = GameManager.instance.volumeIcon;
 			volume_img.type = Image.Type.Filled;
-			if (vol != 1f) Debug.Log(vol);
 			volume_img.fillAmount = vol;
 
+			// Setup volume slider
+			NoteButton noteButton = bt.AddComponent<NoteButton>();
+			noteButton.targetNote = note;
+			noteButton.volumeImage = volume.GetComponent<Image>();
 
-			bt.GetComponent<NoteButton>().targetNote = note;
-			bt.GetComponent<NoteButton>().volumeImage = volume.GetComponent<Image>();
-
+			// Create show/hide toggle
 			ShowHide bt_sh = bt.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
 			bt_sh.transitionType = TransitionType.Instant;
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
+			// Initially hide volume slider
 			volume.SetActive(false);
 
-
+			// Add button functionality
 			bt.Button().onClick.AddListener(()=>{
 				if (!InputManager.instance.IsDragging) {
 					bool n = currentRiff.Toggle(note, num);
 					if (!n) bt_sh.Hide();
-					bt_sh.enabled = currentRiff.Lookup(note, num);
+					bt_sh.enabled = n;
 					bt.Image().sprite = (n ? percussionFilled : percussionEmpty);
 					if (n) bt_sh.Show();
 				}
 			});
 
+			// Register button
 			buttons.Add(bt);
 			buttonGrid[i].Add(bt);
 			buttons.Add(volume);
@@ -298,12 +328,9 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void MakeMelodicButtons (string title, int row, string fileName, bool inScale) {
 		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
-		//Debug.Log ("numbuttons (x length) " + numButtons);
-		//buttonGrid.Clear ();
+		Color transparentWhite = new Color (1f, 1f, 1f, 0.5f);
 
-		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, GetComponent<RectTransform>().sizeDelta.y);
-		beatsBar_tr.sizeDelta = new Vector2 (GetComponent<RectTransform>().sizeDelta.x, beatsBar_tr.sizeDelta.y);
-
+		// Create note text
 		GameObject txt = MakeText (title,
 			iconBar_tr,
 			new Vector2 (buttonWidth, buttonWidth),
@@ -312,12 +339,20 @@ public class InstrumentSetup : MonoBehaviour {
 				-buttonWidth - (buttonWidth+buttonSpacing)*row
 			)
 		);
-		Color color = new Color (1f, 1f, 1f, 0.5f);
-		txt.GetComponent<Text>().color = (inScale ? Color.white : color);
-		buttons.Add(txt);
+
+		// Change text color depending on whether or not the note is in the scale
+		txt.Text().color = (inScale ? Color.white : transparentWhite);
 
 		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
 			int num = i;
+
+			// Check if note is already in riff
+			bool noteExists = currentRiff.Lookup(fileName, num);
+
+			// Get volume if so
+			float vol = noteExists ? currentRiff.VolumeOfNote(fileName, num) : 1f;
+
+			// Make note button
 			GameObject bt = MakeButton(title+"_"+i,
 				(currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty),
 				GetComponent<RectTransform>(),
@@ -325,29 +360,77 @@ public class InstrumentSetup : MonoBehaviour {
 				new Vector2 (
 					buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
-				));
-			float vol = 1f;
-			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-				vol = 0.9f;
-			} else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) {
-				bt.GetComponent<RectTransform>().localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-				vol = 0.8f;
-			}
-			bt.GetComponent<Button>().onClick.AddListener(()=>{
-				currentRiff.Toggle(new Note(fileName, vol, 1f), num);
-				if (currentRiff.Lookup(new Note(fileName, vol, 1f),num)) SuggestChords(num, row);
-				else ClearSuggestions();
-				//Suggest ();
-				//SuggestChords(bt);
-				
-				Toggle(bt.GetComponent<Button>());
+				)
+			);
+					
+			// Change scale based on position of note
+			RectTransform bt_tr = bt.RectTransform();
+			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0)
+				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
+			else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0)
+				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
+			else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0)
+				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
+
+			// Add StopScrolling tag
+			bt.tag = "StopScrolling";
+
+			// Create note
+			Note note = new Note (fileName, vol, 1f);
+
+			// Create volume slider
+			GameObject volume = UI.MakeImage(title+"_volume");
+			RectTransform volume_tr = volume.RectTransform();
+			volume_tr.SetParent(bt_tr);
+			volume_tr.sizeDelta = bt_tr.sizeDelta;
+			volume_tr.localScale = new Vector3 (
+				bt_tr.localScale.x * 1.3f,
+				bt_tr.localScale.y * 2.5f,
+				1f
+			);
+
+			volume_tr.AnchorAtPoint(0.5f, 0.5f);
+			volume_tr.anchoredPosition3D = Vector3.zero;
+
+			Image volume_img = volume.Image();
+			volume_img.sprite = GameManager.instance.melodicVolumeIcon;
+			volume_img.type = Image.Type.Filled;
+			volume_img.fillAmount = vol;
+
+			// Setup volume slider
+			NoteButton noteButton = bt.AddComponent<NoteButton>();
+			noteButton.targetNote = note;
+			noteButton.volumeImage = volume.GetComponent<Image>();
+
+			// Create show/hide toggle
+			ShowHide bt_sh = bt.AddComponent<ShowHide>();
+			bt_sh.objects = new List<GameObject>() { volume};
+			bt_sh.transitionType = TransitionType.Instant;
+			bt_sh.enabled = currentRiff.Lookup(note, num);
+
+			// Initially hide volume slider
+			volume.SetActive(false);
+
+			// Setup button
+			bt.Button().onClick.AddListener(()=>{
+				if (!InputManager.instance.IsDragging) {
+					bool n = currentRiff.Toggle(note, num);
+					if (n) {
+						SuggestChords(num, row);
+						bt_sh.Show();
+					} else {
+						ClearSuggestions();
+						bt_sh.Hide();
+					}
+					bt_sh.enabled = n;
+					bt.Image().sprite = (n ? melodicFilled : melodicEmpty);
+				}
 			});
+
+			// Register button
+			buttons.Add(txt);
 			buttons.Add(bt);
 			buttonGrid[num].Add(bt);
-
 		}
 	}
 
@@ -515,12 +598,12 @@ public class InstrumentSetup : MonoBehaviour {
 
 	void SuggestChords (int column, int row) {
 		ClearSuggestions();
-		if (row+2 < buttonGrid[0].Count)
-			SuggestMinorChord(buttonGrid[column][row+2]);
-		if (row+4 < buttonGrid[0].Count) 
-			SuggestPowerChord(buttonGrid[column][row+4]);
+		if (row+3 < buttonGrid[0].Count)
+			SuggestMinorChord(buttonGrid[column][row+3]);
 		if (row+7 < buttonGrid[0].Count) 
-			SuggestOctave(buttonGrid[column][row+7]);
+			SuggestPowerChord(buttonGrid[column][row+7]);
+		if (row+12 < buttonGrid[0].Count) 
+			SuggestOctave(buttonGrid[column][row+12]);
 	}
 
 	void ClearSuggestions () {

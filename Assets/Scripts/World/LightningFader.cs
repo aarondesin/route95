@@ -4,13 +4,13 @@ using System.Collections;
 public class LightningFader : MonoBehaviour {
 
 	Light _light;
-	SpriteRenderer renderer;
+	SpriteRenderer _renderer;
 	public float fadeSpeed;
 	float baseIntensity;
 
 	void Awake () {
 		_light = gameObject.Light();
-		renderer = gameObject.SpriteRenderer();
+		_renderer = gameObject.SpriteRenderer();
 	}
 
 	void Start () {
@@ -26,7 +26,7 @@ public class LightningFader : MonoBehaviour {
 
 		Color temp = Color.white;
 		temp.a = _light.intensity;
-		renderer.color = temp;
+		_renderer.color = temp;
 
 	}
 }

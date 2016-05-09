@@ -94,6 +94,7 @@ public class GameManager : MonoBehaviour {
 	public Sprite removeIcon;
 	public Sprite circleIcon;
 	public Sprite volumeIcon;
+	public Sprite melodicVolumeIcon;
 	public Sprite fillSprite;
 	public Sprite scribbleCircle;
 
@@ -217,11 +218,16 @@ public class GameManager : MonoBehaviour {
 		// Move casette
 		if (casetteMoving) {
 			float progress = (Time.time - sTime) * casetteMoveSpeed;
-			float dist = progress / Vector3.Distance (casetteTarget.position, casettePosition.position);
-			casette.transform.position = Vector3.Lerp (casettePosition.position, casetteTarget.position, dist);
-			casette.transform.rotation = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, dist);
+			float dist = Vector3.Distance (casetteTarget.position, casettePosition.position);
+			if (dist == 0f) return;
 
-			if (dist >= 1f) {
+			float journey = progress / dist;
+			Vector3 pos = Vector3.Lerp (casettePosition.position, casetteTarget.position, journey);
+			Quaternion rot = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, journey);
+			casette.transform.position = pos;
+			casette.transform.rotation = rot;
+
+			if (journey >= 1f) {
 				casetteMoving = false;
 				casette.transform.position = casetteTarget.position;
 				casette.transform.rotation = casetteTarget.rotation;
@@ -558,8 +564,7 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void ShowLoadPromptForProjects () {
 		Show (loadPrompt);
-		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Project);
-		LoadPrompt.instance.Refresh();
+		LoadPrompt.instance.Refresh(LoadPrompt.Mode.Project);
 	}
 
 	/// <summary>
@@ -567,8 +572,7 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void ShowLoadPromptForSongs () {
 		Show (loadPrompt);
-		LoadPrompt.instance.SetLoadMode(LoadPrompt.Mode.Song);
-		LoadPrompt.instance.Refresh();
+		LoadPrompt.instance.Refresh(LoadPrompt.Mode.Song);
 	}
 
 	#endregion

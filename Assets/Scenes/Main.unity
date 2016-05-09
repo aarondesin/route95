@@ -7025,7 +7025,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_Children:
   - {fileID: 1531383735}
   - {fileID: 1728560017}
@@ -7061,7 +7061,7 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: The speed of your song.
+            m_StringArgument: How many octaves are shown.
             m_BoolArgument: 0
           m_CallState: 2
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
@@ -11042,7 +11042,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49803922}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -14410,6 +14410,7 @@ MonoBehaviour:
   removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
   circleIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
   volumeIcon: {fileID: 21300000, guid: a01c201d16be7a94ebf40dec47d5dc41, type: 3}
+  melodicVolumeIcon: {fileID: 21300000, guid: 2fe6be0cc43c77f40a3c2aa792bf4142, type: 3}
   fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
   scribbleCircle: {fileID: 21300000, guid: f999250d3dafe3b4c83ff7d35b3c6239, type: 3}
   menuClick: {fileID: 8300000, guid: 5f28d112f6413e44baa2ced59af01738, type: 3}
@@ -24212,7 +24213,7 @@ GameObject:
   - 222: {fileID: 1201765331}
   - 114: {fileID: 1201765330}
   m_Layer: 5
-  m_Name: Header
+  m_Name: Header (Load Prompt)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31358,7 +31359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.8784314}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49803922}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -37279,8 +37280,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fileList: {fileID: 1475340076}
   loadButton: {fileID: 1213723255}
-  appendButton: {fileID: 0}
   fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
+  header: {fileID: 1201765330}
 --- !u!114 &2011310445
 MonoBehaviour:
   m_ObjectHideFlags: 0

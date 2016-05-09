@@ -17,13 +17,12 @@ public class LoadPrompt : MonoBehaviour {
 
 	public RectTransform fileList; // Transform of the actual panel with all of the files listed
 	public GameObject loadButton;
-	public GameObject appendButton;
-
-	private Mode loadMode;
 
 	string selectedPath; // Currently selected path
 
 	List<GameObject> fileButtons;
+
+	Mode loadMode;
 
 	public Sprite fillSprite;
 
@@ -32,6 +31,8 @@ public class LoadPrompt : MonoBehaviour {
 	static float horizontalPadding = 8f;
 	static float verticalPadding = 4f;
 	static Vector2 buttonSize = new Vector2 (360f, 72f);
+
+	public Text header;
 
 	#endregion
 	#region Unity Callbacks
@@ -44,20 +45,18 @@ public class LoadPrompt : MonoBehaviour {
 	#endregion
 	#region LoadPrompt Methods
 
-	public void SetLoadMode (Mode newLoadMode) {
-		loadMode = newLoadMode;
-	}
-
 	// 
-	public void Refresh () {
+	public void Refresh (Mode mode) {
 		foreach (GameObject fileButton in fileButtons) {
 			Destroy(fileButton);
 		}
 		fileButtons.Clear();
 
+		loadMode = mode;
+
 		// Get list of files in save location
 		string[] files = new string[0];
-		switch (loadMode) {
+		switch (mode) {
 		case LoadPrompt.Mode.Project:
 			files = Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension);
 			break;
@@ -131,6 +130,9 @@ public class LoadPrompt : MonoBehaviour {
 
 		// Update size of panel to fit all files
 		fileList.sizeDelta = new Vector2 (fileListSize.x, (float)(fileButtons.Count+1)*(verticalPadding + buttonSize.y));
+
+		// Update header
+		header.text = mode == Mode.Project ? "Load Project" : "Load Song";
 	}
 
 
