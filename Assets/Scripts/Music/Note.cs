@@ -71,5 +71,13 @@ public class Note {
 		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
 	}
 
+	public bool IsSnare () {
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare";
+	}
+
+	public bool IsTom () {
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom";
+	}
+
 	#endregion
 }

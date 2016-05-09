@@ -125,8 +125,6 @@ public class UI : MonoBehaviour {
 		tr.localRotation = Quaternion.Euler(Vector3.zero);
 		return image;
 	}
-
-
 }
 
 public static class UIExtension {
@@ -184,5 +182,12 @@ public static class GameObjectExtension {
 
 	public static Light Light (this GameObject obj) {
 		return obj.GetComponent<Light>();
+	}
+
+	public static void SetRate (this ParticleSystem sys, float newRate) {
+		ParticleSystem.EmissionModule temp = sys.emission;
+		ParticleSystem.MinMaxCurve curve = temp.rate;
+		curve = new ParticleSystem.MinMaxCurve(newRate);
+		temp.rate = curve;
 	}
 }

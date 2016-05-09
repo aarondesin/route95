@@ -161,8 +161,12 @@ public class Riff {
 		}
 		// Note not already there
 		beat.Add (newNote);
-		newNote.PlayNote(MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]]);
-		if (newNote.IsKick()) WorldManager.instance.LightningStrike(0.5f * volume * newNote.volume);
+		AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+		newNote.PlayNote(source);
+
+		if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
+		else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
+		else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
 		return true;
 	}
 	public void PlayRiffLoop (AudioClip clip) {
@@ -196,7 +200,9 @@ public class Riff {
 				foreach (Note note in beat.notes) {
 					
 					note.PlayNote(source, volume);
-					if (note.IsKick()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
+					if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
+					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
+					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {

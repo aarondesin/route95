@@ -132,6 +132,9 @@ public class WorldManager : MonoBehaviour {
 
 	public float baseLightningIntensity = 2f;
 	public GameObject lightningStriker;
+	public GameObject lightningFlash;
+
+	public ParticleSystem rainEmitter;
 
 
 	//
@@ -266,6 +269,7 @@ public class WorldManager : MonoBehaviour {
 		moonLight = moon.Light();
 
 		lightningStriker.SetActive(false);
+		rainEmitter.SetRate(0f);
 
 		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
 			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
@@ -402,11 +406,13 @@ public class WorldManager : MonoBehaviour {
 			primaryColor = Color.Lerp (primaryNightColor, primarySunriseColor, lerpValue);
 			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
 		}
-
-		sunLight.intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : 0f;
+			
+		//sunLight.intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : 0f;
+		sunLight.intensity = maxSunIntensity * Mathf.Sin (timeOfDay) + maxSunIntensity/3f;
 		sunLight.color = primaryColor;
 		moonLight.color = Color.white;
-		moonLight.intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : 0f;
+		//moonLight.intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : 0f;
+		moonLight.intensity = maxMoonIntensity * Mathf.Cos (timeOfDay + Mathf.PI/2f) + maxMoonIntensity/3f;
 		RenderSettings.fogColor = secondaryColor;
 
 		RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
@@ -465,9 +471,9 @@ public class WorldManager : MonoBehaviour {
 		GameObject sun = new GameObject ("Sun");
 		sun.AddComponent<Light> ();
 		sun.AddComponent<Sun> ();
-		//sun.GetComponent<Sun> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		sun.GetComponent<Light>().flare = sunFlare;
+
 		return sun;
 	}
 
@@ -592,7 +598,7 @@ public class WorldManager : MonoBehaviour {
 
 		// Define an offset
 		Vector2 r = UnityEngine.Random.insideUnitCircle;
-		Vector3 offset = new Vector3 (200f*r.x, 250f, 200f*r.y);
+		Vector3 offset = new Vector3 (400f*r.x, 250f, 400f*r.y);
 
 		// Pick a point
 		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
@@ -605,6 +611,34 @@ public class WorldManager : MonoBehaviour {
 		lightningStriker.SetActive(true);
 		lightningStriker.transform.position = origin;
 		lightningStriker.Light().intensity = baseLightningIntensity*strength;
+	}
+
+	/// <summary>
+	/// Creates a lightning flash within the clouds.
+	/// </summary>
+	/// <param name="strength">Strength.</param>
+	public void LightningFlash (float strength) {
+
+		// Find camera forward direction (flat)
+		Vector3 forward = Camera.main.transform.forward;
+		forward.y = 0f;
+		forward.Normalize();
+
+		// Define an offset
+		Vector2 r = UnityEngine.Random.insideUnitCircle;
+		Vector3 offset = new Vector3 (800f*r.x, 800f, 800f*r.y);
+
+		// Pick a point
+		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(1.9f, 2.1f) *
+			vertexUpdateDistance + offset;
+
+		// Play sound
+		// TODO
+
+		// Enable lightning flash and move to point
+		lightningFlash.SetActive(true);
+		lightningFlash.transform.position = origin;
+		lightningFlash.Light().intensity = baseLightningIntensity*2f*strength;
 	}
 		
 }

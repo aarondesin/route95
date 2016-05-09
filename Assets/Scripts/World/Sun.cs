@@ -8,6 +8,8 @@ public class Sun : MonoBehaviour {
 	private float yScale = 1000;
 	private float zScale = 1000;
 
+	public bool invert = false;
+
 	private Vector3 sunTarget; // target for the sun to point at: the car or the origin
 
 	private void UpdateTransform(){
@@ -19,6 +21,7 @@ public class Sun : MonoBehaviour {
 		transform.localScale = new Vector3 (100f, 100f, 100f);
 
 		this.transform.LookAt (sunTarget);
+		if (invert) this.transform.Rotate(new Vector3 (180f, 0f, 0f));
 	}
 
 	void Start() {

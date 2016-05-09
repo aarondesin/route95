@@ -140,7 +140,9 @@ public class InputManager : MonoBehaviour {
 							if (noteIndex >= 0) {
 								Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
 								note.PlayNote(source, false);
-								if (note.IsKick()) WorldManager.instance.LightningStrike(note.volume * source.volume);
+								if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
+								else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
+								else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
 							}
 						} else if (song != null && song.scale != -1 && song.key != Key.None) {
 
