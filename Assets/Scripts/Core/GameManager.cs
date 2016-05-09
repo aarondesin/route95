@@ -160,6 +160,18 @@ public class GameManager : MonoBehaviour {
 
 		projectSavePath = Application.persistentDataPath + projectSaveFolder;
 		songSavePath = Application.persistentDataPath + songSaveFolder;
+
+		if (!Directory.Exists(GameManager.instance.projectSavePath)) 
+			Directory.CreateDirectory (GameManager.instance.projectSavePath);
+
+		if (!Directory.Exists(Application.dataPath+projectSaveFolder))
+			Directory.CreateDirectory (Application.dataPath+projectSaveFolder);
+
+		if (!Directory.Exists(GameManager.instance.songSavePath)) 
+			Directory.CreateDirectory (GameManager.instance.songSavePath);
+
+		if (!Directory.Exists(Application.dataPath+songSaveFolder))
+			Directory.CreateDirectory (Application.dataPath+songSaveFolder);
 	}
 
 	void Start () {

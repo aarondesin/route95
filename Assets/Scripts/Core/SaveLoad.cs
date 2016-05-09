@@ -31,7 +31,7 @@ public class SaveLoad {
 	public static void SaveCurrentProject () {
 		BinaryFormatter bf = new BinaryFormatter ();
 
-		string directoryPath = Application.persistentDataPath + "/Projects/";
+		string directoryPath = Application.persistentDataPath + GameManager.instance.projectSaveFolder;
 		string filePath = directoryPath + MusicManager.instance.currentProject.name + projectSaveExtension;
 
 		Directory.CreateDirectory (directoryPath);

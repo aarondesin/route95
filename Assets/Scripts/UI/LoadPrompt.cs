@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class LoadPrompt : MonoBehaviour {
 
@@ -55,16 +56,18 @@ public class LoadPrompt : MonoBehaviour {
 		loadMode = mode;
 
 		// Get list of files in save location
-		string[] files = new string[0];
+		List<string> files = new List<string>();
 		switch (mode) {
 		case LoadPrompt.Mode.Project:
-			files = Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension);
+			files.AddRange (Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension).ToList<string>());
+			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.projectSaveFolder, "*"+SaveLoad.projectSaveExtension).ToList<string>());
 			break;
 		case LoadPrompt.Mode.Song:
-			files = Directory.GetFiles(GameManager.instance.songSavePath, "*"+SaveLoad.songSaveExtension);
+			files.AddRange (Directory.GetFiles(GameManager.instance.songSavePath, "*"+SaveLoad.songSaveExtension).ToList<string>());
+			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.songSaveFolder, "*"+SaveLoad.songSaveExtension).ToList<string>());
 			break;
 		}
-		for (int i=0; i<files.Length; i++) {
+		for (int i=0; i<files.Count; i++) {
 			string path = files[i];
 			string filename = Path.GetFileNameWithoutExtension (files[i]);
 
