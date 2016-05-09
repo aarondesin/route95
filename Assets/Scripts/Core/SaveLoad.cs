@@ -116,7 +116,9 @@ public class SaveLoad {
 	}
 
 	public static void LoadSongToProject (string path) {
-		MusicManager.instance.currentProject.AddSong(LoadSong(path));
+		Song song = LoadSong(path);
+		MusicManager.instance.currentProject.AddSong(song);
+		MusicManager.instance.currentSong = song;
 	}
 
 	public static Song LoadSong (string path) {
