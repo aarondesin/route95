@@ -147,7 +147,7 @@ public class GameManager : MonoBehaviour {
 		else instance = this;
 
 		Profiler.maxNumberOfSamplesPerFrame = -1;
-		Application.targetFrameRate = 60;
+		Application.targetFrameRate = 120;
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {

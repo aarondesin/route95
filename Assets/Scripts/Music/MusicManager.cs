@@ -78,6 +78,18 @@ public class MusicManager : MonoBehaviour {
 	public bool loopPlaylist = false;
 	public Image loopPlaylistButton;
 
+	public int guitarNotes = 0;
+	[SerializeField]
+	float guitarDensity = 0f;
+
+	public int keyboardNotes = 0;
+	[SerializeField]
+	float keyboardDensity = 0f;
+
+	public int brassNotes = 0;
+	[SerializeField]
+	float brassDensity = 0f;
+
 	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
 		{ Tempo.Slowest, 50f },
 		{ Tempo.Slower, 70f },
@@ -134,6 +146,9 @@ public class MusicManager : MonoBehaviour {
 						beat = 0;
 						WorldManager.instance.shakers = 0;
 						beatsElapsedInCurrentSong = 0;
+						guitarNotes = 0;
+						keyboardNotes = 0;
+						brassNotes = 0;
 						if (currentPlayingSong < currentProject.songs.Count-1) {
 							DisableAllAudioSources();
 							currentPlayingSong++;
@@ -152,6 +167,13 @@ public class MusicManager : MonoBehaviour {
 					beat++;
 					beatsElapsedInCurrentSong++;
 					beatsElapsedInPlaylist++;
+					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
+					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
+					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
+
+					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
+					WorldManager.instance.roadSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
+					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
 				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds

@@ -123,7 +123,7 @@ public class Riff {
 		Beat beat = song.beats[beatIndices[pos]];
 		foreach (Note note in beat.notes) {
 			if (note.filename == soundName) {
-				Debug.Log (note.volume);
+				//Debug.Log (note.volume);
 				return note.volume;
 			}
 		}
@@ -180,6 +180,17 @@ public class Riff {
 				//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
 				WorldManager.instance.DeformRandom();
 			} else {
+				switch (instrument.family) {
+				case Instrument.Family.Guitar:
+					MusicManager.instance.guitarNotes++;
+					break;
+				case Instrument.Family.Keyboard:
+					MusicManager.instance.keyboardNotes++;
+					break;
+				case Instrument.Family.Brass:
+					MusicManager.instance.brassNotes++;
+					break;
+				}
 			}
 		}
 		return true;
@@ -230,6 +241,17 @@ public class Riff {
 							//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
 							WorldManager.instance.DeformRandom();
 						} else {
+							switch (instrument.family) {
+							case Instrument.Family.Guitar:
+								MusicManager.instance.guitarNotes++;
+								break;
+							case Instrument.Family.Keyboard:
+								MusicManager.instance.keyboardNotes++;
+								break;
+							case Instrument.Family.Brass:
+								MusicManager.instance.brassNotes++;
+								break;
+							}
 						}
 					}
 				}

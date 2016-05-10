@@ -20788,13 +20788,19 @@ MonoBehaviour:
   wind: {x: 0, y: 0, z: 0}
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   doDecorate: 1
-  initialMaxActive:
-  - group: 1
-    maxActive: 300
-  - group: 2
-    maxActive: 200
-  - group: 3
+  vegetationGroup:
+    group: 1
+    numActive: 0
+    maxActive: 100
+  roadSignGroup:
+    group: 3
+    numActive: 0
     maxActive: 4
+  rockGroup:
+    group: 2
+    numActive: 0
+    maxActive: 200
+  decorationDensity: 1
   grassModel: {fileID: 4300000, guid: de6580a574cfb2d44b3cf930e6318df1, type: 3}
   vegetationMaterial: {fileID: 2100000, guid: 7d033ffc71fccf945a013d4bf3503779, type: 2}
   grassEmitterTemplate: {fileID: 1684075852}
@@ -20816,6 +20822,8 @@ MonoBehaviour:
   roadWidth: 10
   roadHeight: 0.5
   roadExtendRadius: 350
+  roadVariance: 0.4
+  roadSlope: 0.0015
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
   timeOfDay: 0
@@ -20829,14 +20837,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c9b812f6ab6d66d43ab3aead90aeeb9b, type: 3}
   primaryColor: {r: 0, g: 0, b: 0, a: 0}
   secondaryColor: {r: 0, g: 0, b: 0, a: 0}
-  primaryDayColor: {r: 1, g: 1, b: 1, a: 1}
-  secondaryDayColor: {r: 0.5411765, g: 0.7254902, b: 0.8705883, a: 1}
-  primarySunsetColor: {r: 1, g: 0.7529412, b: 0, a: 1}
-  secondarySunsetColor: {r: 1, g: 0.49803922, b: 0, a: 1}
-  primaryNightColor: {r: 0.03529412, g: 0.058823533, b: 0.08627451, a: 1}
-  secondaryNightColor: {r: 0.058823533, g: 0.078431375, b: 0.18823531, a: 1}
-  primarySunriseColor: {r: 1, g: 0.7529412, b: 0, a: 1}
-  secondarySunriseColor: {r: 1, g: 0.5647059, b: 0.2509804, a: 1}
   primaryColors:
     key0:
       serializedVersion: 2
@@ -36983,6 +36983,12 @@ MonoBehaviour:
   beatsElapsedInPlaylist: 0
   loopPlaylist: 0
   loopPlaylistButton: {fileID: 1420294032}
+  guitarNotes: 0
+  guitarDensity: 0
+  keyboardNotes: 0
+  keyboardDensity: 0
+  brassNotes: 0
+  brassDensity: 0
   maxBeats: 0
   loadedAudioSources: 0
   loadsToDo: 0

@@ -135,11 +135,14 @@ public class WorldManager : MonoBehaviour {
 	//[Tooltip("Maxmimum number of decorations.")]
 	private int maxDecorations; //= DEFAULT_MAX_DECORATIONS;
 
-	[Tooltip("Individual maximums for each decoration group.")]
-	public Decoration.GroupInfo[] initialMaxActive;
+	//[Tooltip("Individual maximums for each decoration group.")]
+	//public Decoration.GroupInfo[] initialMaxActive;
 
 	private int numDecorations;
-	private Dictionary<Decoration.Group, int> maxActive;
+	//private Dictionary<Decoration.Group, int> maxActive;
+	public Decoration.GroupInfo vegetationGroup;
+	public Decoration.GroupInfo roadSignGroup;
+	public Decoration.GroupInfo rockGroup;
 	[NonSerialized]
 	public List<GameObject> decorations = new List<GameObject>();
 	[NonSerialized]
@@ -156,6 +159,8 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 
+	public float decorationDensity = 1f;
+
 	public Mesh grassModel;
 	public Material vegetationMaterial;
 	public GameObject grassEmitterTemplate;
@@ -164,7 +169,7 @@ public class WorldManager : MonoBehaviour {
 	[Header("Effects Settings")]
 	//
 
-	public float baseLightningIntensity = 2f;
+	public float baseLightningIntensity = 1.5f;
 	public GameObject lightningStriker;
 	public GameObject lightningFlash;
 	public GameObject shootingStarTemplate;
@@ -207,6 +212,9 @@ public class WorldManager : MonoBehaviour {
 	[Range(100f, 2000f)]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
+	public float roadVariance = 0.4f;
+	public float roadSlope = 0.0015f;
+
 	[Tooltip("Material to use for road.")]
 	public Material roadMaterial;
 
@@ -247,15 +255,6 @@ public class WorldManager : MonoBehaviour {
 	private Color primaryColor;
 	[SerializeField]
 	private Color secondaryColor;
-
-	public Color primaryDayColor       = DEFAULT_PRIMARY_DAY_COLOR;
-	public Color secondaryDayColor     = DEFAULT_SECONDARY_DAY_COLOR;
-	public Color primarySunsetColor    = DEFAULT_PRIMARY_SUNSET_COLOR;
-	public Color secondarySunsetColor  = DEFAULT_SECONDARY_SUNSET_COLOR;
-	public Color primaryNightColor     = DEFAULT_PRIMARY_NIGHT_COLOR;
-	public Color secondaryNightColor   = DEFAULT_SECONDARY_NIGHT_COLOR;
-	public Color primarySunriseColor   = DEFAULT_PRIMARY_SUNRISE_COLOR;
-	public Color secondarySunriseColor = DEFAULT_SECONDARY_SUNRISE_COLOR;
 
 	public Gradient primaryColors;
 	public Gradient secondaryColors;
@@ -302,9 +301,7 @@ public class WorldManager : MonoBehaviour {
 	void Awake () {
 		instance = this;
 
-		for (int i = 0; i<initialMaxActive.Length; i++) {
-			maxDecorations += initialMaxActive[i].maxActive;
-		}
+		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
 		//Debug.Log(maxDecorations);
 
 		freqDataArray = new float[freqArraySize];
@@ -315,10 +312,6 @@ public class WorldManager : MonoBehaviour {
 		road = CreateRoad();
 
 		numDecorations = 0;
-		maxActive = new Dictionary<Decoration.Group, int>();
-		foreach (Decoration.GroupInfo groupSize in initialMaxActive) {
-			maxActive[groupSize.group] = groupSize.maxActive;
-		}
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = CreateSun();
@@ -386,31 +379,26 @@ public class WorldManager : MonoBehaviour {
 	#endregion
 
 	public void Load () {
+
+		// Get start time
 		startLoadTime = Time.realtimeSinceStartup;
-		//GameManager.instance.ChangeLoadingMessage("Loading world...");
-		//terrain.update();
 
-		//StartCoroutine("LoadChunks");
+		// Start by loading chunks
 		terrain.DoLoadChunks();
-
-			
-		//if (doDecorate) {
-			//LoadDecorations();
-			//InitialDecorate();
-		//}
-       
 	}
 
 	public void FinishLoading() {
-		Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-		GameManager.instance.FinishLoading();
+
 		loaded = true;
+
+		// Print time taken
+		Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+
+		// Call GameManager to finish loading
+		GameManager.instance.FinishLoading();
 	}
 	public void DoLoadRoad () {
-		//GameManager.instance.ChangeLoadingMessage("Loading road...");
 		road.DoLoad();
-		//road = CreateRoad();
-		//DoLoadDecorations();
 	}
 
 	public void DoLoadDecorations () {
@@ -435,69 +423,45 @@ public class WorldManager : MonoBehaviour {
 		}
 
 		if (decorations.Count == decorationPaths.Count)
-			DoInitialDecoration();
+			DoDecoration();
 		yield return null;
 	}
 
-	public void DoInitialDecoration () {
-		StartCoroutine("InitialDecoration");
+	public void DoDecoration () {
+		StartCoroutine("DecorationLoop");
 	}
 
-	IEnumerator InitialDecoration () {
-		GameManager.instance.ChangeLoadingMessage("Decorating terrain...");
+	IEnumerator DecorationLoop () {
+		if (!loaded) GameManager.instance.ChangeLoadingMessage("Decorating terrain...");
 		float startTime = Time.realtimeSinceStartup;
 		int numLoaded = 0;
 
-		int attempts = 0;
-		for (; numDecorations<maxDecorations;) {
-			//Debug.Log("about to attempt");
+		while (true) {
+			if (numDecorations < maxDecorations) {
+				numLoaded += (AttemptDecorate () ? 1 : 0);
 
-			numLoaded += (AttemptDecorate () ? 1 : 0);
-			attempts++;
+				if (numDecorations == maxDecorations && !loaded) {
+					FinishLoading();
+					yield return null;
+				}
 
-			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+					yield return null;
+					startTime = Time.realtimeSinceStartup;
+					if (!loaded) GameManager.instance.ReportLoaded(numLoaded);
+					numLoaded = 0;
+				}
+			} else {
 				yield return null;
-				startTime = Time.realtimeSinceStartup;
-				GameManager.instance.ReportLoaded(numLoaded);
-				numLoaded = 0;
 			}
-		}
 
-		if (numDecorations == maxDecorations) FinishLoading();
-		yield return null;
+	
+		}
+			
 	}
 		
 	void UpdateColor() {
-		//Light light = this.GetComponent<Light>();
-
-		// Sunrise to noon
-		if ((timeOfDay >= 0) && (timeOfDay < (Mathf.PI / 2))) {
-			Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
-			float lerpValue = timeOfDay / (Mathf.PI / 2);
-			primaryColor = Color.Lerp (primarySunriseColor, primaryDayColor, lerpValue);
-			secondaryColor = Color.Lerp (secondarySunriseColor, secondaryDayColor, lerpValue);
-		// Noon to sunset
-		} else if ((timeOfDay >= (Mathf.PI / 2)) && (timeOfDay < Mathf.PI)) {
-			Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
-			float lerpValue = (timeOfDay - Mathf.PI / 2) / (Mathf.PI / 2);
-			primaryColor = Color.Lerp (primaryDayColor, primarySunsetColor, lerpValue);
-			secondaryColor = Color.Lerp (secondaryDayColor, secondarySunsetColor, lerpValue);
-
-		// Sunset to night
-		} else if ((timeOfDay >= Mathf.PI) && (timeOfDay < ((3f/2f) * Mathf.PI))){
-			Camera.main.GetComponent<SunShafts>().sunTransform = moon.transform;
-			float lerpValue = (timeOfDay - Mathf.PI) / (Mathf.PI / 2);
-			primaryColor = Color.Lerp (primarySunsetColor, primaryNightColor, lerpValue);
-			secondaryColor = Color.Lerp (secondarySunsetColor, secondaryNightColor, lerpValue);
-
-		// Night to sunrise
-		} else if ((timeOfDay >= ((3f/2f) * Mathf.PI)) && (timeOfDay < (2 * Mathf.PI))){
-			Camera.main.GetComponent<SunShafts>().sunTransform = moon.transform;
-			float lerpValue = (timeOfDay - ((3f/2f) * Mathf.PI)) / (Mathf.PI / 2);
-			primaryColor = Color.Lerp (primaryNightColor, primarySunriseColor, lerpValue);
-			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
-		}
-
+		
 		float progress = timeOfDay/(Mathf.PI*2f);
 
 		primaryColor = primaryColors.Evaluate(progress);
@@ -506,16 +470,13 @@ public class WorldManager : MonoBehaviour {
 		
 			
 		sunLight.intensity = maxSunIntensity/2f * Mathf.Sin (timeOfDay) + maxSunIntensity/2f;
-		//sunLight.color = primaryColor;
 		sunLight.color = primaryColor;
 
 		moonLight.color = Color.white;
 		moonLight.intensity = maxMoonIntensity/2f * Mathf.Cos (progress) + maxMoonIntensity/2f;
 
-		//RenderSettings.fogColor = secondaryColor;
 		RenderSettings.fogColor = secondaryColor;
 
-		//RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
 		RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
 
 		if (Spectrum2.instance != null) {
@@ -548,10 +509,29 @@ public class WorldManager : MonoBehaviour {
 				// Pick a random decoration and decorate with it
 				GameObject decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
 				Decoration deco = decoration.GetComponent<Decoration>();
-				if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<Decoration.Group, int>();
-				if (!Decoration.numDecorations.ContainsKey(deco.group))
-					Decoration.numDecorations.Add (deco.group, 0);
-				if (Decoration.numDecorations[deco.group] < maxActive[deco.group]) {
+
+
+				//if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<Decoration.Group, int>();
+				//if (!Decoration.numDecorations.ContainsKey(deco.group))
+					//Decoration.numDecorations.Add (deco.group, 0);
+				//if (Decoration.numDecorations[deco.group] < maxActive[deco.group]) {
+				int numActive = 0;
+				int maxActive = 0;
+				switch (deco.group) {
+				case Decoration.Group.RoadSigns:
+					numActive = roadSignGroup.numActive;
+					maxActive = roadSignGroup.maxActive;
+					break;
+				case Decoration.Group.Rocks:
+					numActive = rockGroup.numActive;
+					maxActive = rockGroup.maxActive;
+					break;
+				case Decoration.Group.Vegetation:
+					numActive = vegetationGroup.numActive;
+					maxActive = vegetationGroup.maxActive;
+					break;
+				}
+				if (numActive < maxActive) {
 					switch (deco.distribution) {
 					case Decoration.Distribution.Random:
 						Chunk chunk = terrain.RandomChunk ();
@@ -612,7 +592,7 @@ public class WorldManager : MonoBehaviour {
 			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
 		);
 
-		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density / terrain.activeChunks.Count) {
+		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density / terrain.activeChunks.Count * decorationDensity) {
 			//Debug.Log(coordinate);
 			IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
 			//Debug.Log(nearestVertex.ToString());
@@ -627,11 +607,17 @@ public class WorldManager : MonoBehaviour {
 					
 				GameObject newDecoration = 
 					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
-				newDecoration.GetComponent<Decoration>().Randomize();
-				if (!newDecoration.GetComponent<Decoration>().dynamic) newDecoration.transform.parent = chunk.chunk.transform;
+				Decoration deco = newDecoration.GetComponent<Decoration>();
+				deco.Randomize();
+				if (!deco.dynamic) newDecoration.transform.parent = chunk.chunk.transform;
 				numDecorations++;
-				Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
+				//Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
 				terrain.vertexmap.RegisterDecoration (nearestVertex, newDecoration);
+				if (deco.group == Decoration.Group.Rocks) {
+					rockGroup.numActive++;
+				} else if (deco.group == Decoration.Group.Vegetation) {
+					vegetationGroup.numActive++;
+				}
 				//Debug.Log("placed");
 				return true;
 			}
@@ -651,16 +637,20 @@ public class WorldManager : MonoBehaviour {
 		else coordinate.y = 0f;
 		GameObject newDecoration = 
 			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
-		newDecoration.GetComponent<Decoration>().Randomize();
+		Decoration deco = newDecoration.GetComponent<Decoration>();
+		deco.Randomize();
 
 		Vector3 rot = Quaternion.FromToRotation (coordinate+ road.GetDirection(prog), coordinate ).eulerAngles + new Vector3 (-90f,90f,0f);
 		newDecoration.transform.rotation = Quaternion.Euler(rot);
 	
 		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
 		//newDecoration.transform.parent = road.gameObject.transform;
-		//newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
+		newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
 		numDecorations++;
-		Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
+		//Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
+		if (deco.group == Decoration.Group.RoadSigns) {
+			roadSignGroup.numActive++;
+		}
 		//road.AddDecoration(newDecoration, prog);
 		return true;
 	}
@@ -679,7 +669,18 @@ public class WorldManager : MonoBehaviour {
 	public void RemoveDecoration (GameObject deco) {
 		if (deco == null) return;
 		Decoration d = deco.GetComponent<Decoration>();
-		Decoration.numDecorations[d.group]--;
+		//Decoration.numDecorations[d.group]--;
+		switch (d.group) {
+		case Decoration.Group.RoadSigns:
+			roadSignGroup.numActive--;
+			break;
+		case Decoration.Group.Rocks:
+			rockGroup.numActive--;
+			break;
+		case Decoration.Group.Vegetation:
+			vegetationGroup.numActive--;
+			break;
+		}
 		numDecorations--;
 		Destroy(deco);
 	}
@@ -787,7 +788,7 @@ public class WorldManager : MonoBehaviour {
 		IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
 		Vertex v = terrain.vertexmap.VertexAt(coords);
 		if (v == null) v = terrain.vertexmap.AddVertex (coords);
-		if (!v.locked) v.SmoothHeight (v.height + heightScale/16f, 0.95f);
+		if (!v.locked) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
 
 		//Debug.Log(v.ToString());
 	}

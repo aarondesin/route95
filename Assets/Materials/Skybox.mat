@@ -286,7 +286,7 @@ Material:
       data:
         first:
           name: _Value
-        second: 0.8352941
+        second: 0.32941177
       data:
         first:
           name: _Rotation

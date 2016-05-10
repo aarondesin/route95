@@ -12,7 +12,7 @@ public class Road : Bezier {
 
 	public float generateRoadRadius; // Distance from player to generate road
 	public float placementDistance = 30f; // Marginal distance to add new road
-	public float placementRange = 0.4f; // Radius within to place new road node
+	//public float placementRange = 0.4f; // Radius within to place new road node
 
 	public float maxSlope = 0.0015f;
 
@@ -173,7 +173,8 @@ public class Road : Bezier {
 	// Adds a new curve to the road bezier
 	void AddCurve () {
 		//float startTime = Time.realtimeSinceStartup;
-		float displacedDirection = placementDistance * placementRange;
+		float displacedDirection = placementDistance * WorldManager.instance.roadVariance;//placementRange;
+		maxSlope = WorldManager.instance.roadSlope;
 
 		Vector3 point;
 		if (points.Length > 0) point = points [points.Length - 1];

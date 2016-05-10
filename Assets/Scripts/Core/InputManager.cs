@@ -155,7 +155,17 @@ public class InputManager : MonoBehaviour {
 										//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
 										WorldManager.instance.DeformRandom();
 									} else {
-										
+										switch (inst.family) {
+										case Instrument.Family.Guitar:
+											MusicManager.instance.guitarNotes++;
+											break;
+										case Instrument.Family.Keyboard:
+											MusicManager.instance.keyboardNotes++;
+											break;
+										case Instrument.Family.Brass:
+											MusicManager.instance.brassNotes++;
+											break;
+										}
 									}
 								}
 

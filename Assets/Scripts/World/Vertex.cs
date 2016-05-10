@@ -174,11 +174,10 @@ public class VertexMap {
 					if (vert == null) continue;
 					if (vert.locked) continue;
 
-					//Vector3 worldPos = vert.WorldPos();
 					float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
 					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
 
-					if (vert.nearRoad && !vert.locked) {
+					if (vert.nearRoad) {
 						vert.SmoothHeight(roadPoint.y-roadHeight, 0.95f);
 						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
 						foreach (GameObject decoration in decorationDeletes) 

@@ -20,6 +20,7 @@ public class Decoration : MonoBehaviour {
 	[System.Serializable]
 	public struct GroupInfo {
 		public Group group;
+		public int numActive;
 		public int maxActive;
 	}
 
