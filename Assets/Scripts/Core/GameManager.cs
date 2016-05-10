@@ -530,6 +530,7 @@ public class GameManager : MonoBehaviour {
 		// Init music
 		MusicManager.instance.currentPlayingSong = 0;
 		if (MusicManager.instance.currentSong != null) {
+			MusicManager.instance.StartPlaylist();
 			MusicManager.instance.StartSong();
 			MusicManager.instance.currentSong.CompileSong();
 		}

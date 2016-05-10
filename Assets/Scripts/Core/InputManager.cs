@@ -143,6 +143,7 @@ public class InputManager : MonoBehaviour {
 								if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
 								else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
 								else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
+								else if (note.IsShaker()) WorldManager.instance.shakers++;
 							}
 						} else if (song != null && song.scale != -1 && song.key != Key.None) {
 

@@ -71,6 +71,8 @@ public class MusicManager : MonoBehaviour {
 	public Tempo tempo = Tempo.Medium;
 	private float BeatTimer;
 	private int beat;
+	public int beatsElapsedInCurrentSong = 0;
+	public int beatsElapsedInPlaylist = 0;
 	public static bool playing = false;
 	public static bool loop = false;
 	public bool loopPlaylist = false;
@@ -121,20 +123,25 @@ public class MusicManager : MonoBehaviour {
 					InstrumentSetup.currentRiff.PlayRiff (beat++);
 					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
 						beat = 0;
+					WorldManager.instance.shakers -= 2;
 					break;
+
 				case GameManager.Mode.Live:
 					if (currentSong == null) return;
 					if (currentSong.Beats == 0) return;
 
 					if (beat >= currentSong.Beats) {
 						beat = 0;
-
+						WorldManager.instance.shakers = 0;
+						beatsElapsedInCurrentSong = 0;
 						if (currentPlayingSong < currentProject.songs.Count-1) {
 							DisableAllAudioSources();
 							currentPlayingSong++;
 						} else {
-							if (loopPlaylist) currentPlayingSong = 0;
-							else GameManager.instance.SwitchToPostplay();
+							if (loopPlaylist) {
+								currentPlayingSong = 0;
+								beatsElapsedInPlaylist = 0;
+							} else GameManager.instance.SwitchToPostplay();
 						}
 					}
 					currentSong.PlaySong(beat);
@@ -143,6 +150,8 @@ public class MusicManager : MonoBehaviour {
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
 					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 					beat++;
+					beatsElapsedInCurrentSong++;
+					beatsElapsedInPlaylist++;
 					break;
 				}
 				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds
@@ -391,6 +400,10 @@ public class MusicManager : MonoBehaviour {
 	public void StartSong () {
 		loop = loopSong;
 		playing = true;
+	}
+
+	public void StartPlaylist() {
+		beatsElapsedInPlaylist = 0;
 	}
 
 	public void StopPlaying () {

@@ -167,6 +167,7 @@ public class Riff {
 		if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
 		else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
 		else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
+		else if (newNote.IsShaker()) WorldManager.instance.shakers++;
 		return true;
 	}
 	public void PlayRiffLoop (AudioClip clip) {
@@ -193,7 +194,7 @@ public class Riff {
 				source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
 				source.GetComponent<AudioChorusFilter>().rate = chorusRate;
 				source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
-				//source.GetComponent<AudioFlangerFilter>().delay = flangerDelay;
+				source.GetComponent<AudioFlangerFilter>().rate = flangerRate;
 				source.GetComponent<AudioFlangerFilter>().dryMix = flangerDryMix;
 
 				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
@@ -203,6 +204,7 @@ public class Riff {
 					if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
 					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
 					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
+					else if (note.IsShaker()) WorldManager.instance.shakers++;
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {

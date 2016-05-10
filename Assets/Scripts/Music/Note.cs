@@ -79,5 +79,11 @@ public class Note {
 		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom";
 	}
 
+	public bool IsShaker () {
+		return 
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2";
+	}
+
 	#endregion
 }

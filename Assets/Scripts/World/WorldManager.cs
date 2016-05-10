@@ -134,7 +134,10 @@ public class WorldManager : MonoBehaviour {
 	public GameObject lightningStriker;
 	public GameObject lightningFlash;
 
+	public ParticleSystem cloudEmitter;
 	public ParticleSystem rainEmitter;
+	public int shakers;
+	float rainDensity;
 
 
 	//
@@ -288,6 +291,8 @@ public class WorldManager : MonoBehaviour {
 			Vector3 dWind = UnityEngine.Random.insideUnitSphere;
 			wind += dWind * 0.5f;
 			wind.Normalize();
+			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
+			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
 		}
 
 	}
@@ -638,7 +643,7 @@ public class WorldManager : MonoBehaviour {
 		// Enable lightning flash and move to point
 		lightningFlash.SetActive(true);
 		lightningFlash.transform.position = origin;
-		lightningFlash.Light().intensity = baseLightningIntensity*2f*strength;
+		lightningFlash.Light().intensity = baseLightningIntensity*strength;
 	}
 		
 }
