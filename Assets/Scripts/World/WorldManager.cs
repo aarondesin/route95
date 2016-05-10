@@ -133,6 +133,7 @@ public class WorldManager : MonoBehaviour {
 	public float baseLightningIntensity = 2f;
 	public GameObject lightningStriker;
 	public GameObject lightningFlash;
+	public GameObject shootingStarTemplate;
 
 	public ParticleSystem cloudEmitter;
 	public ParticleSystem rainEmitter;
@@ -285,6 +286,7 @@ public class WorldManager : MonoBehaviour {
 
 		lightningStriker.SetActive(false);
 		rainEmitter.SetRate(0f);
+		shootingStarTemplate.SetActive(false);
 
 		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
 			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
@@ -432,12 +434,12 @@ public class WorldManager : MonoBehaviour {
 
 		
 			
-		sunLight.intensity = maxSunIntensity * Mathf.Sin (timeOfDay) + maxSunIntensity/3f;
+		sunLight.intensity = maxSunIntensity/2f * Mathf.Sin (timeOfDay) + maxSunIntensity/2f;
 		//sunLight.color = primaryColor;
 		sunLight.color = primaryColor;
 
 		moonLight.color = Color.white;
-		moonLight.intensity = maxMoonIntensity * Mathf.Cos (progress) + maxMoonIntensity/3f;
+		moonLight.intensity = maxMoonIntensity/2f * Mathf.Cos (progress) + maxMoonIntensity/2f;
 
 		//RenderSettings.fogColor = secondaryColor;
 		RenderSettings.fogColor = secondaryColor;
@@ -676,6 +678,25 @@ public class WorldManager : MonoBehaviour {
 
 	public void ExhaustPuff () {
 		foreach (ParticleSystem sys in exhaustEmitters) sys.Emit(1);
+	}
+
+	public void ShootingStar () {
+
+		// Find camera forward direction (flat)
+		Vector3 forward = Camera.main.transform.forward;
+		forward.y = 0f;
+		forward.Normalize();
+
+		// Define an offset
+		Vector2 r = UnityEngine.Random.insideUnitCircle;
+		Vector3 offset = new Vector3 (1000f*r.x, 600f, 1000f*r.y);
+
+		// Pick a point
+		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(2.9f, 3.1f) *
+			vertexUpdateDistance + offset;
+		
+		GameObject shootingStar = (GameObject)Instantiate(shootingStarTemplate, origin, Quaternion.identity);
+		shootingStar.SetActive(true);
 	}
 		
 }

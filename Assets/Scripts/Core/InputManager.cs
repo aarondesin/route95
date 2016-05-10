@@ -95,7 +95,7 @@ public class InputManager : MonoBehaviour {
 		}
 	}
 
-	void FixedUpdate () {
+	void Update () {
 		
 		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
 			Song song = null;
@@ -144,7 +144,8 @@ public class InputManager : MonoBehaviour {
 								else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
 								else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
 								else if (note.IsShaker()) WorldManager.instance.shakers++;
-								else if (note.IsCymbal()) WorldManager.instance.StarBurst();
+								else if (note.IsHat()) WorldManager.instance.StarBurst();
+								else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
 								else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
 							}
 						} else if (song != null && song.scale != -1 && song.key != Key.None) {

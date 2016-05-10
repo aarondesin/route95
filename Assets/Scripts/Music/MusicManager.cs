@@ -115,7 +115,7 @@ public class MusicManager : MonoBehaviour {
 
 	}
 
-	void FixedUpdate(){
+	void Update(){
 		if (playing && !GameManager.instance.paused) {
 			if (BeatTimer <= 0f) {
 				switch (GameManager.instance.currentMode) {
@@ -407,10 +407,6 @@ public class MusicManager : MonoBehaviour {
 	public void StopPlaying () {
 		playing = false;
 		beat = 0;
-	}
-
-	public bool IsKick (Note note) {
-		return note.filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
 	}
 	
 	#endregion

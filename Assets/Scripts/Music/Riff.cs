@@ -168,7 +168,8 @@ public class Riff {
 		else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
 		else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
 		else if (newNote.IsShaker()) WorldManager.instance.shakers++;
-		else if (newNote.IsCymbal()) WorldManager.instance.StarBurst();
+		else if (newNote.IsHat()) WorldManager.instance.StarBurst();
+		else if (newNote.IsCymbal()) WorldManager.instance.ShootingStar();
 		else if (newNote.IsWood()) WorldManager.instance.ExhaustPuff();
 		return true;
 	}
@@ -207,7 +208,8 @@ public class Riff {
 					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
 					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
 					else if (note.IsShaker()) WorldManager.instance.shakers++;
-					else if (note.IsCymbal()) WorldManager.instance.StarBurst();
+					else if (note.IsHat()) WorldManager.instance.StarBurst();
+					else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
 					else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
 				}
 			}
