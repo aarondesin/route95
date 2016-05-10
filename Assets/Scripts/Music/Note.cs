@@ -85,5 +85,24 @@ public class Note {
 			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2";
 	}
 
+	public bool IsCymbal () {
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash";
+	}
+
+	public bool IsHat () {
+		return 
+			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine";
+	}
+
+	public bool IsWood () {
+		return
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2" ||
+			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock";
+	}
+
 	#endregion
 }

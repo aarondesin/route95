@@ -136,6 +136,11 @@ public class WorldManager : MonoBehaviour {
 
 	public ParticleSystem cloudEmitter;
 	public ParticleSystem rainEmitter;
+
+	public List<ParticleSystem> exhaustEmitters;
+
+	public float starEmissionRate = 6f;
+	public ParticleSystem starEmitter;
 	public int shakers;
 	float rainDensity;
 
@@ -195,7 +200,9 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Sprites to randomize for the moon.")]
 	public List<Sprite> moonSprites;
 
+	[SerializeField]
 	private Color primaryColor;
+	[SerializeField]
 	private Color secondaryColor;
 
 	public Color primaryDayColor       = DEFAULT_PRIMARY_DAY_COLOR;
@@ -206,6 +213,11 @@ public class WorldManager : MonoBehaviour {
 	public Color secondaryNightColor   = DEFAULT_SECONDARY_NIGHT_COLOR;
 	public Color primarySunriseColor   = DEFAULT_PRIMARY_SUNRISE_COLOR;
 	public Color secondarySunriseColor = DEFAULT_SECONDARY_SUNRISE_COLOR;
+
+	public Gradient primaryColors;
+	public Gradient secondaryColors;
+
+	public Gradient skyboxFade;
 
 
 	//
@@ -293,6 +305,7 @@ public class WorldManager : MonoBehaviour {
 			wind.Normalize();
 			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
 			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
+			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);
 		}
 
 	}
@@ -411,16 +424,27 @@ public class WorldManager : MonoBehaviour {
 			primaryColor = Color.Lerp (primaryNightColor, primarySunriseColor, lerpValue);
 			secondaryColor = Color.Lerp (secondaryNightColor, secondarySunriseColor, lerpValue);
 		}
+
+		float progress = timeOfDay/(Mathf.PI*2f);
+
+		primaryColor = primaryColors.Evaluate(progress);
+		secondaryColor = secondaryColors.Evaluate(progress);
+
+		
 			
-		//sunLight.intensity = (timeOfDay >= 0f && timeOfDay <= Mathf.PI) ? maxSunIntensity : 0f;
 		sunLight.intensity = maxSunIntensity * Mathf.Sin (timeOfDay) + maxSunIntensity/3f;
+		//sunLight.color = primaryColor;
 		sunLight.color = primaryColor;
+
 		moonLight.color = Color.white;
-		//moonLight.intensity = (timeOfDay >= Mathf.PI && timeOfDay <= 2f*Mathf.PI) ? maxMoonIntensity : 0f;
-		moonLight.intensity = maxMoonIntensity * Mathf.Cos (timeOfDay + Mathf.PI/2f) + maxMoonIntensity/3f;
+		moonLight.intensity = maxMoonIntensity * Mathf.Cos (progress) + maxMoonIntensity/3f;
+
+		//RenderSettings.fogColor = secondaryColor;
 		RenderSettings.fogColor = secondaryColor;
 
-		RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
+		//RenderSettings.skybox.SetFloat("_Value", Mathf.Clamp01(AngularDistance(timeOfDay,-Mathf.PI/2f)));
+		RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
+
 		if (Spectrum2.instance != null) {
 			Color temp = new Color (sun.GetComponent<Light> ().color.r, sun.GetComponent<Light> ().color.g, sun.GetComponent<Light> ().color.b, Spectrum2.instance.opacity);
 			Spectrum2.instance.GetComponent<LineRenderer> ().SetColors (temp, temp);
@@ -644,6 +668,14 @@ public class WorldManager : MonoBehaviour {
 		lightningFlash.SetActive(true);
 		lightningFlash.transform.position = origin;
 		lightningFlash.Light().intensity = baseLightningIntensity*strength;
+	}
+
+	public void StarBurst () {
+		starEmitter.Emit(UnityEngine.Random.Range(10,20));
+	}
+
+	public void ExhaustPuff () {
+		foreach (ParticleSystem sys in exhaustEmitters) sys.Emit(1);
 	}
 		
 }

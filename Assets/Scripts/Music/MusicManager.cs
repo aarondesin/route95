@@ -269,8 +269,6 @@ public class MusicManager : MonoBehaviour {
 			reverb.density = masterReverb.density;
 			reverb.enabled = false;
 
-
-
 			numLoaded++;
 
 			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
