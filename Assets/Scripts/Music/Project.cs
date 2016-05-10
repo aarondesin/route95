@@ -97,6 +97,19 @@ public class Project {
 		}
 	}
 
+	public void RemoveSong (int index) {
+		Song song = songs[index];
+		songs.RemoveAt(index);
+		if (MusicManager.instance.currentPlayingSong == index) {
+			MusicManager.instance.currentPlayingSong = 0;
+			if (songs.Count > 0) {
+				MusicManager.instance.currentSong = songs[0];
+			} else {
+				MusicManager.instance.currentSong = null;
+			}
+		}
+	}
+		
 	public bool Empty {
 		get {
 			return songs.Count == 0;

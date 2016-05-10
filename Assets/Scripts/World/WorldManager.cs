@@ -6,6 +6,40 @@ using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 
 public class WorldManager : MonoBehaviour {
+
+	public struct Wave {
+		public Vector3 origin;
+		public float range;
+		public float progress;
+		public float width;
+		public float height;
+		public float speed;
+
+		public bool active;
+
+		public Wave (Vector3 pos, float r, float w, float h, float s) {
+			origin = pos;
+			range = r;
+			progress = 0f;
+			width = w;
+			height = h;
+			speed = s;
+			active = true;
+		}
+
+		public void Update () {
+			progress += speed * Time.deltaTime;
+			if (progress >= 1f) active = false;
+		}
+
+		public Vector2 pixelOrigin (int chunkRes, float chunkSize) {
+			return new Vector2 (
+				Mathf.RoundToInt((origin.x-chunkSize/2f) * (float)chunkRes / chunkSize),
+				Mathf.RoundToInt((origin.z-chunkSize/2f) * (float)chunkRes / chunkSize)
+			);
+		}
+	}
+
 	public static WorldManager instance;
 
 	public int loadsToDo;
@@ -144,6 +178,14 @@ public class WorldManager : MonoBehaviour {
 	public ParticleSystem starEmitter;
 	public int shakers;
 	float rainDensity;
+
+	public Texture2D waveTexture;
+	List<Wave> waves = new List<Wave>();
+	List<Wave> waveDeletes = new List<Wave>();
+
+	[SerializeField]
+	float waveProgress = 1f;
+	public float waveSpeed = 0.1f;
 
 
 	//
@@ -288,8 +330,12 @@ public class WorldManager : MonoBehaviour {
 		rainEmitter.SetRate(0f);
 		shootingStarTemplate.SetActive(false);
 
+		waveTexture = new Texture2D (terrain.vertexmap.width, terrain.vertexmap.width);
+
 		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
 			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
+
+		terrainMaterial.SetFloat("_WaveProgress", 1f);
 	}
 
 	// Update is called once per frame
@@ -308,6 +354,31 @@ public class WorldManager : MonoBehaviour {
 			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
 			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
 			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);
+
+			/*if (waveProgress < 1f) {
+				Vector4 pos = PlayerMovement.instance.transform.position;
+				pos.w = 1f;
+				waveProgress += waveSpeed;
+				terrainMaterial.SetVector("_WaveOrigin", pos);
+				SetWaveProgress(waveProgress);
+			}
+
+			if (waves.Count > 0) {
+
+				foreach (Wave wave in waves) {
+					if (!wave.active) waveDeletes.Add(wave);
+					else wave.Update();
+				}
+
+				foreach (Wave wave in waveDeletes) {
+					waves.Remove(wave);
+				}
+
+
+
+
+			}
+			RenderWaveTexture();*/
 		}
 
 	}
@@ -697,6 +768,71 @@ public class WorldManager : MonoBehaviour {
 		
 		GameObject shootingStar = (GameObject)Instantiate(shootingStarTemplate, origin, Quaternion.identity);
 		shootingStar.SetActive(true);
+	}
+
+	public void DeformRandom () {
+		// Find camera forward direction (flat)
+		Vector3 forward = Camera.main.transform.forward;
+		forward.y = 0f;
+		forward.Normalize();
+
+		// Define an offset
+		Vector2 r = UnityEngine.Random.insideUnitCircle;
+		Vector3 offset = new Vector3 (400f*r.x, 0f, 400f*r.y);
+
+		// Pick a point
+		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
+			vertexUpdateDistance + offset;
+
+		IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
+		Vertex v = terrain.vertexmap.VertexAt(coords);
+		if (v == null) v = terrain.vertexmap.AddVertex (coords);
+		if (!v.locked) v.SmoothHeight (v.height + heightScale/16f, 0.95f);
+
+		//Debug.Log(v.ToString());
+	}
+
+	public void StartWave () {
+		SetWaveProgress(0f);
+	}
+
+	public void SetWaveProgress (float p) {
+		terrainMaterial.SetFloat("_WaveProgress", p);
+	}
+
+	public void MakeWave (Vector3 pos, float strength, float speed) {
+		waves.Add(
+			new Wave(pos, strength * strength,
+				strength / 2f, strength, speed) 
+		);
+	}
+
+	public void RenderWaveTexture () {
+		//waveTexture = Texture2D.blackTexture;
+		if (waveTexture.width != terrain.vertexmap.width)
+			waveTexture.Resize (terrain.vertexmap.width, terrain.vertexmap.width);
+
+		for (int i=0; i<waveTexture.width; i++) {
+			for (int j=0; j<waveTexture.height; j++) {
+				
+				//if (waveTexture.GetPixel(i,j).r > 0f) continue;
+				waveTexture.SetPixel(i,j, Color.black);
+
+				Vector2 pix = new Vector2 ((float)i, (float)j);
+				foreach (Wave wave in waves) {
+					if (!wave.active) continue;
+					Vector2 center = wave.pixelOrigin(chunkResolution, chunkSize);
+					float dist = Vector2.Distance (center, pix);
+					if (dist <= wave.range + wave.width && dist >= wave.range - wave.width) {
+						//float val = 
+						waveTexture.SetPixel(i,j,Color.white);
+					}
+				}
+			}
+		}
+
+		terrainMaterial.SetTexture ("_WaveTexture", waveTexture);
+			
 	}
 		
 }

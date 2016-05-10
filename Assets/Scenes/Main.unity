@@ -12543,7 +12543,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9461232
+  m_Size: 0.94612306
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20783,7 +20783,7 @@ MonoBehaviour:
   chunkSize: 100
   chunkResolution: 14
   chunkLoadRadius: 4
-  heightScale: 200
+  heightScale: 800
   vertexUpdateDistance: 600
   wind: {x: 0, y: 0, z: 0}
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
@@ -20810,6 +20810,9 @@ MonoBehaviour:
   starEmissionRate: 10
   starEmitter: {fileID: 1592348090}
   shakers: 0
+  waveTexture: {fileID: 0}
+  waveProgress: 1
+  waveSpeed: 0.1
   roadWidth: 10
   roadHeight: 0.5
   roadExtendRadius: 350
@@ -28489,7 +28492,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.499878, y: 23.220947}
+  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -36359,7 +36362,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793876
+  m_Size: 0.9793874
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -146,7 +146,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			Button listing_remove_button = listing_remove.Button();
 			listing_remove_button.onClick.AddListener(()=>{
 				GameManager.instance.MenuClick();
-				MusicManager.instance.currentProject.songs.RemoveAt(num);
+				MusicManager.instance.currentProject.RemoveSong(num);
 				Refresh();
 			});
 

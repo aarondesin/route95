@@ -1,8 +1,12 @@
 ﻿Shader "Custom/VertexBlend" {
 
 	Properties {
+		_WaveOrigin ("WaveOrigin", Vector) = (0,0,0,0)
+		_WaveDistance ("WaveDistance", Float) = 1
+		_WaveWidth ("WaveWidth", Float) = 3
 		_Texture1 ("Texture1", 2D) = ""
 		_Texture2 ("Texture2", 2D) = ""
+		_WaveTexture ("WaveTexture", 2D) = ""
 		//_Bump ("Bumpmap", 2D) = ""
 	}
 
@@ -19,13 +23,19 @@
 			float4 vertexColor;
 		};
 
-		struct v2f {
-			float4 pos : SV_POSITION;
-			fixed4 color : COLOR;
-		};
+		//struct v2f {
+		//	float4 pos : SV_POSITION;
+		//	fixed4 color : COLOR;
+		//};
+
+		float _WaveOrigin;
+		float _WaveProgress;
+		sampler2D _WaveTexture;
 
 		void vert (inout appdata_full v, out Input o) {
 			UNITY_INITIALIZE_OUTPUT (Input, o);
+			//v.vertex.y += (1-_WaveProgress) * distance (_WaveOrigin, v.vertex);
+			v.vertex.y += tex2Dlod (_WaveTexture, float4 (v.texcoord.xy, 0, 0)).r;
 			o.vertexColor = v.color;
 		}
 

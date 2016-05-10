@@ -76,7 +76,7 @@ public class Chunk {
 
 			// Init normal/color
 			normals [i] = Vector3.up;
-			colors[i] = new Color (0f, 0f, 0f, 0.5f);
+			colors[i] = new Color (1f, 1f, 1f, 0.5f);
 
 			// Get VMap coords
 			IntVector2 coords = IntToV2 (i);
@@ -338,11 +338,11 @@ public class Chunk {
 					              WorldManager.instance.heightScale;
 
 					// If new height, set it
-					if (newY != verts [v].y) vmap.SetHeight (coords, newY);
+					if (newY != vmap.VertexAt(coords).height) vmap.SetHeight (coords, newY);
 				}
 			}
 
-			if (v == numVerts) {
+			if (v == numVerts-1) {
 				isUpdatingVerts = false;
 				yield break;
 			} else if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {

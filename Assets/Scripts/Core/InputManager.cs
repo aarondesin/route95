@@ -140,13 +140,25 @@ public class InputManager : MonoBehaviour {
 							if (noteIndex >= 0) {
 								Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
 								note.PlayNote(source, false);
-								if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
-								else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
-								else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
-								else if (note.IsShaker()) WorldManager.instance.shakers++;
-								else if (note.IsHat()) WorldManager.instance.StarBurst();
-								else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
-								else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+
+								if (inst.type == Instrument.Type.Percussion) {
+									if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
+									else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
+									else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
+									else if (note.IsShaker()) WorldManager.instance.shakers++;
+									else if (note.IsHat()) WorldManager.instance.StarBurst();
+									else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+									else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+								} else {
+									if (inst.codeName == "ElectricBass") {
+										//WorldManager.instance.StartWave();
+										//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
+										WorldManager.instance.DeformRandom();
+									} else {
+										
+									}
+								}
+
 							}
 						} else if (song != null && song.scale != -1 && song.key != Key.None) {
 

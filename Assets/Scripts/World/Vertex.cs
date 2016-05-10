@@ -31,6 +31,8 @@ public class VertexMap {
 	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
 	float NEARBY_ROAD_DISTANCE;
 
+	float roadHeight;
+
 	float chunkSize;
 	int chunkRes;
 	int chunkRadius; 
@@ -44,6 +46,7 @@ public class VertexMap {
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
+		roadHeight = WorldManager.instance.roadHeight;
 		width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Vertex[width,width];
@@ -176,7 +179,7 @@ public class VertexMap {
 					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
 
 					if (vert.nearRoad && !vert.locked) {
-						vert.SmoothHeight(roadPoint.y);
+						vert.SmoothHeight(roadPoint.y-roadHeight, 0.95f);
 						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
 						foreach (GameObject decoration in decorationDeletes) 
 							WorldManager.instance.RemoveDecoration(decoration);
@@ -295,6 +298,11 @@ public class VertexMap {
 
 	//
 
+	public Vertex AddVertex (IntVector2 i) {
+		AddVertex (i.x, i.y);
+		return VertexAt(i);
+	}
+
 	void AddVertex (int x, int y) {
 		//AddVertex (new Vertex (x, y));
 		while (x+width/2 >= width || y+width/2 >= width) {
@@ -369,35 +377,37 @@ public class Vertex {
 		chunkSize = WorldManager.instance.chunkSize;
 	}
 
-	public void SmoothHeight (float h) {
+	public void SmoothHeight (float h, float factor) {
 		SetHeight (h);
 		Vertex l = map.LeftNeighbor (this);
-		if (l != null && !l.locked) l.Smooth (h, 0.5f);
+		if (l != null && !l.locked) l.Smooth (h, factor);
 
 		Vertex r = map.RightNeighbor (this);
-		if (r != null && !r.locked) r.Smooth (h, 0.5f);
+		if (r != null && !r.locked) r.Smooth (h, factor);
 
 		Vertex d = map.DownNeighbor (this);
-		if (d != null && !d.locked) d.Smooth (h, 0.5f);
+		if (d != null && !d.locked) d.Smooth (h, factor);
 
 		Vertex u = map.UpNeighbor (this);
-		if (u != null && !u.locked) u.Smooth (h, 0.5f);
+		if (u != null && !u.locked) u.Smooth (h, factor);
+
+		float factor_squared = factor * factor;
 
 		if (u != null) {
 			Vertex ul = map.LeftNeighbor (u);
-			if (ul != null && !ul.locked) ul.Smooth (h, 0.3f);
+			if (ul != null && !ul.locked) ul.Smooth (h, factor_squared);
 
 			Vertex ur = map.RightNeighbor (u);
-			if (ur != null && !ur.locked) ur.Smooth (h, 0.3f);
+			if (ur != null && !ur.locked) ur.Smooth (h, factor_squared);
 		}
 
 		if (d != null) {
 
 			Vertex dl = map.LeftNeighbor (d);
-			if (dl != null && !dl.locked) dl.Smooth (h, 0.3f);
+			if (dl != null && !dl.locked) dl.Smooth (h, factor_squared);
 
 			Vertex dr = map.RightNeighbor (d);
-			if (dr != null && !dr.locked) dr.Smooth (h, 0.3f);
+			if (dr != null && !dr.locked) dr.Smooth (h, factor_squared);
 		}
 	}
 
@@ -407,6 +417,7 @@ public class Vertex {
 
 		
 	public void SetHeight (float h) {
+		if (locked) return;
 		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
 		height = h;
 		slope = 0f;

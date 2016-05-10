@@ -153,6 +153,8 @@ public class Riff {
 	public bool Toggle (Note newNote, int pos) {
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
+		Instrument instrument = Instrument.AllInstruments[instrumentIndex];
+
 		// Lookup
 		if (Lookup(newNote, pos)) {
 				// Note with same sound is already there
@@ -161,16 +163,25 @@ public class Riff {
 		}
 		// Note not already there
 		beat.Add (newNote);
-		AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+		AudioSource source = MusicManager.instance.instrumentAudioSources[instrument];
 		newNote.PlayNote(source);
 
-		if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
-		else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
-		else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
-		else if (newNote.IsShaker()) WorldManager.instance.shakers++;
-		else if (newNote.IsHat()) WorldManager.instance.StarBurst();
-		else if (newNote.IsCymbal()) WorldManager.instance.ShootingStar();
-		else if (newNote.IsWood()) WorldManager.instance.ExhaustPuff();
+		if (instrument.type == Instrument.Type.Percussion) {
+			if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
+			else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
+			else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
+			else if (newNote.IsShaker()) WorldManager.instance.shakers++;
+			else if (newNote.IsHat()) WorldManager.instance.StarBurst();
+			else if (newNote.IsCymbal()) WorldManager.instance.ShootingStar();
+			else if (newNote.IsWood()) WorldManager.instance.ExhaustPuff();
+		} else {
+			if (instrument == MelodicInstrument.ElectricBass) {
+				//WorldManager.instance.StartWave();
+				//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
+				WorldManager.instance.DeformRandom();
+			} else {
+			}
+		}
 		return true;
 	}
 	public void PlayRiffLoop (AudioClip clip) {
@@ -184,8 +195,9 @@ public class Riff {
 		try {
 			Song song = MusicManager.instance.currentSong;
 			Beat beat = song.beats[beatIndices[pos]];
+			Instrument instrument = Instrument.AllInstruments[instrumentIndex];
 			if (beat.NumNotes() != 0) {
-				AudioSource source = MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]];
+				AudioSource source = MusicManager.instance.instrumentAudioSources[instrument];
 				source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
 				source.GetComponent<AudioTremoloFilter>().depth = tremoloDepth;
 				source.GetComponent<AudioTremoloFilter>().rate = tremoloRate;
@@ -200,17 +212,26 @@ public class Riff {
 				source.GetComponent<AudioFlangerFilter>().rate = flangerRate;
 				source.GetComponent<AudioFlangerFilter>().dryMix = flangerDryMix;
 
-				if (cutSelf) MusicManager.instance.instrumentAudioSources[Instrument.AllInstruments[instrumentIndex]].Stop();
+				if (cutSelf) MusicManager.instance.instrumentAudioSources[instrument].Stop();
 				foreach (Note note in beat.notes) {
-					
 					note.PlayNote(source, volume);
-					if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
-					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
-					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
-					else if (note.IsShaker()) WorldManager.instance.shakers++;
-					else if (note.IsHat()) WorldManager.instance.StarBurst();
-					else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
-					else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+
+					if (instrument.type == Instrument.Type.Percussion) {
+						if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
+						else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
+						else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
+						else if (note.IsShaker()) WorldManager.instance.shakers++;
+						else if (note.IsHat()) WorldManager.instance.StarBurst();
+						else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+						else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+					} else {
+						if (instrument == MelodicInstrument.ElectricBass) {
+							//WorldManager.instance.StartWave();
+							//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
+							WorldManager.instance.DeformRandom();
+						} else {
+						}
+					}
 				}
 			}
 		} catch (ArgumentOutOfRangeException) {
