@@ -12543,7 +12543,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94612306
+  m_Size: 0.9461232
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20816,9 +20816,6 @@ MonoBehaviour:
   starEmissionRate: 10
   starEmitter: {fileID: 1592348090}
   shakers: 0
-  waveTexture: {fileID: 0}
-  waveProgress: 1
-  waveSpeed: 0.1
   roadWidth: 10
   roadHeight: 0.5
   roadExtendRadius: 350
@@ -21632,14 +21629,14 @@ ReflectionProbe:
   m_Mode: 1
   m_RefreshMode: 1
   m_TimeSlicingMode: 2
-  m_Resolution: 128
+  m_Resolution: 256
   m_UpdateFrequency: 0
   m_Importance: 1
   m_BoxSize: {x: 10, y: 2.4, z: 10}
   m_BoxOffset: {x: 0, y: -0.20205665, z: 0}
   m_NearClip: 4.1
   m_FarClip: 50
-  m_ShadowDistance: 50
+  m_ShadowDistance: 25
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_CullingMask:
@@ -28492,7 +28489,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
+  m_AnchoredPosition: {x: 17.499878, y: 23.220947}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -28572,7 +28569,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1277712145
 Transform:
   m_ObjectHideFlags: 0
@@ -36362,7 +36359,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793874
+  m_Size: 0.9793876
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

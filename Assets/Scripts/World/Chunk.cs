@@ -8,23 +8,28 @@ using System.Collections.Generic;
  * This un/loading will be taken care of by the DynamicTerrain class. 
  */
 
-public class Chunk {
+public class Chunk: MonoBehaviour {
 
 	#region Chunk Vars
 
+	DynamicTerrain terrain;
+	VertexMap vmap;
+	int chunkRes;
+	float chunkSize;
 	public GameObject chunk; // Chunk object/mesh
 	public GameObject grassEmitter;
 	public int x; //x position in chunk grid
 	public int y; //y position in chunk grid
 	public float priority = 0f;
 
-	bool hasCheckedForRoad = false;
+	public bool hasCheckedForRoad = false;
 	public bool hasRoad = false;  // Chunk has road on it
 	public bool nearRoad = false; // Chunk is within one chunk distance of a road
 
 	Mesh colliderMesh;
 	public Mesh mesh;
 	Vector3[] verts;
+	IntVector2[] coords;
 	//bool[] constrained;
 	int numVerts;
 	Vector3[] normals;
@@ -36,20 +41,29 @@ public class Chunk {
 	public bool needsColliderUpdate = false;
 	public bool needsColorUpdate = false;
 
+	public List<GameObject> decorations;
+
 	#endregion
 	#region Chunk Methods
 
-	public Chunk (int x, int y) {
+	public void Initialize (int x, int y) {
 		this.x = x;
 		this.y = y;
 
-		VertexMap vmap = DynamicTerrain.instance.vertexmap;
-		int chunkRes = WorldManager.instance.chunkResolution;
-		float chunkSize = WorldManager.instance.chunkSize;
+
+
+		// Init vars
+		terrain = DynamicTerrain.instance;
+		vmap = DynamicTerrain.instance.vertexmap;
+		chunkRes = WorldManager.instance.chunkResolution;
+		chunkSize = WorldManager.instance.chunkSize;
 
 		// Generate vertices
 		verts = CreateUniformVertexArray (chunkRes);
 		numVerts = verts.Length;
+
+		//
+		coords = new IntVector2[numVerts];
 
 		// Init normals
 		normals = new Vector3[numVerts];
@@ -63,12 +77,49 @@ public class Chunk {
 		// Init colors
 		colors = new Color[numVerts];
 
+		mesh = CreateChunkMesh();
+
 		// Create GameObject
-		chunk = CreateChunk (verts, normals, uvs, triangles);
-		chunk.name += "Position:"+chunk.transform.position.ToString();
+		//chunk = CreateChunk (verts, normals, uvs, triangles);
+		//chunk.name += "Position:"+chunk.transform.position.ToString();
 
 		// Move GameObject
-		chunk.transform.position += new Vector3 (x * chunkSize, 0f, y * chunkSize);
+		transform.position = new Vector3 (x * chunkSize - chunkSize/2f, 0f, y * chunkSize - chunkSize/2f);
+
+		gameObject.name = "Chunk ("+x+","+y+") Position:"+transform.position.ToString();
+
+		// Register all vertices with vertex map
+		// Move vertices, generate normals/colors
+		for (int i=0; i<numVerts; i++) {
+
+			// Init normal/color
+			normals [i] = Vector3.up;
+			colors[i] = new Color (1f, 1f, 1f, 0.5f);
+
+			// Get VMap coords
+			IntVector2 coord = IntToV2 (i);
+			coords[i] = coord;
+
+			// Get corresponding vertex
+			Vertex vert = vmap.VertexAt(coord.x, coord.y);
+
+			// Get height from vertex
+			if (vert != null) UpdateVertex (i, vert.height);
+
+			// Register vertex
+			vmap.RegisterChunkVertex (coord, new IntVector2(x, y), i);
+		}
+
+		decorations = new List<GameObject>();
+	}
+
+	public void Reuse (int x, int y) {
+		this.x = x;
+		this.y = y;
+
+		transform.position = new Vector3 (x * chunkSize - chunkSize/2f, 0f, y * chunkSize - chunkSize/2f);
+
+		gameObject.name = "Chunk ("+x+","+y+") Position:"+transform.position.ToString();
 
 		// Register all vertices with vertex map
 		// Move vertices, generate normals/colors
@@ -88,8 +139,10 @@ public class Chunk {
 			if (vert != null) UpdateVertex (i, vert.height);
 
 			// Register vertex
-			vmap.RegisterChunkVertex (coords, this, i);
+			vmap.RegisterChunkVertex (coords, new IntVector2(x, y), i);
 		}
+
+		decorations.Clear();
 	}
 
 	/// <summary>
@@ -170,45 +223,38 @@ public class Chunk {
 	/// <param name="normals">Normals.</param>
 	/// <param name="UVcoords">U vcoords.</param>
 	/// <param name="triangles">Triangles.</param>
-	GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
+	//GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
+	Mesh CreateChunkMesh() {
 		float chunkSize = WorldManager.instance.chunkSize;
 
-		// Create GameObject
-		GameObject chunk = new GameObject ("Chunk ("+x+","+y+")", 
-			typeof(MeshFilter), 
-			typeof(MeshRenderer),
-			typeof(MeshCollider),
-			typeof(Rigidbody)
-		);
-
 		// Move GameObject
-		chunk.transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
+		transform.position = new Vector3 (-chunkSize/2, 0, -chunkSize/2);
 
 		// Create mesh
-		mesh = new Mesh();
-		mesh.MarkDynamic ();
-		mesh.vertices = vertices;
-		mesh.normals = normals;
-		mesh.uv = UVcoords;
-		mesh.triangles = triangles;
-		mesh.colors = colors;
+		Mesh chunkMesh = new Mesh();
+		chunkMesh.MarkDynamic ();
+		chunkMesh.vertices = verts;
+		chunkMesh.normals = normals;
+		chunkMesh.uv = uvs;
+		chunkMesh.triangles = triangles;
+		chunkMesh.colors = colors;
 
 		// Assign mesh
-		chunk.GetComponent<MeshFilter>().mesh = mesh;
+		GetComponent<MeshFilter>().mesh = chunkMesh;
 
 		// Assign material
-		MeshRenderer renderer = chunk.GetComponent<MeshRenderer> ();
+		MeshRenderer renderer = GetComponent<MeshRenderer> ();
 		renderer.material = WorldManager.instance.terrainMaterial;
 		renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
 		// Assign collision mesh
-		MeshCollider collider = chunk.GetComponent<MeshCollider>();
+		MeshCollider collider = GetComponent<MeshCollider>();
 		collider.sharedMesh = mesh;
 		collider.convex = false;
 
 		// Init rigidbody
-		Rigidbody rigidbody = chunk.GetComponent<Rigidbody>();
+		Rigidbody rigidbody = GetComponent<Rigidbody>();
 		rigidbody.freezeRotation = true;
 		rigidbody.isKinematic = true;
 		rigidbody.useGravity = false;
@@ -216,7 +262,7 @@ public class Chunk {
 
 		// Add grass system
 		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
-		grassEmitter.transform.parent = chunk.transform;
+		grassEmitter.transform.parent = transform;
 		grassEmitter.transform.position += new Vector3 (-chunkSize/2f, 0f, -chunkSize/2f);
 
 		// Randomize grass density
@@ -232,7 +278,7 @@ public class Chunk {
 		ParticleSystem.EmissionModule emit = sys.emission;
 		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
 
-		return chunk;
+		return chunkMesh;
 	}
 
 	/// <summary>
@@ -252,7 +298,7 @@ public class Chunk {
 		mesh.RecalculateBounds();
 
 		// Reassign collider mesh
-		chunk.GetComponent<MeshCollider> ().sharedMesh = mesh;
+		GetComponent<MeshCollider> ().sharedMesh = mesh;
 
 		// Replace decorations
 		ReplaceDecorations();
@@ -306,25 +352,26 @@ public class Chunk {
 		float margin = WorldManager.instance.chunkSize / 2;
 		VertexMap vmap = DynamicTerrain.instance.vertexmap;
 		float startTime = Time.realtimeSinceStartup;
+		Vector3 playerPos = PlayerMovement.instance.transform.position;
+		Vector3 chunkPos = transform.position;
 
 		int v = 0;
 		for (; v < numVerts; v++) {
 	
 			// Get VMap coordinates
-			IntVector2 coords = IntToV2 (v);
+			IntVector2 coord = coords[v];
 
 			// Get cooresponding vertex
-			Vertex vert = vmap.VertexAt(coords.x,coords.y);
+			Vertex vert = vmap.VertexAt(coord.x,coord.y);
 
 			// Update vertex height
 			UpdateVertex (v, vert.height);
 
 			// If vertex is not locked and there is frequency data to use
-			if (!vmap.VertexAt (coords).locked && DynamicTerrain.instance.freqData != null) { 
+			if (!vmap.VertexAt (coord).locked && DynamicTerrain.instance.freqData != null) { 
 
 				// Distance between player and vertex
-				Vector3 playerPos = PlayerMovement.instance.transform.position;
-				Vector3 vertPos = chunk.transform.position + verts [v];
+				Vector3 vertPos = chunkPos + verts [v];
 				float distance = Vector3.Distance (vertPos, playerPos);
 
 				// If vertex is close enough
@@ -338,7 +385,7 @@ public class Chunk {
 					              WorldManager.instance.heightScale;
 
 					// If new height, set it
-					if (newY != vmap.VertexAt(coords).height) vmap.SetHeight (coords, newY);
+					if (newY != vmap.VertexAt(coord).height) vmap.SetHeight (coord, newY);
 				}
 			}
 
@@ -355,7 +402,7 @@ public class Chunk {
 
 	}
 
-	public void Update (){
+	public void ChunkUpdate (){
 		//if (needsColliderUpdate) UpdateCollider();
 		if (!hasCheckedForRoad) {
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
@@ -392,7 +439,7 @@ public class Chunk {
 
 	public void CheckForRoad (float startProgress) {
 		hasCheckedForRoad = true;
-		Vector3 chunkPos = chunk.transform.position;
+		Vector3 chunkPos = transform.position;
 		float chunkSize = WorldManager.instance.chunkSize;
 		float checkResolution = (1f - startProgress) * WorldManager.instance.roadPathCheckResolution;
 
@@ -424,17 +471,19 @@ public class Chunk {
 			Vector3 sample = road.GetPoint(progress);
 			if (sample.x >= nearMin.x && sample.x <= nearMax.x &&
 				sample.z >= nearMin.y && sample.z <= nearMax.y) {
-				if (!nearRoad) chunk.name += "|nearRoad";
+				if (!nearRoad) gameObject.name += "|nearRoad";
 				nearRoad = true;
 				if (sample.x >= hasMin.x && sample.x <= hasMax.x &&
 					sample.z >= hasMin.y && sample.z <= hasMax.y) {
 					hasRoad = true;
-					chunk.name += "|hasRoad";
+					gameObject.name += "|hasRoad";
 					return;
 				}
 			}
 			progress += 1f / checkResolution;
 		}
+
+		if (nearRoad) terrain.RegisterChunk(this);
 	}
 
 	public static IntVector2 ToNearestVMapCoords (float x, float y) {
@@ -455,17 +504,29 @@ public class Chunk {
 		return new IntVector2 (xi, yi);
 	}
 
-	// Shifts all decorations on a chunk
+	/// <summary>
+	/// Resets height of all decorations on a chunk
+	/// </summary>
 	public void ReplaceDecorations () {
-		//chunk.GetComponent<MeshCollider>().sharedMesh = chunk.GetComponent<MeshFilter>().mesh;
-		foreach (Transform tr in chunk.GetComponentsInChildren<Transform>()) {
-			if (tr == chunk.transform || tr == grassEmitter.transform) continue;
-			if (tr.gameObject.GetComponent<Decoration>().dynamic) continue;
+		foreach (Transform tr in GetComponentsInChildren<Transform>()) {
+
+			// Skip chunk itself
+			if (tr == transform || tr == grassEmitter.transform) continue;
+
+			// Raycast down
 			RaycastHit hit;
-			if (Physics.Raycast(new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z), Vector3.down,out hit, Mathf.Infinity)) {
+			Vector3 rayOrigin = new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z);
+			if (Physics.Raycast(rayOrigin, Vector3.down,out hit, Mathf.Infinity))
 				tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);
-			}
 		}
+	}
+
+	/// <summary>
+	/// Removes and pools all decorations on the chunk.
+	/// </summary>
+	public void RemoveDecorations () {
+		foreach (GameObject decoration in decorations)
+			WorldManager.instance.RemoveDecoration(decoration);
 	}
 
 	#endregion

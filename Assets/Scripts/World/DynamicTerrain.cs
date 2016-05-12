@@ -18,7 +18,7 @@ public class DynamicTerrain {
 	public List<Chunk> activeCloseToRoadChunks;
 
 	public VertexMap vertexmap;
-	public Dictionary<int, Dictionary<int, Chunk>> chunkmap;
+	public Map<Chunk> chunkmap;
 
 	public LinInt freqData;
 	public int freqSampleSize = 128;
@@ -27,11 +27,15 @@ public class DynamicTerrain {
 	//private Dictionary<Chunk, int> chunkPriorities;
 	List<Chunk> chunksToUpdate;
 
+	ObjectPool chunkPool;
 	float chunkSize;
 	int chunkRes;
 	int chunkLoadRadius;
 
 	bool initialLoad = true;
+
+	Vector3 playerPos;
+	IntVector2 playerChunkPos;
 
 	#endregion
 	#region DynamicTerrain Methods
@@ -40,29 +44,51 @@ public class DynamicTerrain {
 		instance = this;
 		terrain = new GameObject ("Terrain");
 		terrain.transform.position = new Vector3 (0f, 0f, 0f);
-		//terrain.transform.localScale = new Vector3 (10f, 10f, 10f);
+
+		chunkSize = WorldManager.instance.chunkSize;
+		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
 
 		vertexmap = new VertexMap();
-		chunkmap = new Dictionary<int, Dictionary< int, Chunk>> ();
+		vertexmap.terrain = this;
+		chunkmap = new Map<Chunk>(chunkLoadRadius*2);
 
 		activeChunks = new List<Chunk>();
 		activeRoadChunks = new List<Chunk>();
 		activeCloseToRoadChunks = new List<Chunk>();
 
-		//chunkPriorities = new Dictionary<Chunk, int>();
+		chunkPool = new ObjectPool();
 
-		chunkSize = WorldManager.instance.chunkSize;
-		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
+		playerChunkPos = new IntVector2(0, 0);
 	}
 
-	Chunk CreateChunk(int x, int y){
-		Chunk newChunk = new Chunk(x, y);
-		newChunk.chunk.transform.parent = terrain.transform;
+	GameObject CreateChunk(int x, int y){
+		GameObject newChunk;
+		Chunk chunk;
+		if (chunkPool.Empty) {
+			newChunk = new GameObject ("", 
+				typeof(MeshFilter), 
+				typeof(MeshRenderer),
+				typeof(MeshCollider),
+				typeof(Rigidbody),
+				typeof(Chunk)
+			);
+			newChunk.transform.parent = terrain.transform;
+			chunk = newChunk.GetComponent<Chunk>();
+			chunk.Initialize(x, y);
+		} else {
+			newChunk = chunkPool.Get();
+			newChunk.transform.parent = terrain.transform;
+			chunk = newChunk.GetComponent<Chunk>();
+			chunk.Reuse(x, y);
+		}
+
 		//chunkPriorities.Add(newChunk, 0);
 		return newChunk;
 	}
 
 	public void DoLoadChunks () {
+		// Init chunk pool
+
 		WorldManager.instance.StartCoroutine(UpdateChunks());
 	}
 
@@ -77,22 +103,27 @@ public class DynamicTerrain {
 
 		while (true) {
 
-			if (!initialLoad) freqData = UpdateFreqData ();
+			if (!initialLoad) UpdateFreqData ();
 
-			List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
-			List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
-			CreateChunkLists (xChunks, yChunks);
-			if (initialLoad) chunksToLoad = xChunks.Count * yChunks.Count;
+			//List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
+			//List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
+			//CreateChunkLists (xChunks, yChunks);
+			//if (initialLoad) chunksToLoad = xChunks.Count * yChunks.Count;
+			if (initialLoad) chunksToLoad = (chunkLoadRadius*2+1) * (chunkLoadRadius*2+1);
 
+			if (!initialLoad) DeleteChunks();
 
-			foreach (int x in xChunks) {
-				if (!chunkmap.ContainsKey(x)) chunkmap.Add (x, new Dictionary<int, Chunk>());
-				foreach (int y in yChunks) {
-					if (!chunkmap[x].ContainsKey(y)) chunkmap[x].Add (y, null);
-					if (chunkmap[x][y] == null) {
-						Chunk chunk = CreateChunk (x, y);
+			//foreach (int x in xChunks) {
+			//	foreach (int y in yChunks) {
+			playerPos = PlayerMovement.instance.transform.position;
+			playerChunkPos.x = (int)Mathf.RoundToInt((playerPos.x - chunkSize/2f) / chunkSize);
+			playerChunkPos.y = (int)Mathf.RoundToInt((playerPos.z -chunkSize/2f) / chunkSize);
+			for (int x=playerChunkPos.x - chunkLoadRadius; x<=playerChunkPos.x + chunkLoadRadius; x++) {
+				for (int y=playerChunkPos.y - chunkLoadRadius; y<=playerChunkPos.y + chunkLoadRadius; y++) {
+					if (chunkmap.At(x,y) == null) {
+						Chunk chunk = CreateChunk (x, y).GetComponent<Chunk>();
 						activeChunks.Add (chunk);
-						chunkmap[x][y] = chunk;
+						chunkmap.Set(x, y, chunk);
 
 						if (initialLoad) numLoaded++;
 
@@ -108,8 +139,6 @@ public class DynamicTerrain {
 				}
 			}
 
-			if (!initialLoad) DeleteChunks (xChunks, yChunks);
-
 			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
@@ -117,7 +146,7 @@ public class DynamicTerrain {
 
 			if (initialLoad && activeChunks.Count == chunksToLoad) {
 				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
-				int res = vertexmap.vertices.GetLength(0);
+				int res = vertexmap.vertices.Width;
 				CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
 				initialLoad = false;
 				WorldManager.instance.DoLoadRoad();
@@ -142,11 +171,13 @@ public class DynamicTerrain {
 						}
 					}
 				}
+
+				int listLength = chunksToUpdate.Count;
 					
-				if (chunksToUpdate.Count > 0) {
-					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
+				if (listLength > 0) {
+					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < listLength; i++) {
 						try {
-							chunksToUpdate [i].Update ();
+							chunksToUpdate [i].ChunkUpdate ();
 							chunksToUpdate[i].priority = 0;
 						}catch (ArgumentOutOfRangeException a) {
 							Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
@@ -176,20 +207,20 @@ public class DynamicTerrain {
 	float DistanceToPlayer (Chunk chunk) {
 		return Vector3.Distance (
 			new Vector3 (chunk.x*chunkSize +chunkSize/2, 0f, chunk.y*chunkSize+chunkSize/2),
-			new Vector3 (PlayerMovement.instance.transform.position.x, 0f, PlayerMovement.instance.transform.position.z)
+			new Vector3 (playerPos.x, 0f, playerPos.z)
 		);
 	}
 
 	bool InView (Chunk chunk) {
 		bool result = Vector3.Angle(
-			(chunk.chunk.transform.position-Camera.main.gameObject.transform.position), 
+			(chunk.gameObject.transform.position-Camera.main.gameObject.transform.position), 
 			Camera.main.transform.forward
 		) < Camera.main.fieldOfView/2f;
 		return result;
 
 	}
 		
-	LinInt UpdateFreqData () {
+	void UpdateFreqData () {
 		float[] data = new float[freqSampleSize];
 		List<AudioSource> sources = new List<AudioSource>(); //InputManager.instance.audioSources;
 		sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
@@ -207,7 +238,8 @@ public class DynamicTerrain {
 				}
 			}
 		}
-		return new LinInt (data);
+		if (freqData == null) freqData = new LinInt();
+		freqData.Update(data);
 	}
 		
 	public void TranslateWorld (Vector3 offset){
@@ -220,36 +252,78 @@ public class DynamicTerrain {
 
 	// Gives a random chunk (for decoration testing)
 	public Chunk RandomChunk () {
-		if (activeChunks.Count == 0) return null;
-		return activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
+		if (activeChunks.Count == 0) {
+			Debug.LogError("DynamicTerrain.RandomChunk(): no active chunks!");
+			return null;
+		}
+
+		Chunk chunk = activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
+
+		if (chunk == null) {
+			Debug.LogError("DynamicTerrain.RandomChunk(): tried to return null chunk!");
+			return null;
+		}
+
+		return chunk;
 	}
 
 	// Returns a random chunk with road on it
 	public Chunk RandomRoadChunk() {
-		return activeRoadChunks[UnityEngine.Random.Range(0, activeRoadChunks.Count)];
+		if (activeRoadChunks.Count == 0) {
+			Debug.LogError("DynamicTerrain.RandomRoadChunk(): no active road chunks!");
+			return null;
+		}
+
+		Chunk chunk = activeRoadChunks[UnityEngine.Random.Range(0, activeRoadChunks.Count)];
+
+		if (chunk == null) {
+			Debug.LogError("DynamicTerrain.RandomRoadChunk(): tried to return null chunk!");
+			return null;
+		}
+			
+		return chunk;
 	}
 
 	public Chunk RandomCloseToRoadChunk() {
-		if (activeCloseToRoadChunks.Count == 0) return null;
-		return activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
+		if (activeCloseToRoadChunks.Count == 0) {
+			Debug.LogError("DynamicTerrain.RandomCloseToRoadChunk(): no active close to road chunks!");
+			return null;
+		}
+
+		Chunk chunk = activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
+
+		if (chunk == null) {
+			Debug.LogError("DynamicTerrain.RandomCloseToRoadChunk(): tried to return null chunk!");
+			return null;
+		}
+
+		return chunk;
+	}
+
+	public void RegisterChunk (Chunk chunk) {
+		if (chunk.nearRoad) {
+			if (chunk.hasRoad) activeRoadChunks.Add(chunk);
+			activeCloseToRoadChunks.Add(chunk);
+		}
 	}
 
 	public void CheckAllChunksForRoad() {
-		foreach (Chunk chunk in activeChunks) {
+		foreach (Chunk chunk in activeChunks)
 			chunk.CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
-			if (chunk.nearRoad) {
-				//Debug.Log("added");
-				if (chunk.hasRoad) activeRoadChunks.Add(chunk);
-				activeCloseToRoadChunks.Add(chunk);
-			}
+	}
+
+	public void OnExtendRoad () {
+		foreach (Chunk chunk in activeChunks) {
+			if (!chunk.nearRoad) chunk.hasCheckedForRoad = false;
 		}
 	}
 
 	//populates lists of chunk coords to be loaded
 	void CreateChunkLists(List<int> xChunks, List<int> yChunks){
-		Vector3 playerPos = PlayerMovement.instance.transform.position;
+		playerPos = PlayerMovement.instance.transform.position;
 		int playerChunkX = (int)Math.Floor((playerPos.x - this.terrain.transform.position.x) / chunkSize);
 		int playerChunkY = (int)Math.Floor((playerPos.z - this.terrain.transform.position.z) / chunkSize);
+		if (UnityEngine.Random.Range(0,100) == 0) Debug.Log("player at "+ playerChunkX + " "+playerChunkY);
 		xChunks.Add (playerChunkX);
 		yChunks.Add (playerChunkY);
 		for (int i = 1; i <= chunkLoadRadius; i++){
@@ -262,30 +336,37 @@ public class DynamicTerrain {
 	}
 
 	void DeleteChunk(Chunk chunk){
-		//vertexmap.UnregisterChunkVertex(
-		//chunkPriorities.Remove(chunk);
+
+		// Remove all decorations on chunk
+		chunk.RemoveDecorations();
+
+		// Deregister from lists/map
+		DeregisterChunk(chunk);
+
+		// Destroy chunk
+		chunkPool.Add(chunk.gameObject);
+
+	}
+
+	void DeleteChunks () {
+		List<Chunk> deletions = new List<Chunk>();
+
+		foreach (Chunk chunk in activeChunks) {
+			if (chunk.x < playerChunkPos.x - chunkLoadRadius || chunk.x > playerChunkPos.x + chunkLoadRadius ||
+				chunk.y < playerChunkPos.y - chunkLoadRadius || chunk.y > playerChunkPos.y + chunkLoadRadius)
+					deletions.Add(chunk);
+		}
+		foreach (Chunk chunk in deletions) DeleteChunk (chunk);
+	}
+
+	public void DeregisterChunk (Chunk chunk) {
 		activeChunks.Remove(chunk);
 		if (chunk.nearRoad) {
 			activeCloseToRoadChunks.Remove(chunk);
 			if (chunk.hasRoad) activeRoadChunks.Remove(chunk);
 		}
-
-		UnityEngine.Object.Destroy(chunk.chunk);
-		int numChildren = chunk.chunk.transform.childCount;
-		WorldManager.instance.DecNumDeco (numChildren);
-		chunkmap[chunk.x][chunk.y] = null;
-	}
-
-	void DeleteChunks(List<int> xChunks, List<int> yChunks) {
-		List<Chunk> deletions = new List<Chunk>();
-		foreach (Chunk chunk in activeChunks) {
-			//if chunk is not in chunks to be loaded
-			if (!(xChunks.Contains(chunk.x) && yChunks.Contains(chunk.y))) {
-				deletions.Add(chunk);
-
-			}
-		}
-		foreach (Chunk chunk in deletions) DeleteChunk (chunk);
+		chunk.transform.parent = null;
+		chunkmap.Set(chunk.x, chunk.y, null);
 	}
 
 	public void Update(float[] freqDataArray){

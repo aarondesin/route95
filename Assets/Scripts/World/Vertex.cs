@@ -23,11 +23,9 @@ public class IntVector2 {
 	}
 }
 
-public class VertexMap {
-	//public Dictionary<int, Dictionary<int, Vertex>> vertices; 
-	public Vertex[,] vertices;
-	public int width;
-
+public class VertexMap { 
+	public Map<Vertex> vertices;
+	public DynamicTerrain terrain;
 	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
 	float NEARBY_ROAD_DISTANCE;
 
@@ -47,9 +45,9 @@ public class VertexMap {
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
 		roadHeight = WorldManager.instance.roadHeight;
-		width = chunkRadius*(chunkRes-1);
+		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
-		vertices = new Vertex[width,width];
+		vertices = new Map<Vertex>(width);
 	}
 
 	//
@@ -61,6 +59,7 @@ public class VertexMap {
 
 	public bool ContainsVertex (int x, int y) {
 		if (vertices == null) return false;
+		int width = vertices.Width;
 		if (x >= width || y >= width) return false;
 		if (VertexAt(x,y) == null) return false;
 		return true;
@@ -154,23 +153,24 @@ public class VertexMap {
 		float startTime = Time.realtimeSinceStartup;
 		float xWPos;
 		float yWPos;
+		int width = vertices.Width;
 
 		foreach (Vector3 roadPoint in roadPoints) {
 			for (int x = 0; x<width; x++) {
 
 				// Skip if impossible for a point to be in range
-				xWPos = (x-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f;
+				xWPos = (x) * chunkSize/(chunkRes-1) - chunkSize/2f;
 				if (Mathf.Abs(xWPos - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
 					continue;
 
 				for (int y=0; y<width; y++) {
 
 					// Skip if impossible for a point to be in range
-					yWPos = (y-width/2) * chunkSize/(chunkRes-1) - chunkSize/2f ;
+					yWPos = (y) * chunkSize/(chunkRes-1) - chunkSize/2f ;
 					if (Mathf.Abs(yWPos- roadPoint.z) > NEARBY_ROAD_DISTANCE) 
 						continue;
 					
-					Vertex vert = vertices[x,y];
+					Vertex vert = vertices.At(x,y);
 					if (vert == null) continue;
 					if (vert.locked) continue;
 
@@ -203,7 +203,7 @@ public class VertexMap {
 	}
 
 	public void Randomize (float noise) {
-		int x = width;
+		int x = vertices.Width;
 		//Debug.Log(x);
 		//return;
 		for (int i=0; i<x; i++) {
@@ -214,10 +214,10 @@ public class VertexMap {
 		}
 		while (!Mathf.IsPowerOfTwo(x-1)) x--;
 
-		vertices[0,0].SetHeight(UnityEngine.Random.Range (-noise, noise));
-		vertices[x,0].SetHeight(UnityEngine.Random.Range (-noise, noise));
-		vertices[0,x].SetHeight(UnityEngine.Random.Range (-noise, noise));
-		vertices[x,x].SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices.At(0,0).SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices.At(x,0).SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices.At(0,x).SetHeight(UnityEngine.Random.Range (-noise, noise));
+		vertices.At(x,x).SetHeight(UnityEngine.Random.Range (-noise, noise));
 		int currRes = x-1;
 		var currNoise = noise;
 		while (currRes%1 == 0 && currRes > 1) {
@@ -226,14 +226,14 @@ public class VertexMap {
 				for (int j=0; j<x-1; j+=currRes) {
 					int midptX = i+currRes/2;
 					int midptY = j+currRes/2;
-					float avg = (vertices[i,j].height + vertices[i+currRes,j].height +
-						vertices[i,j+currRes].height + vertices[i+currRes,j+currRes].height)/4f;
-					vertices[midptX,midptY].SetHeight (avg + UnityEngine.Random.Range(-currNoise, currNoise));
+					float avg = (vertices.At(i,j).height + vertices.At(i+currRes,j).height +
+						vertices.At(i,j+currRes).height + vertices.At(i+currRes,j+currRes).height)/4f;
+					vertices.At(midptX,midptY).SetHeight (avg + UnityEngine.Random.Range(-currNoise, currNoise));
 
-					vertices[midptX,j].SetHeight ((vertices[i,j].height + vertices[i+currRes,j].height)/2f + UnityEngine.Random.Range(0f, currNoise));
-					vertices[midptX,j+currRes].SetHeight ((vertices[i,j+currRes].height + vertices[i+currRes,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
-					vertices[i,midptY].SetHeight ((vertices[i,j].height + vertices[i,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
-					vertices[i+currRes,midptY].SetHeight ((vertices[i+currRes,j].height + vertices[i+currRes,j+currRes].height)/2f+ UnityEngine.Random.Range(0f, currNoise));
+					vertices.At(midptX,j).SetHeight ((vertices.At(i,j).height + vertices.At(i+currRes,j).height)/2f + UnityEngine.Random.Range(0f, currNoise));
+					vertices.At(midptX,j+currRes).SetHeight ((vertices.At(i,j+currRes).height + vertices.At(i+currRes,j+currRes).height)/2f+ UnityEngine.Random.Range(0f, currNoise));
+					vertices.At(i,midptY).SetHeight ((vertices.At(i,j).height + vertices.At(i,j+currRes).height)/2f+ UnityEngine.Random.Range(0f, currNoise));
+					vertices.At(i+currRes,midptY).SetHeight ((vertices.At(i+currRes,j).height + vertices.At(i+currRes,j+currRes).height)/2f+ UnityEngine.Random.Range(0f, currNoise));
 				}
 			}
 			currRes /= 2;
@@ -244,7 +244,7 @@ public class VertexMap {
 	//
 	// Add a chunk vertex <-> Vertex relationship
 	//
-	public void RegisterChunkVertex (IntVector2 i, Chunk chunk, int vertIndex) {
+	/*public void RegisterChunkVertex (IntVector2 i, Chunk chunk, int vertIndex) {
 		RegisterChunkVertex (i.x, i.y, chunk, vertIndex);
 	}
 
@@ -252,18 +252,17 @@ public class VertexMap {
 		//Debug.Log("register");
 		if (!ContainsVertex (x, y)) AddVertex (x, y);
 		VertexAt(x, y).chunkVertices.Add(new KeyValuePair<Chunk, int> (chunk, vertIndex));
+
 		//vertices [x,y].updateNormal();
+	}*/
+
+	public void RegisterChunkVertex (IntVector2 vertCoords, IntVector2 chunkCoords, int vertIndex) {
+		Vertex vert = ContainsVertex (vertCoords) ? VertexAt(vertCoords) : AddVertex (vertCoords);
+		vert.chunkVertices.Add(new KeyValuePair<IntVector2, int> (chunkCoords, vertIndex));
 	}
 
 	public Vertex VertexAt (int x, int y) {
-		while (x+width/2 >= width || y+width/2 >= width || x+width/2 < 0 || y+width/2 < 0) ResizeMap();
-		//if (Random.Range(0,1000)==0) Debug.Log(x+","+y+" is actually "+(x+width/2)+","+(y+width/2)+" width:"+width);
-		try {
-			return vertices[x+width/2, y+width/2];
-		} catch (IndexOutOfRangeException i) {
-			Debug.LogError (x + "," + y + " width: "+width+i.Message);
-			return null;
-		}
+		return vertices.At(x, y);
 	}
 
 	public Vertex VertexAt (IntVector2 i) {
@@ -298,17 +297,16 @@ public class VertexMap {
 	//
 
 	public Vertex AddVertex (IntVector2 i) {
-		AddVertex (i.x, i.y);
-		return VertexAt(i);
+		return AddVertex (i.x, i.y);
 	}
 
-	void AddVertex (int x, int y) {
+	Vertex AddVertex (int x, int y) {
 		//AddVertex (new Vertex (x, y));
-		while (x+width/2 >= width || y+width/2 >= width) {
-			ResizeMap ();
-		}
-		vertices[x+width/2,y+width/2] = new Vertex(x,y);
-		VertexAt(x,y).map = this;
+		Vertex result = new Vertex(x,y);
+		result.map = this;
+		result.terrain = terrain;
+		vertices.Set(x, y, result);
+		return result;
 		/*float avgH = 0f;
 		avgH += (ContainsVertex(x-1, y) ? vertices[x-1,y].height/4f : 0f);
 		avgH += (ContainsVertex(x+1, y) ? vertices[x+1,y].height/4f : 0f);
@@ -319,43 +317,16 @@ public class VertexMap {
 		SetHeight (new IntVector2 (x,y), avgH);*/
 
 	}
-
-	public void ResizeMap () {
-		
-		Vertex[,] newMap = new Vertex[width*2,width*2];
-		for (int x =0; x<width; x++) {
-			for (int y=0; y<width; y++) {
-				//vertices[x,y].x += width/2;
-				//vertices[x,y].y += width/2;
-				newMap[x+width/2,y+width/2] = vertices[x,y];
-				//if (Random.Range(0,1000) == 0) Debug.Log("newWidth"+width*2+" "+x+","+y+" mapped to "+(x+width)+","+(y+width)+".");
-			}
-		}
-		vertices = newMap;
-		width *= 2;
-		//PrintMap();
-	}
-
-	void PrintMap () {
-		string result = "";
-		for (int i=0; i<width; i++) {
-			if (i==0) result += "|";
-			for (int j=0; j<width; j++) {
-				if (vertices[i,j] == null) result += "_";
-				else result += "v";
-			}
-			if (i==width-1) result += "|\n";
-		}
-		Debug.Log(result);
-	}
 			
 }
 
 public class Vertex {
+	public DynamicTerrain terrain;
 	static int chunkRes;
 	static float chunkSize;
 	public VertexMap map;
-	public List<KeyValuePair<Chunk, int>> chunkVertices;
+	//public List<KeyValuePair<Chunk, int>> chunkVertices;
+	public List<KeyValuePair<IntVector2, int>> chunkVertices;
 	public bool locked = false;
 	public int x;
 	public int y;
@@ -370,7 +341,8 @@ public class Vertex {
 	public Vertex (int x, int y) {
 		this.x = x;
 		this.y = y;
-		chunkVertices = new List<KeyValuePair<Chunk, int>>();
+		//chunkVertices = new List<KeyValuePair<Chunk, int>>();
+		chunkVertices = new List<KeyValuePair<IntVector2, int>>();
 		decorations = new List<GameObject>();
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkSize = WorldManager.instance.chunkSize;
@@ -417,9 +389,10 @@ public class Vertex {
 		
 	public void SetHeight (float h) {
 		if (locked) return;
-		List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();
+		//List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();\
+		List<KeyValuePair<IntVector2, int>> deletes = new List<KeyValuePair<IntVector2, int>>();
 		height = h;
-		slope = 0f;
+		/*slope = 0f;
 		int numPoints = 0;
 		if (map.ContainsVertex(x-1, y)) {
 			slope += Mathf.Abs(map.VertexAt(x-1,y).height-height);
@@ -438,18 +411,21 @@ public class Vertex {
 			numPoints++;
 		}
 		slope /= (float)numPoints;
-		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;
-		foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
-			if (chunkVert.Key == null || chunkVert.Key.chunk == null) {
+		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;*/
+		//foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
+		foreach (KeyValuePair<IntVector2, int> chunkVert in chunkVertices) {
+			Chunk chunk = terrain.chunkmap.At(chunkVert.Key);
+			if (chunkVert.Key == null ||  chunk == null) {
 				deletes.Add (chunkVert);
 				continue;
 			}
 
-			chunkVert.Key.UpdateVertex (chunkVert.Value, h);
-			chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
+			chunk.UpdateVertex (chunkVert.Value, h);
+			//chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
 		}
 
-		foreach (KeyValuePair<Chunk, int> delete in deletes)
+		//foreach (KeyValuePair<Chunk, int> delete in deletes)
+		foreach (KeyValuePair<IntVector2, int> delete in deletes)
 			chunkVertices.Remove (delete);
 
 	}
@@ -479,9 +455,9 @@ public class Vertex {
 	public override string ToString ()
 	{
 		string result = "Vertex ("+x+","+y+") Height: "+height+" | nearRoad: "+nearRoad;
-		foreach (KeyValuePair<Chunk, int> member in chunkVertices) {
-			result += "\nChunk "+member.Key.x +","+member.Key.y;
-		}
+		//foreach (KeyValuePair<Chunk, int> member in chunkVertices) {
+		//	result += "\nChunk "+member.Key.x +","+member.Key.y;
+		//}
 		return result;
 	}
 }

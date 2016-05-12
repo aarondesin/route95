@@ -203,6 +203,8 @@ public class Road : Bezier {
 
 		}
 
+		DynamicTerrain.instance.OnExtendRoad();
+
 		Array.Resize (ref modes, modes.Length + 1);
 		modes[modes.Length - 1] = modes[modes.Length -2];
 		EnforceMode (points.Length - 4);
