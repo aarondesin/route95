@@ -29,6 +29,11 @@ public class VertexMap {
 	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
 	float NEARBY_ROAD_DISTANCE;
 
+	int xMin = 0;
+	int xMax = 0;
+	int yMin = 0;
+	int yMax = 0;
+
 	float roadHeight;
 
 	float chunkSize;
@@ -58,11 +63,7 @@ public class VertexMap {
 	}
 
 	public bool ContainsVertex (int x, int y) {
-		if (vertices == null) return false;
-		int width = vertices.Width;
-		if (x >= width || y >= width) return false;
-		if (VertexAt(x,y) == null) return false;
-		return true;
+		return (VertexAt(x,y) != null);
 	}
 
 	//
@@ -85,9 +86,10 @@ public class VertexMap {
 	}
 
 	public void SetHeight (int x, int y, float h) {
+		//if (UnityEngine.Random.Range(0,100) == 1) Debug.Log("VertexMap.SetHeight "+x +","+y+" " + h);
 		if (!ContainsVertex(x, y)) AddVertex (x,y);
 		Vertex vert = VertexAt(x,y);
-		if (vert.nearRoad) return;
+		//if (vert.nearRoad) return;
 		vert.SetHeight (h);
 	}
 
@@ -153,20 +155,19 @@ public class VertexMap {
 		float startTime = Time.realtimeSinceStartup;
 		float xWPos;
 		float yWPos;
-		int width = vertices.Width;
 
 		foreach (Vector3 roadPoint in roadPoints) {
-			for (int x = 0; x<width; x++) {
+			for (int x = xMin; x <= xMax; x++) {
 
 				// Skip if impossible for a point to be in range
-				xWPos = (x) * chunkSize/(chunkRes-1) - chunkSize/2f;
+				xWPos = x * chunkSize/(chunkRes-1) - chunkSize/2f;
 				if (Mathf.Abs(xWPos - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
 					continue;
 
-				for (int y=0; y<width; y++) {
+				for (int y = yMin; y < yMax; y++) {
 
 					// Skip if impossible for a point to be in range
-					yWPos = (y) * chunkSize/(chunkRes-1) - chunkSize/2f ;
+					yWPos = y * chunkSize/(chunkRes-1) - chunkSize/2f ;
 					if (Mathf.Abs(yWPos- roadPoint.z) > NEARBY_ROAD_DISTANCE) 
 						continue;
 					
@@ -306,6 +307,10 @@ public class VertexMap {
 		result.map = this;
 		result.terrain = terrain;
 		vertices.Set(x, y, result);
+		if (x < xMin) xMin = x;
+		if (x > xMax) xMax = x;
+		if (y < yMin) yMin = y;
+		if (y > yMax) yMax = y;
 		return result;
 		/*float avgH = 0f;
 		avgH += (ContainsVertex(x-1, y) ? vertices[x-1,y].height/4f : 0f);
@@ -386,12 +391,86 @@ public class Vertex {
 		SetHeight (height + (h-height) * factor);
 	}
 
+	bool IsEdge (int coord) {
+		return (coord % (chunkRes-1) == 0);
+	}
+
+	int ChunkMin (int coord) {
+		return coord / (chunkRes-1) - 1;
+	}
+
+	int ChunkMax (int coord) {
+		return coord / (chunkRes-1);
+	}
+
+	int CoordToIndex (int x, int y) {
+
+		int localX = x < 0 ? (chunkRes-1) - (Mathf.Abs(x) % (chunkRes-1)) : x % (chunkRes-1);
+		int localY = y < 0 ? (chunkRes-1) - (Mathf.Abs(y) % (chunkRes-1)) : y % (chunkRes-1);
+		int i = localY * chunkRes + localX;
+
+		return i;
+	}
+
 		
 	public void SetHeight (float h) {
+		// Skip locked vertices
 		if (locked) return;
-		//List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();\
-		List<KeyValuePair<IntVector2, int>> deletes = new List<KeyValuePair<IntVector2, int>>();
+
+		// Set height
 		height = h;
+
+
+		if (IsEdge (x)) {
+
+			// Corner
+			if (IsEdge (y)) {
+
+				Chunk ul = terrain.chunkmap.At (ChunkMin(x), ChunkMax (y));
+				if (ul != null) ul.UpdateVertex (CoordToIndex (x, y), height);
+
+				Chunk ur = terrain.chunkmap.At (ChunkMax(x), ChunkMax (y));
+				if (ur != null) ur.UpdateVertex (CoordToIndex (x, y), height);
+
+				Chunk dl = terrain.chunkmap.At (ChunkMin(x), ChunkMin (y));
+				if (dl != null) dl.UpdateVertex (CoordToIndex (x, y), height);
+
+				Chunk dr = terrain.chunkmap.At (ChunkMax(x), ChunkMin (y));
+				if (dr != null) dr.UpdateVertex (CoordToIndex (x, y), height);
+
+			// X edge
+			} else {
+				Chunk left = terrain.chunkmap.At(ChunkMin (x), ChunkMax(y));
+				if (left != null) left.UpdateVertex (CoordToIndex (x, y), height);
+
+				Chunk right = terrain.chunkmap.At(ChunkMax (x), ChunkMax(y));
+				if (right != null) right.UpdateVertex (CoordToIndex (x, y), height);
+
+			} 
+
+		// Y edge
+		} else if (IsEdge (y)) {
+			Chunk bottom = terrain.chunkmap.At(ChunkMax(x), ChunkMin(y));
+			if (bottom != null) bottom.UpdateVertex (CoordToIndex (x, y), height);
+
+			Chunk top = terrain.chunkmap.At(ChunkMax(x), ChunkMax(y));
+			if (top != null) top.UpdateVertex (CoordToIndex (x, y), height);
+		
+		// No edge
+		} else {
+			try {
+				Chunk chunk = terrain.chunkmap.At(ChunkMax(x), ChunkMax(y));
+				chunk.UpdateVertex (CoordToIndex (x, y), height);
+			} catch (NullReferenceException e) {
+				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "+ChunkMax(x)+","+ChunkMax(y));
+				return;
+			}
+		}
+
+
+		//List<KeyValuePair<Chunk, int>> deletes = new List<KeyValuePair<Chunk, int>>();\
+		//List<KeyValuePair<IntVector2, int>> deletes = new List<KeyValuePair<IntVector2, int>>();
+
 		/*slope = 0f;
 		int numPoints = 0;
 		if (map.ContainsVertex(x-1, y)) {
@@ -413,20 +492,20 @@ public class Vertex {
 		slope /= (float)numPoints;
 		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;*/
 		//foreach (KeyValuePair<Chunk, int> chunkVert in chunkVertices) {
-		foreach (KeyValuePair<IntVector2, int> chunkVert in chunkVertices) {
-			Chunk chunk = terrain.chunkmap.At(chunkVert.Key);
-			if (chunkVert.Key == null ||  chunk == null) {
-				deletes.Add (chunkVert);
-				continue;
-			}
+		//foreach (KeyValuePair<IntVector2, int> chunkVert in chunkVertices) {
+		//	Chunk chunk = terrain.chunkmap.At(chunkVert.Key);
+		//	if (chunkVert.Key == null ||  chunk == null) {
+		//		deletes.Add (chunkVert);
+		//		continue;
+		//	}
 
-			chunk.UpdateVertex (chunkVert.Value, h);
+		//	chunk.UpdateVertex (chunkVert.Value, h);
 			//chunkVert.Key.UpdateColor (chunkVert.Value, blendValue);
-		}
+		//}
 
 		//foreach (KeyValuePair<Chunk, int> delete in deletes)
-		foreach (KeyValuePair<IntVector2, int> delete in deletes)
-			chunkVertices.Remove (delete);
+		//foreach (KeyValuePair<IntVector2, int> delete in deletes)
+		//	chunkVertices.Remove (delete);
 
 	}
 

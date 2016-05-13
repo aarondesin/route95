@@ -37,6 +37,8 @@ public class DynamicTerrain {
 	Vector3 playerPos;
 	IntVector2 playerChunkPos;
 
+	List<AudioSource> sources;
+
 	#endregion
 	#region DynamicTerrain Methods
 
@@ -59,6 +61,7 @@ public class DynamicTerrain {
 		chunkPool = new ObjectPool();
 
 		playerChunkPos = new IntVector2(0, 0);
+
 	}
 
 	GameObject CreateChunk(int x, int y){
@@ -74,21 +77,19 @@ public class DynamicTerrain {
 			);
 			newChunk.transform.parent = terrain.transform;
 			chunk = newChunk.GetComponent<Chunk>();
+			chunkmap.Set(x, y, chunk);
 			chunk.Initialize(x, y);
 		} else {
 			newChunk = chunkPool.Get();
 			newChunk.transform.parent = terrain.transform;
 			chunk = newChunk.GetComponent<Chunk>();
+			chunkmap.Set(x, y, chunk);
 			chunk.Reuse(x, y);
 		}
-
-		//chunkPriorities.Add(newChunk, 0);
 		return newChunk;
 	}
 
 	public void DoLoadChunks () {
-		// Init chunk pool
-
 		WorldManager.instance.StartCoroutine(UpdateChunks());
 	}
 
@@ -103,30 +104,35 @@ public class DynamicTerrain {
 
 		while (true) {
 
-			if (!initialLoad) UpdateFreqData ();
+			// If loading terrain for the first time
+			if (initialLoad) {
+				chunksToLoad = (chunkLoadRadius*2+1) * (chunkLoadRadius*2+1);
 
-			//List<int> xChunks = new List<int> (); //x coords of chunks to be loaded
-			//List<int> yChunks = new List<int> (); //y coords of chunks to be loaded
-			//CreateChunkLists (xChunks, yChunks);
-			//if (initialLoad) chunksToLoad = xChunks.Count * yChunks.Count;
-			if (initialLoad) chunksToLoad = (chunkLoadRadius*2+1) * (chunkLoadRadius*2+1);
+			// If updating terrain
+			} else {
+				DeleteChunks();
+				UpdateFreqData ();
+			}
 
-			if (!initialLoad) DeleteChunks();
-
-			//foreach (int x in xChunks) {
-			//	foreach (int y in yChunks) {
+			// Update player world and chunk positions
 			playerPos = PlayerMovement.instance.transform.position;
 			playerChunkPos.x = (int)Mathf.RoundToInt((playerPos.x - chunkSize/2f) / chunkSize);
 			playerChunkPos.y = (int)Mathf.RoundToInt((playerPos.z -chunkSize/2f) / chunkSize);
+
+			// For each space where there should be a chunk
 			for (int x=playerChunkPos.x - chunkLoadRadius; x<=playerChunkPos.x + chunkLoadRadius; x++) {
 				for (int y=playerChunkPos.y - chunkLoadRadius; y<=playerChunkPos.y + chunkLoadRadius; y++) {
+
+					// If chunk missing
 					if (chunkmap.At(x,y) == null) {
+
+						// Create chunk
 						Chunk chunk = CreateChunk (x, y).GetComponent<Chunk>();
 						activeChunks.Add (chunk);
-						chunkmap.Set(x, y, chunk);
 
 						if (initialLoad) numLoaded++;
 
+						// Take a break if too long
 						if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 							yield return null;
 							startTime = Time.realtimeSinceStartup;
@@ -144,6 +150,7 @@ public class DynamicTerrain {
 				startTime = Time.realtimeSinceStartup;
 			}
 
+			// If finished loading terrain
 			if (initialLoad && activeChunks.Count == chunksToLoad) {
 				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 				int res = vertexmap.vertices.Width;
@@ -151,46 +158,37 @@ public class DynamicTerrain {
 				initialLoad = false;
 				WorldManager.instance.DoLoadRoad();
 
+			// if updating terrain
 			} else {
-				//if (PlayerMovement.instance.moving) {
 				chunksToUpdate.Clear ();
 				foreach (Chunk chunk in activeChunks) {
 					if (chunk.needsColliderUpdate) chunk.UpdateCollider();
 					if (chunk.needsColorUpdate) chunk.UpdateColors();
-					if (DistanceToPlayer (chunk) <= WorldManager.instance.vertexUpdateDistance) {
-						chunk.priority += ChunkHeuristic (chunk) +1;
-						if (chunksToUpdate.Count == 0)
-							chunksToUpdate.Add (chunk);
-						else {
-							for (int i = 0; i < chunksToUpdate.Count; i++) {
-								if (chunk.priority > chunksToUpdate[i].priority) {
-									chunksToUpdate.Insert (i, chunk);
-									break;
-								}
-							}
-						}
-					}
-				}
 
-				int listLength = chunksToUpdate.Count;
-					
-				if (listLength > 0) {
-					for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < listLength; i++) {
-						try {
-							chunksToUpdate [i].ChunkUpdate ();
-							chunksToUpdate[i].priority = 0;
-						}catch (ArgumentOutOfRangeException a) {
-							Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
-							continue;
+					chunk.priority++;
+					if (chunksToUpdate.Count == 0) chunksToUpdate.Add (chunk);
+					else for (int i=0; i<chunksToUpdate.Count; i++) 
+						if (chunk.priority > chunksToUpdate[i].priority) {
+							chunksToUpdate.Insert (i, chunk);
+							break;
 						}
+				}
+					
+				for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
+					try {
+						chunksToUpdate [i].ChunkUpdate ();
+						chunksToUpdate[i].priority = 0;
+					}catch (ArgumentOutOfRangeException a) {
+						Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
+						continue;
 					}
 				}
 					
-
 				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}
+
 			}
 			yield return null;
 		}
@@ -221,9 +219,13 @@ public class DynamicTerrain {
 	}
 		
 	void UpdateFreqData () {
+		if (sources == null) {
+			sources = new List<AudioSource>();
+			sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
+		}
+
 		float[] data = new float[freqSampleSize];
-		List<AudioSource> sources = new List<AudioSource>(); //InputManager.instance.audioSources;
-		sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
+		
 		foreach (AudioSource source in sources) {
 			if (!source.enabled) continue;
 			float[] sample = new float[freqSampleSize];
@@ -337,6 +339,8 @@ public class DynamicTerrain {
 
 	void DeleteChunk(Chunk chunk){
 
+		chunk.StopUpdatingVerts();
+
 		// Remove all decorations on chunk
 		chunk.RemoveDecorations();
 
@@ -385,6 +389,7 @@ public class DynamicTerrain {
 	//create a width by depth mountain centered at vertex (x,y) with a maximum altitude of height, a jaggedness of rough, and a min and max percentage of the random scale 
 	public void CreateMountain (int x, int y, int width, int depth, float height, float rough, 
 		float rangeMin = -0.1f, float rangeMax = 1f) {
+
 		//ensure width and depth are odd
 		if (width % 2 == 0)
 			width++;
@@ -422,8 +427,9 @@ public class DynamicTerrain {
 					float p01 = GetFromHMap(heightmap, xFloor, yCeil);
 					float p11 = GetFromHMap(heightmap, xCeil, yCeil);
 					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
-					if (!vmap.IsConstrained (i, j) && !vmap.IsLocked (i,j))
+					if (!vmap.IsConstrained (i, j) && !vmap.IsLocked (i,j)) {
 						vmap.SetHeight (i, j, interpH);
+					}
 				} else continue;
 			}
 		}

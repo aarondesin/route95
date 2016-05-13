@@ -5,13 +5,15 @@ using System.Collections;
 public class Map <T> where T: class {
 
 	T[,] values;
+	int width;
 
-	public Map (int width) {
-		values = new T[width, width];
+	public Map (int w) {
+		values = new T[w, w];
+		width = w;
 	}
 		
 	public void Resize () {
-		int oldWidth = values.GetLength(0);
+		int oldWidth = width;
 		T[,] newValues = new T[oldWidth*2,oldWidth*2];
 		for (int x=0; x<oldWidth; x++) {
 			for (int y=0; y<oldWidth; y++) {
@@ -19,6 +21,7 @@ public class Map <T> where T: class {
 			}
 		}
 		values = newValues;
+		width *= 2;
 	}
 
 	public T At (IntVector2 i) {
@@ -26,22 +29,20 @@ public class Map <T> where T: class {
 	}
 
 	public T At (int x, int y) {
-		int w = Width;
-		if (values == null || w == 0) return null;
-		if (x+w/2 < 0 || x+w/2 >= w || 
-			y+w/2 < 0 || y+w/2 >= w) return null;
+		if (values == null || width == 0) return null;
+		if (x+width/2 < 0 || x+width/2 >= width || 
+			y+width/2 < 0 || y+width/2 >= width) return null;
 		//Debug.Log("get "+x+" "+y);
-		return values[x+w/2,y+w/2];
+		return values[x+width/2,y+width/2];
 	}
 
 	public void Set (int x, int y, T item) {
 		try {
 			//Debug.Log(x + " "+ y + " went to ");
-			int width = Width;
-			while (x +Width/2 >= Width || y+Width/2 >= Width ||
-			x +Width/2 < 0 || y+Width/2 < 0) Resize();
+			while (x +width/2 >= width || y+width/2 >= width ||
+			x +width/2 < 0 || y+width/2 < 0) Resize();
 
-			values[x+Width/2,y+Width/2] = item;
+			values[x+width/2,y+width/2] = item;
 			//Debug.Log((x+Width/2) + " " +(y+Width/2)+" Width: "+Width);
 			//Debug.Log("set "+x+" "+y);
 
@@ -53,11 +54,11 @@ public class Map <T> where T: class {
 
 	public int Width {
 		get {
-			return values.GetLength(0);
+			return width;
 		}
 	}
 
-	public string ToString () {
-		return "Width: "+Width;
+	public override string ToString () {
+		return "Width: "+width;
 	}
 }

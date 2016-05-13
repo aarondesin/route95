@@ -655,7 +655,9 @@ public class WorldManager : MonoBehaviour {
 		if (side == 0) decoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
 
 		// Parent to nearest chunk
-		Chunk chunk = terrain.chunkmap.At(Mathf.FloorToInt(coordinate.x/chunkSize),Mathf.FloorToInt(coordinate.z/chunkSize));
+		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
+		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
+		Chunk chunk = terrain.chunkmap.At(chunkX,chunkY);
 		decoration.transform.parent = chunk.gameObject.transform;
 		chunk.decorations.Add(decoration);
 
