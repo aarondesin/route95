@@ -319,8 +319,8 @@ public class CameraControl : MonoBehaviour {
 	public void ChangeAngle (int camView) {
 		currentAngle = angles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
-		if (Debug.isDebugBuild) 
-			Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
+		//if (Debug.isDebugBuild) 
+		//	Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 		
 		switch (currentAngle.placementMode) {
 

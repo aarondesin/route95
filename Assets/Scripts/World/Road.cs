@@ -4,98 +4,75 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Road : Bezier {
-	public static Road instance;
 
-	//
-	// Road pathing params
-	//
+	public bool loaded = false;
 
-	public float generateRoadRadius; // Distance from player to generate road
-	public float placementDistance = 30f; // Marginal distance to add new road
-	//public float placementRange = 0.4f; // Radius within to place new road node
+	#region Road Placement Vars
 
-	public float maxSlope = 0.0015f;
+	DynamicTerrain terrain;   // reference to terrain
 
-	public bool generated = false;
+	float generateRoadRadius; // distance from player to generate road (copied from WM)
+	float placementDistance;  // marginal distance to add new road (copied from WM)
+	float maxSlope;           // maximum slope per world unit (copied from WM)
 
-	float UVProgress = 0f;
+	#endregion
+	#region Road Mesh Vars
 
-	//
-	// Mesh generation params
-	//
-	public int stepsPerCurve = 30;
-	private int steps = 0; // Current steps
+	int stepsPerCurve;        // number of steps per road curve (copied from WM)
+	int steps = 0;            // current number of steps
 
-	public float width; // Width of generated road
-	public float height;
-	public float slope = 0.8f; // Ratio of top plane to bottom width
+	float width;              // width of generated road (copied from WM)
+	float height;             // height of generated road (copied from WM)
+	float slope;              // ratio of top plane to bottom width (copied from WM)
 
-	Mesh mesh;
-	List<Vector3> verts;
-	List<Vector2> uvs;
-	List<int> tris;
+	Mesh mesh;                // road mesh
+	List<Vector3> verts;      // vertices in road mesh
+	List<Vector2> uvs;        // road mesh UVs
+	List<int> tris;           // road mesh triangles
 
-	//
-	// Decoration params
-	//
-	public float decorationRemoveThreshold = 0.3f; // Decorations behind this percent will be removed
-	Dictionary<GameObject, float> decorations; // Decorations, and their position along the curve
+	float UVProgress = 0f;    // current UV value to use when generating mesh
 
-	//public bool loaded = false;
-
+	#endregion
 	#region Unity Callbacks
 
-	void Awake () {
-		instance = this;
-		points = new Vector3[0];
-		decorations = new Dictionary<GameObject, float>();
-
-		generateRoadRadius = WorldManager.instance.roadExtendRadius;
-
-		generated = false;
-
-		mesh = new Mesh();
-		// Set default points and build mesh
-
-		//Build();
-	}
-
 	void Start () {
+		loaded = false;
+
+		// Copy vars from WM
+		generateRoadRadius = WorldManager.instance.roadExtendRadius;
+		placementDistance = WorldManager.instance.roadVariance;
+		maxSlope = WorldManager.instance.roadSlope;
+
+		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
+
+		// Init mesh
+		mesh = new Mesh();
+
+		// Init road points
+		points = new Vector3[0];
+
+		// Build mesh
 		Reset ();
 	}
 
 	public void Update () {
 
-		if (!generated) return;
+		if (!loaded) return;
 
 		// Remove far away points behind the player
 		if (Vector3.Distance (points[3], PlayerMovement.instance.transform.position) > generateRoadRadius) {
 
+			// Update player progress
 			float progress = PlayerMovement.instance.progress;
 			float numerator = progress * CurveCount;
+
+
+			// Update points array
 			Vector3[] newPoints = new Vector3[points.Length - 3];
 			for (int i = 0; i < newPoints.Length; i++)
 				newPoints [i] = points [i + 3];
 
 			PlayerMovement.instance.progress = numerator / CurveCount;
-
-			// Check for decorations to remove
-			List<GameObject> deletes = new List<GameObject>();
-			foreach (GameObject decoration in decorations.Keys) {
-				if (decorations[decoration] < decorationRemoveThreshold) {
-					GameObject temp = decoration;
-					deletes.Add(temp);
-				}
-			}
-			foreach (GameObject delete in deletes) {
-				decorations.Remove(delete);
-				Destroy(delete);
-			}
-		}
-
-		if (Vector3.Distance (points [0], PlayerMovement.instance.transform.position) < generateRoadRadius ||
-			Vector3.Distance (points [points.Length - 4], PlayerMovement.instance.transform.position) > generateRoadRadius) {
-			//Debug.Log ("PlayerBackingUpException!");
 		}
 
 		// Create new points in front of player
@@ -105,9 +82,8 @@ public class Road : Bezier {
 			float numerator = progress * CurveCount;
 
 			AddCurve ();
-			PlayerMovement.instance.progress = numerator / CurveCount;
 
-			//generated = true;
+			PlayerMovement.instance.progress = numerator / CurveCount;
 		}
 
 	}
@@ -136,6 +112,12 @@ public class Road : Bezier {
 			modes [i] = Bezier.BezierControlPointMode.Mirrored;
 	}
 
+	public float Width {
+		get {
+			return width;
+		}
+	}
+
 	public void DoLoad () {
 		StartCoroutine("Load");
 	}
@@ -157,11 +139,11 @@ public class Road : Bezier {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}
-				generated = false;
+				loaded = false;
 
 			} else {
-				generated = true;
-				DynamicTerrain.instance.CheckAllChunksForRoad();
+				loaded = true;
+				terrain.CheckAllChunksForRoad();
 				if (WorldManager.instance.doDecorate)
 					WorldManager.instance.DoLoadDecorations();
 				else WorldManager.instance.FinishLoading();

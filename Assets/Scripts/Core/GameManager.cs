@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviour {
 	public Mode currentMode = Mode.Loading;
 	[NonSerialized]
 	public Dictionary<Menu, GameObject> menus; 
+	public float targetDeltaTime;
 
 	// Loading vars
 	private int loadProgress = 0;
@@ -148,6 +149,7 @@ public class GameManager : MonoBehaviour {
 
 		Profiler.maxNumberOfSamplesPerFrame = -1;
 		Application.targetFrameRate = 120;
+		targetDeltaTime = 1f / (float)Application.targetFrameRate;
 
 		// Initialize set of all menus
 		menus = new Dictionary<Menu, GameObject>() {

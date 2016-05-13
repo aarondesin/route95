@@ -63,6 +63,9 @@ public class WorldManager : MonoBehaviour {
 	const float DEFAULT_ROAD_WIDTH = 10f;
 	const float DEFAULT_ROAD_HEIGHT = 0.2f;
 	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;
+	const float DEFAULT_ROAD_STEPS_PER_CURVE = 100;
+	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;
+	const float DEFAULT_ROAD_VARIANCE = 0.4f;
 
 	// Day/night cycle vars
 	const float DEFAULT_TIME_SCALE = 0.01f;
@@ -110,7 +113,7 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Material to use for terrain.")]
 	public Material terrainMaterial;
 
-	private DynamicTerrain terrain;
+	public DynamicTerrain terrain;
 
 
 	//
@@ -190,12 +193,14 @@ public class WorldManager : MonoBehaviour {
 	[Range(0.1f, 1.0f)]
 	public float roadHeight = DEFAULT_ROAD_HEIGHT;
 
+	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
+
 	[Tooltip("Radius within which to extend road.")]
 	[Range(100f, 2000f)]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
-	public float roadVariance = 0.4f;
-	public float roadSlope = 0.0015f;
+	public float roadVariance = DEFAULT_ROAD_VARIANCE;
+	public float roadSlope = DEFAULT_ROAD_MAX_SLOPE;
 
 	[Tooltip("Material to use for road.")]
 	public Material roadMaterial;
@@ -257,6 +262,9 @@ public class WorldManager : MonoBehaviour {
 
 	private float[] freqDataArray;
 	LineRenderer visualizer;
+
+	[Tooltip("FFT window to use when sampling music frequencies.")]
+	public FFTWindow freqFFTWindow;
 
 	[Tooltip("Maximum number of decorations to place per update cycle.")]
 	[Range(10, 200)]
