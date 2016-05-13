@@ -5,6 +5,8 @@ using System.Linq;
 
 public class PlayerMovement : MonoBehaviour {
 	public static PlayerMovement instance;
+	Road road;
+
 	public GameObject lightRight;
 	public GameObject lightLeft;
 	//public float velocity;
@@ -61,6 +63,8 @@ public class PlayerMovement : MonoBehaviour {
 
 		dOffset = 0f;
 
+		road = WorldManager.instance.road;
+
 	}
 
 	public void StartMoving() {
@@ -111,16 +115,16 @@ public class PlayerMovement : MonoBehaviour {
 
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
 
-				progress += velocity * Time.deltaTime / Road.instance.CurveCount;
+				progress += velocity * Time.deltaTime / road.CurveCount;
 				if (progress >= 1f)
 					progress = 1f;
 				
 				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
 				Vector3 offset = new Vector3 (offsetH, 2.27f + roadHeight, 0f);
-				Vector3 point = Road.instance.GetPoint(progress);
-				Vector3 ahead = point + Road.instance.GetVelocity (progress);
+				Vector3 point = road.GetPoint(progress);
+				Vector3 ahead = point + road.GetVelocity (progress);
 				transform.position = point + offset - 
-					Road.instance.BezRight (Road.instance.GetPoint(progress)) * Road.instance.width / 3f;
+					road.BezRight (point) * road.Width / 3f;
 				
 				transform.LookAt (ahead);
 				float rotation = velocity * velocityToRotation;

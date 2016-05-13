@@ -20,6 +20,10 @@ public class LinInt {
 	}
 
 	public LinInt(float[] data) {
+		Update(data);
+	}
+
+	public void Update(float[] data) {
 		keyPoints = new List<float> ();
 		foreach (float f in data) keyPoints.Add (f);
 		averagedEnds = (keyPoints [0] + keyPoints [keyPoints.Count - 1]) / 2;

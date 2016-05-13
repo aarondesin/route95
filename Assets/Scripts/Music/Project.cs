@@ -98,7 +98,7 @@ public class Project {
 	}
 
 	public void RemoveSong (int index) {
-		Song song = songs[index];
+		//Song song = songs[index];
 		songs.RemoveAt(index);
 		if (MusicManager.instance.currentPlayingSong == index) {
 			MusicManager.instance.currentPlayingSong = 0;

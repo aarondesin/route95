@@ -63,21 +63,12 @@ public class WorldManager : MonoBehaviour {
 	const float DEFAULT_ROAD_WIDTH = 10f;
 	const float DEFAULT_ROAD_HEIGHT = 0.2f;
 	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;
+	const float DEFAULT_ROAD_STEPS_PER_CURVE = 100;
+	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;
+	const float DEFAULT_ROAD_VARIANCE = 0.4f;
 
 	// Day/night cycle vars
 	const float DEFAULT_TIME_SCALE = 0.01f;
-
-	static Color DEFAULT_PRIMARY_DAY_COLOR       = new Color (1.00f, 1.00f, 1.00f, 1.00f);
-	static Color DEFAULT_SECONDARY_DAY_COLOR     = new Color (0.54f, 0.72f, 0.87f, 1.00f);
-
-	static Color DEFAULT_PRIMARY_SUNSET_COLOR    = new Color (1.00f, 1.00f, 0.00f, 1.00f);
-	static Color DEFAULT_SECONDARY_SUNSET_COLOR  = new Color (1.00f, 0.50f, 0.00f, 1.00f);
-
-	static Color DEFAULT_PRIMARY_NIGHT_COLOR     = new Color (0.03f, 0.05f, 0.08f, 1.00f);
-	static Color DEFAULT_SECONDARY_NIGHT_COLOR   = new Color (0.06f, 0.07f, 0.18f, 1.00f);
-
-	static Color DEFAULT_PRIMARY_SUNRISE_COLOR   = new Color (1.00f, 1.00f, 0.00f, 1.00f);
-	static Color DEFAULT_SECONDARY_SUNRISE_COLOR = new Color (1.00f, 0.50f, 0.00f, 1.00f);
 
 	// Performance vars
 	const int DEFAULT_CHUNK_UPDATES_PER_CYCLE = 4;
@@ -122,7 +113,7 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Material to use for terrain.")]
 	public Material terrainMaterial;
 
-	private DynamicTerrain terrain;
+	public DynamicTerrain terrain;
 
 
 	//
@@ -159,6 +150,8 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 
+	ObjectPool decorationPool;
+
 	public float decorationDensity = 1f;
 
 	public Mesh grassModel;
@@ -184,14 +177,6 @@ public class WorldManager : MonoBehaviour {
 	public int shakers;
 	float rainDensity;
 
-	public Texture2D waveTexture;
-	List<Wave> waves = new List<Wave>();
-	List<Wave> waveDeletes = new List<Wave>();
-
-	[SerializeField]
-	float waveProgress = 1f;
-	public float waveSpeed = 0.1f;
-
 
 	//
 	[Header("Road Settings")]
@@ -208,12 +193,14 @@ public class WorldManager : MonoBehaviour {
 	[Range(0.1f, 1.0f)]
 	public float roadHeight = DEFAULT_ROAD_HEIGHT;
 
+	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
+
 	[Tooltip("Radius within which to extend road.")]
 	[Range(100f, 2000f)]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
-	public float roadVariance = 0.4f;
-	public float roadSlope = 0.0015f;
+	public float roadVariance = DEFAULT_ROAD_VARIANCE;
+	public float roadSlope = DEFAULT_ROAD_MAX_SLOPE;
 
 	[Tooltip("Material to use for road.")]
 	public Material roadMaterial;
@@ -274,6 +261,10 @@ public class WorldManager : MonoBehaviour {
 	public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
 
 	private float[] freqDataArray;
+	LineRenderer visualizer;
+
+	[Tooltip("FFT window to use when sampling music frequencies.")]
+	public FFTWindow freqFFTWindow;
 
 	[Tooltip("Maximum number of decorations to place per update cycle.")]
 	[Range(10, 200)]
@@ -312,6 +303,7 @@ public class WorldManager : MonoBehaviour {
 		road = CreateRoad();
 
 		numDecorations = 0;
+		decorationPool = new ObjectPool();
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = CreateSun();
@@ -322,8 +314,6 @@ public class WorldManager : MonoBehaviour {
 		lightningStriker.SetActive(false);
 		rainEmitter.SetRate(0f);
 		shootingStarTemplate.SetActive(false);
-
-		waveTexture = new Texture2D (terrain.vertexmap.width, terrain.vertexmap.width);
 
 		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
 			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
@@ -342,36 +332,11 @@ public class WorldManager : MonoBehaviour {
 			UpdateColor();
 			AttemptDecorate();
 			Vector3 dWind = UnityEngine.Random.insideUnitSphere;
-			wind += dWind * 0.5f;
+			wind += dWind * Time.deltaTime;
 			wind.Normalize();
 			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
 			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
 			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);
-
-			/*if (waveProgress < 1f) {
-				Vector4 pos = PlayerMovement.instance.transform.position;
-				pos.w = 1f;
-				waveProgress += waveSpeed;
-				terrainMaterial.SetVector("_WaveOrigin", pos);
-				SetWaveProgress(waveProgress);
-			}
-
-			if (waves.Count > 0) {
-
-				foreach (Wave wave in waves) {
-					if (!wave.active) waveDeletes.Add(wave);
-					else wave.Update();
-				}
-
-				foreach (Wave wave in waveDeletes) {
-					waves.Remove(wave);
-				}
-
-
-
-
-			}
-			RenderWaveTexture();*/
 		}
 
 	}
@@ -480,9 +445,14 @@ public class WorldManager : MonoBehaviour {
 		RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
 
 		if (Spectrum2.instance != null) {
-			Color temp = new Color (sun.GetComponent<Light> ().color.r, sun.GetComponent<Light> ().color.g, sun.GetComponent<Light> ().color.b, Spectrum2.instance.opacity);
-			Spectrum2.instance.GetComponent<LineRenderer> ().SetColors (temp, temp);
-			Spectrum2.instance.GetComponent<LineRenderer> ().material.color = temp;
+
+			if (visualizer == null) visualizer = Spectrum2.instance.GetComponent<LineRenderer>();
+
+			Color temp = primaryColor;
+			temp.a = Spectrum2.instance.opacity;
+
+			visualizer.SetColors (temp, temp);
+			visualizer.material.color = temp;
 		}
 	}
 
@@ -503,49 +473,48 @@ public class WorldManager : MonoBehaviour {
 	}
     
 	bool AttemptDecorate () {
-		if (doDecorate && DynamicTerrain.instance.activeChunks.Count != 0 && road.generated) {
-			for (int i=0; i<decorationsPerStep && numDecorations < maxDecorations; i++) {
 
-				// Pick a random decoration and decorate with it
-				GameObject decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
-				Decoration deco = decoration.GetComponent<Decoration>();
+		// Pick a random decoration and decorate with it
+		GameObject decoration;
+		bool createNew = false;
+		if (decorationPool.Empty) {
+			decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
+			createNew = true;
+		} else decoration = decorationPool.Peek();
 
-
-				//if (Decoration.numDecorations == null) Decoration.numDecorations = new Dictionary<Decoration.Group, int>();
-				//if (!Decoration.numDecorations.ContainsKey(deco.group))
-					//Decoration.numDecorations.Add (deco.group, 0);
-				//if (Decoration.numDecorations[deco.group] < maxActive[deco.group]) {
-				int numActive = 0;
-				int maxActive = 0;
-				switch (deco.group) {
-				case Decoration.Group.RoadSigns:
-					numActive = roadSignGroup.numActive;
-					maxActive = roadSignGroup.maxActive;
-					break;
-				case Decoration.Group.Rocks:
-					numActive = rockGroup.numActive;
-					maxActive = rockGroup.maxActive;
-					break;
-				case Decoration.Group.Vegetation:
-					numActive = vegetationGroup.numActive;
-					maxActive = vegetationGroup.maxActive;
-					break;
-				}
-				if (numActive < maxActive) {
-					switch (deco.distribution) {
-					case Decoration.Distribution.Random:
-						Chunk chunk = terrain.RandomChunk ();
-						return DecorateRandom (chunk, decoration);
-					case Decoration.Distribution.Roadside:
-						float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
-						return DecorateRoadside (bezierProg, decoration);
-					case Decoration.Distribution.CloseToRoad:
-						return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration);
-					}
-					//numDecorations++;
-				}
+		//if (!createNew) Debug.Log("old");
+	
+		Decoration deco = decoration.GetComponent<Decoration>();
+	
+		int numActive = 0;
+		int maxActive = 0;
+		switch (deco.group) {
+		case Decoration.Group.RoadSigns:
+			numActive = roadSignGroup.numActive;
+			maxActive = roadSignGroup.maxActive;
+			break;
+		case Decoration.Group.Rocks:
+			numActive = rockGroup.numActive;
+			maxActive = rockGroup.maxActive;
+			break;
+		case Decoration.Group.Vegetation:
+			numActive = vegetationGroup.numActive;
+			maxActive = vegetationGroup.maxActive;
+			break;
+		}
+		if (numActive < maxActive) {
+			switch (deco.distribution) {
+			case Decoration.Distribution.Random:
+				Chunk chunk = terrain.RandomChunk ();
+				return DecorateRandom (chunk, decoration, createNew);
+			case Decoration.Distribution.Roadside:
+				float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
+				return DecorateRoadside (bezierProg, decoration, createNew);
+			case Decoration.Distribution.CloseToRoad:
+				return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration, createNew);
 			}
 		}
+	
 		return false;
 	}
     
@@ -571,87 +540,139 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	Road CreateRoad() {
+
+		// Create road object
 		GameObject roadObj = new GameObject ("Road",
 			typeof (MeshFilter),
 			typeof (MeshRenderer),
 			typeof (Road)
 		);
-		roadObj.GetComponent<MeshRenderer>().material = roadMaterial;
-		roadObj.GetComponent<MeshRenderer>().reflectionProbeUsage = ReflectionProbeUsage.Off;
-		roadObj.GetComponent<Road>().width = roadWidth;
-		roadObj.GetComponent<Road>().height = roadHeight;
 
-		return roadObj.GetComponent<Road>();
+		// Change renderer properties
+		MeshRenderer roadRenderer = roadObj.GetComponent<MeshRenderer>();
+		roadRenderer.material = roadMaterial;
+		roadRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+
+		// Pass on road properties
+		Road rd = roadObj.GetComponent<Road>();
+		rd.width = roadWidth;
+		rd.height = roadHeight;
+
+		return rd;
 	}
 
-	bool DecorateRandom (Chunk chunk, GameObject decoration) {
-		//chunk.UpdateCollider();
-		if (chunk == null) return false;
+	bool DecorateRandom (Chunk chunk, GameObject decorationPrefab, bool createNew) {
+		if (chunk == null) {
+			Debug.LogError("WorldManager.DecorateRandom(): invalid chunk!");
+			return false;
+		}
+
+		//if (!createNew) Debug.Log("old");
+
+		// Pick a random coordinate
 		Vector2 coordinate = new Vector2 (
 			chunk.x*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f),
 			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
 		);
 
-		if (Mathf.PerlinNoise (coordinate.x, coordinate.y) < decoration.GetComponent<Decoration>().density / terrain.activeChunks.Count * decorationDensity) {
-			//Debug.Log(coordinate);
-			IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
-			//Debug.Log(nearestVertex.ToString());
-			//if (UnityEngine.Random.Range(0,100) == 0) Debug.Log(coordinate + " maps to "+nearestVertex.ToString());
-			if (!terrain.vertexmap.IsConstrained (nearestVertex)) {
-				RaycastHit hit;
-				float y = 0f;
-				if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down,out hit, Mathf.Infinity)) {
-					//Debug.Log("bap");
-					y = hit.point.y;
-				}
+		// Find nearest vertex
+		IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
+
+		// Check if constrained
+		if (terrain.vertexmap.IsConstrained (nearestVertex)) return false;
+
+		// Roll based on density
+		float density = decorationPrefab.GetComponent<Decoration>().density;
+		float spawnThreshold = density / terrain.activeChunks.Count * decorationDensity;
+
+		// If roll succeeded
+		if (!createNew || Mathf.PerlinNoise (coordinate.x, coordinate.y) < spawnThreshold) {
+
+			// Instantiate or grab object
+			GameObject decoration;
+			if (createNew) decoration = (GameObject)Instantiate(decorationPrefab);
+			else decoration = decorationPool.Get();
+			Decoration deco = decoration.GetComponent<Decoration>();
+
+			// Raycast down 
+			RaycastHit hit;
+			float y;
+			Vector3 rayOrigin = new Vector3 (coordinate.x, heightScale, coordinate.y);
+			if (Physics.Raycast(rayOrigin, Vector3.down,out hit, Mathf.Infinity)) y = hit.point.y;
+			else y = 0f;
+
+			// Transform decoration
+			decoration.transform.position = new Vector3 (coordinate.x, y, coordinate.y);
 					
-				GameObject newDecoration = 
-					(GameObject)Instantiate (decoration, new Vector3 (coordinate.x, y, coordinate.y), Quaternion.Euler (0f, 0f, 0f));
-				Decoration deco = newDecoration.GetComponent<Decoration>();
-				deco.Randomize();
-				if (!deco.dynamic) newDecoration.transform.parent = chunk.chunk.transform;
-				numDecorations++;
-				//Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-				terrain.vertexmap.RegisterDecoration (nearestVertex, newDecoration);
-				if (deco.group == Decoration.Group.Rocks) {
-					rockGroup.numActive++;
-				} else if (deco.group == Decoration.Group.Vegetation) {
-					vegetationGroup.numActive++;
-				}
-				//Debug.Log("placed");
-				return true;
+			// Randomize decoration
+			deco.Randomize();
+
+			// Parent decoration to chunk (if not dynamic)
+			if (!deco.dynamic) {
+				decoration.transform.parent = chunk.gameObject.transform;
+				chunk.decorations.Add(decoration);
 			}
+
+			// Register decoration
+			numDecorations++;
+			terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);
+			switch (deco.group) {
+			case Decoration.Group.Rocks:
+				rockGroup.numActive++;
+				break;
+			case Decoration.Group.Vegetation:
+				vegetationGroup.numActive++;
+				break;
+			}
+				
+			return true;
 		}
 
 		return false;
 	}
 
-	bool DecorateRoadside (float prog, GameObject decoration) {
-		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
+	bool DecorateRoadside (float prog, GameObject decorationPrefab, bool createNew) {
+
+		// Get road point
 		Vector3 point = road.GetPoint(prog);
-		Vector3 coordinate = 
-			point + road.BezRight(point) * roadWidth * 2f * (side == 0 ? 1 : -1);
+
+		// Pick a road side
+		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
+
+		// Calculate coordinate
+		Vector3 coordinate = point + road.BezRight(point) * roadWidth * 2f * (side == 0 ? 1 : -1);
+
+		// Raycast down
 		RaycastHit hit;
-		if (Physics.Raycast(new Vector3 (coordinate.x, heightScale, coordinate.y), Vector3.down, out hit, Mathf.Infinity))
-			coordinate.y = hit.point.y;
+		Vector3 rayOrigin = new Vector3 (coordinate.x, heightScale, coordinate.y);
+		if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity)) coordinate.y = hit.point.y;
 		else coordinate.y = 0f;
-		GameObject newDecoration = 
-			(GameObject)Instantiate (decoration, coordinate, Quaternion.Euler (0f, 0f, 0f));
-		Decoration deco = newDecoration.GetComponent<Decoration>();
+
+		// Instantiate or grab decoration
+		GameObject decoration;
+		if (createNew) decoration = Instantiate(decorationPrefab);
+		else decoration = decorationPool.Get();
+
+		// Randomize
+		Decoration deco = decoration.GetComponent<Decoration>();
 		deco.Randomize();
 
+		// Point decoration in road direction
 		Vector3 rot = Quaternion.FromToRotation (coordinate+ road.GetDirection(prog), coordinate ).eulerAngles + new Vector3 (-90f,90f,0f);
-		newDecoration.transform.rotation = Quaternion.Euler(rot);
-	
-		if (side == 0) newDecoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
-		//newDecoration.transform.parent = road.gameObject.transform;
-		newDecoration.transform.parent = terrain.chunkmap[Mathf.FloorToInt(coordinate.x/chunkSize)][Mathf.FloorToInt(coordinate.z/chunkSize)].chunk.transform;
+		decoration.transform.rotation = Quaternion.Euler(rot);
+		if (side == 0) decoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
+
+		// Parent to nearest chunk
+		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
+		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
+		Chunk chunk = terrain.chunkmap.At(chunkX,chunkY);
+		decoration.transform.parent = chunk.gameObject.transform;
+		chunk.decorations.Add(decoration);
+
+		// Register
 		numDecorations++;
-		//Decoration.numDecorations[decoration.GetComponent<Decoration>().group]++;
-		if (deco.group == Decoration.Group.RoadSigns) {
-			roadSignGroup.numActive++;
-		}
-		//road.AddDecoration(newDecoration, prog);
+		if (deco.group == Decoration.Group.RoadSigns) roadSignGroup.numActive++;
+
 		return true;
 	}
 
@@ -667,9 +688,13 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	public void RemoveDecoration (GameObject deco) {
-		if (deco == null) return;
 		Decoration d = deco.GetComponent<Decoration>();
-		//Decoration.numDecorations[d.group]--;
+
+		// Deparent decoration
+		deco.transform.parent = null;
+		//Debug.Log("removing " + deco.name);
+
+		// Deregister
 		switch (d.group) {
 		case Decoration.Group.RoadSigns:
 			roadSignGroup.numActive--;
@@ -682,11 +707,9 @@ public class WorldManager : MonoBehaviour {
 			break;
 		}
 		numDecorations--;
-		Destroy(deco);
-	}
 
-	public void DecNumDeco(int n) {
-		numDecorations -= n;
+		// Pool decoration
+		decorationPool.Add(deco);
 	}
 
 	/// <summary>
@@ -791,49 +814,6 @@ public class WorldManager : MonoBehaviour {
 		if (!v.locked) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
 
 		//Debug.Log(v.ToString());
-	}
-
-	public void StartWave () {
-		SetWaveProgress(0f);
-	}
-
-	public void SetWaveProgress (float p) {
-		terrainMaterial.SetFloat("_WaveProgress", p);
-	}
-
-	public void MakeWave (Vector3 pos, float strength, float speed) {
-		waves.Add(
-			new Wave(pos, strength * strength,
-				strength / 2f, strength, speed) 
-		);
-	}
-
-	public void RenderWaveTexture () {
-		//waveTexture = Texture2D.blackTexture;
-		if (waveTexture.width != terrain.vertexmap.width)
-			waveTexture.Resize (terrain.vertexmap.width, terrain.vertexmap.width);
-
-		for (int i=0; i<waveTexture.width; i++) {
-			for (int j=0; j<waveTexture.height; j++) {
-				
-				//if (waveTexture.GetPixel(i,j).r > 0f) continue;
-				waveTexture.SetPixel(i,j, Color.black);
-
-				Vector2 pix = new Vector2 ((float)i, (float)j);
-				foreach (Wave wave in waves) {
-					if (!wave.active) continue;
-					Vector2 center = wave.pixelOrigin(chunkResolution, chunkSize);
-					float dist = Vector2.Distance (center, pix);
-					if (dist <= wave.range + wave.width && dist >= wave.range - wave.width) {
-						//float val = 
-						waveTexture.SetPixel(i,j,Color.white);
-					}
-				}
-			}
-		}
-
-		terrainMaterial.SetTexture ("_WaveTexture", waveTexture);
-			
 	}
 		
 }
