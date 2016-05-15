@@ -55,6 +55,8 @@ public class Chunk: MonoBehaviour {
 	/// <param name="y">The y coordinate.</param>
 	public void Initialize (int x, int y) {
 
+		terrain = WorldManager.instance.terrain;
+
 		// Init vars
 		this.x = x;
 		this.y = y;
@@ -123,9 +125,6 @@ public class Chunk: MonoBehaviour {
 			}
 		}
 
-		// Mark for collider update
-		needsColliderUpdate = true;
-
 		// Assign material
 		MeshRenderer renderer = GetComponent<MeshRenderer> ();
 		renderer.material = WorldManager.instance.terrainMaterial;
@@ -169,6 +168,7 @@ public class Chunk: MonoBehaviour {
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
 	public void Reuse (int x, int y) {
+		terrain = WorldManager.instance.terrain;
 
 		// Update vars
 		this.x = x;

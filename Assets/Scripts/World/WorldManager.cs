@@ -63,8 +63,9 @@ public class WorldManager : MonoBehaviour {
 	const float DEFAULT_ROAD_WIDTH = 10f;
 	const float DEFAULT_ROAD_HEIGHT = 0.2f;
 	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;
-	const float DEFAULT_ROAD_STEPS_PER_CURVE = 100;
+	const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;
 	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;
+	const float DEFAULT_ROAD_PLACEMENT_DISTANCE = 30f;
 	const float DEFAULT_ROAD_VARIANCE = 0.4f;
 
 	// Day/night cycle vars
@@ -199,6 +200,8 @@ public class WorldManager : MonoBehaviour {
 	[Range(100f, 2000f)]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
+	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
+
 	public float roadVariance = DEFAULT_ROAD_VARIANCE;
 	public float roadSlope = DEFAULT_ROAD_MAX_SLOPE;
 
@@ -297,7 +300,9 @@ public class WorldManager : MonoBehaviour {
 
 		freqDataArray = new float[freqArraySize];
 
-		terrain = new DynamicTerrain ();
+		terrain = new GameObject ("Terrain",
+			typeof(DynamicTerrain)
+		).GetComponent<DynamicTerrain> ();
 		wind = UnityEngine.Random.insideUnitSphere;
 
 		road = CreateRoad();
@@ -325,9 +330,9 @@ public class WorldManager : MonoBehaviour {
 	void Update () {
 		if (loadedTerrain && !hasRandomized) 
 			Load();
-		if (loaded && road.generated) {
+		if (loaded && road.loaded) {
 
-			terrain.Update(freqDataArray);
+			//terrain.Update(freqDataArray);
 			UpdateTime();
 			UpdateColor();
 			AttemptDecorate();
@@ -583,7 +588,7 @@ public class WorldManager : MonoBehaviour {
 
 		// Roll based on density
 		float density = decorationPrefab.GetComponent<Decoration>().density;
-		float spawnThreshold = density / terrain.activeChunks.Count * decorationDensity;
+		float spawnThreshold = density / terrain.NumActiveChunks * decorationDensity;
 
 		// If roll succeeded
 		if (!createNew || Mathf.PerlinNoise (coordinate.x, coordinate.y) < spawnThreshold) {
@@ -665,7 +670,7 @@ public class WorldManager : MonoBehaviour {
 		// Parent to nearest chunk
 		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
 		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
-		Chunk chunk = terrain.chunkmap.At(chunkX,chunkY);
+		Chunk chunk = terrain.ChunkAt(chunkX,chunkY);
 		decoration.transform.parent = chunk.gameObject.transform;
 		chunk.decorations.Add(decoration);
 

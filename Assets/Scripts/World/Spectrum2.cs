@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class Spectrum2 : MonoBehaviour {
 	public static Spectrum2 instance;
 
+	DynamicTerrain terrain;
+
 	// Use this for initialization
 	public int numberOfObjects = 20;
 	public float height;
@@ -16,6 +18,8 @@ public class Spectrum2 : MonoBehaviour {
 
 	void Start () {
 		instance = this;
+
+		terrain = WorldManager.instance.terrain;
 
 		// Initialize visualizer points
 		points = new Vector3[numberOfObjects];
@@ -32,11 +36,11 @@ public class Spectrum2 : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (DynamicTerrain.instance != null && DynamicTerrain.instance.freqData != null) {
+		if (terrain != null && terrain.freqData != null) {
 
 			for (int i = 0; i < numberOfObjects; i++) {
 				
-				float y = height + Mathf.Log (DynamicTerrain.instance.freqData.GetDataPoint ((float)i / numberOfObjects)) * scale;
+				float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)i / numberOfObjects)) * scale;
 				if (y != float.NaN) {
 					if (y < points[i].y && points[i].y >= transform.position.y+fallRate) {
 						points[i].y -= fallRate;

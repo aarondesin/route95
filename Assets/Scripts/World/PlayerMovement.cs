@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour {
 	float dOffset;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		instance = this;
 		lights = false;
 		moving = false;
@@ -63,8 +63,12 @@ public class PlayerMovement : MonoBehaviour {
 
 		dOffset = 0f;
 
-		road = WorldManager.instance.road;
 
+
+	}
+
+	void Start () {
+		road = WorldManager.instance.road;
 	}
 
 	public void StartMoving() {

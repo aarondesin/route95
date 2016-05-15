@@ -422,40 +422,40 @@ public class Vertex {
 			// Corner
 			if (IsEdge (y)) {
 
-				Chunk ul = terrain.chunkmap.At (ChunkMin(x), ChunkMax (y));
+				Chunk ul = terrain.ChunkAt (ChunkMin(x), ChunkMax (y));
 				if (ul != null) ul.UpdateVertex (CoordToIndex (ul.x, ul.y), height);
 
-				Chunk ur = terrain.chunkmap.At (ChunkMax(x), ChunkMax (y));
+				Chunk ur = terrain.ChunkAt (ChunkMax(x), ChunkMax (y));
 				if (ur != null) ur.UpdateVertex (CoordToIndex (ur.x, ur.y), height);
 
-				Chunk dl = terrain.chunkmap.At (ChunkMin(x), ChunkMin (y));
+				Chunk dl = terrain.ChunkAt (ChunkMin(x), ChunkMin (y));
 				if (dl != null) dl.UpdateVertex (CoordToIndex (dl.x, dl.y), height);
 
-				Chunk dr = terrain.chunkmap.At (ChunkMax(x), ChunkMin (y));
+				Chunk dr = terrain.ChunkAt (ChunkMax(x), ChunkMin (y));
 				if (dr != null) dr.UpdateVertex (CoordToIndex (dr.x, dr.y), height);
 
 			// X edge
 			} else {
-				Chunk left = terrain.chunkmap.At(ChunkMin (x), ChunkMax(y));
+				Chunk left = terrain.ChunkAt(ChunkMin (x), ChunkMax(y));
 				if (left != null) left.UpdateVertex (CoordToIndex (left.x, left.y), height);
 
-				Chunk right = terrain.chunkmap.At(ChunkMax (x), ChunkMax(y));
+				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkMax(y));
 				if (right != null) right.UpdateVertex(CoordToIndex(right.x, right.y), height);
 
 			} 
 
 		// Y edge
 		} else if (IsEdge (y)) {
-			Chunk bottom = terrain.chunkmap.At(ChunkMax(x), ChunkMin(y));
+			Chunk bottom = terrain.ChunkAt(ChunkMax(x), ChunkMin(y));
 			if (bottom != null) bottom.UpdateVertex (CoordToIndex (bottom.x, bottom.y), height);
 
-			Chunk top = terrain.chunkmap.At(ChunkMax(x), ChunkMax(y));
+			Chunk top = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
 			if (top != null) top.UpdateVertex (CoordToIndex (top.x, top.y), height);
 		
 		// No edge
 		} else {
 			try {
-				Chunk chunk = terrain.chunkmap.At(ChunkMax(x), ChunkMax(y));
+				Chunk chunk = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
 				if (chunk != null) chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
 			} catch (NullReferenceException e) {
 				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "+ChunkMax(x)+","+ChunkMax(y));

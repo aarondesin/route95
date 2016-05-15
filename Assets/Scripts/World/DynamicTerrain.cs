@@ -146,7 +146,7 @@ public class DynamicTerrain : MonoBehaviour {
 	/// </summary>
 	/// <returns>The chunks.</returns>
 	IEnumerator UpdateChunks () {
-
+		
 		// Init loading vars
 		int chunksToLoad = 0; // number of chunks to be loaded at start
 		float startTime = Time.realtimeSinceStartup;
@@ -169,13 +169,15 @@ public class DynamicTerrain : MonoBehaviour {
 
 			// Update player world and chunk positions
 			playerPos = PlayerMovement.instance.transform.position;
-			playerChunkPos.x = (int)Mathf.RoundToInt((playerPos.x - chunkSize/2f) / chunkSize);
-			playerChunkPos.y = (int)Mathf.RoundToInt((playerPos.z -chunkSize/2f) / chunkSize);
+			playerChunkPos = new IntVector2 (
+				(int)Mathf.RoundToInt((playerPos.x - chunkSize/2f) / chunkSize),
+				(int)Mathf.RoundToInt((playerPos.z -chunkSize/2f) / chunkSize)
+			);
 
 			// For each space where there should be a chunk
 			for (int x=playerChunkPos.x - chunkLoadRadius; x<=playerChunkPos.x + chunkLoadRadius; x++) {
 				for (int y=playerChunkPos.y - chunkLoadRadius; y<=playerChunkPos.y + chunkLoadRadius; y++) {
-
+					
 					// Skip if chunk exists
 					if (chunkmap.At(x,y) != null) continue;
 
@@ -293,6 +295,16 @@ public class DynamicTerrain : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Chunks at x and y.
+	/// </summary>
+	/// <returns>The <see cref="Chunk"/>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	public Chunk ChunkAt (int x, int y) {
+		return chunkmap.At (x, y);
+	}
+
+	/// <summary>
 	/// Removes a chunk from the appropriate lists.
 	/// </summary>
 	/// <param name="chunk">Chunk.</param>
@@ -393,6 +405,12 @@ public class DynamicTerrain : MonoBehaviour {
 		}
 
 		return chunk;
+	}
+
+	public int NumActiveChunks {
+		get {
+			return activeChunks.Count;
+		}
 	}
 
 	/// <summary>

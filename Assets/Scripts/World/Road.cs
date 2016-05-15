@@ -12,6 +12,7 @@ public class Road : Bezier {
 	DynamicTerrain terrain;   // reference to terrain
 
 	float generateRoadRadius; // distance from player to generate road (copied from WM)
+	float variance;
 	float placementDistance;  // marginal distance to add new road (copied from WM)
 	float maxSlope;           // maximum slope per world unit (copied from WM)
 
@@ -21,9 +22,9 @@ public class Road : Bezier {
 	int stepsPerCurve;        // number of steps per road curve (copied from WM)
 	int steps = 0;            // current number of steps
 
-	float width;              // width of generated road (copied from WM)
-	float height;             // height of generated road (copied from WM)
-	float slope;              // ratio of top plane to bottom width (copied from WM)
+	public float width;              // width of generated road (copied from WM)
+	public float height;             // height of generated road (copied from WM)
+	public float slope;              // ratio of top plane to bottom width (copied from WM)
 
 	Mesh mesh;                // road mesh
 	List<Vector3> verts;      // vertices in road mesh
@@ -35,15 +36,12 @@ public class Road : Bezier {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		loaded = false;
 
-		// Copy vars from WM
-		generateRoadRadius = WorldManager.instance.roadExtendRadius;
-		placementDistance = WorldManager.instance.roadVariance;
-		maxSlope = WorldManager.instance.roadSlope;
-
-		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
+		verts = new List<Vector3> ();
+		uvs = new List<Vector2> ();
+		tris = new List<int> ();
 
 		// Init mesh
 		mesh = new Mesh();
@@ -51,8 +49,23 @@ public class Road : Bezier {
 		// Init road points
 		points = new Vector3[0];
 
+	}
+
+	public void Start () {
+
+		// Copy vars from WM
+		generateRoadRadius = WorldManager.instance.roadExtendRadius;
+		variance = WorldManager.instance.roadVariance;
+		placementDistance = WorldManager.instance.roadPlacementDistance;
+		maxSlope = WorldManager.instance.roadSlope;
+
+		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
+
+		terrain = WorldManager.instance.terrain;
+
 		// Build mesh
 		Reset ();
+		
 	}
 
 	public void Update () {
@@ -77,6 +90,8 @@ public class Road : Bezier {
 
 		// Create new points in front of player
 		while (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
+
+
 
 			float progress = PlayerMovement.instance.progress;
 			float numerator = progress * CurveCount;
@@ -155,7 +170,7 @@ public class Road : Bezier {
 	// Adds a new curve to the road bezier
 	void AddCurve () {
 		//float startTime = Time.realtimeSinceStartup;
-		float displacedDirection = placementDistance * WorldManager.instance.roadVariance;//placementRange;
+		float displacedDirection = placementDistance * variance; //placementRange;
 		maxSlope = WorldManager.instance.roadSlope;
 
 		Vector3 point;
@@ -182,10 +197,9 @@ public class Road : Bezier {
 			}
 
 			points[PointsCount - i] = point;
-
 		}
 
-		DynamicTerrain.instance.OnExtendRoad();
+		terrain.OnExtendRoad ();
 
 		Array.Resize (ref modes, modes.Length + 1);
 		modes[modes.Length - 1] = modes[modes.Length -2];
@@ -220,7 +234,7 @@ public class Road : Bezier {
 				//point-BezRight(point)*width
 			};
 			//DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
-			DynamicTerrain.instance.vertexmap.DoCheckRoads (points);
+			terrain.vertexmap.DoCheckRoads (points);
 			progress += diff / resolution;
 
 			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
@@ -233,15 +247,14 @@ public class Road : Bezier {
 
 	// Sets the road mesh
 	public void Build () {
-		mesh.Clear ();
 
 		// Populate vertex, UV, and triangles lists
 		BuildRoadMesh ();
 
 		// Apply lists
-		mesh.SetVertices (verts);
-		mesh.SetUVs (0, uvs);
-		mesh.SetTriangles (tris, 0);
+		mesh.vertices = verts.ToArray();
+		mesh.uv = uvs.ToArray();
+		mesh.triangles = tris.ToArray();
 
 		// Recalculate properties
 		mesh.RecalculateNormals();
@@ -256,9 +269,9 @@ public class Road : Bezier {
 	// Calculates vertices, UVs, and tris for road mesh
 	void BuildRoadMesh() {
 
-		List<Vector3> newVertices = new List<Vector3> ();
-		List<int> newTriangles = new List<int> ();
-		List<Vector2> newUVs = new List<Vector2>();
+		verts.Clear ();
+		uvs.Clear ();
+		tris.Clear ();
 
 		float progressI = 0f;
 		Vector3 pointI = GetPoint (progressI);
@@ -266,24 +279,24 @@ public class Road : Bezier {
 		Vector3 rightI = BezRight (dirI);
 		Vector3 downI = BezDown (dirI);
 
-		newVertices.Add(pointI + width * -rightI);
-		newUVs.Add(new Vector2(-0.25f, 0f));
+		verts.Add(pointI + width * -rightI);
+		uvs.Add(new Vector2(-0.25f, 0f));
 		int leftDownI = 0;
 
-		newVertices.Add(pointI + width *rightI);
-		newUVs.Add(new Vector2(1.25f, 0f));
+		verts.Add(pointI + width *rightI);
+		uvs.Add(new Vector2(1.25f, 0f));
 		int rightDownI = 1;
 
-		newVertices.Add(
+		verts.Add(
 			pointI + slope * width * -rightI + height * -downI
 		);
-		newUVs.Add(new Vector2(1-slope-0.25f, 0f));
+		uvs.Add(new Vector2(1-slope-0.25f, 0f));
 		int leftUpI = 2;
 
-		newVertices.Add(
+		verts.Add(
 			pointI + slope * width * rightI + height * -downI
 		);
-		newUVs.Add(new Vector2(slope+0.25f, 1f));
+		uvs.Add(new Vector2(slope+0.25f, 1f));
 		int rightUpI = 3;
 
 		bool flipUVs = true;
@@ -300,56 +313,56 @@ public class Road : Bezier {
 			UVProgress += Vector3.Distance (pointF, pointI);
 			float UVValue = 0.5f + 0.5f * Mathf.Sin(UVProgress);
 
-			newVertices.Add(pointF + width * -rightF);
-			newUVs.Add(new Vector2(-0.25f, UVValue));
+			verts.Add(pointF + width * -rightF);
+			uvs.Add(new Vector2(-0.25f, UVValue));
 			int leftDownF = num * 4;
 
-			newVertices.Add(pointF + width * rightF);
-			newUVs.Add(new Vector2(1.25f, UVValue));
+			verts.Add(pointF + width * rightF);
+			uvs.Add(new Vector2(1.25f, UVValue));
 			int rightDownF = num * 4 + 1;
 
-			newVertices.Add(
+			verts.Add(
 				pointF + slope * width * -rightF + height * -downF
 			);
-			newUVs.Add(new Vector2(1-slope-0.25f, UVValue));
+			uvs.Add(new Vector2(1-slope-0.25f, UVValue));
 			int leftUpF = num * 4 + 2;
 
-			newVertices.Add(
+			verts.Add(
 				pointF + slope * width * 
 				rightF + height * -downF
 			);
-			newUVs.Add(new Vector2(slope+0.25f, UVValue));
+			uvs.Add(new Vector2(slope+0.25f, UVValue));
 			int rightUpF = num * 4 + 3;
 
 
 			// Left slope
-			newTriangles.Add (leftDownI);
-			newTriangles.Add (leftUpI);
-			newTriangles.Add (leftDownF);
+			tris.Add (leftDownI);
+			tris.Add (leftUpI);
+			tris.Add (leftDownF);
 
-			newTriangles.Add (leftDownF);
-			newTriangles.Add (leftUpI);
-			newTriangles.Add (leftUpF);
+			tris.Add (leftDownF);
+			tris.Add (leftUpI);
+			tris.Add (leftUpF);
 
 
 			// Right slope
-			newTriangles.Add (rightUpI);
-			newTriangles.Add (rightDownI);
-			newTriangles.Add (rightDownF);
+			tris.Add (rightUpI);
+			tris.Add (rightDownI);
+			tris.Add (rightDownF);
 
-			newTriangles.Add (rightUpF);
-			newTriangles.Add (rightUpI);
-			newTriangles.Add (rightDownF);
+			tris.Add (rightUpF);
+			tris.Add (rightUpI);
+			tris.Add (rightDownF);
 
 
 			// Road surface plane
-			newTriangles.Add (leftUpF);
-			newTriangles.Add (rightUpI);
-			newTriangles.Add (rightUpF);
+			tris.Add (leftUpF);
+			tris.Add (rightUpI);
+			tris.Add (rightUpF);
 
-			newTriangles.Add (leftUpI);
-			newTriangles.Add (rightUpI);
-			newTriangles.Add (leftUpF);
+			tris.Add (leftUpI);
+			tris.Add (rightUpI);
+			tris.Add (leftUpF);
 
 
 			progressI = progressF;
@@ -361,18 +374,6 @@ public class Road : Bezier {
 
 			flipUVs = !flipUVs;
 		}
-
-		verts = newVertices;
-		uvs = newUVs;
-		tris = newTriangles;
-	}
-
-	#endregion
-	#region Decoration Functions
-
-	// Registers a decoration and its progress
-	public void AddDecoration (GameObject decoration, float prog) {
-		decorations.Add (decoration, prog);
 	}
 
 	#endregion
