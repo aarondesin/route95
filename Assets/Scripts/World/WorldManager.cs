@@ -263,7 +263,6 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
 	public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
 
-	private float[] freqDataArray;
 	LineRenderer visualizer;
 
 	[Tooltip("FFT window to use when sampling music frequencies.")]
@@ -297,8 +296,6 @@ public class WorldManager : MonoBehaviour {
 
 		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
 		//Debug.Log(maxDecorations);
-
-		freqDataArray = new float[freqArraySize];
 
 		terrain = new GameObject ("Terrain",
 			typeof(DynamicTerrain)

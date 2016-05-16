@@ -235,7 +235,7 @@ public class DynamicTerrain : MonoBehaviour {
 				}
 					
 				// Update highest priority chunks
-				for (int i=0; i < WorldManager.instance.chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
+				for (int i=0; i < chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
 					try {
 						chunksToUpdate [i].ChunkUpdate ();
 						chunksToUpdate[i].priority = 0;
