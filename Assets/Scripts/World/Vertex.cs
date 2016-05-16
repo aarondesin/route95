@@ -458,7 +458,9 @@ public class Vertex {
 				Chunk chunk = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
 				if (chunk != null) chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
 			} catch (NullReferenceException e) {
-				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "+ChunkMax(x)+","+ChunkMax(y));
+				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "
+					+ChunkMax(x)+","+ChunkMax(y)+" "
+					+e.Message);
 				return;
 			}
 		}
