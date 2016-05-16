@@ -17,6 +17,8 @@ public class InputManager : MonoBehaviour {
 	[Tooltip("List of scroll views to disable while dragging.")]
 	public List<ScrollRect> scrollviews;
 
+	Vector3 prevMouse = Vector3.zero;
+	public Vector3 mouseDelta;
 	Vector3 clickPosition;
 	List<AudioSource> audioSources;
 
@@ -96,6 +98,7 @@ public class InputManager : MonoBehaviour {
 	}
 
 	void Update () {
+		mouseDelta = Input.mousePosition - prevMouse;
 		
 		if (GameManager.instance.currentMode == GameManager.Mode.Live) {
 			Song song = null;
@@ -219,6 +222,8 @@ public class InputManager : MonoBehaviour {
 				}
 			}
 		}
+
+		prevMouse = Input.mousePosition;
 	}
 
 	#endregion

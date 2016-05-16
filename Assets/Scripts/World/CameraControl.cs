@@ -7,6 +7,12 @@ public class CameraControl : MonoBehaviour {
 
 	public static CameraControl instance;
 
+	public enum State {
+		Setup,
+		Live,
+		Free
+	}
+
 	public enum CameraControlMode {
 		Manual, // Angles only change on user input
 		Random  // Angles cycle randomly through all available angles
@@ -16,6 +22,9 @@ public class CameraControl : MonoBehaviour {
 
 	[Header("General camera settings")]
 
+	public float rotateSensitivity = 0.4f;
+	public float moveSensitivity = 0.5f;
+	State state = State.Setup;
 	public float swaySpeed = 1f;
 	public float baseSway = 1f;
 
@@ -59,7 +68,6 @@ public class CameraControl : MonoBehaviour {
 	CameraView currentAngle;
 	List<CameraView> angles;
 	float transitionTimer;
-	bool liveMode = false;
 	bool paused = false;
 
 	// Mappings of keys to camera angle indices
@@ -95,14 +103,6 @@ public class CameraControl : MonoBehaviour {
 				fov = 75f,
 				followMode = CameraView.CameraFollowMode.Static
 			},
-
-			// On the hood, backwards
-			/*new CameraView () {
-				name = "HoodBackward",
-				tr = HoodBackward,
-				fov = 90f,
-				followMode = CameraFollowMode.Static
-			},*/
 
 			// Near chase
 			new CameraView () {
@@ -183,28 +183,6 @@ public class CameraControl : MonoBehaviour {
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
 
-			// Wide rear
-			/*new CameraView () {
-				name = "WideRear",
-				transform = WideRear,
-				targetPos = WideRear.position,
-				targetRot = WideRear.rotation,
-				fov = 75f,
-				followMode = CameraFollowMode.Static,
-				placementMode = CameraPlacementMode.Fixed
-			},*/
-
-			// Wide front
-			/*new CameraView () {
-				name = "WideFront",
-				transform = WideFront,
-				targetPos = WideFront.position,
-				targetRot = WideFront.rotation,
-				fov = 75f,
-				followMode = CameraFollowMode.Static,
-				placementMode = CameraPlacementMode.Fixed
-			},*/
-
 			// Far top
 			new CameraView () {
 				name = "FarTop",
@@ -232,35 +210,8 @@ public class CameraControl : MonoBehaviour {
 
 	void Update() {
 
-		// If in live mode
-		if (liveMode && !paused) {
-
-			// Check each mapped key for input
-			foreach (KeyCode key in keyToView.Keys) {
-				if (Input.GetKeyDown (key)) {
-					if (controlMode != CameraControlMode.Manual)
-						controlMode = CameraControlMode.Manual;
-					ChangeAngle (keyToView [key]);
-				}
-			}
-				
-			UpdateAllAngles();
-
-			// Move camera to current angle position
-			transform.position = currentAngle.pos;
-			transform.rotation = currentAngle.rot;
-
-			// Update transition timer
-			if (controlMode == CameraControlMode.Random) {
-				if (transitionTimer <= 0f) {
-					ChangeAngle ();
-					transitionTimer = liveModeTransitionFreq;
-				} else transitionTimer--;
-			}
-
-		// If not in live mode
-		} else {
-			
+		switch (state) {
+		case State.Setup:
 			if (moving) {
 
 				if (Vector3.Distance(start.position, target.position) != 0f) {
@@ -280,11 +231,62 @@ public class CameraControl : MonoBehaviour {
 					moving = false;
 				}
 			}
+			break;
+
+
+		case State.Live:
+			if (!paused) {
+
+				// Check each mapped key for input
+				foreach (KeyCode key in keyToView.Keys) {
+					if (Input.GetKeyDown (key)) {
+						if (controlMode != CameraControlMode.Manual)
+							controlMode = CameraControlMode.Manual;
+						ChangeAngle (keyToView [key]);
+					}
+				}
+					
+				UpdateAllAngles();
+
+				// Move camera to current angle position
+				transform.position = currentAngle.pos;
+				transform.rotation = currentAngle.rot;
+
+				// Update transition timer
+				if (controlMode == CameraControlMode.Random) {
+					if (transitionTimer <= 0f) {
+						ChangeAngle ();
+						transitionTimer = liveModeTransitionFreq;
+					} else transitionTimer--;
+				}
+			}
+			break;
+
+		case State.Free:
+
+			// Rotate camera
+			Vector3 d = InputManager.instance.mouseDelta;
+			Vector3 old = transform.rotation.eulerAngles;
+			old.z = 0f;
+			old.x += -d.y * rotateSensitivity;
+			old.y += d.x * rotateSensitivity;
+			transform.rotation = Quaternion.Euler(old);
+
+			// Translate camera
+			float forward = Input.GetAxisRaw("Forward") * moveSensitivity;
+			float up = Input.GetAxisRaw("Up") * moveSensitivity;
+			float right = Input.GetAxisRaw("Right") * moveSensitivity;
+			transform.Translate(new Vector3 (right, up, forward));
+
+			break;
+
 		}
 
+		// Calculate sway
 		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway;
 		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway;
 
+		// Do sway
 		transform.Rotate (bx, by, 0f);
 	}
 
@@ -293,12 +295,25 @@ public class CameraControl : MonoBehaviour {
 
 	// Set for live mode
 	public void StartLiveMode () {
-		liveMode = true;
+		state = State.Live;
 		ChangeAngle();
 	}
 
 	public void StopLiveMode () {
-		liveMode = false;
+		state = State.Setup;
+		LerpToPosition(ViewChase);
+	}
+
+	public void StartFreeMode () {
+		state = State.Free;
+		transform.rotation = Quaternion.identity;
+		GameManager.instance.MoveCasetteBack();
+		GameManager.instance.HideAll();
+		GameManager.instance.Hide(GameManager.instance.systemButtons);
+	}
+
+	public void StopFreeMode () {
+		state = State.Setup;
 		LerpToPosition(ViewChase);
 	}
 
