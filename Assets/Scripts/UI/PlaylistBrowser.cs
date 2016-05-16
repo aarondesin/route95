@@ -27,6 +27,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		instance = this;
 		projectNameInputField.onEndEdit.AddListener( delegate {
 			MusicManager.instance.currentProject.name = projectNameInputField.text;
+			if (projectNameInputField.text == "devnull") CameraControl.instance.StartFreeMode();
 		});
 		listings = new List<GameObject>();
 	}
