@@ -31,8 +31,8 @@ public class Chunk: MonoBehaviour {
 	VertexMap vmap;                        // reference to vertex map to use
 	public List<GameObject> decorations;   // list of decorations parented to this chunk
 
-	int chunkRes;                          // chunk resolution (copied from WM)
-	float chunkSize;                       // width of a chunk in world units (copied from WM)
+	static int chunkRes;                          // chunk resolution (copied from WM)
+	static float chunkSize;                       // width of a chunk in world units (copied from WM)
 
 	public float priority = 0f;            // this chunk's priority when considering chunks to update.
 
@@ -113,16 +113,10 @@ public class Chunk: MonoBehaviour {
 			coords[i] = coord;
 
 			// Get corresponding vertex
-			mapVerts[i] = vmap.VertexAt (coord);
+			mapVerts[i] = vmap.VertexAt (coord, true);
 
 			// If vertex exists, get height
-			if (mapVerts[i] != null) UpdateVertex (i, mapVerts[i].height);
-
-			// If vertex doesn't exist, create it
-			else {
-				mapVerts[i] = vmap.AddVertex(coord);
-				mapVerts[i].SetHeight(0f);
-			}
+			UpdateVertex (i, mapVerts[i].height);
 		}
 
 		// Assign material
@@ -192,14 +186,11 @@ public class Chunk: MonoBehaviour {
 			coords[i] = coord;
 
 			// Get corresponding vertex
-			mapVerts[i] = vmap.VertexAt(coord.x, coord.y);
+			mapVerts[i] = vmap.VertexAt(coord, true);
 
 			// Get height from vertex
-			if (mapVerts[i] != null) UpdateVertex (i, mapVerts[i].height);
-			else {
-				mapVerts[i] = vmap.AddVertex(coord);
-				mapVerts[i].SetHeight(0f);
-			}
+			UpdateVertex (i, mapVerts[i].height);
+	
 		}
 
 		// Mark chunk for collider update
@@ -428,7 +419,7 @@ public class Chunk: MonoBehaviour {
 					              WorldManager.instance.heightScale;
 
 					// If new height, set it
-					if (newY != vmap.VertexAt(coord).height) vmap.SetHeight (coord, newY);
+					if (newY != vmap.VertexAt(coord, false).height) vmap.SetHeight (coord, newY);
 				}
 			}
 
@@ -521,13 +512,14 @@ public class Chunk: MonoBehaviour {
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
 	public static IntVector2 ToNearestVMapCoords (float x, float y) {
-		float chunkSize = WorldManager.instance.chunkSize;
-		int chunkRes = WorldManager.instance.chunkResolution;
-
-		return new IntVector2 (
-			Mathf.RoundToInt((x-chunkSize/2f) * (float)chunkRes / chunkSize),
-			Mathf.RoundToInt((y-chunkSize/2f) * (float)chunkRes / chunkSize)
+		//if (x < 0) Debug.Log(x);
+		IntVector2 result = new IntVector2 (
+			Mathf.RoundToInt((x-chunkSize/2f) * chunkRes / chunkSize),
+			Mathf.RoundToInt((y-chunkSize/2f) * chunkRes / chunkSize)
 		);
+		//if (x < 0) Debug.Log(result.x);
+		//Debug.Log (x+","+y +" mapped to "+result.ToString());
+		return result;
 	}
 
 	/// <summary>
@@ -556,7 +548,8 @@ public class Chunk: MonoBehaviour {
 			RaycastHit hit;
 			Vector3 rayOrigin = new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z);
 			if (Physics.Raycast(rayOrigin, Vector3.down,out hit, Mathf.Infinity))
-				tr.position = new Vector3 (tr.position.x, hit.point.y, tr.position.z);
+				tr.position = new Vector3 (tr.position.x, hit.point.y + 
+					tr.gameObject.GetComponent<Decoration>().positionOffset.y, tr.position.z);
 		}
 	}
 
@@ -566,6 +559,17 @@ public class Chunk: MonoBehaviour {
 	public void RemoveDecorations () {
 		foreach (GameObject decoration in decorations)
 			WorldManager.instance.RemoveDecoration(decoration);
+	}
+
+	public void SetDebugColors (DynamicTerrain.DebugColors color) {
+		switch (color) {
+		case DynamicTerrain.DebugColors.Constrained:
+			for (int v=0; v<numVerts; v++) {
+				colors[v] = mapVerts[v].noDecorations ? Color.black : Color.white;
+			}
+			mesh.colors = colors;
+			break;
+		}
 	}
 
 	#endregion

@@ -49,8 +49,13 @@ public class Decoration : MonoBehaviour {
 
 	void FixedUpdate () {
 		if (dynamic) {
+
+			// Remove if decoration fell below
+			if (transform.position.y < -WorldManager.instance.heightScale) 
+				WorldManager.instance.RemoveDecoration (gameObject);
+
+			// Push with wind
 			GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
-			if (transform.position.y < -WorldManager.instance.heightScale) WorldManager.instance.RemoveDecoration (gameObject);
 		}
 	}
 
@@ -59,18 +64,18 @@ public class Decoration : MonoBehaviour {
 
 	// Starts with base position/rotation, and adds variance
 	public void Randomize () {
-		GetComponent<Transform>().position += positionOffset;
-		GetComponent<Transform>().rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
+		transform.position += positionOffset;
+		transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
 
 		// Randomize scale (width and height)
-		GetComponent<Transform>().localScale = new Vector3 (
-			WorldManager.instance.chunkSize*Random.Range (widthRange[0], widthRange[1]),
-			WorldManager.instance.chunkSize*Random.Range (heightRange[0], heightRange[1]),
-			WorldManager.instance.chunkSize*Random.Range (widthRange[0], widthRange[1])
+		transform.localScale = new Vector3 (
+			transform.localScale.x * Random.Range (widthRange[0], widthRange[1]),
+			transform.localScale.y * Random.Range (heightRange[0], heightRange[1]),
+			transform.localScale.z * Random.Range (widthRange[0], widthRange[1])
 		);
 
 		// Randomize rotation
-		GetComponent<Transform>().Rotate ( new Vector3 (
+		transform.Rotate ( new Vector3 (
 			Random.Range (pitchRange[0], pitchRange[1]),
 			Random.Range (yawRange[0], yawRange[1]),
 			Random.Range (rollRange[0], rollRange[1])

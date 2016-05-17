@@ -27,12 +27,13 @@ public class VertexMap {
 	public Map<Vertex> vertices;
 	public DynamicTerrain terrain;
 	//const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
-	float NEARBY_ROAD_DISTANCE;
+	float nearbyRoadDistance;
+	float noDecorationsDistance;
 
-	int xMin = 0;
-	int xMax = 0;
-	int yMin = 0;
-	int yMax = 0;
+	public int xMin = 0;
+	public int xMax = 0;
+	public int yMin = 0;
+	public int yMax = 0;
 
 	float roadHeight;
 
@@ -48,7 +49,8 @@ public class VertexMap {
 		chunkSize = WorldManager.instance.chunkSize;
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
-		NEARBY_ROAD_DISTANCE = WorldManager.instance.roadWidth;
+		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
+		noDecorationsDistance = nearbyRoadDistance * 1.2f;
 		roadHeight = WorldManager.instance.roadHeight;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
@@ -158,14 +160,14 @@ public class VertexMap {
 
 				// Skip if impossible for a point to be in range
 				xWPos = x * chunkSize/(chunkRes-1) - chunkSize/2f;
-				if (Mathf.Abs(xWPos - roadPoint.x) > NEARBY_ROAD_DISTANCE) 
+				if (Mathf.Abs(xWPos - roadPoint.x) > noDecorationsDistance) 
 					continue;
 
 				for (int y = yMin; y < yMax; y++) {
 
 					// Skip if impossible for a point to be in range
 					yWPos = y * chunkSize/(chunkRes-1) - chunkSize/2f ;
-					if (Mathf.Abs(yWPos- roadPoint.z) > NEARBY_ROAD_DISTANCE) 
+					if (Mathf.Abs(yWPos- roadPoint.z) > noDecorationsDistance) 
 						continue;
 					
 					Vertex vert = vertices.At(x,y);
@@ -173,20 +175,24 @@ public class VertexMap {
 					if (vert.locked) continue;
 
 					float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
-					vert.nearRoad = dist <= NEARBY_ROAD_DISTANCE;
+					vert.noDecorations = dist <= noDecorationsDistance;
 
-					if (vert.nearRoad) {
-						vert.SmoothHeight(roadPoint.y-roadHeight, 0.95f);
-						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
-						foreach (GameObject decoration in decorationDeletes) 
-							WorldManager.instance.RemoveDecoration(decoration);
-						decorationDeletes.Clear();
-						vert.locked = true;
-					}
+					if (vert.noDecorations) {
+						vert.nearRoad = dist <= nearbyRoadDistance;
 
-					if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
-						yield return null;
-						startTime = Time.realtimeSinceStartup;
+						if (vert.nearRoad) {
+							vert.SmoothHeight(roadPoint.y, UnityEngine.Random.Range(0.98f, 0.99f), UnityEngine.Random.Range(2, 8));
+							foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
+							foreach (GameObject decoration in decorationDeletes) 
+								WorldManager.instance.RemoveDecoration(decoration);
+							decorationDeletes.Clear();
+							vert.locked = true;
+						}
+
+						if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+							yield return null;
+							startTime = Time.realtimeSinceStartup;
+						}
 					}
 				}
 
@@ -255,16 +261,18 @@ public class VertexMap {
 	}*/
 
 	public void RegisterChunkVertex (IntVector2 vertCoords, IntVector2 chunkCoords, int vertIndex) {
-		Vertex vert = ContainsVertex (vertCoords) ? VertexAt(vertCoords) : AddVertex (vertCoords);
+		Vertex vert = VertexAt(vertCoords, true);
 		vert.chunkVertices.Add(new KeyValuePair<IntVector2, int> (chunkCoords, vertIndex));
 	}
 
-	public Vertex VertexAt (int x, int y) {
-		return vertices.At(x, y);
+	public Vertex VertexAt (int x, int y, bool make = false) {
+		Vertex vert = vertices.At (x,y);
+		if (vert == null && make) vert = AddVertex (x, y);
+		return vert;
 	}
 
-	public Vertex VertexAt (IntVector2 i) {
-		return VertexAt(i.x, i.y);
+	public Vertex VertexAt (IntVector2 i, bool make = false) {
+		return VertexAt(i.x, i.y, make);
 	}
 
 	public void RegisterDecoration (IntVector2 i, GameObject deco) {
@@ -334,6 +342,7 @@ public class Vertex {
 	public float height = 0f;
 	public float currHeight = 0f;
 	public bool nearRoad = false;
+	public bool noDecorations = false;
 	public Vector3 normal = Vector3.up;
 	public float slope = 0f;
 	public float blendValue = UnityEngine.Random.Range (0f, 1.0f);
@@ -346,6 +355,26 @@ public class Vertex {
 		decorations = new List<GameObject>();
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkSize = WorldManager.instance.chunkSize;
+	}
+
+	public void SmoothHeight (float h, float factor, float range) {
+		SetHeight (h);
+		Vector2 v = new Vector2 ((float)x, (float)y);
+		for (int ix = map.xMin; ix <= map.xMax; ix++) {
+			if ((float)Mathf.Abs(ix - x) > range) continue;
+			for (int iy = map.yMin; iy <= map.yMax; iy++) {
+				if ((float)Mathf.Abs(iy - y) > range) continue;
+
+				Vector2 n = new Vector2 ((float)ix, (float)iy);
+				float dist = Vector2.Distance (n,v);
+				if (dist > range) continue;
+
+				if (ix == x && iy == y) continue;
+
+				Vertex vert = map.VertexAt(ix, iy);
+				if (vert != null && !vert.locked) vert.Smooth(h, factor * (range-dist) / range);
+			}
+		}
 	}
 
 	public void SmoothHeight (float h, float factor) {
@@ -383,7 +412,10 @@ public class Vertex {
 	}
 
 	public void Smooth (float h, float factor) {
+		//if (UnityEngine.Random.Range(0,100) == 1) Debug.Log(factor);
+		//Debug.Log(h);
 		SetHeight (height + (h-height) * factor);
+		//Debug.Log(h);
 	}
 
 	bool IsEdge (int coord) {

@@ -7,44 +7,11 @@ using UnityStandardAssets.ImageEffects;
 
 public class WorldManager : MonoBehaviour {
 
-	public struct Wave {
-		public Vector3 origin;
-		public float range;
-		public float progress;
-		public float width;
-		public float height;
-		public float speed;
-
-		public bool active;
-
-		public Wave (Vector3 pos, float r, float w, float h, float s) {
-			origin = pos;
-			range = r;
-			progress = 0f;
-			width = w;
-			height = h;
-			speed = s;
-			active = true;
-		}
-
-		public void Update () {
-			progress += speed * Time.deltaTime;
-			if (progress >= 1f) active = false;
-		}
-
-		public Vector2 pixelOrigin (int chunkRes, float chunkSize) {
-			return new Vector2 (
-				Mathf.RoundToInt((origin.x-chunkSize/2f) * (float)chunkRes / chunkSize),
-				Mathf.RoundToInt((origin.z-chunkSize/2f) * (float)chunkRes / chunkSize)
-			);
-		}
-	}
+	#region WorldManager Vars
 
 	public static WorldManager instance;
 
 	public int loadsToDo;
-
-	#region WorldManager Defaults
 
 	// Chunk vars
 	const float DEFAULT_CHUNK_SIZE = 100;
@@ -62,6 +29,7 @@ public class WorldManager : MonoBehaviour {
 	// Road vars
 	const float DEFAULT_ROAD_WIDTH = 10f;
 	const float DEFAULT_ROAD_HEIGHT = 0.2f;
+	const float DEFAULT_ROAD_SLOPE = 0.9f;
 	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;
 	const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;
 	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;
@@ -108,13 +76,19 @@ public class WorldManager : MonoBehaviour {
 	[Range(100f, 1000f)]
 	public float vertexUpdateDistance = DEFAULT_VERTEX_UPDATE_DISTANCE;
 
-	[Tooltip("Current wind vector.")]
-	public Vector3 wind;
-
 	[Tooltip("Material to use for terrain.")]
 	public Material terrainMaterial;
+	public Material terrainDebugMaterial;
 
+	[NonSerialized]
 	public DynamicTerrain terrain;
+
+	//
+	[Header("Physics Settings")]
+	//
+
+	[Tooltip("Current wind vector.")]
+	public Vector3 wind;
 
 
 	//
@@ -124,21 +98,20 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Enable/disable decoration.")]
 	public bool doDecorate = true;
 
-	//[Tooltip("Maxmimum number of decorations.")]
-	private int maxDecorations; //= DEFAULT_MAX_DECORATIONS;
+	[SerializeField]
+	private int maxDecorations;
 
-	//[Tooltip("Individual maximums for each decoration group.")]
-	//public Decoration.GroupInfo[] initialMaxActive;
-
+	[SerializeField]
 	private int numDecorations;
-	//private Dictionary<Decoration.Group, int> maxActive;
+
 	public Decoration.GroupInfo vegetationGroup;
 	public Decoration.GroupInfo roadSignGroup;
 	public Decoration.GroupInfo rockGroup;
+
 	[NonSerialized]
 	public List<GameObject> decorations = new List<GameObject>();
-	[NonSerialized]
-	public List<string> decorationPaths = new List<string>() {
+
+	List<string> decorationPaths = new List<string>() {
 		"Prefabs/Decoration_75MPH",
 		"Prefabs/Decoration_Agave01",
 		"Prefabs/Decoration_BarrelCactus",
@@ -150,13 +123,20 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/Decoration_Saguaro",
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
-
+		
 	ObjectPool decorationPool;
 
+	[Tooltip("Current global decoration density.")]
+	[Range(0f,2f)]
 	public float decorationDensity = 1f;
 
+	[Tooltip("Mesh to use for grass particles.")]
 	public Mesh grassModel;
+
+	[Tooltip("Material to use for vegetation decorations.")]
 	public Material vegetationMaterial;
+
+	[Tooltip("Template to use for grass particle emitters.")]
 	public GameObject grassEmitterTemplate;
 
 	//
@@ -183,9 +163,6 @@ public class WorldManager : MonoBehaviour {
 	[Header("Road Settings")]
 	//
 
-	[NonSerialized]
-	public Road road;
-
 	[Tooltip("Width of generated road.")]
 	[Range(1f, 20f)]
 	public float roadWidth = DEFAULT_ROAD_WIDTH;
@@ -193,6 +170,8 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Height of generated road.")]
 	[Range(0.1f, 1.0f)]
 	public float roadHeight = DEFAULT_ROAD_HEIGHT;
+
+	public float roadSlope = DEFAULT_ROAD_SLOPE;
 
 	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
@@ -203,7 +182,10 @@ public class WorldManager : MonoBehaviour {
 	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
 
 	public float roadVariance = DEFAULT_ROAD_VARIANCE;
-	public float roadSlope = DEFAULT_ROAD_MAX_SLOPE;
+	public float roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
+
+	[NonSerialized]
+	public Road road;
 
 	[Tooltip("Material to use for road.")]
 	public Material roadMaterial;
@@ -227,6 +209,9 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Daytime intensity of the sun.")]
 	[Range(0.1f, 1.5f)]
 	public float maxSunIntensity;
+	public float minSunIntensity;
+	float sunIntensityAxis;
+	float sunIntensityAmplitude;
 
 	[Tooltip("Flare texture to use for the sun.")]
 	public Flare sunFlare;
@@ -237,6 +222,9 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Nighttime intensity of the moon.")]
 	[Range(0.1f, 1.5f)]
 	public float maxMoonIntensity;
+	public float minMoonIntensity;
+	float moonIntensityAxis;
+	float moonIntensityAmplitude;
 
 	[Tooltip("Sprites to randomize for the moon.")]
 	public List<Sprite> moonSprites;
@@ -310,8 +298,16 @@ public class WorldManager : MonoBehaviour {
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
 		sun = CreateSun();
 		sunLight = sun.Light();
+		sunIntensityAmplitude = (maxSunIntensity-minSunIntensity)/2f;
+		sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
+
 		moon = CreateMoon();
 		moonLight = moon.Light();
+		moonIntensityAmplitude = (maxMoonIntensity-maxMoonIntensity)/2f;
+		moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
+
+		RenderSettings.ambientMode = AmbientMode.Flat;
+		RenderSettings.ambientIntensity = 0.5f;
 
 		lightningStriker.SetActive(false);
 		rainEmitter.SetRate(0f);
@@ -434,15 +430,14 @@ public class WorldManager : MonoBehaviour {
 		primaryColor = primaryColors.Evaluate(progress);
 		secondaryColor = secondaryColors.Evaluate(progress);
 
-		
-			
-		sunLight.intensity = maxSunIntensity/2f * Mathf.Sin (timeOfDay) + maxSunIntensity/2f;
+		sunLight.intensity = sunIntensityAxis + sunIntensityAmplitude * Mathf.Sin (timeOfDay);
 		sunLight.color = primaryColor;
 
 		moonLight.color = Color.white;
-		moonLight.intensity = maxMoonIntensity/2f * Mathf.Cos (progress) + maxMoonIntensity/2f;
+		moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay-(Mathf.PI/2f));
 
 		RenderSettings.fogColor = secondaryColor;
+		RenderSettings.ambientLight = secondaryColor;
 
 		RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
 
@@ -463,15 +458,6 @@ public class WorldManager : MonoBehaviour {
 		while (timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
 			timeOfDay -= 2 * Mathf.PI;
 		}
-	}
-
-	float AngularDistance (float angle, float pos) {
-		float d = angle - pos;
-		while (d < -Mathf.PI)
-			d += 2f * Mathf.PI;
-		while (d > Mathf.PI)
-			d -= 2f * Mathf.PI;
-		return 1.0f-Mathf.Abs(5f*d/Mathf.PI/2.0f);
 	}
     
 	bool AttemptDecorate () {
@@ -581,7 +567,10 @@ public class WorldManager : MonoBehaviour {
 		IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
 
 		// Check if constrained
-		if (terrain.vertexmap.IsConstrained (nearestVertex)) return false;
+		if (terrain.vertexmap.VertexAt(nearestVertex).noDecorations) {
+			Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
+			return false;
+		}
 
 		// Roll based on density
 		float density = decorationPrefab.GetComponent<Decoration>().density;
@@ -642,7 +631,8 @@ public class WorldManager : MonoBehaviour {
 		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
 
 		// Calculate coordinate
-		Vector3 coordinate = point + road.BezRight(point) * roadWidth * 2f * (side == 0 ? 1 : -1);
+		Vector3 coordinate = point + road.BezRight(point) * 
+			roadWidth * UnityEngine.Random.Range(1.5f, 1.6f) * (side == 0 ? 1 : -1);
 
 		// Raycast down
 		RaycastHit hit;
@@ -652,7 +642,8 @@ public class WorldManager : MonoBehaviour {
 
 		// Instantiate or grab decoration
 		GameObject decoration;
-		if (createNew) decoration = Instantiate(decorationPrefab);
+		if (createNew) decoration = 
+			(GameObject)Instantiate(decorationPrefab, coordinate, Quaternion.Euler(Vector3.zero));
 		else decoration = decorationPool.Get();
 
 		// Randomize
@@ -660,9 +651,8 @@ public class WorldManager : MonoBehaviour {
 		deco.Randomize();
 
 		// Point decoration in road direction
-		Vector3 rot = Quaternion.FromToRotation (coordinate+ road.GetDirection(prog), coordinate ).eulerAngles + new Vector3 (-90f,90f,0f);
-		decoration.transform.rotation = Quaternion.Euler(rot);
-		if (side == 0) decoration.transform.Rotate (new Vector3 (0f, 180f, 0f), Space.World);
+		decoration.transform.rotation = Quaternion.LookRotation (road.GetDirection(prog), Vector3.up);
+		decoration.transform.Rotate(-90f, side == 1 ? 180f : 0f, 0f);
 
 		// Parent to nearest chunk
 		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
@@ -816,6 +806,10 @@ public class WorldManager : MonoBehaviour {
 		if (!v.locked) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
 
 		//Debug.Log(v.ToString());
+	}
+
+	public void DebugTerrain () {
+		terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
 	}
 		
 }

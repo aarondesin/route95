@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
     serializedVersion: 3
-    m_Resolution: 3
+    m_Resolution: 4
     m_BakeResolution: 40
     m_TextureWidth: 1024
     m_TextureHeight: 1024
@@ -9824,6 +9824,7 @@ GameObject:
   - 164: {fileID: 371512240}
   - 65: {fileID: 371512241}
   - 65: {fileID: 371512242}
+  - 65: {fileID: 371512243}
   m_Layer: 9
   m_Name: Player Avatar
   m_TagString: Untagged
@@ -10022,6 +10023,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3.61, y: 1.72, z: 1}
   m_Center: {x: 0, y: -0.94, z: 1.67}
+--- !u!65 &371512243
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371512236}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.57, y: 0.18, z: 1}
+  m_Center: {x: 0, y: 0.42, z: -0.24}
 --- !u!1 &387124028
 GameObject:
   m_ObjectHideFlags: 0
@@ -15912,6 +15925,7 @@ MonoBehaviour:
   paused: 0
   currentMenu: 0
   currentMode: 0
+  targetDeltaTime: 0
   loaded: 0
   casetteFront: {fileID: 42670265}
   casetteBack: {fileID: 402827720}
@@ -20785,9 +20799,13 @@ MonoBehaviour:
   chunkLoadRadius: 4
   heightScale: 800
   vertexUpdateDistance: 600
-  wind: {x: 0, y: 0, z: 0}
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
+  terrainDebugMaterial: {fileID: 2100000, guid: d1cad6307feb3e84084988a715c5efff,
+    type: 2}
+  wind: {x: 0, y: 0, z: 0}
   doDecorate: 1
+  maxDecorations: 0
+  numDecorations: 0
   vegetationGroup:
     group: 1
     numActive: 0
@@ -20817,16 +20835,21 @@ MonoBehaviour:
   starEmitter: {fileID: 1592348090}
   shakers: 0
   roadWidth: 10
-  roadHeight: 0.5
+  roadHeight: 1
+  roadSlope: 0.6
+  roadStepsPerCurve: 25
   roadExtendRadius: 350
+  roadPlacementDistance: 30
   roadVariance: 0.4
-  roadSlope: 0.0015
+  roadMaxSlope: 0.001
   roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   timeScale: 0.01
   timeOfDay: 0
-  maxSunIntensity: 0.5
+  maxSunIntensity: 0.6
+  minSunIntensity: 0.6
   sunFlare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
   maxMoonIntensity: 0.45
+  minMoonIntensity: 0.2
   moonSprites:
   - {fileID: 21300000, guid: 16b1aed2b39d339439f1671efa73148c, type: 3}
   - {fileID: 21300000, guid: 542a09cb4c7d2cd4b8cbc9a0a1f54542, type: 3}
@@ -20965,9 +20988,10 @@ MonoBehaviour:
     m_NumAlphaKeys: 5
   chunkUpdatesPerCycle: 2
   freqArraySize: 256
+  freqFFTWindow: 0
   decorationsPerStep: 100
   grassPerChunk: 5
-  roadPathCheckResolution: 25
+  roadPathCheckResolution: 50
   loadedTerrain: 0
 --- !u!1 &906108765
 GameObject:
@@ -24602,6 +24626,7 @@ MonoBehaviour:
   selected: {fileID: 0}
   scrollviews:
   - {fileID: 181759422}
+  mouseDelta: {x: 0, y: 0, z: 0}
   framesDragged: 0
 --- !u!4 &1118047755
 Transform:
@@ -29526,6 +29551,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92efc10c71b48941b29b4206d79e4ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotateSensitivity: 0.5
+  moveSensitivity: 0.5
   swaySpeed: 0.5
   baseSway: 0.01
   initialPosition: {fileID: 2107393831}

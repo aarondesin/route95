@@ -54,10 +54,14 @@ public class Road : Bezier {
 	public void Start () {
 
 		// Copy vars from WM
+		width = WorldManager.instance.roadWidth;
+		height = WorldManager.instance.roadHeight;
+		slope = WorldManager.instance.roadSlope;
+
 		generateRoadRadius = WorldManager.instance.roadExtendRadius;
 		variance = WorldManager.instance.roadVariance;
 		placementDistance = WorldManager.instance.roadPlacementDistance;
-		maxSlope = WorldManager.instance.roadSlope;
+		maxSlope = WorldManager.instance.roadMaxSlope;
 
 		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
 
@@ -70,22 +74,17 @@ public class Road : Bezier {
 
 	public void Update () {
 
+		variance = WorldManager.instance.roadVariance;
+		maxSlope = WorldManager.instance.roadMaxSlope;
+
 		if (!loaded) return;
 
 		// Remove far away points behind the player
-		if (Vector3.Distance (points[3], PlayerMovement.instance.transform.position) > generateRoadRadius) {
+		if (Vector3.Distance (points[0], PlayerMovement.instance.transform.position) > generateRoadRadius) {
 
-			// Update player progress
-			float progress = PlayerMovement.instance.progress;
-			float numerator = progress * CurveCount;
+			RemoveCurve();
 
-
-			// Update points array
-			Vector3[] newPoints = new Vector3[points.Length - 3];
-			for (int i = 0; i < newPoints.Length; i++)
-				newPoints [i] = points [i + 3];
-
-			PlayerMovement.instance.progress = numerator / CurveCount;
+			PlayerMovement.instance.progress -= 0.5f / (float)CurveCount;
 		}
 
 		// Create new points in front of player
@@ -171,7 +170,6 @@ public class Road : Bezier {
 	void AddCurve () {
 		//float startTime = Time.realtimeSinceStartup;
 		float displacedDirection = placementDistance * variance; //placementRange;
-		maxSlope = WorldManager.instance.roadSlope;
 
 		Vector3 point;
 		if (points.Length > 0) point = points [points.Length - 1];
@@ -183,11 +181,14 @@ public class Road : Bezier {
 		RaycastHit hit;
 
 		for (int i=3; i>0; i--) {
-			point += direction + new Vector3(
+			float a = UnityEngine.Random.Range (0f, Mathf.PI * 2f);
+			float d = UnityEngine.Random.Range (displacedDirection * 0.75f, displacedDirection);
+			/*point += direction + new Vector3(
 				UnityEngine.Random.Range(-displacedDirection, displacedDirection), 
 				0f, 
 				UnityEngine.Random.Range(-displacedDirection, displacedDirection)
-			);
+			);*/
+			point += direction + new Vector3 (d*Mathf.Cos(a), 0f, d*Mathf.Sin(a));
 				
 			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
 
@@ -209,8 +210,24 @@ public class Road : Bezier {
 		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 	
 	}
-			
-		
+
+	void RemoveCurve () {
+
+		// Update points array
+		Vector3[] newPoints = new Vector3[points.Length - 3];
+		BezierControlPointMode[] newModes = new BezierControlPointMode[modes.Length-1];
+		for (int i = 0; i < newPoints.Length; i++) {
+			newPoints [i] = points [i + 3];
+			if (i % 3 == 0) newModes[i/3] = modes[i/3 + 1];
+		}
+
+		points = newPoints;
+		modes = newModes;
+
+		steps -= stepsPerCurve;
+		Build();
+
+	}
 
 	// Marks all points between player and newly created points for leveling
 	public void DoBulldoze (float startProgress) {
@@ -237,7 +254,7 @@ public class Road : Bezier {
 			terrain.vertexmap.DoCheckRoads (points);
 			progress += diff / resolution;
 
-			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -247,6 +264,7 @@ public class Road : Bezier {
 
 	// Sets the road mesh
 	public void Build () {
+		mesh.Clear();
 
 		// Populate vertex, UV, and triangles lists
 		BuildRoadMesh ();
@@ -273,30 +291,33 @@ public class Road : Bezier {
 		uvs.Clear ();
 		tris.Clear ();
 
+		float UVoffset = 0.4f;
+		float UVslope = slope;
+
 		float progressI = 0f;
 		Vector3 pointI = GetPoint (progressI);
 		Vector3 dirI = GetDirection(progressI);
 		Vector3 rightI = BezRight (dirI);
 		Vector3 downI = BezDown (dirI);
 
+		// Left down
 		verts.Add(pointI + width * -rightI);
-		uvs.Add(new Vector2(-0.25f, 0f));
+		uvs.Add(new Vector2(-UVoffset, 0f));
 		int leftDownI = 0;
 
+		// Right down
 		verts.Add(pointI + width *rightI);
-		uvs.Add(new Vector2(1.25f, 0f));
+		uvs.Add(new Vector2(1f + UVoffset, 0f));
 		int rightDownI = 1;
 
-		verts.Add(
-			pointI + slope * width * -rightI + height * -downI
-		);
-		uvs.Add(new Vector2(1-slope-0.25f, 0f));
+		// Left up
+		verts.Add(pointI + slope * width * -rightI + height * -downI);
+		uvs.Add(new Vector2(-UVoffset + UVslope, 0f));
 		int leftUpI = 2;
 
-		verts.Add(
-			pointI + slope * width * rightI + height * -downI
-		);
-		uvs.Add(new Vector2(slope+0.25f, 1f));
+		// Right up
+		verts.Add(pointI + slope * width * rightI + height * -downI);
+		uvs.Add(new Vector2(1f + UVoffset - UVslope, 1f));
 		int rightUpI = 3;
 
 		bool flipUVs = true;
@@ -313,25 +334,24 @@ public class Road : Bezier {
 			UVProgress += Vector3.Distance (pointF, pointI);
 			float UVValue = 0.5f + 0.5f * Mathf.Sin(UVProgress);
 
+			// Left down
 			verts.Add(pointF + width * -rightF);
-			uvs.Add(new Vector2(-0.25f, UVValue));
+			uvs.Add(new Vector2(-UVoffset, UVValue));
 			int leftDownF = num * 4;
 
+			// Right down
 			verts.Add(pointF + width * rightF);
-			uvs.Add(new Vector2(1.25f, UVValue));
+			uvs.Add(new Vector2(1f + UVoffset, UVValue));
 			int rightDownF = num * 4 + 1;
 
-			verts.Add(
-				pointF + slope * width * -rightF + height * -downF
-			);
-			uvs.Add(new Vector2(1-slope-0.25f, UVValue));
+			// Left up
+			verts.Add(pointF + slope * width * -rightF + height * -downF);
+			uvs.Add(new Vector2(-UVoffset + UVslope, UVValue));
 			int leftUpF = num * 4 + 2;
 
-			verts.Add(
-				pointF + slope * width * 
-				rightF + height * -downF
-			);
-			uvs.Add(new Vector2(slope+0.25f, UVValue));
+			// Right up
+			verts.Add(pointF + slope * width * rightF + height * -downF);
+			uvs.Add(new Vector2(1f + UVoffset - UVslope, UVValue));
 			int rightUpF = num * 4 + 3;
 
 

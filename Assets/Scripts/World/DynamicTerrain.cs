@@ -12,6 +12,10 @@ using UnityEditor;
 /// Class to manage chunks. 
 /// </summary>
 public class DynamicTerrain : MonoBehaviour {
+
+	public enum DebugColors {
+		Constrained
+	}
 	
 	#region DynamicTerrain Vars
 
@@ -654,6 +658,17 @@ public class DynamicTerrain : MonoBehaviour {
 			sum += corner;
 		}
 		return (sum/count);
+	}
+
+	public void SetDebugColors (DebugColors colors) {
+		switch (colors) {
+		case DebugColors.Constrained:
+			foreach (Chunk chunk in activeChunks) {
+				chunk.GetComponent<MeshRenderer>().material = WorldManager.instance.terrainDebugMaterial;
+				chunk.SetDebugColors (colors);
+			}
+			break;
+		}
 	}
 }
 

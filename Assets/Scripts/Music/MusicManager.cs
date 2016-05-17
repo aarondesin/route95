@@ -172,7 +172,7 @@ public class MusicManager : MonoBehaviour {
 					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
 
 					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-					WorldManager.instance.roadSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
+					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
 					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
