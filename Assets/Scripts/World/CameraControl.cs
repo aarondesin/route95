@@ -22,9 +22,9 @@ public class CameraControl : MonoBehaviour {
 
 	[Header("General camera settings")]
 
-	public float rotateSensitivity = 0.4f;
-	public float moveSensitivity = 0.5f;
-	State state = State.Setup;
+	public float rotateSensitivity = 0.25f;
+	public float moveSensitivity = 0.4f;
+	public State state = State.Setup;
 	public float swaySpeed = 1f;
 	public float baseSway = 1f;
 
@@ -267,15 +267,16 @@ public class CameraControl : MonoBehaviour {
 			// Rotate camera
 			Vector3 d = InputManager.instance.mouseDelta;
 			Vector3 old = transform.rotation.eulerAngles;
+			bool slow = Input.GetAxisRaw("Slow") != 0f;
 			old.z = 0f;
-			old.x += -d.y * rotateSensitivity;
-			old.y += d.x * rotateSensitivity;
+			old.x += -d.y * rotateSensitivity * (slow ? 0.05f : 1f);
+			old.y += d.x * rotateSensitivity * (slow ? 0.05f : 1f);
 			transform.rotation = Quaternion.Euler(old);
 
 			// Translate camera
-			float forward = Input.GetAxisRaw("Forward") * moveSensitivity;
-			float up = Input.GetAxisRaw("Up") * moveSensitivity;
-			float right = Input.GetAxisRaw("Right") * moveSensitivity;
+			float forward = Input.GetAxisRaw("Forward") * moveSensitivity * (slow ? 0.05f : 1f);
+			float up = Input.GetAxisRaw("Up") * moveSensitivity * (slow ? 0.05f : 1f);
+			float right = Input.GetAxisRaw("Right") * moveSensitivity * (slow ? 0.05f : 1f);
 			transform.Translate(new Vector3 (right, up, forward));
 
 			break;
@@ -295,6 +296,7 @@ public class CameraControl : MonoBehaviour {
 
 	// Set for live mode
 	public void StartLiveMode () {
+		if (state == State.Free) return;
 		state = State.Live;
 		ChangeAngle();
 	}
@@ -310,6 +312,8 @@ public class CameraControl : MonoBehaviour {
 		GameManager.instance.MoveCasetteBack();
 		GameManager.instance.HideAll();
 		GameManager.instance.Hide(GameManager.instance.systemButtons);
+		Cursor.lockState = CursorLockMode.Confined;
+		Cursor.visible = false;
 	}
 
 	public void StopFreeMode () {

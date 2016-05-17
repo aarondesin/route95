@@ -123,7 +123,7 @@ public class MusicManager : MonoBehaviour {
 
 
 		loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
-			(Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
+			Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 
 	}
 

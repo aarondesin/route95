@@ -223,6 +223,12 @@ public class InputManager : MonoBehaviour {
 			}
 		}
 
+		if (CameraControl.instance.state == CameraControl.State.Free) {
+			if (Input.GetKeyDown (KeyCode.Space)) GameManager.instance.SwitchToLive();
+			else if (Input.GetKeyDown (KeyCode.LeftArrow)) WorldManager.instance.timeOfDay -= Mathf.PI/16f;
+			else if (Input.GetKeyDown (KeyCode.RightArrow)) WorldManager.instance.timeOfDay += Mathf.PI/16f;
+		}
+
 		prevMouse = Input.mousePosition;
 	}
 

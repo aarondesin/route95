@@ -423,17 +423,24 @@ public class Vertex {
 	}
 
 	int ChunkMin (int coord) {
-		return coord / (chunkRes-1) - 1;
+		return coord / (chunkRes-1) -1;
+		//return coord / (chunkRes-1) - (coord % (chunkRes-1) == 0 ? 1 : 0);
 	}
 
 	int ChunkMax (int coord) {
 		return coord < 0 ? coord / (chunkRes-1) -1 : coord / (chunkRes-1);
+		//return coord / (chunkRes-1);
 	}
 
 	//int CoordToIndex (int x, int y, bool r, bool u, bool edge) {
 	int CoordToIndex (int chunkX, int chunkY) {
 		int localX = x - chunkX * (chunkRes-1);
+		if (localX >= chunkRes || localX < 0) 
+			Debug.LogError ("Vertex.CoordToIndex(): x coord "+x+" not on chunk "+chunkX+"!");
+
 		int localY = y - chunkY * (chunkRes-1);
+		if (localY >= chunkRes || localY < 0) 
+			Debug.LogError ("Vertex.CoordToIndex(): y coord "+y+" not on chunk "+chunkY+"!");
 
 		int i = localY * chunkRes + localX;
 
@@ -443,11 +450,26 @@ public class Vertex {
 		
 	public void SetHeight (float h) {
 		// Skip locked vertices
-		if (locked) return;
+		if (locked || h == height) return;
 
 		// Set height
 		height = h;
 
+		float blend = 0f;
+		Vertex l = map.VertexAt(x-1,y);
+		blend += (l != null ? Mathf.Abs (h - l.height) : 0f);
+
+		Vertex r = map.VertexAt(x+1,y);
+		blend += (r != null ? Mathf.Abs (h - r.height) : 0f);
+
+		Vertex u = map.VertexAt(x,y+1);
+		blend += (u != null ? Mathf.Abs (h - u.height) : 0f);
+
+		Vertex d = map.VertexAt(x,y-1);
+		blend += (d != null ? Mathf.Abs (h - d.height) : 0f);
+
+		blend /= (WorldManager.instance.heightScale/10f);
+		blend = Mathf.Clamp01(blend);
 
 		if (IsEdge (x)) {
 
@@ -455,40 +477,70 @@ public class Vertex {
 			if (IsEdge (y)) {
 
 				Chunk ul = terrain.ChunkAt (ChunkMin(x), ChunkMax (y));
-				if (ul != null) ul.UpdateVertex (CoordToIndex (ul.x, ul.y), height);
+				if (ul != null) {
+					ul.UpdateVertex (CoordToIndex (ul.x, ul.y), height);
+					ul.UpdateColor (CoordToIndex (ul.x, ul.y), blend);
+				}
 
 				Chunk ur = terrain.ChunkAt (ChunkMax(x), ChunkMax (y));
-				if (ur != null) ur.UpdateVertex (CoordToIndex (ur.x, ur.y), height);
+				if (ur != null) {
+					ur.UpdateVertex (CoordToIndex (ur.x, ur.y), height);
+					ur.UpdateColor (CoordToIndex (ur.x, ur.y), blend);
+				}
 
 				Chunk dl = terrain.ChunkAt (ChunkMin(x), ChunkMin (y));
-				if (dl != null) dl.UpdateVertex (CoordToIndex (dl.x, dl.y), height);
+				if (dl != null) {
+					dl.UpdateVertex (CoordToIndex (dl.x, dl.y), height);
+					dl.UpdateColor (CoordToIndex (dl.x, dl.y), blend);
+				}
 
 				Chunk dr = terrain.ChunkAt (ChunkMax(x), ChunkMin (y));
-				if (dr != null) dr.UpdateVertex (CoordToIndex (dr.x, dr.y), height);
+				if (dr != null) {
+					dr.UpdateVertex (CoordToIndex (dr.x, dr.y), height);
+					dr.UpdateColor (CoordToIndex (dr.x, dr.y), blend);
+				}
 
 			// X edge
 			} else {
+				//Debug.Log(x);
 				Chunk left = terrain.ChunkAt(ChunkMin (x), ChunkMax(y));
-				if (left != null) left.UpdateVertex (CoordToIndex (left.x, left.y), height);
+				if (left != null) {
+					//Debug.Log(left.x);
+					left.UpdateVertex (CoordToIndex (left.x, left.y), height);
+					left.UpdateColor (CoordToIndex (left.x, left.y), blend);
+				}
 
 				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkMax(y));
-				if (right != null) right.UpdateVertex(CoordToIndex(right.x, right.y), height);
+				if (right != null) {
+					//Debug.Log(right.x);
+					right.UpdateVertex(CoordToIndex(right.x, right.y), height);
+					right.UpdateColor (CoordToIndex (right.x, right.y), blend);
+				}
 
 			} 
 
 		// Y edge
 		} else if (IsEdge (y)) {
 			Chunk bottom = terrain.ChunkAt(ChunkMax(x), ChunkMin(y));
-			if (bottom != null) bottom.UpdateVertex (CoordToIndex (bottom.x, bottom.y), height);
+			if (bottom != null) {
+				bottom.UpdateVertex (CoordToIndex (bottom.x, bottom.y), height);
+				bottom.UpdateColor (CoordToIndex (bottom.x, bottom.y), blend);
+			}
 
 			Chunk top = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
-			if (top != null) top.UpdateVertex (CoordToIndex (top.x, top.y), height);
+			if (top != null) {
+				top.UpdateVertex (CoordToIndex (top.x, top.y), height);
+				top.UpdateColor (CoordToIndex (top.x, top.y), blend);
+			}
 		
 		// No edge
 		} else {
 			try {
 				Chunk chunk = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
-				if (chunk != null) chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
+				if (chunk != null) {
+					chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
+					chunk.UpdateColor (CoordToIndex (chunk.x, chunk.y), blend);
+				}
 			} catch (NullReferenceException e) {
 				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "
 					+ChunkMax(x)+","+ChunkMax(y)+" "

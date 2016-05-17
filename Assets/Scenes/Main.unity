@@ -12556,7 +12556,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94517106
+  m_Size: 0.94612306
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20796,7 +20796,7 @@ MonoBehaviour:
   loadsToDo: 0
   chunkSize: 100
   chunkResolution: 14
-  chunkLoadRadius: 4
+  chunkLoadRadius: 8
   heightScale: 800
   vertexUpdateDistance: 600
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
@@ -20838,7 +20838,7 @@ MonoBehaviour:
   roadHeight: 1
   roadSlope: 0.6
   roadStepsPerCurve: 25
-  roadExtendRadius: 350
+  roadExtendRadius: 700
   roadPlacementDistance: 30
   roadVariance: 0.4
   roadMaxSlope: 0.001
@@ -23403,7 +23403,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_AnchoredPosition: {x: -0.00012207031, y: 0}
   m_SizeDelta: {x: 1680, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -28432,7 +28432,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -28514,7 +28514,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.5, y: 431}
+  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -29553,6 +29553,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotateSensitivity: 0.5
   moveSensitivity: 0.5
+  state: 0
   swaySpeed: 0.5
   baseSway: 0.01
   initialPosition: {fileID: 2107393831}
@@ -36386,7 +36387,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793875
+  m_Size: 0.9793874
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

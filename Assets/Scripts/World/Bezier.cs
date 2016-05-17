@@ -21,35 +21,35 @@ public class Bezier : MonoBehaviour{
 	// Bezier properties
 	//
 	[SerializeField]
-	protected Vector3[] points;
+	protected List<Vector3> points;
 
 	[SerializeField]
-	protected BezierControlPointMode[] modes;
+	protected List<BezierControlPointMode> modes;
 
 	#endregion
 	#region Bezier Operations
 
 	// Manually set points
-	public void SetPoints (Vector3[] newPoints) {
+	public void SetPoints (List<Vector3> newPoints) {
 		points = newPoints;
 	}
 
 	// Return points
-	public Vector3[] GetPoints () {
+	public List<Vector3> GetPoints () {
 		return points;
 	}
 
 	// Manually set control point modes
-	public void SetModes (BezierControlPointMode[] newModes) {
+	public void SetModes (List<BezierControlPointMode> newModes) {
 		modes = newModes;
 	}
 
-	public BezierControlPointMode[] GetModes () {
+	public List<BezierControlPointMode> GetModes () {
 		return modes;
 	}
 
 	public void SetPoint (int index, Vector3 value) {
-		if (index >= points.Length) return;
+		if (index >= points.Count) return;
 		points[index] = value;
 	}
 
@@ -79,7 +79,7 @@ public class Bezier : MonoBehaviour{
 		int i;
 		if (t >= 1f) {
 			t = 1f;
-			i = points.Length - 4;
+			i = points.Count - 4;
 		} else {
 			t = Mathf.Clamp01 (t) * CurveCount;
 			i = (int)t;
@@ -94,7 +94,7 @@ public class Bezier : MonoBehaviour{
 		int i;
 		if (t >= 1f) {
 			t = 1f;
-			i = points.Length - 4;
+			i = points.Count - 4;
 		} else {
 			t = Mathf.Clamp01 (t) * CurveCount;
 			i = (int)t;
@@ -128,21 +128,21 @@ public class Bezier : MonoBehaviour{
 	// Return total number of points in bezier
 	public int PointsCount {
 		get {
-			return (points.Length);
+			return (points.Count);
 		}
 	}
 
 	// Returns the number of curves in the bezier
 	public int CurveCount {
 		get {
-			return (points.Length - 1) / 3;
+			return (points.Count - 1) / 3;
 		}
 	}
 
 	// Returns the total number of points in the bezier
 	public int ModeCount {
 		get {
-			return modes.Length;
+			return modes.Count;
 		}
 	}
 
@@ -158,7 +158,7 @@ public class Bezier : MonoBehaviour{
 			if (index > 0) {
 				points [index - 1] += delta;
 			}
-			if (index + 1 < points.Length) {
+			if (index + 1 < points.Count) {
 				points [index + 1] += delta;
 			}
 		}
@@ -181,7 +181,7 @@ public class Bezier : MonoBehaviour{
 	public void EnforceMode (int index) {
 		int modeIndex = (index + 1) / 3;
 		BezierControlPointMode mode = modes [modeIndex];
-		if (mode == BezierControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Length - 1) {
+		if (mode == BezierControlPointMode.Free || modeIndex == 0 || modeIndex == modes.Count - 1) {
 			return;
 		}
 

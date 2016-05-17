@@ -140,7 +140,7 @@ public class Chunk: MonoBehaviour {
 		// Add grass system
 		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
 		grassEmitter.transform.parent = transform;
-		grassEmitter.transform.position += new Vector3 (-chunkSize/2f, 0f, -chunkSize/2f);
+		grassEmitter.transform.localPosition = Vector3.zero;
 
 		// Randomize grass density
 		ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
@@ -300,8 +300,10 @@ public class Chunk: MonoBehaviour {
 	public void UpdateCollider () {
 		needsColliderUpdate = false;
 
+		ParticleSystem grass = grassEmitter.GetComponent<ParticleSystem>();
+
 		// Clear current grass
-		grassEmitter.GetComponent<ParticleSystem>().Clear();
+		grass.Clear();
 
 		// Reassign mesh vertices/normals
 		mesh.vertices = verts;
@@ -312,6 +314,10 @@ public class Chunk: MonoBehaviour {
 
 		// Reassign collider mesh
 		GetComponent<MeshCollider> ().sharedMesh = mesh;
+
+		// Assign particle system emission shape
+		ParticleSystem.ShapeModule shape = grass.shape;
+		shape.mesh = mesh;
 
 		// Replace decorations
 		ReplaceDecorations();
@@ -419,7 +425,8 @@ public class Chunk: MonoBehaviour {
 					              WorldManager.instance.heightScale;
 
 					// If new height, set it
-					if (newY != vmap.VertexAt(coord, false).height) vmap.SetHeight (coord, newY);
+					//if (newY != vmap.VertexAt(coord, false).height) vmap.SetHeight (coord, newY);
+					if (newY != 0f) vmap.AddHeight (coord, newY);
 				}
 			}
 

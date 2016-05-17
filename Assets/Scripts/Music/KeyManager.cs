@@ -63,14 +63,9 @@ public class KeyManager : MonoBehaviour {
 								numLoaded = 0;
 							}
 						}
-						yield return null;
 					}
-					yield return null;
-
 				}
 			}
-			yield return null;
-
 		}
 		MusicManager.instance.FinishLoading();
 		yield return null;

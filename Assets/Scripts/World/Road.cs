@@ -47,7 +47,7 @@ public class Road : Bezier {
 		mesh = new Mesh();
 
 		// Init road points
-		points = new Vector3[0];
+		points = new List<Vector3>();
 
 	}
 
@@ -80,15 +80,16 @@ public class Road : Bezier {
 		if (!loaded) return;
 
 		// Remove far away points behind the player
-		if (Vector3.Distance (points[0], PlayerMovement.instance.transform.position) > generateRoadRadius) {
+		if (Vector3.Distance (points.Head(), PlayerMovement.instance.transform.position) > generateRoadRadius) {
 
 			RemoveCurve();
 
 			PlayerMovement.instance.progress -= 0.5f / (float)CurveCount;
+
 		}
 
 		// Create new points in front of player
-		while (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
+		while (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
 
 
@@ -107,23 +108,16 @@ public class Road : Bezier {
 
 	// Resets curve to default values
 	public void Reset () {
-		points = new Vector3[4];
-		points [0] = PlayerMovement.instance.transform.position;
-		points [0].y = 0f; //2.227f;
-		points [1].z = points [0].z;
-		points [1].y = points [0].y;
-		points [1].x = points [0].x - 60f;
-		points [2].z = points [0].z + 130f;
-		points [2].y = points [0].y;
-		points [2].x = points [0].x + 60f;
-		points [3].z = points [0].z + 150f;
-		points [3].y = points [0].y;
-		points [3].x = points [0].x;
+		points = new List<Vector3>();
+		Vector3 p = PlayerMovement.instance.transform.position;
+		points.Add(new Vector3 (p.x, 0f, p.y));
+		points.Add(new Vector3 (p.x - 60f, p.y, p.z));
+		points.Add(new Vector3 (p.x + 60f, p.y, p.z + 130f));
+		points.Add(new Vector3 (p.x, p.y, p.z + 150f));
 
-
-		modes = new Bezier.BezierControlPointMode[points.Length / 2];
-		for (int i=0; i<modes.Length; i++)
-			modes [i] = Bezier.BezierControlPointMode.Mirrored;
+		modes = new List<Bezier.BezierControlPointMode>();
+		for (int i=0; i<points.Count / 2; i++)
+			modes.Add(Bezier.BezierControlPointMode.Mirrored);
 	}
 
 	public float Width {
@@ -141,7 +135,7 @@ public class Road : Bezier {
 		float startTime = Time.realtimeSinceStartup;
 
 		while (true) {
-			if (Vector3.Distance (points [points.Length - 1], PlayerMovement.instance.transform.position) < generateRoadRadius) {
+			if (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
 				float progress = PlayerMovement.instance.progress;
 				float numerator = progress * CurveCount;
@@ -154,6 +148,8 @@ public class Road : Bezier {
 					startTime = Time.realtimeSinceStartup;
 				}
 				loaded = false;
+
+			//} else if (Vector3.Distance (points.Head(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
 			} else {
 				loaded = true;
@@ -168,31 +164,66 @@ public class Road : Bezier {
 
 	// Adds a new curve to the road bezier
 	void AddCurve () {
-		//float startTime = Time.realtimeSinceStartup;
 		float displacedDirection = placementDistance * variance; //placementRange;
 
 		Vector3 point;
-		if (points.Length > 0) point = points [points.Length - 1];
+		if (points.Count > 0) point = points.Tail();
 		else point = PlayerMovement.instance.transform.position;
+		Vector3 old = point;
 
 		Vector3 direction = GetDirection (1f) * placementDistance;
-		Array.Resize (ref points, points.Length + 3);
 
 		RaycastHit hit;
 
 		for (int i=3; i>0; i--) {
 			float a = UnityEngine.Random.Range (0f, Mathf.PI * 2f);
 			float d = UnityEngine.Random.Range (displacedDirection * 0.75f, displacedDirection);
-			/*point += direction + new Vector3(
-				UnityEngine.Random.Range(-displacedDirection, displacedDirection), 
-				0f, 
-				UnityEngine.Random.Range(-displacedDirection, displacedDirection)
-			);*/
+
 			point += direction + new Vector3 (d*Mathf.Cos(a), 0f, d*Mathf.Sin(a));
 				
 			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
 
-			float dist = Vector2.Distance (new Vector2 (points [points.Length-4].x, point.x), new Vector2 (points [points.Length-4].z, point.z));
+			float dist = Vector2.Distance (new Vector2 (old.x, point.x), new Vector2 (old.z, point.z));
+			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
+				point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
+			}
+
+			//points[PointsCount - i] = point;
+			points.Add(point);
+		}
+
+		terrain.OnExtendRoad ();
+
+		modes.Add (modes.Tail());
+		EnforceMode (points.Count - 4);
+		steps += stepsPerCurve;
+		Build();
+		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+	
+	}
+
+	public void Backtrack () {
+		float displacedDirection = placementDistance * variance; //placementRange;
+
+		Vector3 point;
+		if (points.Count > 0) point = points [0];
+		else point = PlayerMovement.instance.transform.position;
+
+		Vector3 direction = -GetDirection (0f) * placementDistance;
+
+
+
+		RaycastHit hit;
+
+		for (int i=3; i>0; i--) {
+			float a = UnityEngine.Random.Range (0f, Mathf.PI * 2f);
+			float d = UnityEngine.Random.Range (displacedDirection * 0.75f, displacedDirection);
+
+			point += direction + new Vector3 (d*Mathf.Cos(a), 0f, d*Mathf.Sin(a));
+
+			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
+
+			float dist = Vector2.Distance (new Vector2 (points [points.Count-4].x, point.x), new Vector2 (points [points.Count-4].z, point.z));
 			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
 				point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
 			}
@@ -202,19 +233,18 @@ public class Road : Bezier {
 
 		terrain.OnExtendRoad ();
 
-		Array.Resize (ref modes, modes.Length + 1);
-		modes[modes.Length - 1] = modes[modes.Length -2];
-		EnforceMode (points.Length - 4);
+		modes.Add (modes[modes.Count-1]);
+		EnforceMode (points.Count - 4);
 		steps += stepsPerCurve;
 		Build();
 		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
-	
+
 	}
 
 	void RemoveCurve () {
 
 		// Update points array
-		Vector3[] newPoints = new Vector3[points.Length - 3];
+		/*Vector3[] newPoints = new Vector3[points.Length - 3];
 		BezierControlPointMode[] newModes = new BezierControlPointMode[modes.Length-1];
 		for (int i = 0; i < newPoints.Length; i++) {
 			newPoints [i] = points [i + 3];
@@ -222,7 +252,10 @@ public class Road : Bezier {
 		}
 
 		points = newPoints;
-		modes = newModes;
+		modes = newModes;*/
+
+		for (int i=0; i<3; i++) points.RemoveAt(0);
+		modes.RemoveAt(0);
 
 		steps -= stepsPerCurve;
 		Build();
