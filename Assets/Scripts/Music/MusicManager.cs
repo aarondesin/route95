@@ -214,7 +214,7 @@ public class MusicManager : MonoBehaviour {
 				LoadAudioClip(path);
 				numLoaded++;
 
-				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 					GameManager.instance.ReportLoaded (numLoaded);
@@ -293,7 +293,7 @@ public class MusicManager : MonoBehaviour {
 
 			numLoaded++;
 
-			if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 				GameManager.instance.ReportLoaded (numLoaded);

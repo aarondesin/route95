@@ -149,7 +149,7 @@ public class Road : Bezier {
 				AddCurve();
 				PlayerMovement.instance.progress = numerator / CurveCount;
 
-				if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}

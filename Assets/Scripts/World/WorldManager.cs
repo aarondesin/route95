@@ -377,7 +377,7 @@ public class WorldManager : MonoBehaviour {
 			LoadDecoration (path);
 			numLoaded++;
 
-			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 				GameManager.instance.ReportLoaded(numLoaded);
@@ -408,7 +408,7 @@ public class WorldManager : MonoBehaviour {
 					yield return null;
 				}
 
-				if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 					if (!loaded) GameManager.instance.ReportLoaded(numLoaded);
@@ -565,10 +565,15 @@ public class WorldManager : MonoBehaviour {
 
 		// Find nearest vertex
 		IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
+		Vertex vert = terrain.vertexmap.VertexAt (nearestVertex);
+		if (vert == null) {
+			Debug.LogError ("WorldManager.DecorateRandom(): picked nonexistent vertex at " + nearestVertex.ToString ());
+			return false;
+		}
 
 		// Check if constrained
 		if (terrain.vertexmap.VertexAt(nearestVertex).noDecorations) {
-			Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
+			//Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
 			return false;
 		}
 

@@ -402,7 +402,7 @@ public class Chunk: MonoBehaviour {
 			UpdateVertex (v, vert.height);
 
 			// If vertex is not locked and there is frequency data to use
-			if (!vert.locked && terrain.freqData != null) { 
+			if (GameManager.instance.loaded && !vert.locked && terrain.freqData != null) { 
 
 				// Distance between player and vertex
 				Vector3 vertPos = chunkPos + verts [v];
@@ -514,8 +514,8 @@ public class Chunk: MonoBehaviour {
 	public static IntVector2 ToNearestVMapCoords (float x, float y) {
 		//if (x < 0) Debug.Log(x);
 		IntVector2 result = new IntVector2 (
-			Mathf.RoundToInt((x-chunkSize/2f) * chunkRes / chunkSize),
-			Mathf.RoundToInt((y-chunkSize/2f) * chunkRes / chunkSize)
+			Mathf.FloorToInt((x+chunkSize/2f)* (chunkRes-1) / chunkSize),
+			Mathf.FloorToInt((y+chunkSize/2f)* (chunkRes-1) / chunkSize)
 		);
 		//if (x < 0) Debug.Log(result.x);
 		//Debug.Log (x+","+y +" mapped to "+result.ToString());

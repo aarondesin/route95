@@ -207,6 +207,8 @@ public class DynamicTerrain : MonoBehaviour {
 			if (!loaded && activeChunks.Count == chunksToLoad) {
 				loaded = true;
 
+				Debug.Log (vertexmap.xMin + "-" + vertexmap.xMax + "," + vertexmap.yMin + "-" + vertexmap.yMax);
+
 				// Update all colliders
 				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 
@@ -383,8 +385,8 @@ public class DynamicTerrain : MonoBehaviour {
 		}
 
 		// Convert audio data into LinInt
-		if (freqData == null) freqData = new LinInt();
-		freqData.Update(data);
+		if (freqData == null && GameManager.instance.loaded) freqData = new LinInt();
+		if (GameManager.instance.loaded) freqData.Update(data);
 	}
 		
 	/// <summary>

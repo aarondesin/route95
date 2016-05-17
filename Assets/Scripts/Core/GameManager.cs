@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityStandardAssets.ImageEffects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -140,6 +141,10 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject casette;
 
+	Camera mainCamera;
+	int cullingMaskBackup = 0;
+	CameraClearFlags clearFlagsBackup = CameraClearFlags.Nothing;
+
 	#endregion
 	#region Unity Callbacks
 
@@ -174,10 +179,14 @@ public class GameManager : MonoBehaviour {
 
 		if (!Directory.Exists(Application.dataPath+songSaveFolder))
 			Directory.CreateDirectory (Application.dataPath+songSaveFolder);
+
+
 	}
 
 	void Start () {
 		ShowAll();
+		mainCamera = Camera.main;
+		StopRendering ();
 	}
 
 	void Update () {
@@ -314,6 +323,8 @@ public class GameManager : MonoBehaviour {
 
 		// Show main menu
 		Show (mainMenu);
+
+		StartRendering ();
 	}
 
 	#endregion
@@ -562,6 +573,24 @@ public class GameManager : MonoBehaviour {
 
 		// Go to postplay menu
 		GoToPostPlayMenu();
+	}
+
+	public void StopRendering () {
+		cullingMaskBackup = mainCamera.cullingMask;
+		clearFlagsBackup = mainCamera.clearFlags;
+		mainCamera.cullingMask = 0;
+		mainCamera.clearFlags = CameraClearFlags.Nothing;
+		mainCamera.GetComponent<SunShafts> ().enabled = false;
+		mainCamera.GetComponent<CameraMotionBlur> ().enabled = false;
+		mainCamera.GetComponent<BloomOptimized> ().enabled = false;
+	}
+
+	public void StartRendering() {
+		mainCamera.cullingMask = cullingMaskBackup;
+		mainCamera.clearFlags = clearFlagsBackup;
+		mainCamera.GetComponent<SunShafts> ().enabled = true;
+		mainCamera.GetComponent<CameraMotionBlur> ().enabled = true;
+		mainCamera.GetComponent<BloomOptimized> ().enabled = true;
 	}
 
 	#endregion

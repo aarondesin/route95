@@ -50,7 +50,7 @@ public class VertexMap {
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
-		noDecorationsDistance = nearbyRoadDistance * 1.2f;
+		noDecorationsDistance = WorldManager.instance.roadWidth * 1.5f;
 		roadHeight = WorldManager.instance.roadHeight;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
@@ -189,7 +189,7 @@ public class VertexMap {
 							vert.locked = true;
 						}
 
-						if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+						if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 							yield return null;
 							startTime = Time.realtimeSinceStartup;
 						}
@@ -198,7 +198,7 @@ public class VertexMap {
 
 			}
 
-			if (Time.realtimeSinceStartup - startTime > 1f / Application.targetFrameRate) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}

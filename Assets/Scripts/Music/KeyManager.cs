@@ -55,7 +55,7 @@ public class KeyManager : MonoBehaviour {
 							//Debug.Log("Scale["+key.ToString()+"]["+scale.name+"]["+instrument.codeName+"]");
 							numLoaded++;
 
-							if (Time.realtimeSinceStartup - startTime > 1f/Application.targetFrameRate) {
+							if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 								yield return null;
 								startTime = Time.realtimeSinceStartup;
 								GameManager.instance.ReportLoaded(numLoaded);
@@ -63,10 +63,13 @@ public class KeyManager : MonoBehaviour {
 								numLoaded = 0;
 							}
 						}
+						yield return null;
 					}
+					yield return null;
 
 				}
 			}
+			yield return null;
 
 		}
 		MusicManager.instance.FinishLoading();
