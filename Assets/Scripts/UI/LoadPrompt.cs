@@ -92,7 +92,7 @@ public class LoadPrompt : MonoBehaviour {
 			button_tr.ResetScaleRot();
 
 			Image button_img = button.Image();
-			button_img.sprite = fillSprite;
+			button_img.sprite = GameManager.instance.fillSprite;
 			button_img.color = new Color(1f,1f,1f,0f);
 
 			GameObject text = UIHelpers.MakeText(filename+"_Text");

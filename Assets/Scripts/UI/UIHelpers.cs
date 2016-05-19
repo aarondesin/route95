@@ -27,6 +27,25 @@ public class UIHelpers : MonoBehaviour {
 		return button;
 	}
 
+	public static GameObject MakeButton (string buttonName, Sprite graphic) {
+		GameObject button = MakeButton (buttonName);
+		button.Image().sprite = graphic;
+		return button;
+	}
+
+	public static GameObject MakeButton (string buttonName, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
+		GameObject button = MakeButton (buttonName);
+
+		RectTransform tr = button.RectTransform();
+		tr.SetParent(parent);
+		tr.sizeDelta = sizeD;
+		tr.anchoredPosition = pos;
+
+		button.Image().sprite = image;
+
+		return button;
+	}
+
 	/// <summary>
 	/// Creates a button GameObject with default properties
 	/// and a child text GameObject.
@@ -63,8 +82,21 @@ public class UIHelpers : MonoBehaviour {
 		tr.localScale = Vector3.one;
 		tr.localRotation = Quaternion.Euler(Vector3.zero);
 		Text txt = text.GetComponent<Text>();
+		txt.text = textName;
+		txt.font = GameManager.instance.font;
 		txt.resizeTextForBestFit = false;
 		txt.fontStyle = FontStyle.Normal;
+		return text;
+	}
+
+	public static GameObject MakeText (string textName, RectTransform parent, Vector2 sizeD, Vector2 pos) {
+		GameObject text = MakeText (textName);
+
+		RectTransform tr = text.RectTransform();
+		tr.SetParent(parent);
+		tr.sizeDelta = sizeD;
+		tr.anchoredPosition = pos;
+
 		return text;
 	}
 
@@ -80,8 +112,26 @@ public class UIHelpers : MonoBehaviour {
 			typeof (Image)
 		);
 		RectTransform tr = image.GetComponent<RectTransform>();
-		tr.localScale = Vector3.one;
-		tr.localRotation = Quaternion.Euler(Vector3.zero);
+		tr.ResetScaleRot();
+		return image;
+	}
+
+	public static GameObject MakeImage (string imageName, Sprite graphic) {
+		GameObject image = MakeImage (imageName);
+		image.Image().sprite = graphic;
+		return image;
+	}
+
+	public static GameObject MakeImage (string imageName, Sprite graphic, RectTransform parent, Vector2 sizeD, Vector2 pos) {
+		GameObject image = MakeImage (imageName);
+
+		RectTransform tr = image.RectTransform();
+		tr.SetParent(parent);
+		tr.sizeDelta = sizeD;
+		tr.anchoredPosition = pos;
+
+		image.Image().sprite = graphic;
+
 		return image;
 	}
 }

@@ -13,10 +13,16 @@ using UnityEditor;
 /// </summary>
 public class DynamicTerrain : MonoBehaviour {
 
+	#region DynamicTerrain Enums
+
+	/// <summary>
+	/// Types of debug colors for terrain to show.
+	/// </summary>
 	public enum DebugColors {
-		Constrained
+		Constrained // Shows where decoration placement is constrained
 	}
-	
+
+	#endregion
 	#region DynamicTerrain Vars
 
 	bool loaded = false;                 // is the terrain loaded?
@@ -185,6 +191,11 @@ public class DynamicTerrain : MonoBehaviour {
 					// Skip if chunk exists
 					if (chunkmap.At(x,y) != null) continue;
 
+					// Skip if chunk too far (circular generation)
+					if (WorldManager.instance.chunkGenerationMode == WorldManager.ChunkGenerationMode.Circular)
+						if (IntVector2.Distance (new IntVector2(x,y), playerChunkPos) > (float)chunkLoadRadius)
+							continue;
+
 					// Create chunk
 					chunkmap.Set(x,y, CreateChunk (x, y).GetComponent<Chunk>());
 
@@ -204,7 +215,7 @@ public class DynamicTerrain : MonoBehaviour {
 			}
 
 			// If finished loading terrain
-			if (!loaded && activeChunks.Count == chunksToLoad) {
+			if (!loaded) {
 				loaded = true;
 
 				Debug.Log (vertexmap.xMin + "-" + vertexmap.xMax + "," + vertexmap.yMin + "-" + vertexmap.yMax);
@@ -272,9 +283,18 @@ public class DynamicTerrain : MonoBehaviour {
 
 		// Check if each active chunk is within chunk load radius
 		foreach (Chunk chunk in activeChunks) {
-			if (chunk.x < playerChunkPos.x - chunkLoadRadius || chunk.x > playerChunkPos.x + chunkLoadRadius ||
-				chunk.y < playerChunkPos.y - chunkLoadRadius || chunk.y > playerChunkPos.y + chunkLoadRadius)
-				deletions.Add(chunk);
+			switch (WorldManager.instance.chunkGenerationMode) {
+				case WorldManager.ChunkGenerationMode.Circular:
+					if (IntVector2.Distance (new IntVector2 (chunk.x, chunk.y), playerChunkPos) > chunkLoadRadius)
+						deletions.Add(chunk);
+					break;
+
+				case WorldManager.ChunkGenerationMode.Square:
+					if (chunk.x < playerChunkPos.x - chunkLoadRadius || chunk.x > playerChunkPos.x + chunkLoadRadius ||
+						chunk.y < playerChunkPos.y - chunkLoadRadius || chunk.y > playerChunkPos.y + chunkLoadRadius)
+						deletions.Add(chunk);
+					break;
+			}
 		}
 
 		// Delete all marked chunks

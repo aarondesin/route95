@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // Class to manage CameraControl
 public class CameraControl : MonoBehaviour {
 
-	public static CameraControl instance;
+	#region CameraControl Enums
 
 	public enum State {
 		Setup,
@@ -17,8 +17,11 @@ public class CameraControl : MonoBehaviour {
 		Manual, // Angles only change on user input
 		Random  // Angles cycle randomly through all available angles
 	}
-		
-	#region Exposed Vars
+
+	#endregion
+	#region CameraControl Vars
+
+	public static CameraControl instance;
 
 	[Header("General camera settings")]
 
@@ -54,15 +57,15 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Initial control mode.")]
 	public CameraControlMode controlMode = CameraControlMode.Random;
 
-	#endregion
-	#region Hidden Vars
+	const float DEFAULT_SPEED = 0.2f;
 
 	// Camera interp vars
 	Transform start;
 	Transform target;
-	float speed = 1f;
+	float speed = DEFAULT_SPEED;
 	float sTime;
 	bool moving = false;
+	float progress = 0f;
 
 	// Live mode camera angle vars
 	CameraView currentAngle;
@@ -216,7 +219,7 @@ public class CameraControl : MonoBehaviour {
 
 				if (Vector3.Distance(start.position, target.position) != 0f) {
 
-					float progress = (Time.time-sTime) *speed * Time.deltaTime / 
+					progress += speed * Time.deltaTime / 
 						Vector3.Distance(start.position, target.transform.position);
 
 					// Lerp position
@@ -299,11 +302,13 @@ public class CameraControl : MonoBehaviour {
 		if (state == State.Free) return;
 		state = State.Live;
 		ChangeAngle();
+		paused = false;
 	}
 
 	public void StopLiveMode () {
 		state = State.Setup;
 		LerpToPosition(ViewChase);
+		paused = true;
 	}
 
 	public void StartFreeMode () {
@@ -338,8 +343,8 @@ public class CameraControl : MonoBehaviour {
 	public void ChangeAngle (int camView) {
 		currentAngle = angles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
-		//if (Debug.isDebugBuild) 
-		//	Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
+		if (Debug.isDebugBuild) 
+			Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 		
 		switch (currentAngle.placementMode) {
 
@@ -367,7 +372,7 @@ public class CameraControl : MonoBehaviour {
 
 				case CameraView.CameraFollowMode.Lead:
 					angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
-				angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
+					angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
 					break;
 
 				case CameraView.CameraFollowMode.Static:
@@ -413,12 +418,14 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	// Lerp to position
-	public void LerpToPosition (Transform newPosition) {
+	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
 		Camera.main.fieldOfView = 75f;
-		start = GetComponent<Transform>();
+		start = transform;
 		sTime = Time.time;
 		target = newPosition;
 		moving = true;
+		speed = newSpeed;
+		progress = 0f;
 	}
 		
 	#endregion

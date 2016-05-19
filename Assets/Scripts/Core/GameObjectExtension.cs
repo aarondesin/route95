@@ -72,6 +72,44 @@ public static class GameObjectExtension {
 		return obj.GetComponent<Light>();
 	}
 
+	public static void SetParent (this GameObject obj, RectTransform parent) {
+		RectTransform tr = obj.RectTransform();
+		Vector3 scale = tr.localScale;
+		tr.SetParent (parent);
+		tr.localScale = scale;
+	}
+
+	public static void AnchorAtPoint (this GameObject obj, float x, float y) {
+		obj.RectTransform().AnchorAtPoint (new Vector2 (x, y));
+	}
+
+	public static void SetSize2D (this GameObject obj, float x, float y) {
+		obj.RectTransform().sizeDelta = new Vector2 (x, y);
+	}
+
+	public static void SetSideWidth (this GameObject obj, float width) {
+		obj.RectTransform().sizeDelta = new Vector2 (width, width);
+	}
+
+	public static void SetPosition2D (this GameObject obj, float x, float y) {
+		obj.RectTransform().anchoredPosition = new Vector2 (x, y);
+	}
+
+	public static void SetTextAlignment (this GameObject obj, TextAnchor align) {
+		obj.Text().alignment = align;
+	}
+
+	public static void SetFontSize (this GameObject obj, int size) {
+		obj.Text().fontSize = size;
+	}
+
+	#endregion
+	#region RectTransform Extensions
+
+	public static void SetSideWidth (this RectTransform tr, float width) {
+		tr.sizeDelta = new Vector2 (width, width);
+	}
+
 	#endregion
 	#region ParticleSystem Extensions
 

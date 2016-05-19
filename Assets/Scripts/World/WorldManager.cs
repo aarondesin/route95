@@ -7,6 +7,16 @@ using UnityStandardAssets.ImageEffects;
 
 public class WorldManager : MonoBehaviour {
 
+	#region WorldManager Enums
+
+	/// <summary>
+	/// Modes to generate chunks around player.
+	/// </summary>
+	public enum ChunkGenerationMode {
+		Square,
+		Circular
+	}
+
 	#region WorldManager Vars
 
 	public static WorldManager instance;
@@ -16,7 +26,7 @@ public class WorldManager : MonoBehaviour {
 	// Chunk vars
 	const float DEFAULT_CHUNK_SIZE = 100;
 	const int DEFAULT_CHUNK_RESOLUTION = 8;
-	const int DEFAULT_CHUNK_LOAD_RADIUS = 8;
+	const int DEFAULT_CHUNK_LOAD_RADIUS = 4;
 
 	// Terrain vars
 	const float DEFAULT_HEIGHT_SCALE = 800f;
@@ -60,8 +70,11 @@ public class WorldManager : MonoBehaviour {
 	public int chunkResolution = DEFAULT_CHUNK_RESOLUTION;
 
 	[Tooltip("The radius around the player within which to draw chunks.")]
-	[Range(1, 32)]
+	[Range(4, 32)]
 	public int chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
+
+	[Tooltip("Mode to generate chunks.")]
+	public ChunkGenerationMode chunkGenerationMode = ChunkGenerationMode.Circular;
 
 
 	//
@@ -175,8 +188,8 @@ public class WorldManager : MonoBehaviour {
 
 	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
-	[Tooltip("Radius within which to extend road.")]
-	[Range(100f, 2000f)]
+	//[Tooltip("Radius within which to extend road.")]
+	//[Range(100f, 2000f)]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
 	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
@@ -290,6 +303,7 @@ public class WorldManager : MonoBehaviour {
 		).GetComponent<DynamicTerrain> ();
 		wind = UnityEngine.Random.insideUnitSphere;
 
+		roadExtendRadius = chunkSize * (chunkLoadRadius-2);
 		road = CreateRoad();
 
 		numDecorations = 0;
@@ -639,6 +653,13 @@ public class WorldManager : MonoBehaviour {
 		Vector3 coordinate = point + road.BezRight(point) * 
 			roadWidth * UnityEngine.Random.Range(1.5f, 1.6f) * (side == 0 ? 1 : -1);
 
+		// Find nearest chunk
+		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
+		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
+		Chunk chunk = terrain.ChunkAt(chunkX,chunkY);
+
+		if (chunk == null) return false;
+
 		// Raycast down
 		RaycastHit hit;
 		Vector3 rayOrigin = new Vector3 (coordinate.x, heightScale, coordinate.y);
@@ -660,9 +681,6 @@ public class WorldManager : MonoBehaviour {
 		decoration.transform.Rotate(-90f, side == 1 ? 180f : 0f, 0f);
 
 		// Parent to nearest chunk
-		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
-		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
-		Chunk chunk = terrain.ChunkAt(chunkX,chunkY);
 		decoration.transform.parent = chunk.gameObject.transform;
 		chunk.decorations.Add(decoration);
 
@@ -816,5 +834,7 @@ public class WorldManager : MonoBehaviour {
 	public void DebugTerrain () {
 		terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
 	}
-		
+
+	#endregion
+
 }

@@ -504,6 +504,7 @@ public class Chunk: MonoBehaviour {
 
 					terrain.AddRoadChunk(this);
 					gameObject.name += "|hasRoad";
+					grassEmitter.SetActive(false);
 					hasRoad = true;
 					return;
 				}

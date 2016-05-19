@@ -9,6 +9,8 @@ using UnityEditor;
 
 public class SongTimeline : MonoBehaviour {
 
+	#region SongTimeline Vars
+
 	public static SongTimeline instance;
 
 	static int NUM_COLUMNS = 4; // number of columns shown on timeline
@@ -23,12 +25,18 @@ public class SongTimeline : MonoBehaviour {
 	float columnWidth;
 	float columnHeight;
 
-	void Start () {
+	#endregion
+	#region Unity Callbacks
+
+	void Awake () {
 		instance = this;
 		columns = new List<GameObject>();
 		columnWidth = GetComponent<RectTransform>().rect.width/(float)NUM_COLUMNS;
 		columnHeight = GetComponent<RectTransform>().rect.height;
 	}
+
+	#endregion
+	#region SongTimeline Methods
 
 	public void MakeColumns () {
 		Song song = MusicManager.instance.currentSong;
@@ -41,72 +49,55 @@ public class SongTimeline : MonoBehaviour {
 		);
 			
 		for (int i=0; i<MusicManager.instance.currentSong.songPieceIndices.Count; i++) {
-			GameObject column = new GameObject();
-			column.name = "Column"+i;
-
-			column.AddComponent<CanvasRenderer>();
-
-			column.AddComponent<RectTransform>();
-			column.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-			column.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth, columnHeight);
-			column.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-			column.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 0f);
-			column.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 0f);
-			//column.GetComponent<RectTransform>().anchoredPosition = new Vector2 (
-			//	GetComponent<RectTransform>().offsetMin.x+(float)(i/NUM_COLUMNS)*columnWidth, 0f
-			//);
-			column.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-				columnWidth/2f+i*columnWidth,
-				//GetComponent<RectTransform>().offsetMin.x+((float)i/(float)NUM_COLUMNS)*4f*columnWidth,
-				columnHeight/2f,
-				0f
+			GameObject column = new GameObject("Column"+i,
+				typeof (RectTransform),
+				typeof (CanvasRenderer),
+				typeof (Button),
+				typeof (Image)
 			);
-			column.GetComponent<RectTransform>().localRotation = Quaternion.Euler(new Vector3 (0f, 0f, 0f));
+
+			RectTransform tr = column.RectTransform();
+			column.SetParent(gameObject.RectTransform());
+			tr.sizeDelta = new Vector2 (columnWidth, columnHeight);
+			tr.localScale = new Vector3 (1f, 1f, 1f);
+			tr.AnchorAtPoint (0f, 0f);
+			tr.anchoredPosition3D = new Vector3 (columnWidth/2f+i*columnWidth, columnHeight/2f, 0f);
+			tr.ResetScaleRot();
 
 			int num = i; // avoid pointer problems
-			column.AddComponent<Button>();
-			column.GetComponent<Button>().onClick.AddListener(()=>{
+			column.Button().onClick.AddListener(()=>{
 				Riff riff = MusicManager.instance.currentSong.riffs[SongArrangeSetup.instance.selectedRiffIndex];
 				song.ToggleRiff (riff, num);
 				RefreshColumn (column, song.songPieces[song.songPieceIndices[num]]);
-				//Debug.Log(MusicManager.instance.currentSong.songPieces[num].ToString());
 			});
 
-			column.AddComponent<Image>();
-			//column.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-			column.GetComponent<Image>().sprite = graphic;
+			column.Image().sprite = graphic;
 			columns.Add(column);
 		}
+
 		for (int i=0; i<columns.Count; i++)
 			RefreshColumn (columns[i], song.songPieces[song.songPieceIndices[i]]);
 
-		GameObject addColumnButton = new GameObject();
-		addColumnButton.name = "AddColumnButton";
-		addColumnButton.AddComponent<CanvasRenderer>();
-
-		addColumnButton.AddComponent<RectTransform>();
-		addColumnButton.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>());
-		addColumnButton.GetComponent<RectTransform>().sizeDelta = new Vector2 (columnWidth/3f, columnHeight/3f);
-		addColumnButton.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-		addColumnButton.GetComponent<RectTransform>().localRotation = Quaternion.Euler(new Vector3 (0f, 0f, 0f));
-		addColumnButton.GetComponent<RectTransform>().anchorMin = new Vector2 (1f, 0f);
-		addColumnButton.GetComponent<RectTransform>().anchorMax = new Vector2 (1f, 0f);
-		addColumnButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-			-columnWidth/2f,
-			//GetComponent<RectTransform>().offsetMin.x+((float)i/(float)NUM_COLUMNS)*4f*columnWidth,
-			columnHeight/2f,
-			0f
+		GameObject addColumnButton = new GameObject("AddColumnButton",
+			typeof (RectTransform),
+			typeof (CanvasRenderer),
+			typeof (Button),
+			typeof (Image)
 		);
+
+		RectTransform atr = addColumnButton.RectTransform();
+		addColumnButton.SetParent(gameObject.RectTransform());
+		atr.sizeDelta = new Vector2 (columnWidth/3f, columnHeight/3f);
+		atr.AnchorAtPoint (1f, 0f);
+		atr.anchoredPosition3D = new Vector3 (-columnWidth/2f, columnHeight/2f, 0f);
+		atr.ResetScaleRot();
 			
-		addColumnButton.AddComponent<Button>();
-		addColumnButton.GetComponent<Button>().onClick.AddListener(()=>{
+		addColumnButton.Button().onClick.AddListener(()=>{
 			MusicManager.instance.currentSong.NewSongPiece();
 			RefreshTimeline();
 		});
 
-		addColumnButton.AddComponent<Image>();
-		//column.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-		addColumnButton.GetComponent<Image>().sprite = addGraphic;
+		addColumnButton.Image().sprite = addGraphic;
 		columns.Add(addColumnButton);
 	}
 
@@ -128,32 +119,42 @@ public class SongTimeline : MonoBehaviour {
 		Measure measure = song.measures[songpiece.measureIndices[0]];
 		foreach (int r in measure.riffIndices) {
 			Riff riff = song.riffs[r];
-			GameObject label = new GameObject();
-			label.name = riff.name;
-			label.AddComponent<RectTransform>();
-			label.GetComponent<RectTransform>().SetParent(column.GetComponent<RectTransform>());
-			label.GetComponent<RectTransform>().sizeDelta = new Vector2 (
-				column.GetComponent<RectTransform>().rect.width,
-				column.GetComponent<RectTransform>().rect.height/(float)measure.riffIndices.Count
-			);
-			label.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-			label.AddComponent<CanvasRenderer>();
-			label.AddComponent<Text>();
-			label.GetComponent<Text>().text = riff.name;
-			label.GetComponent<Text>().color = Color.white;
-			label.GetComponent<Text>().fontStyle = FontStyle.Normal;
-			label.GetComponent<Text>().fontSize = 5;
-			label.GetComponent<Text>().font = GameManager.instance.font;
-			label.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
-			label.GetComponent<RectTransform>().anchorMin = new Vector2 (0.5f, 0.0f);
-			label.GetComponent<RectTransform>().anchorMax = new Vector2 (0.5f, 0.0f);
-			label.GetComponent<RectTransform>().anchoredPosition3D = new Vector3 (
-				0,
-				(float)(measure.riffIndices.Count-1-i)*label.GetComponent<RectTransform>().sizeDelta.y+0.5f*label.GetComponent<RectTransform>().sizeDelta.y,
-				0f
-			);
-			label.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0f, 0f, 0f);
+			RectTransform column_tr = column.RectTransform();
+
+			GameObject icon = UIHelpers.MakeImage (riff.name + "Icon", riff.instrument.icon);
+			RectTransform icon_tr = icon.RectTransform();
+			icon_tr.SetParent (column_tr);
+			icon_tr.sizeDelta = new Vector2 (column_tr.rect.height/9f, column_tr.rect.height/9f);
+			icon_tr.AnchorAtPoint (0f, 0.5f);
+			icon_tr.anchoredPosition3D = new Vector3 (icon_tr.sizeDelta.x/2f, (float)(8-i)*icon_tr.sizeDelta.y, 0f);
+			icon_tr.ResetScaleRot();
+
+			GameObject label = UIHelpers.MakeText (riff.name);
+			RectTransform label_tr = label.RectTransform();
+			label.SetParent(column_tr);
+			label_tr.sizeDelta = new Vector2 (column_tr.rect.width, column_tr.rect.height/(float)measure.riffIndices.Count);
+			label_tr.AnchorAtPoint (0.5f, 0f);
+			label_tr.anchoredPosition3D = new Vector3 (0f, (float)(measure.riffIndices.Count-1-i)*label_tr.sizeDelta.y+0.5f*label_tr.sizeDelta.y, 0f);
+			label_tr.ResetScaleRot();
+
+			Text label_text = label.Text();
+			label_text.text = riff.name;
+			label_text.color = Color.white;
+			label_text.fontStyle = FontStyle.Normal;
+			label_text.fontSize = 6;
+			label_text.font = GameManager.instance.font;
+			label_text.alignment = TextAnchor.MiddleCenter;
+
+			
+
 			i++;
 		}
 	}
+
+	public void SetInteractable (bool inter) {
+		foreach (Selectable selectable in GetComponentsInChildren<Selectable>())
+			selectable.interactable = inter;
+	}
+
+	#endregion
 }

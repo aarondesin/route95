@@ -20,8 +20,8 @@ public class InstrumentSetup : MonoBehaviour {
 	[Header("UI Settings")]
 
 	public float baseButtonScale = 1f;      // Multiplier for button scale
-	public float buttonWidth = 128f;        // Base width of buttons
-	public float buttonSpacing = 8f;        // Spacing between buttons
+	public float buttonWidth = 96f;        // Base width of buttons
+	public float buttonSpacing = 4f;        // Spacing between buttons
 
 	int numNotes;                           // Number of rows
 	int numButtons;                         // Number of columns
@@ -38,6 +38,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public InputField nameInputField;
 	public Scrollbar scrollBarH;
 	public Scrollbar scrollBarV;
+	RectTransform notePanel;
 	public Image playRiffButton;
 	public Text tempoText;
 	public Scrollbar iconBar;
@@ -79,6 +80,10 @@ public class InstrumentSetup : MonoBehaviour {
 	void Awake () {
 		instance = this;
 		nameInputField.onEndEdit.AddListener(delegate { currentRiff.name = nameInputField.text; });
+		buttons = new List<GameObject>();
+		buttonGrid = new List<List<GameObject>>();
+		suggestions = new List<GameObject>();
+		notePanel = gameObject.RectTransform();
 	}
 
 	#endregion
@@ -128,7 +133,6 @@ public class InstrumentSetup : MonoBehaviour {
 		nameInputField.text = currentRiff.name;
 		playRiffButton.GetComponent<Image>().sprite = GameManager.instance.playIcon;
 		MakeBeatNumbers ();
-		UpdateBeatsText();
 		UpdateTempoText();
 
 		numButtons = Riff.MAX_BEATS;
@@ -147,6 +151,8 @@ public class InstrumentSetup : MonoBehaviour {
 		// Set initial scrollbar values
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
+		SyncHorizontalScrollViews(scrollBarH);
+		SyncVerticalScrollViews(scrollBarV);
 
 		// Update riff volume slider
 		riffVolumeSlider.value = currentRiff.volume;
@@ -165,14 +171,15 @@ public class InstrumentSetup : MonoBehaviour {
 	/// Creates beat numbers.
 	/// </summary>
 	public void MakeBeatNumbers () {
-		for (int i=0; i<Riff.MAX_BEATS/4; i++) {
-			buttons.Add(MakeText((i+1).ToString(), beatsBar_tr,
-				new Vector2 (48f, 48f),
-				new Vector2 (
-					buttonWidth + (buttonWidth+buttonSpacing)*(i*Riff.MAX_BEATS),
-					-beatsBar_tr.rect.height/2f
-				)
-			));
+		for (int i=0; i < Riff.MAX_BEATS/4 ; i++) {
+			GameObject beatNumber = UIHelpers.MakeText((i+1).ToString());
+			beatNumber.SetParent (beatsBar_tr);
+			beatNumber.SetSideWidth (48f);
+			beatNumber.AnchorAtPoint (0f, 0.5f);
+			beatNumber.SetPosition2D ((0.5f + i * 4) * buttonWidth + buttonSpacing * (i * 4 + 1), 0f);
+			beatNumber.SetTextAlignment (TextAnchor.MiddleCenter);
+			beatNumber.SetFontSize(30);
+			buttons.Add (beatNumber);
 		}
 	}
 
@@ -186,21 +193,19 @@ public class InstrumentSetup : MonoBehaviour {
 		int numDrums = set.Count;
 
 		// Resize note panel
-		RectTransform tr = gameObject.RectTransform();
-		tr.sizeDelta = new Vector2 (
-			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
-			(numDrums+1)*buttonWidth + numDrums*buttonSpacing
-		);
+		float x = (numButtons)*buttonWidth + (numButtons+1)*buttonSpacing;
+		float y = (numDrums)*buttonWidth + (numDrums+1)*buttonSpacing;
+		notePanel.sizeDelta = new Vector2 (x, y);
 
 		// Resize drum icons panel
-		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, notePanel.sizeDelta.y);
 
 		// Resize beat number panel
-		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		beatsBar_tr.sizeDelta = new Vector2 (notePanel.sizeDelta.x, beatsBar_tr.sizeDelta.y);
 		beatsBar_tr.localScale = Vector3.one;
 
 		// Make rows
-		int i=0;
+		int i = 0;
 		foreach (string note in set) 
 			MakePercussionButtons (note, i++, note, percInst.icons[note]);
 	}
@@ -228,17 +233,16 @@ public class InstrumentSetup : MonoBehaviour {
 		numNotes = 1 + 12 * octavesShown;
 
 		// Resize note button panel
-		RectTransform tr = gameObject.RectTransform();
-		tr.sizeDelta = new Vector2 (
-			(numButtons+1)*buttonWidth + numButtons*buttonSpacing,
-			(numNotes+1)*buttonWidth + numNotes*buttonSpacing
+		notePanel.sizeDelta = new Vector2 (
+			numButtons * buttonWidth + (numButtons + 1) * buttonSpacing,
+			numNotes * buttonWidth + (numNotes + 1) * buttonSpacing
 		);
 
-		// Resize note text bar
-		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, tr.sizeDelta.y);
+		// Resize note text/icon bar
+		iconBar_tr.sizeDelta = new Vector2 (iconBar_tr.sizeDelta.x, notePanel.sizeDelta.y);
 
 		// Resize beats bar
-		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
+		beatsBar_tr.sizeDelta = new Vector2 (notePanel.sizeDelta.x, beatsBar_tr.sizeDelta.y);
 
 		for (int i = 0; i < numNotes && i < totalNotes; i++) {
 			string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i+startIndex];
@@ -252,13 +256,13 @@ public class InstrumentSetup : MonoBehaviour {
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
 
 		// Make icon for note
-		buttons.Add(MakeIcon (title, iconGraphic, 
-			iconBar_tr, new Vector2 (0.75f*buttonWidth, 0.75f*buttonWidth),
-			new Vector2 (
-				iconBar_tr.rect.width/2f,
-				-buttonWidth - (buttonWidth+buttonSpacing)*row
-			))
-		);
+		GameObject drumIcon = UIHelpers.MakeImage (title, iconGraphic);
+		drumIcon.SetParent (iconBar_tr); 
+		drumIcon.SetSideWidth (buttonWidth);
+		drumIcon.AnchorAtPoint (0.5f, 1.0f);
+		drumIcon.SetPosition2D (0f, -buttonWidth - (buttonWidth+buttonSpacing)*row);
+
+		buttons.Add(drumIcon);
 			
 		for (int i = 0; i < numButtons; i ++) {
 			int num = i;
@@ -270,28 +274,27 @@ public class InstrumentSetup : MonoBehaviour {
 			float vol = noteExists ? currentRiff.VolumeOfNote(soundName, num) : 1f;
 
 			// Create note button
-			GameObject bt = MakeButton(title+"_"+i, 
-				(currentRiff.Lookup(soundName, num) ? percussionFilled : percussionEmpty),
-				GetComponent<RectTransform>(),
-				new Vector2 (buttonWidth*0.75f, buttonWidth*0.75f),
-				new Vector2 (
-					buttonWidth + (buttonWidth+buttonSpacing)*num,
-					-buttonWidth - (buttonWidth+buttonSpacing)*row
-				)
-			);
+			Sprite graphic = (currentRiff.Lookup(soundName, num) ? percussionFilled : percussionEmpty);
+			GameObject button = UIHelpers.MakeButton (title+"_"+ i, graphic);
+			button.SetParent(notePanel);
+			button.SetSideWidth(buttonWidth);
+			button.AnchorAtPoint(0f, 1f);
+			
+			button.SetPosition2D(((float)num + 0.5f) * buttonWidth + (num+1)*buttonSpacing, 
+				-((float)row + 0.5f) * buttonWidth - (row+1)*buttonSpacing);
 
 			// Add StopScrolling tag
-			bt.tag = "StopScrolling";
+			button.tag = "StopScrolling";
 
 			// Change scale based on beat
-			RectTransform bt_tr = bt.RectTransform();
-			bt_tr.localScale = Vector3.one;
+			RectTransform button_tr = button.RectTransform();
+			button_tr.localScale = Vector3.one;
 
 			// Half beat
-			if (i % 4 - 2 == 0) bt_tr.localScale *= 0.75f;
+			if (i % 4 - 2 == 0) button_tr.localScale *= 0.75f;
 
 			// Quarter beat
-			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) bt_tr.localScale *= 0.5f;
+			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) button_tr.localScale *= 0.5f;
 
 			// Create note
 			Note note = new Note (soundName, vol, 1f);
@@ -299,9 +302,9 @@ public class InstrumentSetup : MonoBehaviour {
 			// Create volume slider
 			GameObject volume = UIHelpers.MakeImage(title+"_volume");
 			RectTransform volume_tr = volume.RectTransform();
-			volume_tr.SetParent(bt_tr);
-			volume_tr.sizeDelta = bt_tr.sizeDelta * 1.3f;
-			volume_tr.localScale = bt_tr.localScale * 1.3f;
+			volume_tr.SetParent(button_tr);
+			volume_tr.sizeDelta = button_tr.sizeDelta * 1.3f;
+			volume_tr.localScale = button_tr.localScale * 1.3f;
 			volume_tr.AnchorAtPoint(0.5f, 0.5f);
 			volume_tr.anchoredPosition3D = Vector3.zero;
 
@@ -311,12 +314,12 @@ public class InstrumentSetup : MonoBehaviour {
 			volume_img.fillAmount = vol;
 
 			// Setup volume slider
-			NoteButton noteButton = bt.AddComponent<NoteButton>();
+			NoteButton noteButton = button.AddComponent<NoteButton>();
 			noteButton.targetNote = note;
 			noteButton.volumeImage = volume.GetComponent<Image>();
 
 			// Create show/hide toggle
-			ShowHide bt_sh = bt.AddComponent<ShowHide>();
+			ShowHide bt_sh = button.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
@@ -324,20 +327,19 @@ public class InstrumentSetup : MonoBehaviour {
 			volume.SetActive(false);
 
 			// Add button functionality
-			bt.Button().onClick.AddListener(()=>{
+			button.Button().onClick.AddListener(()=>{
 				if (!InputManager.instance.IsDragging) {
 					bool n = currentRiff.Toggle(note, num);
 					if (!n) bt_sh.Hide();
 					bt_sh.enabled = n;
-					bt.Image().sprite = (n ? percussionFilled : percussionEmpty);
+					button.Image().sprite = (n ? percussionFilled : percussionEmpty);
 					if (n) bt_sh.Show();
 				}
 			});
 
 			// Register button
-			buttons.Add(bt);
-			buttonGrid[i].Add(bt);
-			buttons.Add(volume);
+			buttons.Add(button);
+			buttonGrid[i].Add(button);
 		}
 	}
 
@@ -346,17 +348,18 @@ public class InstrumentSetup : MonoBehaviour {
 		Color transparentWhite = new Color (1f, 1f, 1f, 0.5f);
 
 		// Create note text
-		GameObject txt = MakeText (title,
-			iconBar_tr,
-			new Vector2 (buttonWidth, buttonWidth),
-			new Vector2 (
-				iconBar_tr.rect.width/2f,
-				-buttonWidth - (buttonWidth+buttonSpacing)*row
-			)
-		);
+		GameObject noteText = UIHelpers.MakeText (title);
+		noteText.SetParent (iconBar_tr);
+		noteText.SetSideWidth (buttonWidth);
+		noteText.AnchorAtPoint (0.5f, 1f);
+		noteText.SetPosition2D (0f, - (0.5f + row) * buttonWidth - buttonSpacing * (row + 1));
+		noteText.SetTextAlignment (TextAnchor.MiddleCenter);
+		noteText.SetFontSize (30);
+
+		buttons.Add (noteText);
 
 		// Change text color depending on whether or not the note is in the scale
-		txt.Text().color = (inScale ? Color.white : transparentWhite);
+		noteText.Text().color = (inScale ? Color.white : transparentWhite);
 
 		for (int i=0; i<numButtons; i++) {
 			int num = i;
@@ -368,21 +371,19 @@ public class InstrumentSetup : MonoBehaviour {
 			float vol = noteExists ? currentRiff.VolumeOfNote(fileName, num) : 1f;
 
 			// Make note button
-			GameObject bt = MakeButton(title+"_"+i,
-				(currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty),
-				GetComponent<RectTransform>(),
-				new Vector2(buttonWidth, buttonWidth/2f),
-				new Vector2 (
-					buttonWidth + (buttonWidth+buttonSpacing)*num,
-					-buttonWidth - (buttonWidth+buttonSpacing)*row
-				)
-			);
-
+			Sprite graphic = (currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty);
+			GameObject button = UIHelpers.MakeButton(title+"_"+i, graphic);
+			button.SetParent (notePanel);
+			button.SetSize2D (buttonWidth, buttonWidth/2f);
+			button.AnchorAtPoint (0f, 1f);
+			button.SetPosition2D(((float)num + 0.5f) * buttonWidth + (num+1)*buttonSpacing, 
+				-((float)row + 0.5f) * buttonWidth - (row+1)*buttonSpacing);
+			
 			// Add StopScrolling tag
-			bt.tag = "StopScrolling";
+			button.tag = "StopScrolling";
 					
 			// Change scale based on position of note
-			RectTransform bt_tr = bt.RectTransform();
+			RectTransform bt_tr = button.RectTransform();
 			bt_tr.localScale = Vector3.one;
 			if (i % 4 - 2 == 0) bt_tr.localScale *= 0.75f;
 			else if (i % 4 - 1 == 0 || i % 4 - 3 == 0) bt_tr.localScale *= 0.5f;
@@ -410,12 +411,12 @@ public class InstrumentSetup : MonoBehaviour {
 			volume_img.fillAmount = vol;
 
 			// Setup volume slider
-			NoteButton noteButton = bt.AddComponent<NoteButton>();
+			NoteButton noteButton = button.AddComponent<NoteButton>();
 			noteButton.targetNote = note;
 			noteButton.volumeImage = volume.GetComponent<Image>();
 
 			// Create show/hide toggle
-			ShowHide bt_sh = bt.AddComponent<ShowHide>();
+			ShowHide bt_sh = button.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
@@ -423,7 +424,7 @@ public class InstrumentSetup : MonoBehaviour {
 			volume.SetActive(false);
 
 			// Setup button
-			bt.Button().onClick.AddListener(()=>{
+			button.Button().onClick.AddListener(()=>{
 				if (!InputManager.instance.IsDragging) {
 					bool n = currentRiff.Toggle(note, num);
 					if (n) {
@@ -434,14 +435,13 @@ public class InstrumentSetup : MonoBehaviour {
 						bt_sh.Hide();
 					}
 					bt_sh.enabled = n;
-					bt.Image().sprite = (n ? melodicFilled : melodicEmpty);
+					button.Image().sprite = (n ? melodicFilled : melodicEmpty);
 				}
 			});
 
 			// Register button
-			buttons.Add(txt);
-			buttons.Add(bt);
-			buttonGrid[num].Add(bt);
+			buttons.Add(button);
+			buttonGrid[num].Add(button);
 		}
 	}
 
@@ -515,7 +515,7 @@ public class InstrumentSetup : MonoBehaviour {
 
 		if (sliders == null) return;
 
-		foreach (GameObject slider in sliders) {
+		foreach (GameObject slider in sliders)
 			slider.SetActive(false);
 	}
 
@@ -529,7 +529,7 @@ public class InstrumentSetup : MonoBehaviour {
 		obj.SetActive(!st);
 	}
 
-	void Suggest () {
+	/*void Suggest () {
 		int posX = riffai.FindHintXPosition (currentRiff, subdivsShown);
 		Debug.Log ("posX = " + posX);
 		//Debug.Log ("curr inst " + currentRiff.instrument);
@@ -562,7 +562,7 @@ public class InstrumentSetup : MonoBehaviour {
 			Suggest (buttonGrid[posX][posY]);
 
 		}
-	}
+	}*/
 
 	void Suggest (GameObject button) {
 		Debug.Log ("in Suggest");
@@ -585,56 +585,83 @@ public class InstrumentSetup : MonoBehaviour {
 		ClearSuggestions();
 
 		Song song = MusicManager.instance.currentSong;
-		if (song.scale == ScaleInfo.Minor) SuggestMinorChord (column, row);
-		else if (song.scale == ScaleInfo.Major) SuggestMajorChord (column, row);
 
-		SuggestPowerChord (column, row);
-		SuggestOctave (column, row);
-		if (row+3 < buttonGrid[0].Count)
-			SuggestMinorChord(buttonGrid[column][row+3]);
-		if (row+7 < buttonGrid[0].Count) 
+		// Suggest minor/major harmony
+		if (song.scale == ScaleInfo.Minor.scaleIndex && 
+			row+3 < buttonGrid[column].Count) SuggestMinorChord (buttonGrid[column][row+3]);
+		else if (song.scale == ScaleInfo.Major.scaleIndex &&
+			row+4 < buttonGrid[column].Count) SuggestMajorChord (buttonGrid[column][row+4]);
+
+		// Suggest power chord
+		if (row+7 < buttonGrid[column].Count) 
 			SuggestPowerChord(buttonGrid[column][row+7]);
+
+		// Suggest octave
 		if (row+12 < buttonGrid[0].Count) 
 			SuggestOctave(buttonGrid[column][row+12]);
 	}
 
+	/// <summary>
+	/// Clears all suggestion icons.
+	/// </summary>
 	void ClearSuggestions () {
 		foreach (GameObject suggestion in suggestions) Destroy(suggestion);
 		suggestions.Clear();
 		GameManager.instance.HideTooltip();
 	}
 
+	/// <summary>
+	/// Suggests a minor chord.
+	/// </summary>
+	/// <param name="button"></param>
 	void SuggestMinorChord (GameObject button) {
-		GameObject suggestion = MakeIcon (
+		RectTransform tr = button.RectTransform();
+
+		GameObject suggestion = UIHelpers.MakeImage (
 			"Minor", 
 			minorSuggestion, 
-			button.GetComponent<RectTransform>(), 
-			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.y,
-				button.GetComponent<RectTransform>().sizeDelta.y
-			),
-			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
-				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
-			)
+			tr,
+			new Vector2 (tr.sizeDelta.y, tr.sizeDelta.y),
+			new Vector2 (tr.sizeDelta.x*0.5f, -tr.sizeDelta.y*0.5f)
 		);
-		suggestion.AddComponent<Tooltip>();
-		suggestion.GetComponent<Tooltip>().text = "Minor Chord (sad)";
+		Tooltip tooltip = suggestion.AddComponent<Tooltip>();
+		tooltip.text = "Minor Chord (sad)";
+		suggestions.Add(suggestion);
+	}
+
+	/// <summary>
+	/// Suggests a major chord.
+	/// </summary>
+	/// <param name="button"></param>
+	void SuggestMajorChord (GameObject button) {
+		RectTransform tr = button.RectTransform();
+
+		GameObject suggestion = UIHelpers.MakeImage (
+			"Major", 
+			minorSuggestion, 
+			tr,
+			new Vector2 (tr.sizeDelta.y, tr.sizeDelta.y),
+			new Vector2 (tr.sizeDelta.x*0.5f, -tr.sizeDelta.y*0.5f)
+		);
+		Tooltip tooltip = suggestion.AddComponent<Tooltip>();
+		tooltip.text = "Major Chord (happy)";
 		suggestions.Add(suggestion);
 	}
 
 	void SuggestPowerChord (GameObject button) {
-		GameObject suggestion = MakeIcon (
+		RectTransform tr = button.RectTransform();
+
+		GameObject suggestion = UIHelpers.MakeImage (
 			"Power", 
 			powerSuggestion, 
-			button.GetComponent<RectTransform>(), 
+			tr, 
 			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.y,
-				button.GetComponent<RectTransform>().sizeDelta.y
+				tr.sizeDelta.y,
+				tr.sizeDelta.y
 			),
 			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
-				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
+				tr.sizeDelta.x*0.5f, 
+				-tr.sizeDelta.y*0.5f
 			)
 		);
 		suggestion.AddComponent<Tooltip>();
@@ -643,17 +670,19 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void SuggestOctave (GameObject button) {
-		GameObject suggestion = MakeIcon (
+		RectTransform tr = button.RectTransform();
+
+		GameObject suggestion = UIHelpers.MakeImage (
 			"Octave", 
 			octaveSuggestion, 
-			button.GetComponent<RectTransform>(), 
+			tr, 
 			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.y,
-				button.GetComponent<RectTransform>().sizeDelta.y
+				tr.sizeDelta.y,
+				tr.sizeDelta.y
 			),
 			new Vector2 (
-				button.GetComponent<RectTransform>().sizeDelta.x*0.5f, 
-				-button.GetComponent<RectTransform>().sizeDelta.y*0.5f
+				tr.sizeDelta.x*0.5f, 
+				-tr.sizeDelta.y*0.5f
 			)
 		);
 		suggestion.AddComponent<Tooltip>();
