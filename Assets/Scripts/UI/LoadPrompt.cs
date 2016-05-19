@@ -5,29 +5,35 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+/// <summary>
+/// Class to handle the loading prompt.
+/// </summary>
 public class LoadPrompt : MonoBehaviour {
 
+	#region LoadPrompt Enums
+
+	/// <summary>
+	/// Type of file to display and load.
+	/// </summary>
 	public enum Mode {
 		Project,
 		Song
 	};
 
-	public static LoadPrompt instance;
-
+	#endregion
 	#region LoadPrompt Vars
 
-	public RectTransform fileList; // Transform of the actual panel with all of the files listed
-	public GameObject loadButton;
+	public static LoadPrompt instance; // Quick reference to this instance
 
-	string selectedPath; // Currently selected path
-
-	List<GameObject> fileButtons;
-
-	Mode loadMode;
-
-	public Sprite fillSprite;
-
+	public RectTransform fileList;     // Transform of the actual panel with all of the files listed
 	static Vector2 fileListSize = new Vector2 (84f, 84f);
+	public GameObject loadButton;      // Load button on propmt
+
+	Mode loadMode;                     // Type of file to display and load
+	string selectedPath;               // Currently selected path
+
+	List<GameObject> fileButtons;      // List of created buttons
+	
 
 	static float horizontalPadding = 8f;
 	static float verticalPadding = 4f;

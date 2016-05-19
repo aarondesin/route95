@@ -38,7 +38,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public InputField nameInputField;
 	public Scrollbar scrollBarH;
 	public Scrollbar scrollBarV;
-	public GameObject playRiffButton;
+	public Image playRiffButton;
 	public Text tempoText;
 	public Scrollbar iconBar;
 	public RectTransform iconBar_tr;
@@ -84,9 +84,12 @@ public class InstrumentSetup : MonoBehaviour {
 	#endregion
 	#region InstrumentSetup Methods
 
-	// Calls appropriate Setup() function based on current instrument
+	/// <summary>
+	/// Sets up riff editor and calls appropriate init function.
+	/// </summary>
 	public void Initialize () {
 		
+		// Check if riff is valid
 		if (currentRiff == null) {
 			Debug.LogError ("InstrumentSetup.Initialize(): no riff selected!");
 			return;
@@ -141,33 +144,42 @@ public class InstrumentSetup : MonoBehaviour {
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
 
+		// Set initial scrollbar values
 		scrollBarH.value = 0.01f;
 		scrollBarV.value = 0.99f;
 
+		// Update riff volume slider
 		riffVolumeSlider.value = currentRiff.volume;
 	}
 
-	// Removes all existing buttons
+	/// <summary>
+	/// Removes all existing buttons.
+	/// </summary>
 	public void Cleanup () {
 		foreach (GameObject button in buttons) Destroy(button);
 		buttons.Clear();
 		foreach (List<GameObject> list in buttonGrid) list.Clear();
 	}
 
+	/// <summary>
+	/// Creates beat numbers.
+	/// </summary>
 	public void MakeBeatNumbers () {
 		for (int i=0; i<Riff.MAX_BEATS/4; i++) {
 			buttons.Add(MakeText((i+1).ToString(), beatsBar_tr,
 				new Vector2 (48f, 48f),
 				new Vector2 (
 					buttonWidth + (buttonWidth+buttonSpacing)*(i*Riff.MAX_BEATS),
-					//buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-beatsBar_tr.rect.height/2f
 				)
 			));
 		}
 	}
 
-	// Initializes a percussion setup menu
+	/// <summary>
+	/// Initializes percussion riff editor.
+	/// </summary>
+	/// <param name="percInst">Percussion instrument to use.</param>
 	void InitializePercussionSetup (PercussionInstrument percInst) {
 
 		List<string> set = KeyManager.instance.percussionSets[percInst];
@@ -185,18 +197,23 @@ public class InstrumentSetup : MonoBehaviour {
 
 		// Resize beat number panel
 		beatsBar_tr.sizeDelta = new Vector2 (tr.sizeDelta.x, beatsBar_tr.sizeDelta.y);
-		beatsBar_tr.localScale = new Vector3 (1f, 1f, 1f);
+		beatsBar_tr.localScale = Vector3.one;
 
+		// Make rows
 		int i=0;
 		foreach (string note in set) 
 			MakePercussionButtons (note, i++, note, percInst.icons[note]);
 	}
 
-	// Initializes a melodic setup menu
+	/// <summary>
+	/// Initializes melodic riff editor.
+	/// </summary>
+	/// <param name="meloInst">Melodic instrument to use.</param>
 	void InitializeMelodicSetup (MelodicInstrument meloInst) {
 
 		// Calculate available octaves
-		maxOctaves = (int)Mathf.CeilToInt( (float)(Sounds.soundsToLoad[currentRiff.instrument.codeName].Count) / 12f);
+		List<string> sounds = Sounds.soundsToLoad[currentRiff.instrument.codeName];
+		maxOctaves = (int)Mathf.CeilToInt( (float)(sounds.Count) / 12f);
 		if (maxOctaves < octavesShown) octavesShown = maxOctaves;
 
 		// Gather key/scale info
@@ -263,17 +280,18 @@ public class InstrumentSetup : MonoBehaviour {
 				)
 			);
 
-			// Change scale based on beat
-			RectTransform bt_tr = bt.RectTransform();
-			if (i % 4 == 0) // Down beat
-				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			else if (i % 4 - 2 == 0) // Half beat
-				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) // Quarter beat
-				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
-
 			// Add StopScrolling tag
 			bt.tag = "StopScrolling";
+
+			// Change scale based on beat
+			RectTransform bt_tr = bt.RectTransform();
+			bt_tr.localScale = Vector3.one;
+
+			// Half beat
+			if (i % 4 - 2 == 0) bt_tr.localScale *= 0.75f;
+
+			// Quarter beat
+			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) bt_tr.localScale *= 0.5f;
 
 			// Create note
 			Note note = new Note (soundName, vol, 1f);
@@ -300,7 +318,6 @@ public class InstrumentSetup : MonoBehaviour {
 			// Create show/hide toggle
 			ShowHide bt_sh = bt.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
-			bt_sh.transitionType = ShowHide.TransitionType.Instant;
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
 			// Initially hide volume slider
@@ -360,18 +377,15 @@ public class InstrumentSetup : MonoBehaviour {
 					-buttonWidth - (buttonWidth+buttonSpacing)*row
 				)
 			);
-					
-			// Change scale based on position of note
-			RectTransform bt_tr = bt.RectTransform();
-			if (i % 4 == 0)
-				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			else if (i % 4 - 2 == 0)
-				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			else if (i % 4 - 1 == 0 || i % 4 - 3 == 0)
-				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 
 			// Add StopScrolling tag
 			bt.tag = "StopScrolling";
+					
+			// Change scale based on position of note
+			RectTransform bt_tr = bt.RectTransform();
+			bt_tr.localScale = Vector3.one;
+			if (i % 4 - 2 == 0) bt_tr.localScale *= 0.75f;
+			else if (i % 4 - 1 == 0 || i % 4 - 3 == 0) bt_tr.localScale *= 0.5f;
 
 			// Create note
 			Note note = new Note (fileName, vol, 1f);
@@ -431,117 +445,84 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Sets the volume of the riff.
+	/// Called from the riff volume slider.
+	/// </summary>
+	/// <param name="slider"></param>
 	public void SetRiffVolume (Slider slider) {
 		currentRiff.volume = slider.value;
 	}
 
-	GameObject MakeButton (string title, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
-		GameObject button = new GameObject();
-		button.name = title+"Text";
-		button.AddComponent<RectTransform>();
-		button.AddComponent<CanvasRenderer>();
-		button.AddComponent<Image>();
-		button.GetComponent<Image>().sprite = image;
-		button.AddComponent<Button>();
-		button.GetComponent<RectTransform>().SetParent(parent);
-		button.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
-		button.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
-		button.GetComponent<RectTransform>().sizeDelta = sizeD;
-		button.GetComponent<RectTransform>().anchoredPosition = pos;
-		return button;
-	}
-
-	GameObject MakeText (string title, RectTransform parent, Vector2 sizeD, Vector2 pos) {
-		GameObject text = new GameObject();
-		text.AddComponent<CanvasRenderer>();
-		text.AddComponent<RectTransform>();
-		text.GetComponent<RectTransform>().SetParent(parent);
-		text.GetComponent<RectTransform>().sizeDelta = sizeD;
-		text.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-		text.AddComponent<Text>();
-		text.GetComponent<Text>().text = title;
-		text.GetComponent<Text>().fontSize = 30;
-		text.GetComponent<Text>().font = GameManager.instance.font;
-		text.GetComponent<Text>().fontStyle = FontStyle.Normal;
-		text.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
-		text.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
-		text.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
-		text.GetComponent<RectTransform>().anchoredPosition = pos;
-		return text;
-	}
-
-	GameObject MakeIcon (string title, Sprite graphic, RectTransform parent, Vector2 sizeD, Vector2 pos) {
-		GameObject icon = new GameObject();
-		icon.name = title+"Icon";
-		icon.AddComponent<RectTransform>();
-		icon.AddComponent<CanvasRenderer>();
-		icon.AddComponent<Image>();
-		icon.GetComponent<Image>().sprite = graphic;
-		icon.GetComponent<RectTransform>().SetParent(parent);
-		icon.GetComponent<RectTransform>().sizeDelta = sizeD;
-		icon.GetComponent<RectTransform>().localScale = new Vector3 (1f, 1f, 1f);
-		icon.GetComponent<RectTransform>().anchorMin = new Vector2 (0f, 1f);
-		icon.GetComponent<RectTransform>().anchorMax = new Vector2 (0f, 1f);
-		icon.GetComponent<RectTransform>().anchoredPosition = pos;
-		return icon;
-	}
-
-	// Flips button art
-	void Toggle (Button button) {
-		Sprite img = button.GetComponent<Image>().sprite;
-		if (img == melodicEmpty || img == melodicSuggested) {
-			button.GetComponent<Image>().sprite = melodicFilled;
-		} else if (img == melodicFilled) {
-			button.GetComponent<Image>().sprite = melodicEmpty;
-		} else if (img == percussionEmpty || img == percussionSuggested) {
-			button.GetComponent<Image>().sprite = percussionFilled;
-		} else {
-			button.GetComponent<Image>().sprite = percussionEmpty;
-		}
-	}
-
+	/// <summary>
+	/// Syncs note panel and beat number panel.
+	/// </summary>
+	/// <param name="slider"></param>
 	public void SyncHorizontalScrollViews (Scrollbar slider) {
 		scrollBarH.value = slider.value;
 		beatsBar.value = slider.value;
 	}
 
+	/// <summary>
+	/// Syncs note panel and note names/drum icons.
+	/// </summary>
+	/// <param name="slider"></param>
 	public void SyncVerticalScrollViews (Scrollbar slider) {
 		scrollBarV.value = slider.value;
 		iconBar.value = slider.value;
 	}
 
+	/// <summary>
+	/// Increments the number of octaves shown.
+	/// </summary>
 	public void IncreaseOctavesShown () {
-		if (octavesShown < maxOctaves) octavesShown++;
-		Initialize();
+		if (octavesShown < maxOctaves) {
+			octavesShown++;
+			Initialize();
+		}
 	}
 
+	/// <summary>
+	/// Decrements the number of octaves shown.
+	/// </summary>
 	public void DecreaseOctavesShown () {
-		if (octavesShown > 1) octavesShown--;
-		Initialize();
+		if (octavesShown > 1) {
+			octavesShown--;
+			Initialize();
+		}
 	}
 
-	public void TogglePlayRiffButton () {
-		if (playRiffButton.GetComponent<Image>().sprite == GameManager.instance.playIcon) 
-			playRiffButton.GetComponent<Image>().sprite = GameManager.instance.pauseIcon;
-		else playRiffButton.GetComponent<Image>().sprite = GameManager.instance.playIcon;
+	/// <summary>
+	/// Updates the play riff button art.
+	/// </summary>
+	public void UpdatePlayRiffButtonArt () {
+		playRiffButton.sprite = MusicManager.instance.playing ?
+			GameManager.instance.playIcon :
+			GameManager.instance.pauseIcon;
 	}
 
-	void UpdateBeatsText() {
-		//beatsText.GetComponent<Text>().text = "Beats: "+ currentRiff.beatsShown.ToString();
-	}
-
+	/// <summary>
+	/// Updates the text for the tempo selector.
+	/// </summary>
 	public void UpdateTempoText () {
 		tempoText.text = MusicManager.instance.tempo.ToString();
 	}
 
+	/// <summary>
+	/// Hides all effect sliders.
+	/// </summary>
 	public void HideSliders () {
-		if (sliders != null) {
-			foreach (GameObject slider in sliders) {
-				slider.SetActive(false);
-			}
-		}
+
+		if (sliders == null) return;
+
+		foreach (GameObject slider in sliders) {
+			slider.SetActive(false);
 	}
 
+	/// <summary>
+	/// Hides all sliders and toggles the indicated slider.
+	/// </summary>
+	/// <param name="obj"></param>
 	public void HideSliders (GameObject obj) {
 		bool st = obj.activeSelf;
 		HideSliders();
@@ -593,8 +574,22 @@ public class InstrumentSetup : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Suggests chords based on a clicked note.
+	/// </summary>
+	/// <param name="column"></param>
+	/// <param name="row"></param>
 	void SuggestChords (int column, int row) {
+
+		// Clear previous suggestions
 		ClearSuggestions();
+
+		Song song = MusicManager.instance.currentSong;
+		if (song.scale == ScaleInfo.Minor) SuggestMinorChord (column, row);
+		else if (song.scale == ScaleInfo.Major) SuggestMajorChord (column, row);
+
+		SuggestPowerChord (column, row);
+		SuggestOctave (column, row);
 		if (row+3 < buttonGrid[0].Count)
 			SuggestMinorChord(buttonGrid[column][row+3]);
 		if (row+7 < buttonGrid[0].Count) 
