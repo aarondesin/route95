@@ -11,7 +11,9 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-// All keys available in the game
+/// <summary>
+/// All musical keys.
+/// </summary>
 public enum Key {
 	None,
 	C,
@@ -28,6 +30,9 @@ public enum Key {
 	B
 };
 
+/// <summary>
+/// All tempos.
+/// </summary>
 public enum Tempo {
 	Slowest,
 	Slower,
@@ -39,58 +44,52 @@ public enum Tempo {
 	NUM_TEMPOS
 };
 
+/// <summary>
+/// Instanced MonoBehaviour class to manage all music-related operations.
+/// </summary>
 public class MusicManager : MonoBehaviour {
 
+	#region Sound Struct
+
+	/// <summary>
+	/// Struct to hold all relevant sound and playback data.
+	/// </summary>
 	public struct Sound {
-		public AudioClip clip;
-		public AudioSource source;
-		public float volume;
-		public float delay;
+		public AudioClip clip;     // AudioClip to play
+		public AudioSource source; // AudioSource to use for playback
+		public float volume;       // Note volume
+		public float delay;        // Note delay
 	}
 
+	#endregion
 	#region MusicManager Vars
 
-	public static MusicManager instance; // access this MusicManager from anywhere using MusicManager.instance
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("MusicManager Status")]
+	
+	public static MusicManager instance;                               // Quick reference to this instance
 
-	public AudioMixer mixer;
-	public Project currentProject;
+	float startLoadTime;                                               // Time at which loading started
+	int loadProgress;                                                  // Number of load tasks
+	public int loadsToDo;                                              // Number of tasks to load
 
-	// --Global Music Properties-- //
-	public Instrument currentInstrument = MelodicInstrument.ElectricGuitar;
-	[NonSerialized]
-	public Song currentSong = null;
-	public int currentPlayingSong;
-	public bool loopSong = false; // loop song in live mode?
+	[Tooltip("Is this playing right now?")]
+	public bool playing = false;
 
-	// --Game Data Storage --//
-	public static Dictionary<string, AudioClip> SoundClips = new Dictionary<string, AudioClip>(); // holds all loaded sounds
-	public AudioSource OneShot; // used for playing one-shot sound effects (UI, etc.)
-	public AudioSource LoopRiff;
-	public Dictionary<Instrument, AudioSource> instrumentAudioSources;
+	[Tooltip("Loop riff?")]
+	public bool loop = false;
 
-	public Tempo tempo = Tempo.Medium;
-	private float BeatTimer;
-	private int beat;
-	public int beatsElapsedInCurrentSong = 0;
-	public int beatsElapsedInPlaylist = 0;
-	public static bool playing = false;
-	public static bool loop = false;
+	[Tooltip("Loop playlist?")]
 	public bool loopPlaylist = false;
-	public Image loopPlaylistButton;
 
-	public int guitarNotes = 0;
-	[SerializeField]
-	float guitarDensity = 0f;
+	public Instrument currentInstrument = 
+		MelodicInstrument.ElectricGuitar;                              // Current instrument in live mode
 
-	public int keyboardNotes = 0;
-	[SerializeField]
-	float keyboardDensity = 0f;
+	[Tooltip("Current tempo.")]
+	public Tempo tempo = Tempo.Medium;
 
-	public int brassNotes = 0;
-	[SerializeField]
-	float brassDensity = 0f;
-
-	public static Dictionary<Tempo, float> tempoToFloat = new Dictionary<Tempo, float> () {
+	public static Dictionary<Tempo, float> tempoToFloat =              // Mappings of tempos to values
+		new Dictionary<Tempo, float> () {
 		{ Tempo.Slowest, 50f },
 		{ Tempo.Slower, 70f },
 		{ Tempo.Slow, 90f },
@@ -100,120 +99,220 @@ public class MusicManager : MonoBehaviour {
 		{ Tempo.Fastest, 170f }
 	};
 
-	public int maxBeats; // max beats in riff, after subdivisions
+	[Tooltip("Index of currently playing song.")]
+	public int currentPlayingSong;
 
-	float startLoadTime;
+	[Tooltip("Current beat.")]
+	[SerializeField]
+	private int beat;
 
-	public bool loadedAudioSources = false;
+	private float BeatTimer;                                           // Countdown to next beat
 
-	int loadProgress;
-	public int loadsToDo;
+	[Tooltip("Number of beats elapsed in current song.")]
+	public int beatsElapsedInCurrentSong = 0;
+
+	[Tooltip("Number of beats elapsed in current playlist.")]
+	public int beatsElapsedInPlaylist = 0;
+
+	[Tooltip("Number of elapsed guitar notes in current song.")]
+	public int guitarNotes = 0;
+
+	[Tooltip("Current density of guitar notes.")]
+	[SerializeField]
+	float guitarDensity = 0f;
+
+	[Tooltip("Number of elapsed keyboard notes in current song.")]
+	public int keyboardNotes = 0;
+
+	[Tooltip("Current density of keyboard notes.")]
+	[SerializeField]
+	float keyboardDensity = 0f;
+
+	[Tooltip("Number of elapsed brass notes in current song.")]
+	public int brassNotes = 0;
+
+	[Tooltip("Current density of brass notes.")]
+	[SerializeField]
+	float brassDensity = 0f;
+
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Object References")]
+
+	[Tooltip("Mixer to use for music.")]
+	public AudioMixer mixer;
+
+	[Tooltip("AudioSource to use for UI sounds.")]
+	public AudioSource OneShot;
+
+	[Tooltip("AudioSource to use for UI riff playback.")]
+	public AudioSource LoopRiff;
+
+	[Tooltip("Loop playlist button sprite.")]
+	public Image loopPlaylistButton;
+
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Project References")]
+
+	[Tooltip("Current open project.")]
+	public Project currentProject;
+
+	[NonSerialized]
+	public Song currentSong = null;
+
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Sounds")]
+
+	public static Dictionary<string, AudioClip> SoundClips = 
+		new Dictionary<string, AudioClip>();                           // Holds all loaded sounds
+
+	[NonSerialized]
+	public Dictionary<Instrument, AudioSource> instrumentAudioSources; // Mapping of instruments to AudioSources
 
 	#endregion
 	#region Unity Callbacks
 
 	void Awake () {
+
+		// Init instance
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
 
-		maxBeats = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2);
+		// Load instrument lists
+		Instrument.LoadInstruments();
 
-		tempo = Tempo.Medium;
-		Instrument.LoadInstruments ();
-
-
+		// Calculate number of objects to load
 		loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
 			Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
-
 	}
 
-	void FixedUpdate(){
-		if (playing && !GameManager.instance.paused) {
-			if (BeatTimer <= 0f) {
-				switch (GameManager.instance.currentMode) {
-				case GameManager.Mode.Setup:
+	void FixedUpdate() {
+
+		// Return if not playing or game is paused
+		if (!playing) return;
+		if (GameManager.instance.paused) return;
+
+		// If new beat
+		if (BeatTimer <= 0f) {
+			switch (GameManager.instance.currentState) {
+
+				// Setup mode (riff editor)
+				case GameManager.State.Setup:
+
+					// Play riff note
 					InstrumentSetup.currentRiff.PlayRiff (beat++);
-					if (beat >= InstrumentSetup.currentRiff.beatsShown*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS) && loop)
-						beat = 0;
+
+					// Wrap payback
+					if (beat >= Riff.MAX_BEATS && loop) beat = 0;
+
+					// Decrement shaker density
 					WorldManager.instance.shakers -= 2;
 					break;
 
-				case GameManager.Mode.Live:
+				// Live mode
+				case GameManager.State.Live:
+
+					// Break if current song is null
 					if (currentSong == null) return;
 					if (currentSong.Beats == 0) return;
 
+					// If song is finished
 					if (beat >= currentSong.Beats) {
 						beat = 0;
-						WorldManager.instance.shakers = 0;
+
+						// Reset vars
 						beatsElapsedInCurrentSong = 0;
 						guitarNotes = 0;
 						keyboardNotes = 0;
 						brassNotes = 0;
+
+						// Reset shaker density
+						WorldManager.instance.shakers = 0;
+						
+						// If another song available, switch
 						if (currentPlayingSong < currentProject.songs.Count-1) {
 							DisableAllAudioSources();
 							currentPlayingSong++;
+
+						// If no more songs to play
 						} else {
+
+							// Loop playlist if possible
 							if (loopPlaylist) {
 								currentPlayingSong = 0;
 								beatsElapsedInPlaylist = 0;
+
+							// Otherwise go to postplay menu
 							} else GameManager.instance.SwitchToPostplay();
 						}
 					}
+
+					// Play notes
 					currentSong.PlaySong(beat);
 
+					// Calculate song progress
 					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
 					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
+
+					// Increment vars
 					beat++;
 					beatsElapsedInCurrentSong++;
 					beatsElapsedInPlaylist++;
+
+					// Update instrument densities
 					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
 					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
 					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
-
 					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
 					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
 					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
-				BeatTimer = 7200f / tempoToFloat[tempo] /4f;// 3600f = 60 fps * 60 seconds
 
-			} else {
+				// Reset beat timer
+				BeatTimer = 7200f / tempoToFloat[tempo] /4f; // 3600f = 60 fps * 60 seconds
 
-				BeatTimer -= 1.667f;
-			}
-		} 
-
-	}
-
-	public void FinishLoading() {
-		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
-		WorldManager.instance.Load();
-	}
-
+			// Decrement beat timer
+			} else BeatTimer -= 1.667f;
+	} 
+	
 	#endregion
-	#region Loading Callbacks
+	#region Load Methods
 
-	//
-	// LoadSounds (Coroutine)
-	// LoadInstruments (Coroutine)
-	// 
-
+	/// <summary>
+	/// Begins loading MusicManager.
+	/// </summary>
 	public void Load() {
+
+		// Save loading start time
 		startLoadTime = Time.realtimeSinceStartup;
+
+		// Begin by loading sounds
 		StartCoroutine ("LoadSounds");
 	}
 
+	/// <summary>
+	/// Coroutine to load all instrument sounds.
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator LoadSounds () {
+
+		// Update loading message
 		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
+
+		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
 		int numLoaded = 0;
 
+		// For each sound path
 		foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
 			foreach (string path in list.Value) {
+
+				// Load sound
 				LoadAudioClip(path);
 				numLoaded++;
 
+				// If over time
 				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
@@ -223,10 +322,14 @@ public class MusicManager : MonoBehaviour {
 			}
 		}
 
+		// When done, start loading instruments
 		yield return StartCoroutine("LoadInstruments");
 	}
 
-	// Loads a single audio clip
+	/// <summary>
+	/// Loads a sound.
+	/// </summary>
+	/// <param name="path">Sound path.</param>
 	void LoadAudioClip (string path) {
 		AudioClip sound = (AudioClip) Resources.Load (path);
 
@@ -234,23 +337,39 @@ public class MusicManager : MonoBehaviour {
 		else SoundClips.Add (path, sound);
 	}
 
+	/// <summary>
+	/// Coroutine to load instruments.
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator LoadInstruments () {
+
+		// Update loading message
 		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+
+		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
 		int numLoaded = 0;
 
+		// Init audio source dict
 		instrumentAudioSources = new Dictionary<Instrument, AudioSource>();
+
+		// Foreach instrument
 		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
 
+			// Load instrument data
 			Instrument.AllInstruments[i].Load();
 
+			// Create instrument AudioSource GameObject
 			GameObject obj = new GameObject (Instrument.AllInstruments[i].name);
+			AudioSource source = obj.AddComponent<AudioSource>();
 
 			// Group instrument under MusicManager
 			obj.transform.parent = transform.parent;
 
-			AudioSource source = obj.AddComponent<AudioSource>();
+			// Connect AudioSource to mixer
 			source.outputAudioMixerGroup = mixer.FindMatchingGroups (obj.name) [0];
+
+			// Connect instrument to AudioSource
 			instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
 
 			// Add distortion filter
@@ -293,6 +412,7 @@ public class MusicManager : MonoBehaviour {
 
 			numLoaded++;
 
+			// If over time
 			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
@@ -301,8 +421,22 @@ public class MusicManager : MonoBehaviour {
 			}
 		}
 
-		if (instrumentAudioSources.Count == Instrument.AllInstruments.Count) KeyManager.instance.DoBuildScales();
+		// When done, start building scales
+		if (instrumentAudioSources.Count == Instrument.AllInstruments.Count)
+			KeyManager.instance.DoBuildScales();
 		yield return null;
+	}
+
+	/// <summary>
+	/// Finishes loading MusicManager.
+	/// </summary>
+	public void FinishLoading() {
+
+		// Report loading time
+		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+
+		// Start loading WorldManager
+		WorldManager.instance.Load();
 	}
 
 	#endregion
@@ -341,7 +475,7 @@ public class MusicManager : MonoBehaviour {
 	/// <summary>
 	/// Sets the key of the current song.
 	/// </summary>
-	/// <param name="key">New key (int)</param>
+	/// <param name="key">New key (int).</param>
 	public void SetKey (int key) {
 		currentSong.key = (Key)key;
 	}
@@ -359,32 +493,55 @@ public class MusicManager : MonoBehaviour {
 	/// </summary>
 	public void ToggleLoopPlaylist () {
 		loopPlaylist = !loopPlaylist;
-		loopPlaylistButton.sprite = loopPlaylist ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
+
+		// Update sprite
+		loopPlaylistButton.sprite = loopPlaylist ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
 	}
 
+	/// <summary>
+	/// Toggles looping the current riff.
+	/// </summary>
 	public void PlayRiffLoop(){
+
+		// If looping
 		if (loop) {
+
+			// Stop doing so
 			StopLooping();
-			instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
+			
+			// Stop AudioSource
+			Instrument instrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
+			instrumentAudioSources[instrument].Stop();
+
+		// If not looping, then start
 		} else {
 			playing = true;
 			loop = true;
 		}
 	}
 
+	/// <summary>
+	/// Stops looping the current riff.
+	/// </summary>
 	public void StopLooping () {
 		playing = false;
 		loop = false;
 		beat = 0;
-		instrumentAudioSources[Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex]].Stop();
+		Instrument instrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
+		instrumentAudioSources[instrument].Stop();
 	}
 
-
-
+	/// <summary>
+	/// Disables all instrument audio sources.
+	/// </summary>
 	void DisableAllAudioSources () {
 		foreach (Instrument inst in Instrument.AllInstruments) instrumentAudioSources[inst].enabled = false;
 	}
 
+	/// <summary>
+	/// Increases the tempo.
+	/// </summary>
 	public void IncreaseTempo () {
 		if ((int)tempo < (int)Tempo.NUM_TEMPOS-1) {
 			tempo = (Tempo)((int)tempo+1);
@@ -393,6 +550,9 @@ public class MusicManager : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Decreases the tempo.
+	/// </summary>
 	public void DecreaseTempo () {
 		if ((int)tempo > 0) {
 			tempo = (Tempo)((int)tempo-1);
@@ -401,31 +561,45 @@ public class MusicManager : MonoBehaviour {
 		}
 	}
 
-
-	// Adds a new riff
+	/// <summary>
+	/// Adds a riff to the current song.
+	/// </summary>
+	/// <returns></returns>
 	public Riff AddRiff () {
+
+		// Create a new riff
 		Riff temp = new Riff ();
-		InstrumentSetup.currentRiff = temp;
+
+		// Register the riff with the current song
 		currentSong.RegisterRiff(temp);
+
+		// Update riff editor
+		InstrumentSetup.currentRiff = temp;
+		
+		// Update song arrange
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
 		SongArrangeSetup.instance.Refresh();
+
 		return temp;
 	}
 
-	// Remotely toggles looping
-	public void ToggleLoopSong () {
-		loopSong = !loopSong;
-	}
-
+	/// <summary>
+	/// Starts playing a song.
+	/// </summary>
 	public void StartSong () {
-		loop = loopSong;
 		playing = true;
 	}
 
+	/// <summary>
+	/// Starts playing a playlist.
+	/// </summary>
 	public void StartPlaylist() {
 		beatsElapsedInPlaylist = 0;
 	}
 
+	/// <summary>
+	/// Stops playing a song.
+	/// </summary>
 	public void StopPlaying () {
 		playing = false;
 		beat = 0;

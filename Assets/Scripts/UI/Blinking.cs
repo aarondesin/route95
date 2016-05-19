@@ -2,10 +2,12 @@
 using UnityEngine.UI;
 using System.Collections;
 
-// Small class 
+/// <summary>
+/// Class to blink a sprite.
+/// </summary>
 public class Blinking : MonoBehaviour {
 
-	#region Exposed Vars
+	#region Blinking Vars
 
 	[Tooltip("The color of the image at the peak of its blink cycle.")]
 	public Color peakColor;

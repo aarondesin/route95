@@ -65,7 +65,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			// Create listing for song
 			//
-			GameObject listing = UI.MakeButton(song.name);
+			GameObject listing = UIHelpers.MakeButton(song.name);
 			listings.Add (listing);
 
 			RectTransform listing_tr = listing.RectTransform();
@@ -88,7 +88,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			// Create background for listing
 			//
-			GameObject listing_bg = UI.MakeImage (song.name + "_bg");
+			GameObject listing_bg = UIHelpers.MakeImage (song.name + "_bg");
 			RectTransform listing_bg_tr = listing_bg.RectTransform();
 			listing_bg_tr.SetParent (playlist);
 			listing_bg_tr.sizeDelta = new Vector2 (listing_tr.sizeDelta.x - 2f * horizontalPadding, listing_tr.sizeDelta.y);
@@ -111,7 +111,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			// Create song text
 			//
-			GameObject listing_text = UI.MakeText(song.name+"_text");
+			GameObject listing_text = UIHelpers.MakeText(song.name+"_text");
 
 			RectTransform listing_text_tr = listing_text.RectTransform();
 			listing_text_tr.SetParent(listing_tr);
@@ -131,7 +131,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			// Create remove song button
 			//
-			GameObject listing_remove = UI.MakeButton(song.name+"_remove");
+			GameObject listing_remove = UIHelpers.MakeButton(song.name+"_remove");
 
 			RectTransform listing_remove_tr = listing_remove.RectTransform();
 			listing_remove_tr.SetParent(listing_tr);
@@ -155,7 +155,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			// Create edit song button
 			//
-			GameObject listing_edit = UI.MakeButton(song.name+"_edit");
+			GameObject listing_edit = UIHelpers.MakeButton(song.name+"_edit");
 
 			RectTransform listing_edit_tr = listing_edit.RectTransform();
 			listing_edit_tr.SetParent(listing_tr);
@@ -191,7 +191,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			if (num > 0) {
 				Song prevSong = MusicManager.instance.currentProject.songs[i-1];
-				GameObject listing_up = UI.MakeButton(song.name+"_up");
+				GameObject listing_up = UIHelpers.MakeButton(song.name+"_up");
 
 				RectTransform listing_up_tr = listing_up.RectTransform();
 				listing_up_tr.SetParent(listing_tr);
@@ -226,7 +226,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			//
 			if (num < MusicManager.instance.currentProject.songs.Count-1) {
 				Song nextSong = MusicManager.instance.currentProject.songs[i+1];
-				GameObject listing_down = UI.MakeButton(song.name+"_down");
+				GameObject listing_down = UIHelpers.MakeButton(song.name+"_down");
 
 				RectTransform listing_down_tr = listing_down.RectTransform();
 				listing_down_tr.SetParent(listing_tr);
@@ -262,7 +262,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		//
 		// Create new song button
 		//
-		GameObject newSongButton = UI.MakeButton("New Song");
+		GameObject newSongButton = UIHelpers.MakeButton("New Song");
 		listings.Add (newSongButton);
 
 		RectTransform newSongButton_tr = newSongButton.RectTransform();
@@ -286,7 +286,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			GameManager.instance.GoToKeySelectMenu();
 		});
 
-		GameObject newSong_text = UI.MakeText("New Song_text");
+		GameObject newSong_text = UIHelpers.MakeText("New Song_text");
 
 		RectTransform newSong_text_tr = newSong_text.RectTransform();
 		newSong_text_tr.SetParent(newSongButton_tr);
@@ -306,7 +306,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		newSong_text_txt.font = font;
 		newSong_text_txt.alignment = TextAnchor.MiddleLeft;
 
-		GameObject newSongButton_highlight = UI.MakeImage ("Highlight (New Song Button)");
+		GameObject newSongButton_highlight = UIHelpers.MakeImage ("Highlight (New Song Button)");
 		listings.Add (newSongButton_highlight);
 
 		RectTransform newSongButton_highlight_tr = newSongButton_highlight.RectTransform();
@@ -325,13 +325,12 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		ShowHide newSongButton_sh = newSongButton.ShowHide();
 		newSongButton_sh.objects = new List<GameObject>() { newSongButton_highlight };
-		newSongButton_sh.transitionType = TransitionType.Instant;
 		newSongButton_sh.Hide();
 
 		//
 		// Create load song button
 		//
-		GameObject loadSongButton = UI.MakeButton("Load Song Button (Playlist Browser)");
+		GameObject loadSongButton = UIHelpers.MakeButton("Load Song Button (Playlist Browser)");
 		listings.Add (loadSongButton);
 
 		RectTransform loadSongButton_tr = loadSongButton.RectTransform();
@@ -354,7 +353,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			GameManager.instance.ShowLoadPromptForSongs();
 		});
 
-		GameObject loadSongButton_text = UI.MakeText("Load New Song_text");
+		GameObject loadSongButton_text = UIHelpers.MakeText("Load New Song_text");
 
 		RectTransform loadSongButton_text_tr = loadSongButton_text.RectTransform();
 		loadSongButton_text_tr.SetParent(loadSongButton_tr);
@@ -374,7 +373,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		loadSongButton_text_txt.font = font;
 		loadSongButton_text_txt.alignment = TextAnchor.MiddleLeft;
 
-		GameObject loadSongButton_highlight = UI.MakeImage ("Load New Song Highlight");
+		GameObject loadSongButton_highlight = UIHelpers.MakeImage ("Load New Song Highlight");
 		listings.Add (loadSongButton_highlight);
 
 		RectTransform loadSongButton_highlight_tr = loadSongButton_highlight.RectTransform();
@@ -393,7 +392,6 @@ public class PlaylistBrowser : MonoBehaviour {
 
 		ShowHide loadSongButton_sh = loadSongButton.ShowHide();
 		loadSongButton_sh.objects = new List<GameObject>() { loadSongButton_highlight };
-		loadSongButton_sh.transitionType = TransitionType.Instant;
 		loadSongButton_sh.Hide();
 	
 	}

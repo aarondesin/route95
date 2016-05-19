@@ -15923,13 +15923,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   paused: 0
-  currentMenu: 0
-  currentMode: 0
-  targetDeltaTime: 0
+  currentState: 0
   loaded: 0
+  loadingScreen: {fileID: 796519848}
+  loadingBar: {fileID: 1576480158}
+  loadingMessage: {fileID: 152282597}
+  casette: {fileID: 1730378343}
+  casetteMoveSpeed: 0.4
   casetteFront: {fileID: 42670265}
   casetteBack: {fileID: 402827720}
-  casetteMoveSpeed: 0.4
   fadeWaitTime: 180
   fadeSpeed: 0.02
   projectSaveFolder: /Projects/
@@ -15965,13 +15967,8 @@ MonoBehaviour:
   liveIcons: {fileID: 1690160809}
   songProgressBar: {fileID: 1170065699}
   loopIcon: {fileID: 906108765}
-  loadingSpeed: 3
-  loadingScreen: {fileID: 796519848}
-  loadingBar: {fileID: 1576480158}
-  loadingMessage: {fileID: 152282597}
   tooltip: {fileID: 529178210}
   tooltipDistance: 32
-  casette: {fileID: 1730378343}
 --- !u!4 &622006810
 Transform:
   m_ObjectHideFlags: 0
@@ -20796,7 +20793,7 @@ MonoBehaviour:
   loadsToDo: 0
   chunkSize: 100
   chunkResolution: 14
-  chunkLoadRadius: 8
+  chunkLoadRadius: 4
   heightScale: 800
   vertexUpdateDistance: 600
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
@@ -24626,8 +24623,7 @@ MonoBehaviour:
   selected: {fileID: 0}
   scrollviews:
   - {fileID: 181759422}
-  mouseDelta: {x: 0, y: 0, z: 0}
-  framesDragged: 0
+  dragThreshold: 30
 --- !u!4 &1118047755
 Transform:
   m_ObjectHideFlags: 0
@@ -36995,28 +36991,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65bdab0f780371d4c8315c6b1c7d5e4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mixer: {fileID: 24100000, guid: f67c1c84114f8a843bf10b57f49b6c12, type: 2}
-  currentProject:
-    name: New Project
-    songPaths: []
-  currentPlayingSong: 0
-  loopSong: 0
-  OneShot: {fileID: 0}
-  LoopRiff: {fileID: 0}
+  loadsToDo: 0
+  playing: 0
+  loop: 0
+  loopPlaylist: 0
   tempo: 0
+  currentPlayingSong: 0
+  beat: 0
   beatsElapsedInCurrentSong: 0
   beatsElapsedInPlaylist: 0
-  loopPlaylist: 0
-  loopPlaylistButton: {fileID: 1420294032}
   guitarNotes: 0
   guitarDensity: 0
   keyboardNotes: 0
   keyboardDensity: 0
   brassNotes: 0
   brassDensity: 0
-  maxBeats: 0
-  loadedAudioSources: 0
-  loadsToDo: 0
+  mixer: {fileID: 24100000, guid: f67c1c84114f8a843bf10b57f49b6c12, type: 2}
+  OneShot: {fileID: 0}
+  LoopRiff: {fileID: 0}
+  loopPlaylistButton: {fileID: 1420294032}
+  currentProject:
+    name: New Project
+    songPaths: []
 --- !u!164 &1664068198
 AudioReverbFilter:
   m_ObjectHideFlags: 0

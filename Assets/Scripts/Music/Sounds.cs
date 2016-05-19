@@ -2,10 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Class to hold all sound data to be loaded at runtime.
+/// </summary>
 public class Sounds : MonoBehaviour {
 
-	// List of all sound paths to load
-	public static Dictionary<string, List<string>> soundsToLoad = new Dictionary<string, List<string>>() {// maybe use dict for efficiency
+	/// <summary>
+	/// List of all sound paths to load.
+	/// </summary>
+	public static Dictionary<string, List<string>> soundsToLoad = new Dictionary<string, List<string>>() {
 
 		// Melodic.ElectricGuitar
 		{ "ElectricGuitar", new List<string> {

@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Audio;
 
+/// <summary>
+/// Class to handle effect sliders and buttons.
+/// </summary>
 public class EffectButton : MonoBehaviour {
 
 	public Image image;

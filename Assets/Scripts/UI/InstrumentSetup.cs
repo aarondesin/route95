@@ -5,43 +5,40 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Class to handle initialization of the riff editor.
+/// </summary>
 public class InstrumentSetup : MonoBehaviour {
 
 	#region InstrumentSetup Vars
 
-	public static InstrumentSetup instance;
-	public RiffAI riffai;
-
-	public const int MAX_NUMNOTES = 8;
-
-	public static Riff currentRiff; // current riff being edited
-
-	int numRows;
-	int subdivsShown = 2;
-	int octavesShown = 2;
-	int maxOctaves;
-	int numNotes;
-	int numButtons;
-
-	List<GameObject> buttons = new List<GameObject>();
-	List<List<GameObject>> buttonGrid = new List<List<GameObject>>();
-	List<GameObject> suggestions = new List<GameObject>();
-
-
+	public static InstrumentSetup instance; // Quick reference to this instance
+	public RiffAI riffai;                   // RiffAI instance to use (inactive)
+	public static Riff currentRiff;         // Current riff being edited
+	
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI Settings")]
 
-	public float baseButtonScale = 1f;
-	public float buttonWidth = 128f;
-	public float buttonSpacing = 8f;
+	public float baseButtonScale = 1f;      // Multiplier for button scale
+	public float buttonWidth = 128f;        // Base width of buttons
+	public float buttonSpacing = 8f;        // Spacing between buttons
 
+	int numNotes;                           // Number of rows
+	int numButtons;                         // Number of columns
+	int maxOctaves;                         // Maximum number of octaves supported by scale
+	int octavesShown = 2;                   // Number of octaves currently shown
+	
+	List<GameObject> buttons;               // List of all buttons and objects
+	List<List<GameObject>> buttonGrid;      // 2D grid of buttons (for AI)
+	List<GameObject> suggestions;           // List of suggestion objects
 
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI References")]
 
 	public InputField nameInputField;
 	public Scrollbar scrollBarH;
 	public Scrollbar scrollBarV;
 	public GameObject playRiffButton;
-	//public GameObject beatsText;
 	public Text tempoText;
 	public Scrollbar iconBar;
 	public RectTransform iconBar_tr;
@@ -59,6 +56,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public Image echoButton;
 	public Image reverbButton;
 
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI Art")]
 
 	// Icons for percussion setup buttons
@@ -130,7 +128,7 @@ public class InstrumentSetup : MonoBehaviour {
 		UpdateBeatsText();
 		UpdateTempoText();
 
-		numButtons = (int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS+2)*currentRiff.beatsShown/4;
+		numButtons = Riff.MAX_BEATS;
 
 		// Refresh button grid
 		buttonGrid.Clear ();
@@ -157,11 +155,11 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	public void MakeBeatNumbers () {
-		for (int i=0; i<currentRiff.beatsShown; i++) {
+		for (int i=0; i<Riff.MAX_BEATS/4; i++) {
 			buttons.Add(MakeText((i+1).ToString(), beatsBar_tr,
 				new Vector2 (48f, 48f),
 				new Vector2 (
-					buttonWidth + (buttonWidth+buttonSpacing)*(i*(int)Mathf.Pow(2f,Riff.MAX_SUBDIVS)),
+					buttonWidth + (buttonWidth+buttonSpacing)*(i*Riff.MAX_BEATS),
 					//buttonWidth + (buttonWidth+buttonSpacing)*num,
 					-beatsBar_tr.rect.height/2f
 				)
@@ -245,7 +243,7 @@ public class InstrumentSetup : MonoBehaviour {
 			))
 		);
 			
-		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) { // 0=4 1=2 2=1
+		for (int i = 0; i < numButtons; i ++) {
 			int num = i;
 
 			// Check if note is already in riff
@@ -267,11 +265,11 @@ public class InstrumentSetup : MonoBehaviour {
 
 			// Change scale based on beat
 			RectTransform bt_tr = bt.RectTransform();
-			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0) // Down beat
+			if (i % 4 == 0) // Down beat
 				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0) // Half beat
+			else if (i % 4 - 2 == 0) // Half beat
 				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0) // Quarter beat
+			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) // Quarter beat
 				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 
 			// Add StopScrolling tag
@@ -281,7 +279,7 @@ public class InstrumentSetup : MonoBehaviour {
 			Note note = new Note (soundName, vol, 1f);
 
 			// Create volume slider
-			GameObject volume = UI.MakeImage(title+"_volume");
+			GameObject volume = UIHelpers.MakeImage(title+"_volume");
 			RectTransform volume_tr = volume.RectTransform();
 			volume_tr.SetParent(bt_tr);
 			volume_tr.sizeDelta = bt_tr.sizeDelta * 1.3f;
@@ -302,7 +300,7 @@ public class InstrumentSetup : MonoBehaviour {
 			// Create show/hide toggle
 			ShowHide bt_sh = bt.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
-			bt_sh.transitionType = TransitionType.Instant;
+			bt_sh.transitionType = ShowHide.TransitionType.Instant;
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
 			// Initially hide volume slider
@@ -327,7 +325,7 @@ public class InstrumentSetup : MonoBehaviour {
 	}
 
 	void MakeMelodicButtons (string title, int row, string fileName, bool inScale) {
-		int numButtons = (int)currentRiff.beatsShown*(int)Mathf.Pow(2f, (float)Riff.MAX_SUBDIVS);
+		int numButtons = Riff.MAX_BEATS;
 		Color transparentWhite = new Color (1f, 1f, 1f, 0.5f);
 
 		// Create note text
@@ -343,7 +341,7 @@ public class InstrumentSetup : MonoBehaviour {
 		// Change text color depending on whether or not the note is in the scale
 		txt.Text().color = (inScale ? Color.white : transparentWhite);
 
-		for (int i=0; i<numButtons; i+=(int)Mathf.Pow(2f, (float)(Riff.MAX_SUBDIVS-subdivsShown))) {
+		for (int i=0; i<numButtons; i++) {
 			int num = i;
 
 			// Check if note is already in riff
@@ -365,11 +363,11 @@ public class InstrumentSetup : MonoBehaviour {
 					
 			// Change scale based on position of note
 			RectTransform bt_tr = bt.RectTransform();
-			if (i%(4*Riff.MAX_SUBDIVS)%4 == 0)
+			if (i % 4 == 0)
 				bt_tr.localScale = new Vector3 (baseButtonScale, baseButtonScale, baseButtonScale);
-			else if (i%(4*Riff.MAX_SUBDIVS)%4-2 == 0)
+			else if (i % 4 - 2 == 0)
 				bt_tr.localScale = new Vector3 (0.75f*baseButtonScale, 0.75f*baseButtonScale, 0.75f*baseButtonScale);
-			else if (i%(4*Riff.MAX_SUBDIVS)%4-1 == 0 || i%(4*Riff.MAX_SUBDIVS)%4-3 == 0)
+			else if (i % 4 - 1 == 0 || i % 4 - 3 == 0)
 				bt_tr.localScale = new Vector3 (0.5f*baseButtonScale, 0.5f*baseButtonScale, 0.5f*baseButtonScale);
 
 			// Add StopScrolling tag
@@ -379,7 +377,7 @@ public class InstrumentSetup : MonoBehaviour {
 			Note note = new Note (fileName, vol, 1f);
 
 			// Create volume slider
-			GameObject volume = UI.MakeImage(title+"_volume");
+			GameObject volume = UIHelpers.MakeImage(title+"_volume");
 			RectTransform volume_tr = volume.RectTransform();
 			volume_tr.SetParent(bt_tr);
 			volume_tr.sizeDelta = bt_tr.sizeDelta;
@@ -405,7 +403,6 @@ public class InstrumentSetup : MonoBehaviour {
 			// Create show/hide toggle
 			ShowHide bt_sh = bt.AddComponent<ShowHide>();
 			bt_sh.objects = new List<GameObject>() { volume};
-			bt_sh.transitionType = TransitionType.Instant;
 			bt_sh.enabled = currentRiff.Lookup(note, num);
 
 			// Initially hide volume slider

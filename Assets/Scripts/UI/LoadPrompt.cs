@@ -71,7 +71,7 @@ public class LoadPrompt : MonoBehaviour {
 			string path = files[i];
 			string filename = Path.GetFileNameWithoutExtension (files[i]);
 
-			GameObject button = UI.MakeButton(filename);
+			GameObject button = UIHelpers.MakeButton(filename);
 
 			RectTransform button_tr = button.RectTransform();
 			button_tr.SetParent(fileList);
@@ -89,7 +89,7 @@ public class LoadPrompt : MonoBehaviour {
 			button_img.sprite = fillSprite;
 			button_img.color = new Color(1f,1f,1f,0f);
 
-			GameObject text = UI.MakeText(filename+"_Text");
+			GameObject text = UIHelpers.MakeText(filename+"_Text");
 			RectTransform text_tr = text.RectTransform();
 			text_tr.SetParent(button.transform);
 			text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
@@ -114,7 +114,7 @@ public class LoadPrompt : MonoBehaviour {
 				
 			fileButtons.Add(button);
 
-			GameObject highlight = UI.MakeImage (filename+"_Highlight");
+			GameObject highlight = UIHelpers.MakeImage (filename+"_Highlight");
 			RectTransform highlight_tr = highlight.RectTransform();
 			highlight_tr.SetParent (button_tr);
 			highlight_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;

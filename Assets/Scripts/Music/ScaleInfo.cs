@@ -2,18 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Class to hold all types of scales.
+/// </summary>
 public class ScaleInfo {
-	public string name;
-	public int scaleIndex; // index in list of all scales
 
-	public int rootIndex;
-	public int secondIndex;
-	public int thirdIndex;
-	public int fourthIndex;
-	public int fifthIndex;
-	public int sixthIndex;
-	public int seventhIndex;
+	#region ScaleInfo Vars
 
+	public string name;      // Name of scale
+	public int scaleIndex;   // Index in list of all scales
+
+	public int rootIndex;    // Interval to root
+	public int secondIndex;  // Interval to second
+	public int thirdIndex;   // Interval to third
+	public int fourthIndex;  // Interval to fourth
+	public int fifthIndex;   // Interval to fifth
+	public int sixthIndex;   // Interval to sixth
+	public int seventhIndex; // Interval to seventh
+
+	/// <summary>
+	/// Major scale.
+	/// </summary>
 	public static ScaleInfo Major = new ScaleInfo () {
 		name = "Major",
 		scaleIndex = 0,
@@ -26,6 +35,9 @@ public class ScaleInfo {
 		rootIndex = 1
 	};
 
+	/// <summary>
+	/// Minor scale.
+	/// </summary>
 	public static ScaleInfo Minor = new ScaleInfo () {
 		name = "Minor",
 		scaleIndex = 1,
@@ -38,9 +50,14 @@ public class ScaleInfo {
 		rootIndex = 2
 	};
 			
+	/// <summary>
+	/// List of all scale types.
+	/// </summary>
 	public static List<ScaleInfo> AllScales = new List<ScaleInfo> () {
 		Major,
 		Minor
 	};
+
+	#endregion
 
 }
