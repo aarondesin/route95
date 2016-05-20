@@ -497,8 +497,8 @@ public class InstrumentSetup : MonoBehaviour {
 	/// </summary>
 	public void UpdatePlayRiffButtonArt () {
 		playRiffButton.sprite = MusicManager.instance.playing ?
-			GameManager.instance.playIcon :
-			GameManager.instance.pauseIcon;
+			GameManager.instance.pauseIcon :
+			GameManager.instance.playIcon;
 	}
 
 	/// <summary>
