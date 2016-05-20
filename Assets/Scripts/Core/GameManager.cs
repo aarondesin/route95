@@ -183,33 +183,36 @@ public class GameManager : MonoBehaviour {
 		targetDeltaTime = 1f / (float)Application.targetFrameRate;
 
 		// Init save paths
-		projectSavePath = Application.persistentDataPath + projectSaveFolder;
-		songSavePath = Application.persistentDataPath + songSaveFolder;
+		//projectSavePath = Application.persistentDataPath + projectSaveFolder;
+		projectSavePath = Application.dataPath + projectSaveFolder;
+		//songSavePath = Application.persistentDataPath + songSaveFolder;
+		songSavePath = Application.dataPath + songSaveFolder;
 
 		// Create save folders
-		if (!Directory.Exists(GameManager.instance.projectSavePath)) 
-			Directory.CreateDirectory (GameManager.instance.projectSavePath);
+		//if (!Directory.Exists(GameManager.instance.projectSavePath)) 
+		//	Directory.CreateDirectory (GameManager.instance.projectSavePath);
 
-		if (!Directory.Exists(Application.dataPath+projectSaveFolder))
-			Directory.CreateDirectory (Application.dataPath+projectSaveFolder);
+		if (!Directory.Exists(projectSavePath))
+			Directory.CreateDirectory (projectSavePath);
 
-		if (!Directory.Exists(GameManager.instance.songSavePath)) 
-			Directory.CreateDirectory (GameManager.instance.songSavePath);
+		//if (!Directory.Exists(GameManager.instance.songSavePath)) 
+		//	Directory.CreateDirectory (GameManager.instance.songSavePath);
 
-		if (!Directory.Exists(Application.dataPath+songSaveFolder))
-			Directory.CreateDirectory (Application.dataPath+songSaveFolder);
+		if (!Directory.Exists(projectSaveFolder))
+			Directory.CreateDirectory (projectSaveFolder);
 	}
 
 	void Start () {
-
-		// Show all menus for initialization
-		ShowAll();
 
 		// Init camera ref
 		mainCamera = Camera.main;
 
 		// Stop 3D rendering while loading
 		StopRendering ();
+
+		// Hide menus
+		HideAll();
+		Hide (prompt);
 	}
 
 	void Update () {
@@ -410,7 +413,6 @@ public class GameManager : MonoBehaviour {
 
 		Hide (addRiffPrompt);
 		Hide (loadPrompt);
-		Hide (prompt);
 		Hide (liveIcons);
 	}
 

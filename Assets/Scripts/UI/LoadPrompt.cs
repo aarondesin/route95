@@ -66,11 +66,9 @@ public class LoadPrompt : MonoBehaviour {
 		switch (mode) {
 		case LoadPrompt.Mode.Project:
 			files.AddRange (Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension).ToList<string>());
-			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.projectSaveFolder, "*"+SaveLoad.projectSaveExtension).ToList<string>());
 			break;
 		case LoadPrompt.Mode.Song:
 			files.AddRange (Directory.GetFiles(GameManager.instance.songSavePath, "*"+SaveLoad.songSaveExtension).ToList<string>());
-			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.songSaveFolder, "*"+SaveLoad.songSaveExtension).ToList<string>());
 			break;
 		}
 		for (int i=0; i<files.Count; i++) {

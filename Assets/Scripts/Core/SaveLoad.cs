@@ -82,7 +82,7 @@ public static class SaveLoad {
 	public static void SaveCurrentProject () {
 
 		// Build paths
-		string directoryPath = Application.persistentDataPath + GameManager.instance.projectSaveFolder;
+		string directoryPath = GameManager.instance.projectSavePath;
 		string filePath = directoryPath + MusicManager.instance.currentProject.name + projectSaveExtension;
 
 		try {
@@ -91,7 +91,7 @@ public static class SaveLoad {
 			Save<Project>(MusicManager.instance.currentProject, directoryPath, filePath);
 
 			// Prompt
-			Prompt.instance.PromptMessage("Save Project", "Successfully saved project!", "Okay");
+			Prompt.instance.PromptMessage("Save Project", "Successfully saved project to \"" + filePath + "\".", "Okay");
 
 		// Catch exceptions
 		} catch (FailedToSaveException e) {
@@ -107,7 +107,7 @@ public static class SaveLoad {
 	public static void SaveSong(Song song) {
 	
 		// Build paths
-		string directoryPath = Application.persistentDataPath + "/Songs/";
+		string directoryPath = Application.dataPath + "/Songs/";
 		string filePath = directoryPath + song.name + songSaveExtension;
 
 		// Save song
@@ -159,6 +159,11 @@ public static class SaveLoad {
 			// Deserialize object
 			T result = (T)bf.Deserialize(file);
 
+			// Check if valid result
+			if (result == null) throw new FailedToLoadException (
+				"SaveLoad.Load(): loaded file \"" + filePath + "\" was null.\n"
+				);
+
 			// Close file
 			file.Close();
 
@@ -198,15 +203,12 @@ public static class SaveLoad {
 			// Load first song, if available
 			if (!project.Empty)
 				MusicManager.instance.currentSong = project.songs[0];
-	
+
 			// Refresh name field on playlist browser
 			PlaylistBrowser.instance.RefreshName();
 	
 			// Go to playlist menu if not there already
 			GameManager.instance.GoToPlaylistMenu();
-
-			// Prompt success
-			Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Okay");
 
 		// Catch and print any FailedToLoadExceptions
 		} catch (FailedToLoadException f) {
@@ -252,7 +254,7 @@ public static class SaveLoad {
 			// Load song
 			Song result = Load<Song>(path);
 
-			Prompt.instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
+			//Prompt.instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
 
 			return result;
 
@@ -263,7 +265,9 @@ public static class SaveLoad {
 			Debug.LogError(e.Message);
 
 			// Prompt
-			Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+			Prompt.instance.PromptMessage("Failed to load song", 
+				"Failed to load song \"" + path + "\". It may be in an older format or corrupt.", 
+				"Okay");
 
 			return null;
 		}
