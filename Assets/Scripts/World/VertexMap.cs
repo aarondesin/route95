@@ -14,8 +14,6 @@ public class VertexMap {
 	public int yMin = 0;
 	public int yMax = 0;
 
-	float roadHeight;
-
 	float chunkSize;
 	int chunkRes;
 	int chunkRadius; 
@@ -30,7 +28,6 @@ public class VertexMap {
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
 		noDecorationsDistance = WorldManager.instance.roadWidth * 1.5f;
-		roadHeight = WorldManager.instance.roadHeight;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Map<Vertex>(width);

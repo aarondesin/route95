@@ -231,19 +231,42 @@ public class Riff {
 			if (beat.NoteCount == 0) return;
 
 			// Update effect levels
-			distortion.distortionLevel = distortionLevel;
-			tremolo.depth              = tremoloDepth;
-			tremolo.rate               = tremoloRate;
-			echo.decayRatio            = echoDecayRatio;
-			echo.delay                 = echoDelay;
-			echo.dryMix                = echoDryMix;
-			reverb.decayTime           = reverbDecayTime;
-			reverb.reverbLevel         = reverbLevel;
-			chorus.dryMix              = chorusDryMix;
-			chorus.rate                = chorusRate;
-			chorus.depth               = chorusDepth;
-			flanger.rate               = flangerRate;
-			flanger.dryMix             = flangerDryMix;
+			if (distortionEnabled) {
+				distortion.enabled = true;
+				distortion.distortionLevel = distortionLevel;
+			} else distortion.enabled = false;
+
+			if (tremoloEnabled) {
+				tremolo.enabled = true;
+				tremolo.depth = tremoloDepth;
+				tremolo.rate = tremoloRate;
+			} else tremolo.enabled = false;
+
+			if (echoEnabled) {
+				echo.enabled = true;
+				echo.decayRatio = echoDecayRatio;
+				echo.delay = echoDelay;
+				echo.dryMix = echoDryMix;
+			} else echo.enabled = false;
+
+			if (reverbEnabled) {
+				reverb.enabled = true;
+				reverb.decayTime = reverbDecayTime;
+				reverb.reverbLevel = reverbLevel;
+			} else reverb.enabled = false;
+
+			if (chorusEnabled) {
+				chorus.enabled = true;
+				chorus.dryMix = chorusDryMix;
+				chorus.rate = chorusRate;
+				chorus.depth = chorusDepth;
+			} else chorus.enabled = false;
+
+			if (flangerEnabled) {
+				flanger.enabled = true;
+				flanger.rate = flangerRate;
+				flanger.dryMix = flangerDryMix;
+			} else flanger.enabled = false;
 
 			// Cutoff
 			if (cutSelf) source.Stop();

@@ -158,7 +158,6 @@ public class DynamicTerrain : MonoBehaviour {
 	IEnumerator UpdateChunks () {
 		
 		// Init loading vars
-		int chunksToLoad = 0; // number of chunks to be loaded at start
 		float startTime = Time.realtimeSinceStartup;
 
 		// Change loading screen message
@@ -167,12 +166,8 @@ public class DynamicTerrain : MonoBehaviour {
 		// Main loop
 		while (true) {
 
-			// If loading terrain for the first time
-			if (!loaded) {
-				chunksToLoad = (chunkLoadRadius*2+1) * (chunkLoadRadius*2+1);
-
 			// If updating terrain
-			} else {
+			if (loaded) {
 				DeleteChunks();
 				UpdateFreqData ();
 			}
@@ -217,8 +212,6 @@ public class DynamicTerrain : MonoBehaviour {
 			// If finished loading terrain
 			if (!loaded) {
 				loaded = true;
-
-				Debug.Log (vertexmap.xMin + "-" + vertexmap.xMax + "," + vertexmap.yMin + "-" + vertexmap.yMax);
 
 				// Update all colliders
 				foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();

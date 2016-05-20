@@ -69,6 +69,8 @@ public class MusicManager : MonoBehaviour {
 	
 	public static MusicManager instance;                               // Quick reference to this instance
 
+	AudioSource source;                                                // Global MM audio source
+
 	float startLoadTime;                                               // Time at which loading started
 	int loadProgress;                                                  // Number of load tasks
 	public int loadsToDo;                                              // Number of tasks to load
@@ -176,6 +178,8 @@ public class MusicManager : MonoBehaviour {
 		// Init instance
 		if (instance) Debug.LogError("More than one MusicManager exists!");
 		else instance = this;
+
+		source = GetComponent<AudioSource>();
 
 		// Load instrument lists
 		Instrument.LoadInstruments();
@@ -441,6 +445,10 @@ public class MusicManager : MonoBehaviour {
 
 	#endregion
 	#region MusicManager Callbacks
+
+	public static void PlayMenuSound (AudioClip sound) {
+		instance.source.PlayOneShot (sound, 1f);
+	}
 
 	/// <summary>
 	/// Creates a new, blank project.

@@ -127,6 +127,10 @@ public class GameManager : MonoBehaviour {
 
 	[Tooltip("Sound to use when clicking a menu.")]
 	public AudioClip menuClick;
+	public AudioClip menuClick2;
+	public AudioClip effectsOn;
+	public AudioClip effectsOff;
+	public List<AudioClip> scribbles;
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Menu Objects")]
@@ -731,7 +735,23 @@ public class GameManager : MonoBehaviour {
 	/// Plays a click noise.
 	/// </summary>
 	public void MenuClick () {
-		MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(menuClick, 1f);
+		MusicManager.PlayMenuSound (menuClick);
+	}
+
+	public void MenuClick2 () {
+		MusicManager.PlayMenuSound (menuClick2);
+	}
+
+	public void EffectsOn () {
+		MusicManager.PlayMenuSound (effectsOn);
+	}
+
+	public void EffectsOff () {
+		MusicManager.PlayMenuSound (effectsOff);
+	}
+
+	public void Scribble () {
+		MusicManager.PlayMenuSound (scribbles[UnityEngine.Random.Range(0,3)]);
 	}
 
 	/// <summary>

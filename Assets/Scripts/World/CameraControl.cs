@@ -63,7 +63,6 @@ public class CameraControl : MonoBehaviour {
 	Transform start;
 	Transform target;
 	float speed = DEFAULT_SPEED;
-	float sTime;
 	bool moving = false;
 	float progress = 0f;
 
@@ -421,7 +420,6 @@ public class CameraControl : MonoBehaviour {
 	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
 		Camera.main.fieldOfView = 75f;
 		start = transform;
-		sTime = Time.time;
 		target = newPosition;
 		moving = true;
 		speed = newSpeed;
