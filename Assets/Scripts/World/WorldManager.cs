@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 
+/// <summary>
+/// Manager for all things world-related.
+/// </summary>
 public class WorldManager : MonoBehaviour {
 
 	#region WorldManager Enums
@@ -17,6 +20,7 @@ public class WorldManager : MonoBehaviour {
 		Circular
 	}
 
+	#endregion
 	#region WorldManager Vars
 
 	public static WorldManager instance;
@@ -24,42 +28,41 @@ public class WorldManager : MonoBehaviour {
 	public int loadsToDo;
 
 	// Chunk vars
-	const float DEFAULT_CHUNK_SIZE = 100;
-	const int DEFAULT_CHUNK_RESOLUTION = 8;
-	const int DEFAULT_CHUNK_LOAD_RADIUS = 4;
+	const float DEFAULT_CHUNK_SIZE = 100;                // Default chunk size (world units)
+	const int DEFAULT_CHUNK_RESOLUTION = 8;              // Default number of vertices per chunk edge
+	const int DEFAULT_CHUNK_LOAD_RADIUS = 4;             // Default player radius to load chunks (chunks)
 
 	// Terrain vars
-	const float DEFAULT_HEIGHT_SCALE = 800f;
-	const float DEFAULT_VERTEX_UPDATE_DISTANCE = 600f;
+	const float DEFAULT_HEIGHT_SCALE = 800f;             // Default terrain height scale (world units)
+	const float DEFAULT_VERTEX_UPDATE_DISTANCE = 600f;   // Default player radius to update vertices (world units)
 
 	// Decoration vars
-	const int DEFAULT_MAX_DECORATIONS = 1000;
-	const int DEFAULT_DECORATIONS_PER_STEP = 100;
+	const int DEFAULT_MAX_DECORATIONS = 1000;            // Default hard decoration limit
+	const int DEFAULT_DECORATIONS_PER_STEP = 100;        // Default max number of decorations to place each cycle
 
 	// Road vars
-	const float DEFAULT_ROAD_WIDTH = 10f;
-	const float DEFAULT_ROAD_HEIGHT = 0.2f;
-	const float DEFAULT_ROAD_SLOPE = 0.9f;
-	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;
-	const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;
-	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;
-	const float DEFAULT_ROAD_PLACEMENT_DISTANCE = 30f;
-	const float DEFAULT_ROAD_VARIANCE = 0.4f;
+	const float DEFAULT_ROAD_WIDTH = 10f;                // Default road width (world units)
+	const float DEFAULT_ROAD_HEIGHT = 0.2f;              // Default road height (world units)
+	const float DEFAULT_ROAD_SLOPE = 0.9f;               // Default ratio of road top plane to bottom plane (percent)
+	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;      // Default player radius to extend road (world units)
+	const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;        // Default number of road mesh subdivision steps per segment
+	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;        // Default limit on road slope per world unit
+	const float DEFAULT_ROAD_PLACEMENT_DISTANCE = 30f;   // Default distance to place road (world units)
+	const float DEFAULT_ROAD_VARIANCE = 0.4f;            // Default radius of road placement circle (percent)
 
 	// Day/night cycle vars
-	const float DEFAULT_TIME_SCALE = 0.01f;
+	const float DEFAULT_TIME_SCALE = 0.01f;              // Default time scale multiplier
 
 	// Performance vars
-	const int DEFAULT_CHUNK_UPDATES_PER_CYCLE = 4;
-	const int DEFAULT_FREQ_ARRAY_SIZE = 256;
-	const float DEFAULT_ROAD_PATH_CHECK_RESOLUTION = 4f;
+	const int DEFAULT_CHUNK_UPDATES_PER_CYCLE = 4;       // Default number of chunks to update per cycle
+	const int DEFAULT_FREQ_ARRAY_SIZE = 256;             // Default size of frequency data array (power of 2)
+	const float DEFAULT_ROAD_PATH_CHECK_RESOLUTION = 4f; // Default resolution at which to check the road
 
 	#endregion
 	#region WorldManager Vars
 
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Chunk Settings")]
-	//
 
 	[Tooltip("The length of one side of a chunk.")]
 	[Range(1f, 200f)]
@@ -76,10 +79,8 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Mode to generate chunks.")]
 	public ChunkGenerationMode chunkGenerationMode = ChunkGenerationMode.Circular;
 
-
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Terrain Settings")]
-	//
 
 	[Tooltip("Height scale of generated terrain.")]
 	[Range(100f, 1000f)]
@@ -91,40 +92,47 @@ public class WorldManager : MonoBehaviour {
 
 	[Tooltip("Material to use for terrain.")]
 	public Material terrainMaterial;
+
+	[Tooltip("Material to use when debugging terrain.")]
 	public Material terrainDebugMaterial;
 
 	[NonSerialized]
-	public DynamicTerrain terrain;
+	public DynamicTerrain terrain;                       // Reference to terrain
 
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Physics Settings")]
-	//
 
 	[Tooltip("Current wind vector.")]
 	public Vector3 wind;
 
-
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Decoration Settings")]
-	//
 
 	[Tooltip("Enable/disable decoration.")]
 	public bool doDecorate = true;
 
 	[SerializeField]
+	[Tooltip("Total max decorations.")]
 	private int maxDecorations;
 
 	[SerializeField]
+	[Tooltip("Current number of active decorations")]
 	private int numDecorations;
 
+	[Tooltip("Decoration group info for vegetation.")]
 	public Decoration.GroupInfo vegetationGroup;
+
+	[Tooltip("Decoration group info for road signs.")]
 	public Decoration.GroupInfo roadSignGroup;
+
+	[Tooltip("Decoration group info for rocks.")]
 	public Decoration.GroupInfo rockGroup;
 
 	[NonSerialized]
-	public List<GameObject> decorations = new List<GameObject>();
+	public List<GameObject> decorations =                // List of all active decorations
+		new List<GameObject>();
 
-	List<string> decorationPaths = new List<string>() {
+	List<string> decorationPaths = new List<string>() {  // List of load paths for decoration prefabs
 		"Prefabs/Decoration_75MPH",
 		"Prefabs/Decoration_Agave01",
 		"Prefabs/Decoration_BarrelCactus",
@@ -137,8 +145,8 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 		
-	ObjectPool decorationPool;
-
+	ObjectPool decorationPool;                           // Decoration pool to use
+	
 	[Tooltip("Current global decoration density.")]
 	[Range(0f,2f)]
 	public float decorationDensity = 1f;
@@ -152,29 +160,46 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Template to use for grass particle emitters.")]
 	public GameObject grassEmitterTemplate;
 
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Effects Settings")]
-	//
 
+	[Tooltip("Base intensity of lightning effects.")]
+	[Range(0.5f, 2f)]
 	public float baseLightningIntensity = 1.5f;
+
+	[Tooltip("GameObject to use for lightning strikes.")]
 	public GameObject lightningStriker;
+
+	[Tooltip("GameObject to use for in-cloud lightning flashes.")]
 	public GameObject lightningFlash;
+
+	[Tooltip("Star particle emitter.")]
+	public ParticleSystem starEmitter;
+
+	[Tooltip("Natural star emission rate.")]
+	public float starEmissionRate = 6f;
+	
+	[Tooltip("Template to use to instantiate shooting stars.")]
 	public GameObject shootingStarTemplate;
 
+	[Tooltip("Cloud particle emitter.")]
 	public ParticleSystem cloudEmitter;
+
+	[Tooltip("Rain particle emitter.")]
 	public ParticleSystem rainEmitter;
 
-	public List<ParticleSystem> exhaustEmitters;
-
-	public float starEmissionRate = 6f;
-	public ParticleSystem starEmitter;
+	[Tooltip("Number of active shakers.")]
 	public int shakers;
+
+	[SerializeField]
+	[Tooltip("Current density of rain.")]
 	float rainDensity;
 
+	[Tooltip("All car exhaust puff emitters.")]
+	public List<ParticleSystem> exhaustEmitters;
 
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Road Settings")]
-	//
 
 	[Tooltip("Width of generated road.")]
 	[Range(1f, 20f)]
@@ -184,29 +209,32 @@ public class WorldManager : MonoBehaviour {
 	[Range(0.1f, 1.0f)]
 	public float roadHeight = DEFAULT_ROAD_HEIGHT;
 
+	[Tooltip("Ratio of top of road to bottom.")]
 	public float roadSlope = DEFAULT_ROAD_SLOPE;
 
+	[Tooltip("Number of mesh subdivisions per road segment.")]
 	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
-	//[Tooltip("Radius within which to extend road.")]
-	//[Range(100f, 2000f)]
+	[Tooltip("Radius within which to trigger extending the road.")]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
+	[Tooltip("Radius within which to place road.")]
 	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
 
+	[Tooltip("Percentage radius of road placement distance within which to place road.")]
 	public float roadVariance = DEFAULT_ROAD_VARIANCE;
+
+	[Tooltip("Max road slope per world unit of distance.")]
 	public float roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
 
 	[NonSerialized]
-	public Road road;
+	public Road road;                                    // Road object
 
 	[Tooltip("Material to use for road.")]
 	public Material roadMaterial;
 
-
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Day/Night Cycle Settings")]
-	//
 
 	[Tooltip("Global time scale for day/night cycle.")]
 	[Range(0.001f, 0.1f)]
@@ -216,46 +244,57 @@ public class WorldManager : MonoBehaviour {
 	[Range(0f, 2f*Mathf.PI)]
 	public float timeOfDay;
 
-	private GameObject sun;
-	Light sunLight;
+	GameObject sun;                                      // Sun object
+	Light sunLight;                                      // Sun object's light
 
 	[Tooltip("Daytime intensity of the sun.")]
 	[Range(0.1f, 1.5f)]
 	public float maxSunIntensity;
-	public float minSunIntensity;
-	float sunIntensityAxis;
-	float sunIntensityAmplitude;
 
+	[Tooltip("Nighttime intensity of the sun.")]
+	public float minSunIntensity;
+
+	float sunIntensityAxis;                              // Axis of sun intensity oscillation
+	float sunIntensityAmplitude;                         // Amplitude of sun intensity oscillation
+	
 	[Tooltip("Flare texture to use for the sun.")]
 	public Flare sunFlare;
 
-	private GameObject moon;
-	Light moonLight;
+	GameObject moon;                                     // Moon object
+	Light moonLight;                                     // Moon object's light
 
 	[Tooltip("Nighttime intensity of the moon.")]
 	[Range(0.1f, 1.5f)]
 	public float maxMoonIntensity;
+
+	[Tooltip("Daytime intensity of the moon.")]
 	public float minMoonIntensity;
-	float moonIntensityAxis;
-	float moonIntensityAmplitude;
+
+	float moonIntensityAxis;                             // Axis of moon intensity oscillation
+	float moonIntensityAmplitude;                        // Amplitude of moon intensity oscillation
 
 	[Tooltip("Sprites to randomize for the moon.")]
 	public List<Sprite> moonSprites;
 
+	[Tooltip("Current primary color.")]
 	[SerializeField]
 	private Color primaryColor;
+
+	[Tooltip("Current secondary color.")]
 	[SerializeField]
 	private Color secondaryColor;
 
+	[Tooltip("Primary color cycle.")]
 	public Gradient primaryColors;
+
+	[Tooltip("Secondary color cycle.")]
 	public Gradient secondaryColors;
 
+	[Tooltip("Skybox transition cycle.")]
 	public Gradient skyboxFade;
 
-
-	//
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Performance Settings")]
-	//
 
 	[Tooltip("Maximum number of chunk updates per cycle.")]
 	[Range(1,16)]
@@ -264,7 +303,7 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
 	public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
 
-	LineRenderer visualizer;
+	LineRenderer visualizer;                                // Frequency visualizer
 
 	[Tooltip("FFT window to use when sampling music frequencies.")]
 	public FFTWindow freqFFTWindow;
@@ -285,8 +324,6 @@ public class WorldManager : MonoBehaviour {
 	bool loaded = false;
 	public bool loadedTerrain = false;
 	bool hasRandomized = false;
-
-
 
 	#endregion
 	#region Unity Callbacks
@@ -354,6 +391,7 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	#endregion
+	#region WorldManager Methods
 
 	public void Load () {
 
@@ -618,7 +656,8 @@ public class WorldManager : MonoBehaviour {
 			deco.Randomize();
 
 			// Parent decoration to chunk (if not dynamic)
-			if (!deco.dynamic) {
+			if (deco.dynamic) decoration.transform.parent = terrain.transform;
+			else {
 				decoration.transform.parent = chunk.gameObject.transform;
 				chunk.decorations.Add(decoration);
 			}

@@ -52,7 +52,7 @@ public class Project {
 
 	/// <summary>
 	/// Initializes any data not loaded.
-	/// Called on deserialization.
+	/// Called after deserialization.
 	/// </summary>
 	/// <param name="context"></param>
 	[OnDeserialized()]
@@ -88,7 +88,7 @@ public class Project {
 			SaveLoad.SaveSong(song);
 
 			// Generate and add path
-			string path = Application.persistentDataPath + GameManager.instance.songSaveFolder +
+			string path = Application.dataPath + GameManager.instance.songSaveFolder +
 				song.name + SaveLoad.songSaveExtension;
 			songPaths.Add (path);
 		}

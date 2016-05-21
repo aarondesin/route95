@@ -4490,7 +4490,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 21300000, guid: f5582dee6883d8c4ab0d378d6e27ac2c, type: 3}
-  addGraphic: {fileID: 21300000, guid: ed614671d2e9fca49a149b99abdc6eb1, type: 3}
   scrollbar: {fileID: 1175178861}
 --- !u!1 &152282597
 GameObject:
@@ -12708,7 +12707,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9461232
+  m_Size: 0.94612306
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20998,15 +20997,16 @@ MonoBehaviour:
   baseLightningIntensity: 3
   lightningStriker: {fileID: 478507253}
   lightningFlash: {fileID: 1436337460}
+  starEmitter: {fileID: 1592348090}
+  starEmissionRate: 10
   shootingStarTemplate: {fileID: 1231141450}
   cloudEmitter: {fileID: 190642049}
   rainEmitter: {fileID: 1686887395}
+  shakers: 0
+  rainDensity: 0
   exhaustEmitters:
   - {fileID: 117567641}
   - {fileID: 1126885382}
-  starEmissionRate: 10
-  starEmitter: {fileID: 1592348090}
-  shakers: 0
   roadWidth: 10
   roadHeight: 1
   roadSlope: 0.6
@@ -23576,7 +23576,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1680, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -24089,9 +24089,9 @@ RectTransform:
   m_Father: {fileID: 87238409}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -6, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1067672902
 MonoBehaviour:
@@ -24832,7 +24832,7 @@ RectTransform:
   m_Father: {fileID: 1893654520}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -27131,7 +27131,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: -4.2499504}
-  m_SizeDelta: {x: 0, y: 8.5}
+  m_SizeDelta: {x: 0, y: 4}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1175178863
 MonoBehaviour:
@@ -28680,7 +28680,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -17.500122, y: 23.220947}
+  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -31409,7 +31409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1415144759
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36031,8 +36031,8 @@ RectTransform:
   m_RootOrder: 9
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0000042915344, y: -30}
-  m_SizeDelta: {x: 196, y: 56}
+  m_AnchoredPosition: {x: 0.0000042915344, y: -36}
+  m_SizeDelta: {x: 196, y: 72}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1598446549
 MonoBehaviour:
@@ -36083,13 +36083,13 @@ MonoBehaviour:
   m_Vertical: 0
   m_MovementType: 2
   m_Elasticity: 0.1
-  m_Inertia: 1
+  m_Inertia: 0
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 20
   m_Viewport: {fileID: 2036810857}
   m_HorizontalScrollbar: {fileID: 1175178863}
   m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 2
+  m_HorizontalScrollbarVisibility: 0
   m_VerticalScrollbarVisibility: 2
   m_HorizontalScrollbarSpacing: -3
   m_VerticalScrollbarSpacing: -3
@@ -36580,8 +36580,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288437015}
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9793876
+  m_Value: 0
+  m_Size: 0.9793874
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -37211,6 +37211,15 @@ MonoBehaviour:
   currentProject:
     name: New Project
     songPaths: []
+  currentSong:
+    name: New Song
+    key: 0
+    scale: -1
+    songPieces: []
+    measures: []
+    riffs: []
+    beats: []
+    songPieceIndices: 
 --- !u!164 &1664068198
 AudioReverbFilter:
   m_ObjectHideFlags: 0
@@ -44183,7 +44192,7 @@ RectTransform:
   m_Father: {fileID: 1598446548}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}

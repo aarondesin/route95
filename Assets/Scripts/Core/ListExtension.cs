@@ -25,6 +25,23 @@ public static class ListExtension {
 	public static T Tail<T> (this List<T> list) {
 		return list[list.Count-1];
 	}
+
+	
+	public static void InsertSorted<T> (this List<T> list, T toInsert, bool highestFirst) where T : IComparable {
+		if (list.Count == 0) list.Add (toInsert);
+		else {
+			for (int i = 0; i < list.Count; i++) {
+				if (highestFirst && toInsert.CompareTo (list[i]) > 0) {
+					list.Insert (i, toInsert);
+					return;
+				} else if (!highestFirst && toInsert.CompareTo (list[i]) < 0) {
+					list.Insert (i, toInsert);
+					return;
+				}
+			}
+			list.Add (toInsert);
+		}
+	}
 	
 }
 

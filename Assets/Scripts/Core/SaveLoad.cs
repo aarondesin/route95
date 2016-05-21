@@ -150,6 +150,8 @@ public static class SaveLoad {
 
 		try {
 
+			Debug.Log("SaveLoad.Load<" + typeof(T).ToString() + ">(): loading path \"" + filePath + "\".");
+
 			// Init BinaryFormatter
 			BinaryFormatter bf = new BinaryFormatter();
 

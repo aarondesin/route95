@@ -54,7 +54,7 @@ public class Song {
 
 	/// <summary>
 	/// Refreshes all data that was not loaded.
-	/// Called on deserialization.
+	/// Called after deserialization.
 	/// </summary>
 	/// <param name="context"></param>
 	[OnDeserialized()]
@@ -193,14 +193,14 @@ public class Song {
 			// Replace riff with new one
 			else {
 				measure.riffIndices.Remove (riff.index);
-				measure.riffIndices.Add (newRiff.index);
+				measure.riffIndices.InsertSorted<int> (newRiff.index, false);
 			}
 
 			return;
 		}
 
 		// Riff not already there
-		measure.riffIndices.Add (newRiff.index);
+		measure.riffIndices.InsertSorted<int> (newRiff.index, false);
 	}
 
 	#endregion

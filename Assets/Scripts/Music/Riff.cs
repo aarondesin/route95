@@ -25,12 +25,25 @@ public class Riff {
 	[NonSerialized]
 	public Instrument instrument;            // Reference to instrument used in riff
 
+	[NonSerialized]
 	AudioSource source;                      // Source to play notes on
+
+	[NonSerialized]
 	AudioDistortionFilter distortion;        // Distortion filter
+
+	[NonSerialized]
 	AudioTremoloFilter tremolo;              // Tremolo filter
+
+	[NonSerialized]
 	AudioChorusFilter chorus;                // Chorus filter
+
+	[NonSerialized]
 	AudioFlangerFilter flanger;              // Flanger filter
+
+	[NonSerialized]
 	AudioEchoFilter echo;                    // Echo filter
+
+	[NonSerialized]
 	AudioReverbFilter reverb;                // Reverb filter
 
 	#endregion

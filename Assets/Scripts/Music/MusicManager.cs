@@ -156,10 +156,12 @@ public class MusicManager : MonoBehaviour {
 	[Header("Project References")]
 
 	[Tooltip("Current open project.")]
+	//[NonSerialized]
 	public Project currentProject;
 
-	[NonSerialized]
-	public Song currentSong = null;
+	[Tooltip("Current song being edited/played.")]
+	//[NonSerialized]
+	public Song currentSong;
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Sounds")]
