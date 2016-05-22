@@ -8,7 +8,7 @@ using UnityStandardAssets.ImageEffects;
 /// <summary>
 /// Manager for all things world-related.
 /// </summary>
-public class WorldManager : MonoBehaviour {
+public class WorldManager : InstancedMonoBehaviour {
 
 	#region WorldManager Enums
 
@@ -22,8 +22,6 @@ public class WorldManager : MonoBehaviour {
 
 	#endregion
 	#region WorldManager Vars
-
-	public static WorldManager instance;
 
 	public int loadsToDo;
 
@@ -99,6 +97,8 @@ public class WorldManager : MonoBehaviour {
 	[NonSerialized]
 	public DynamicTerrain terrain;                       // Reference to terrain
 
+	public Spectrum2 visualization;
+
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Physics Settings")]
 
@@ -145,7 +145,7 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
 		
-	ObjectPool decorationPool;                           // Decoration pool to use
+	ObjectPool<Decoration> decorationPool;                           // Decoration pool to use
 	
 	[Tooltip("Current global decoration density.")]
 	[Range(0f,2f)]
@@ -247,6 +247,9 @@ public class WorldManager : MonoBehaviour {
 	GameObject sun;                                      // Sun object
 	Light sunLight;                                      // Sun object's light
 
+	[Tooltip("Scale to use for the sun.")]
+	public float sunScale;
+
 	[Tooltip("Daytime intensity of the sun.")]
 	[Range(0.1f, 1.5f)]
 	public float maxSunIntensity;
@@ -262,6 +265,9 @@ public class WorldManager : MonoBehaviour {
 
 	GameObject moon;                                     // Moon object
 	Light moonLight;                                     // Moon object's light
+
+	[Tooltip("Scale to use for the moon.")]
+	public float moonScale;
 
 	[Tooltip("Nighttime intensity of the moon.")]
 	[Range(0.1f, 1.5f)]
@@ -330,7 +336,6 @@ public class WorldManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-		instance = this;
 
 		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
 		//Debug.Log(maxDecorations);
@@ -340,19 +345,21 @@ public class WorldManager : MonoBehaviour {
 		).GetComponent<DynamicTerrain> ();
 		wind = UnityEngine.Random.insideUnitSphere;
 
+		visualization.enabled = false;
+
 		roadExtendRadius = chunkSize * (chunkLoadRadius-2);
 		road = CreateRoad();
 
 		numDecorations = 0;
-		decorationPool = new ObjectPool();
+		decorationPool = new ObjectPool<Decoration>();
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
-		sun = CreateSun();
+		sun = CreateSun(sunScale);
 		sunLight = sun.Light();
 		sunIntensityAmplitude = (maxSunIntensity-minSunIntensity)/2f;
 		sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
 
-		moon = CreateMoon();
+		moon = CreateMoon(moonScale);
 		moonLight = moon.Light();
 		moonIntensityAmplitude = (maxMoonIntensity-maxMoonIntensity)/2f;
 		moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
@@ -408,6 +415,8 @@ public class WorldManager : MonoBehaviour {
 
 		// Print time taken
 		Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+
+		visualization.enabled = true;
 
 		// Call GameManager to finish loading
 		GameManager.instance.FinishLoading();
@@ -520,7 +529,7 @@ public class WorldManager : MonoBehaviour {
 		if (decorationPool.Empty) {
 			decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
 			createNew = true;
-		} else decoration = decorationPool.Peek();
+		} else decoration = decorationPool.Peek().gameObject;
 
 		//if (!createNew) Debug.Log("old");
 	
@@ -559,9 +568,15 @@ public class WorldManager : MonoBehaviour {
 	}
     
 	GameObject CreateSun(){
-		GameObject sun = new GameObject ("Sun");
-		sun.AddComponent<Light> ();
-		sun.AddComponent<Sun> ();
+		GameObject sun = new GameObject ("Sun",
+			typeof (Light),
+			typeof (Sun)
+		);
+
+		//sun.GetComponent<Sun>().
+
+		Light light = sun.Light();
+		
 		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
 		sun.GetComponent<Light>().flare = sunFlare;
 
@@ -639,7 +654,7 @@ public class WorldManager : MonoBehaviour {
 			// Instantiate or grab object
 			GameObject decoration;
 			if (createNew) decoration = (GameObject)Instantiate(decorationPrefab);
-			else decoration = decorationPool.Get();
+			else decoration = decorationPool.Get().gameObject;
 			Decoration deco = decoration.GetComponent<Decoration>();
 
 			// Raycast down 
@@ -651,9 +666,6 @@ public class WorldManager : MonoBehaviour {
 
 			// Transform decoration
 			decoration.transform.position = new Vector3 (coordinate.x, y, coordinate.y);
-					
-			// Randomize decoration
-			deco.Randomize();
 
 			// Parent decoration to chunk (if not dynamic)
 			if (deco.dynamic) decoration.transform.parent = terrain.transform;
@@ -709,7 +721,7 @@ public class WorldManager : MonoBehaviour {
 		GameObject decoration;
 		if (createNew) decoration = 
 			(GameObject)Instantiate(decorationPrefab, coordinate, Quaternion.Euler(Vector3.zero));
-		else decoration = decorationPool.Get();
+		else decoration = decorationPool.Get().gameObject;
 
 		// Randomize
 		Decoration deco = decoration.GetComponent<Decoration>();
@@ -763,7 +775,7 @@ public class WorldManager : MonoBehaviour {
 		numDecorations--;
 
 		// Pool decoration
-		decorationPool.Add(deco);
+		decorationPool.Add(d);
 	}
 
 	/// <summary>
@@ -872,6 +884,19 @@ public class WorldManager : MonoBehaviour {
 
 	public void DebugTerrain () {
 		terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
+	}
+
+	public void PrintVertexMap () {
+		VertexMap vmap = terrain.vertexmap;
+		string log = "";
+		for (int i = vmap.xMin; i <= vmap.xMax; i++) {
+			for (int j = vmap.yMin; j <= vmap.yMax; j++) {
+				Vertex vert = vmap.VertexAt(i, j);
+				log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
+			}
+			log += "\n";
+		}
+		System.IO.File.WriteAllText(Application.persistentDataPath + "/vmap.txt", log);
 	}
 
 	#endregion

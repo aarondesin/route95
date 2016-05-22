@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Sun : MonoBehaviour {
+
+
+public class Sun : GlobalLightSource {
 	public static Sun instance;
 
 	private float xScale = 1000;

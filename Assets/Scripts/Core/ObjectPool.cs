@@ -6,24 +6,24 @@ using System.Collections.Generic;
 /// Data storage class to handle poolable
 /// GameObjects.
 /// </summary>
-public class ObjectPool {
+public class ObjectPool<T> where T: MonoBehaviour, IPoolable {
 
-	List<GameObject> pool; // List of inactive GameObjects
+	List<T> pool; // List of inactive GameObjects
 
 	/// <summary>
 	/// Init this instance.
 	/// </summary>
 	public ObjectPool () {
-		pool = new List<GameObject>();
+		pool = new List<T>();
 	}
 
 	/// <summary>
 	/// Adds an item to the pool, and deactivates it.
 	/// </summary>
 	/// <param name="item">Item to add to the pool.</param>
-	public void Add (GameObject item) {
+	public void Add (T item) {
 		pool.Add(item);
-		item.SetActive (false);
+		item.OnPool();
 	}
 
 	/// <summary>
@@ -31,8 +31,8 @@ public class ObjectPool {
 	/// of the pool.
 	/// </summary>
 	/// <returns>Reference to the top GameObject.</returns>
-	public GameObject Peek () {
-		if (Empty) return null;
+	public T Peek () {
+		if (Empty) return default(T);
 		return pool[0];
 	}
 
@@ -41,14 +41,14 @@ public class ObjectPool {
 	/// and activates it.
 	/// </summary>
 	/// <returns>GameObject at the top of the pool.</returns>
-	public GameObject Get () {
+	public T Get () {
 
 		// Return null if empty
-		if (Empty) return null;
+		if (Empty) return default(T);
 
-		GameObject result = pool[0];
+		T result = pool[0];
 		pool.RemoveAt(0);
-		result.SetActive(true);
+		result.OnDepool();
 		return result;
 	}
 

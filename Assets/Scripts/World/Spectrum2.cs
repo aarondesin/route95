@@ -16,41 +16,38 @@ public class Spectrum2 : MonoBehaviour {
 	public float opacity;
 	public float fallRate;
 
-	void Start () {
+	void Awake () {
 		instance = this;
-
-		terrain = WorldManager.instance.terrain;
 
 		// Initialize visualizer points
 		points = new Vector3[numberOfObjects];
 		for (int i=0; i<numberOfObjects; i++) {
 			float angle = i*Mathf.PI*2f/numberOfObjects;
 			Vector3 pos = new Vector3 (Mathf.Cos (angle), 0f, Mathf.Sin(angle))*radius;
-			GameObject point = new GameObject();
-			point.GetComponent<Transform>().position = pos;
-			point.GetComponent<Transform>().SetParent(GetComponent<Transform>());
+			GameObject point = new GameObject("Point"+i);
+			point.transform.position = pos;
+			point.transform.SetParent(transform);
 			points[i] = point.transform.position;
 		}
 		GetComponent<LineRenderer>().SetVertexCount(numberOfObjects);
+		GetComponent<LineRenderer> ().SetPositions (points);
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (terrain != null && terrain.freqData != null) {
+		if (terrain == null) terrain = WorldManager.instance.terrain;
+		if (terrain.freqData == null) return;
 
-			for (int i = 0; i < numberOfObjects; i++) {
-				
-				float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)i / numberOfObjects)) * scale;
-				if (y != float.NaN) {
-					if (y < points[i].y && points[i].y >= transform.position.y+fallRate) {
-						points[i].y -= fallRate;
-					} else {
-						points [i].y = y;
-					}
-				}
+		for (int i = 0; i < numberOfObjects; i++) {
+			float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)(i==0 ? (numberOfObjects-1) : i) / numberOfObjects)) * scale;
+			if (y != float.NaN) {
+				if (y < points[i].y && points[i].y >= transform.position.y+fallRate)
+					points[i].y -= fallRate;
+				else points [i].y = y;
 			}
-			GetComponent<LineRenderer> ().SetPositions (points);
+			
 		}
+		GetComponent<LineRenderer> ().SetPositions (points);
 	}
 
 }

@@ -2,16 +2,19 @@
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// Class for generic modal popups.
+/// </summary>
 public class Prompt : MonoBehaviour {
 
 	#region Prompt Vars
 
-	public static Prompt instance;
+	public static Prompt instance; // Quick reference to this instance
 
-	public GameObject dialog;
-	public Text titleText;
-	public Text messageText;
-	public Text buttonText;
+	public GameObject dialog;      // Object to use for modal popups
+	public Text titleText;         // Reference to title text
+	public Text messageText;       // Reference to message body text
+	public Text buttonText;        // Reference to button text
 
 	#endregion
 	#region Unity Callbacks

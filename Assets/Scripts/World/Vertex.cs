@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Vertex {
+
 	public DynamicTerrain terrain;
 	static int chunkRes;
 	static float chunkSize;
@@ -95,25 +96,28 @@ public class Vertex {
 		return (coord % (chunkRes-1) == 0);
 	}
 
+	int ChunkAt (int coord) {
+		return coord / (chunkRes-1) - (coord < 0 ? 1 : 0);
+	}
+
 	int ChunkMin (int coord) {
-		return coord / (chunkRes-1) -1;
-		//return coord / (chunkRes-1) - (coord % (chunkRes-1) == 0 ? 1 : 0);
+		int result = coord / (chunkRes - 1) - (coord < 0 ? 1 : coord % (chunkRes-1) == 0 ? 1 : 0);
+		return result;
 	}
 
 	int ChunkMax (int coord) {
-		return coord < 0 ? coord / (chunkRes-1) -1 : coord / (chunkRes-1);
-		//return coord / (chunkRes-1);
+		int result = coord / (chunkRes - 1) - (coord < 0 ? 1 : 0 );
+		return result;
 	}
 
-	//int CoordToIndex (int x, int y, bool r, bool u, bool edge) {
 	int CoordToIndex (int chunkX, int chunkY) {
 		int localX = x - chunkX * (chunkRes-1);
-		if (localX >= chunkRes || localX < 0) 
-			Debug.LogError ("Vertex.CoordToIndex(): x coord "+x+" not on chunk "+chunkX+"!");
+		if (localX >= chunkRes || localX < 0)
+			throw new ArgumentOutOfRangeException ("Vertex.CoordToIndex(): x coord "+x+" not on chunk "+chunkX+"!");
 
 		int localY = y - chunkY * (chunkRes-1);
 		if (localY >= chunkRes || localY < 0) 
-			Debug.LogError ("Vertex.CoordToIndex(): y coord "+y+" not on chunk "+chunkY+"!");
+			throw new ArgumentOutOfRangeException ("Vertex.CoordToIndex(): y coord "+y+" not on chunk "+chunkY+"!");
 
 		int i = localY * chunkRes + localX;
 
@@ -175,32 +179,28 @@ public class Vertex {
 
 			// X edge
 			} else {
-				//Debug.Log(x);
-				Chunk left = terrain.ChunkAt(ChunkMin (x), ChunkMax(y));
+				Chunk left = terrain.ChunkAt(ChunkMin (x), ChunkAt(y));
 				if (left != null) {
-					//Debug.Log(left.x);
 					left.UpdateVertex (CoordToIndex (left.x, left.y), height);
 					left.UpdateColor (CoordToIndex (left.x, left.y), blend);
-				}
+				} 
 
-				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkMax(y));
+				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkAt(y));
 				if (right != null) {
-					//Debug.Log(right.x);
 					right.UpdateVertex(CoordToIndex(right.x, right.y), height);
 					right.UpdateColor (CoordToIndex (right.x, right.y), blend);
 				}
-
 			} 
 
 		// Y edge
 		} else if (IsEdge (y)) {
-			Chunk bottom = terrain.ChunkAt(ChunkMax(x), ChunkMin(y));
+			Chunk bottom = terrain.ChunkAt(ChunkAt(x), ChunkMin(y));
 			if (bottom != null) {
 				bottom.UpdateVertex (CoordToIndex (bottom.x, bottom.y), height);
 				bottom.UpdateColor (CoordToIndex (bottom.x, bottom.y), blend);
 			}
 
-			Chunk top = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
+			Chunk top = terrain.ChunkAt(ChunkAt(x), ChunkMax(y));
 			if (top != null) {
 				top.UpdateVertex (CoordToIndex (top.x, top.y), height);
 				top.UpdateColor (CoordToIndex (top.x, top.y), blend);
@@ -208,43 +208,12 @@ public class Vertex {
 		
 		// No edge
 		} else {
-			try {
-				Chunk chunk = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
-				if (chunk != null) {
-					chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
-					chunk.UpdateColor (CoordToIndex (chunk.x, chunk.y), blend);
-				}
-			} catch (NullReferenceException e) {
-				Debug.LogError ("Vertex.SetHeight(): tried to access nonexistent chunk at "
-					+ChunkMax(x)+","+ChunkMax(y)+" "
-					+e.Message);
-				return;
+			Chunk chunk = terrain.ChunkAt(ChunkAt(x), ChunkAt(y));
+			if (chunk != null) {
+				chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
+				chunk.UpdateColor (CoordToIndex (chunk.x, chunk.y), blend);
 			}
 		}
-
-
-		/*slope = 0f;
-		int numPoints = 0;
-		if (map.ContainsVertex(x-1, y)) {
-			slope += Mathf.Abs(map.VertexAt(x-1,y).height-height);
-			numPoints++;
-		}
-		if (map.ContainsVertex(x+1, y)) {
-			slope += Mathf.Abs(map.VertexAt(x+1,y).height-height);
-			numPoints++;
-		}
-		if (map.ContainsVertex(x, y-1)) {
-			slope += Mathf.Abs(map.VertexAt(x,y-1).height-height);
-			numPoints++;
-		}
-		if (map.ContainsVertex(x, y+1)) {
-			slope += Mathf.Abs(map.VertexAt(x,y+1).height-height);
-			numPoints++;
-		}
-		slope /= (float)numPoints;
-		float blendValue = Mathf.Clamp01(slope/50f);///WorldManager.instance.heightScale;*/
-
-
 	}
 
 	public void AddHeight (float h) {

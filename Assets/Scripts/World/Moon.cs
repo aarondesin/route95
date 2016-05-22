@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Moon : MonoBehaviour {
-	public static Moon instance;
+/// <summary>
+/// Class to handle moon movement and lighting.
+/// </summary>
+public class Moon : GlobalLightSource {
 
 	#region Moon Vars
+
+	public static Moon instance;  // Quick reference to this instance
+	Light _light;                 // Reference to this light component
 
 	private float xScale = 1000f;
 	private float yScale = 1000f;
 	private float zScale = 1000f;
 
-	private Vector3 sunTarget; // target for the sun to point at: the car or the origin
+	private Vector3 target; // target for the sun to point at: the car or the origin
 
 	#endregion
 	#region Unity Callbacks
 
-	void Start() {
+	void Awake () {
 		instance = this;
 		this.GetComponent<Light> ().range = 100f;
 		this.GetComponent<Light> ().type = LightType.Directional;

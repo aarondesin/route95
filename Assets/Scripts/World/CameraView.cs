@@ -2,8 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Structure to hold all camera view information.
+/// </summary>
 public class CameraView {
 
+	#region CameraView Enums
+
+	/// <summary>
+	/// Setup mode camera views.
+	/// </summary>
 	public enum View {
 		OutsideCar,
 		Driving,
@@ -11,30 +19,41 @@ public class CameraView {
 		Chase
 	}
 
+	/// <summary>
+	/// Type of camera placement.
+	/// </summary>
 	public enum CameraPlacementMode {
 		Fixed,
 		RandomSky,
 		RandomGround
 	}
 
+	/// <summary>
+	/// Type of camera follow.
+	/// </summary>
 	public enum CameraFollowMode {
 		Lead, // Points in front of target
 		Static,
 		Shaky
 	}
 
-	public string name;
-	public Transform transform;
-	public float fov; // field of view
-	public CameraFollowMode followMode; // type of camera following
-	public CameraPlacementMode placementMode;
-	public Vector3 pos; // current position of camera
-	public Quaternion rot; // current rotation of camera
+	#endregion
+	#region CameraView Vars
 
-	public Vector3 targetPos; // target transform
-	public Quaternion targetRot;
+	public string name;                       // Name
+	public Transform transform;               // Transform to use
+	public float fov;                         // Field of view
+	public CameraFollowMode followMode;       // Type of camera following
+	public CameraPlacementMode placementMode; // Type of camera placement
+	public Vector3 pos;                       // Current position of camera
+	public Quaternion rot;                    // Current rotation of camera
 
-	public float lag; // how tightly camera follows (lower = tighter)
-	public float shake;
+	public Vector3 targetPos;                 // Target transform
+	public Quaternion targetRot;              // Target rotation
+
+	public float lag;                         // How tightly camera follows (lower = tighter)
+	public float shake;                       // Amount of camera shake
+
+	#endregion
 }
 

@@ -15,18 +15,20 @@ public class SongTimeline : MonoBehaviour {
 	#region SongTimeline Vars
 
 	public static SongTimeline instance; // Quick reference to the song timeline
-	RectTransform timeline_tr;
+	RectTransform timeline_tr;           // Transform of the timeline
 
-	static int NUM_COLUMNS = 4; // number of columns shown on timeline
+	static int NUM_COLUMNS = 4;          // Number of columns shown on timeline
 
+	[Tooltip("Sprite to use for columns.")]
 	public Sprite graphic;
 
-	List<GameObject> columns;
+	List<GameObject> columns;            // List of active columns
 
+	[Tooltip("Reference to scrollbar.")]
 	public GameObject scrollbar;
 
-	float columnWidth;
-	float columnHeight;
+	float columnWidth;                   // Calculated width of columns
+	float columnHeight;                  // Calculated height of columns
 
 	#endregion
 	#region Unity Callbacks

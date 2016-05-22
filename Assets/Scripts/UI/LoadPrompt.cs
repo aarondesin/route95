@@ -98,7 +98,7 @@ public class LoadPrompt : MonoBehaviour {
 			text_tr.SetParent(button.transform);
 			text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
 			text_tr.AnchorAtPoint (0.5f, 0.5f);
-			text.GetComponent<RectTransform>().anchoredPosition3D = Vector3.zero;
+			text_tr.anchoredPosition3D = Vector3.zero;
 			text_tr.ResetScaleRot();
 
 			Text text_text = text.Text();

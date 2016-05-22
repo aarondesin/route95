@@ -648,6 +648,10 @@ public class InstrumentSetup : MonoBehaviour {
 		suggestions.Add(suggestion);
 	}
 
+	/// <summary>
+	/// Suggests a power chord.
+	/// </summary>
+	/// <param name="button"></param>
 	void SuggestPowerChord (GameObject button) {
 		RectTransform tr = button.RectTransform();
 
@@ -669,6 +673,10 @@ public class InstrumentSetup : MonoBehaviour {
 		suggestions.Add(suggestion);
 	}
 
+	/// <summary>
+	/// Suggests an octave.
+	/// </summary>
+	/// <param name="button"></param>
 	void SuggestOctave (GameObject button) {
 		RectTransform tr = button.RectTransform();
 

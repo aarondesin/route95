@@ -2,22 +2,33 @@
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// Class to handle the live mode song progress bar.
+/// </summary>
 public class SongProgressBar : MonoBehaviour {
 
-	public static SongProgressBar instance;
+	#region SongProgressBar Vars
 
+	public static SongProgressBar instance; // Quick reference to this instance
+
+	[Tooltip("Reference to background image.")]
 	public Image background;
+
+	[Tooltip("Reference to bar image.")]
 	public Image bar;
 
-	float value;
+	float value;                            // Current song progress value
 
-	void Start () {
+	#endregion
+	#region Unity Callbacks
+
+	void Awake () {
 		instance = this;
 	}
 
 	void Update () {
-		RectTransform bgtr = background.GetComponent<RectTransform>();
-		RectTransform batr = bar.GetComponent<RectTransform>();
+		RectTransform bgtr = background.gameObject.RectTransform();
+		RectTransform batr = bar.gameObject.RectTransform();
 		batr.sizeDelta = new Vector2 (value*bgtr.rect.width, bgtr.rect.height);
 		batr.anchoredPosition3D = new Vector3 (
 				batr.sizeDelta.x/2f,
@@ -26,7 +37,16 @@ public class SongProgressBar : MonoBehaviour {
 		);
 	}
 
+	#endregion
+	#region SongProgressBar Methods
+
+	/// <summary>
+	/// Set the song progress bar value.
+	/// </summary>
+	/// <param name="v">New value.</param>
 	public void SetValue (float v) {
 		value = Mathf.Clamp01(v);
 	}
+
+	#endregion
 }

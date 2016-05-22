@@ -16,5 +16,9 @@ public class WorldManagerEditor : Editor {
 		if (GUILayout.Button("Show constraints")) {
 			((WorldManager)target).DebugTerrain();
 		}
+
+		if (GUILayout.Button("Print vertex map")) {
+			((WorldManager)target).PrintVertexMap();
+		}
 	}
 }

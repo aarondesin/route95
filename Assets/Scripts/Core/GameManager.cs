@@ -14,7 +14,7 @@ using UnityEditor;
 /// Instanced class to handle all application functions,
 /// major state changes, and UI interactions.
 /// </summary>
-public class GameManager : MonoBehaviour {
+public class GameManager : InstancedMonoBehaviour {
 
 	#region GameManager Enums
 
@@ -31,9 +31,9 @@ public class GameManager : MonoBehaviour {
 	#endregion
 	#region GameManager Vars
 
-	public static GameManager instance;            // Quick reference to the Game Manager
+	MusicManager Music;
+	WorldManager World;
 
-	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Game Status")]
 
 	[Tooltip("Is the game paused?")]
@@ -175,10 +175,6 @@ public class GameManager : MonoBehaviour {
 
 	void Awake () {
 
-		// Check if already initialized
-		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
-		else instance = this;
-
 		// Remove profiler sample limit
 		Profiler.maxNumberOfSamplesPerFrame = -1;
 
@@ -187,26 +183,21 @@ public class GameManager : MonoBehaviour {
 		targetDeltaTime = 1f / (float)Application.targetFrameRate;
 
 		// Init save paths
-		//projectSavePath = Application.persistentDataPath + projectSaveFolder;
 		projectSavePath = Application.dataPath + projectSaveFolder;
-		//songSavePath = Application.persistentDataPath + songSaveFolder;
 		songSavePath = Application.dataPath + songSaveFolder;
 
-		// Create save folders
-		//if (!Directory.Exists(GameManager.instance.projectSavePath)) 
-		//	Directory.CreateDirectory (GameManager.instance.projectSavePath);
-
+		// Create folders if non-existent
 		if (!Directory.Exists(projectSavePath))
 			Directory.CreateDirectory (projectSavePath);
-
-		//if (!Directory.Exists(GameManager.instance.songSavePath)) 
-		//	Directory.CreateDirectory (GameManager.instance.songSavePath);
 
 		if (!Directory.Exists(projectSaveFolder))
 			Directory.CreateDirectory (projectSaveFolder);
 	}
 
 	void Start () {
+
+		Music = MusicManager.instance as MusicManager;
+		World = WorldManager.instance as WorldManager;
 
 		// Init camera ref
 		mainCamera = Camera.main;
@@ -306,14 +297,14 @@ public class GameManager : MonoBehaviour {
 		loadingScreen.SetActive(true);
 
 		// Calculate operations to do
-		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
+		loadsToDo = Music.loadsToDo + World.loadsToDo;
 
 		// Init vars
 		startLoadTime = Time.realtimeSinceStartup;
 		loading = true;
 
 		// Start by loading MusicManager
-		MusicManager.instance.Load();
+		Music.Load();
 	}
 
 	/// <summary>
@@ -459,7 +450,7 @@ public class GameManager : MonoBehaviour {
 
 		// Enable/disable confirmation button
 		keySelectConfirmButton.GetComponent<Button>().interactable = 
-			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
+			Music.currentSong.scale != -1 && Music.currentSong.key != Key.None;
 		
 	}
 
@@ -491,7 +482,7 @@ public class GameManager : MonoBehaviour {
 		HideAll ();
 
 		// If no scale selected, go to key select first
-		if (MusicManager.instance.currentSong.scale == -1) GoToKeySelectMenu();
+		if (Music.currentSong.scale == -1) GoToKeySelectMenu();
 
 
 		else {
@@ -514,7 +505,7 @@ public class GameManager : MonoBehaviour {
 		currentState = State.Setup;
 
 		// Stop music/live mode operations
-		MusicManager.instance.StopPlaying();
+		Music.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
 
@@ -568,18 +559,18 @@ public class GameManager : MonoBehaviour {
 		// Show live menus
 		Show (liveIcons);
 		Show (songProgressBar);
-		if (MusicManager.instance.loopPlaylist) Show(loopIcon);
+		if (Music.loopPlaylist) Show(loopIcon);
 		else Hide(loopIcon);
 
 		// Init music
-		MusicManager.instance.currentPlayingSong = 0;
-		if (MusicManager.instance.currentSong != null) {
-			MusicManager.instance.StartPlaylist();
-			MusicManager.instance.StartSong();
+		Music.currentPlayingSong = 0;
+		if (Music.currentSong != null) {
+			Music.StartPlaylist();
+			Music.StartSong();
 		}
 
 		// Start live operations
-		InstrumentDisplay.instance.Refresh();
+		InstrumentDisplay.Refresh();
 		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
 	}
@@ -594,7 +585,7 @@ public class GameManager : MonoBehaviour {
 		paused = false;
 
 		// Stop music/live operations
-		MusicManager.instance.StopPlaying();
+		Music.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
 
@@ -738,18 +729,30 @@ public class GameManager : MonoBehaviour {
 		MusicManager.PlayMenuSound (menuClick);
 	}
 
+	/// <summary>
+	/// Plays an alternate click noise.
+	/// </summary>
 	public void MenuClick2 () {
 		MusicManager.PlayMenuSound (menuClick2);
 	}
 
+	/// <summary>
+	/// Plays an effects on noise.
+	/// </summary>
 	public void EffectsOn () {
 		MusicManager.PlayMenuSound (effectsOn);
 	}
 
+	/// <summary>
+	/// Plays an effects off noise.
+	/// </summary>
 	public void EffectsOff () {
 		MusicManager.PlayMenuSound (effectsOff);
 	}
 
+	/// <summary>
+	/// Plays a random pen scribble sound.
+	/// </summary>
 	public void Scribble () {
 		MusicManager.PlayMenuSound (scribbles[UnityEngine.Random.Range(0,3)]);
 	}
@@ -796,6 +799,14 @@ public class GameManager : MonoBehaviour {
 		pauseMenu.SetActive(false);
 		PlayerMovement.instance.StartMoving();
 		CameraControl.instance.Unpause();
+	}
+
+	/// <summary>
+	/// Use this to prevent debug statement spam.
+	/// </summary>
+	/// <returns></returns>
+	public static bool IsDebugFrame () {
+		return (Time.frameCount % 100 == 1);
 	}
 
 	/// <summary>

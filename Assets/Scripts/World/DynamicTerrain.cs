@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -27,7 +28,7 @@ public class DynamicTerrain : MonoBehaviour {
 
 	bool loaded = false;                 // is the terrain loaded?
 
-	ObjectPool chunkPool;                // pool of chunk GameObjects
+	ObjectPool<Chunk> chunkPool;                // pool of chunk GameObjects
 	List<Chunk> chunksToUpdate;          // list of chunks to be updated
 	int chunkUpdatesPerCycle;            // number of chunks to update each cycle (copied from WM)
 
@@ -53,7 +54,8 @@ public class DynamicTerrain : MonoBehaviour {
 	int freqSampleSize;                  // sample size to use when reading frequency data (copied from WM)
 	float[] data;                        // raw frequency data
 	FFTWindow fftWindow;                 // FFT window to use when reading frequency data (copied from WM)
-	List<AudioSource> sources;           // list of instrument audio sources to read from (copied from MM)
+	AudioSource[] sources;
+	int numSources;
 
 	#endregion
 	#region Unity Callbacks
@@ -66,7 +68,7 @@ public class DynamicTerrain : MonoBehaviour {
 		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
 
 		// Init chunk pool
-		chunkPool = new ObjectPool();
+		chunkPool = new ObjectPool<Chunk>();
 
 		// Init chunk lists
 		chunksToUpdate = new List<Chunk>();
@@ -89,7 +91,6 @@ public class DynamicTerrain : MonoBehaviour {
 		freqSampleSize = WorldManager.instance.freqArraySize;
 		data = new float[freqSampleSize];
 		fftWindow = WorldManager.instance.freqFFTWindow;
-
 	}
 
 	#endregion
@@ -136,7 +137,7 @@ public class DynamicTerrain : MonoBehaviour {
 		} else {
 
 			// Take a chunk from the pool
-			chunk = chunkPool.Get();
+			chunk = chunkPool.Get().gameObject;
 
 			// Reuse chunk
 			chunk.GetComponent<Chunk>().Reuse(x, y);
@@ -310,7 +311,7 @@ public class DynamicTerrain : MonoBehaviour {
 		DeregisterChunk(chunk);
 
 		// Pool chunk
-		chunkPool.Add(chunk.gameObject);
+		chunkPool.Add(chunk);
 	}
 
 	/// <summary>
@@ -368,31 +369,26 @@ public class DynamicTerrain : MonoBehaviour {
 	/// Reads the frequency data put out from instruments.
 	/// </summary>
 	void UpdateFreqData () {
-
-		// Get audio sources from MM
 		if (sources == null) {
-			sources = new List<AudioSource>();
-			sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
+			sources = MusicManager.instance.instrumentAudioSources.Values.ToArray<AudioSource>();
+			numSources = sources.Length;
 		}
 
 		// For each instrument audio source
-		foreach (AudioSource source in sources) {
+		for (int s = 0; s < numSources; s++) {
 
 			// Skip if disabled
-			if (!source.enabled) continue;
+			if (!sources[s].enabled) continue;
 
 			// Sample audio source
 			float[] sample = new float[freqSampleSize];
-			source.GetSpectrumData (sample, 0, fftWindow);
+			sources[s].GetSpectrumData (sample, 0, fftWindow);
 
 			// Add audio source data into final array
 			for (int i = 0; i < freqSampleSize; i++) {
 				if (sample [i] != float.NaN && sample [i] != 0f) {
-					if (source == MusicManager.instance.instrumentAudioSources [Instrument.AllInstruments[0]]) {
-						data [i] = sample [i];
-					} else {
-						data [i] += sample [i];
-					}
+					if (s == 0)  data [i] = sample [i];
+					else data [i] += sample [i];
 				}
 			}
 		}
@@ -574,7 +570,15 @@ public class DynamicTerrain : MonoBehaviour {
 		return (int)Math.Pow (2, r);
 	}
 
-	// Returns the initial corners for the Diamond Square Algorithm
+	/// <summary>
+	/// Returns the initial corners for the Diamond Square Algorithm.
+	/// </summary>
+	/// <param name="vmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="width"></param>
+	/// <param name="depth"></param>
+	/// <returns></returns>
 	public float[] InitializeCorners(VertexMap vmap, int x, int y, int width, int depth) {
 		float[] corners = new float[4];
 		//corner lower left
@@ -596,9 +600,17 @@ public class DynamicTerrain : MonoBehaviour {
 		return corners;
 	}
 
-	// Fills heightmap with DiamondSquare generated heights, 
-	// using corners as the seeds, height as the initial center 
-	// value, and rough as the height offset value
+	/// <summary>
+	/// Fills heightmap with DiamondSquare generated heights, 
+	/// using corners as the seeds, height as the initial center 
+	/// value, and rough as the height offset value
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="corners"></param>
+	/// <param name="height"></param>
+	/// <param name="rough"></param>
+	/// <param name="rangeMin"></param>
+	/// <param name="rangeMax"></param>
 	void FillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
 		//set middle of hmap
 		int max = (int)heightmap.GetLongLength(0) - 1;
@@ -606,6 +618,14 @@ public class DynamicTerrain : MonoBehaviour {
 		Divide(ref heightmap, max, rough, rangeMin, rangeMax);
 	}
 
+	/// <summary>
+	/// Performs the square phase of the diamond-square algorithm.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="size"></param>
+	/// <param name="offset"></param>
 	void Square(ref float[,] heightmap, int x, int y, int size, float offset) {
 		float ave = Average (new float[] {
 			GetFromHMap(heightmap, x - size, y - size), //lower left
@@ -616,6 +636,14 @@ public class DynamicTerrain : MonoBehaviour {
 		heightmap [x, y] = ave + offset;
 	}
 
+	/// <summary>
+	/// Performs the diamond phase of the diamond-square algorithm.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="size"></param>
+	/// <param name="offset"></param>
 	void Diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
 		float ave = Average (new float[] {
 			GetFromHMap(heightmap, x, y - size), //bottom
@@ -626,6 +654,14 @@ public class DynamicTerrain : MonoBehaviour {
 		heightmap [x, y] = ave + offset;
 	}
 
+	/// <summary>
+	/// Calls diamond and square.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="size"></param>
+	/// <param name="rough"></param>
+	/// <param name="rangeMin"></param>
+	/// <param name="rangeMax"></param>
 	void Divide(ref float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
 		int x, y, half = size / 2;
 		float scale = size * rough;
@@ -653,7 +689,13 @@ public class DynamicTerrain : MonoBehaviour {
 		Divide (ref heightmap, half, rough, rangeMin, rangeMax);
 	}
 
-	//accesses heightmap and returns -INF for out of bounds vertices
+	/// <summary>
+	/// Accesses heightmap and returns -INF for out of bounds vertices
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <returns></returns>
 	float GetFromHMap (float [,] heightmap, int x, int y) {
 		if (x < 0 || x >= heightmap.GetLength (0) || y < 0 || y >= heightmap.GetLength (1)) {
 			return float.NegativeInfinity;
@@ -661,7 +703,11 @@ public class DynamicTerrain : MonoBehaviour {
 		return heightmap [x, y];
 	}
 
-	//returns the average of 4 corners, excluding non-legal values
+	/// <summary>
+	/// Returns the average of 4 corners, excluding non-legal values
+	/// </summary>
+	/// <param name="corners"></param>
+	/// <returns></returns>
 	float Average(float[] corners) {
 		float count = 4f;
 		float sum = 0f;
@@ -675,6 +721,10 @@ public class DynamicTerrain : MonoBehaviour {
 		return (sum/count);
 	}
 
+	/// <summary>
+	/// Sets all chunks to use debug colors.
+	/// </summary>
+	/// <param name="colors"></param>
 	public void SetDebugColors (DebugColors colors) {
 		switch (colors) {
 		case DebugColors.Constrained:

@@ -7,11 +7,12 @@ using System.Collections.Generic;
 /// Instanced MonoBehaviour to handle all key to scale to 
 /// note operations.
 /// </summary>
-public class KeyManager : MonoBehaviour {
+public class KeyManager : InstancedMonoBehaviour {
 
 	#region KeyManager Vars
 
-	public static KeyManager instance;
+	GameManager Game;
+	MusicManager Music;
 
 	// Mappings of keys to scales to instruments
 	public Dictionary<Key, Dictionary<ScaleInfo, Dictionary<MelodicInstrument, Scale>>> scales;
@@ -23,9 +24,8 @@ public class KeyManager : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Start () {
-
-		// Init instance
-		instance = this;
+		Game = GameManager.instance as GameManager;
+		Music = MusicManager.instance as MusicManager;
 	}
 
 	#endregion
@@ -45,7 +45,7 @@ public class KeyManager : MonoBehaviour {
 	IEnumerator BuildScales () {
 
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading scales...");
+		Game.ChangeLoadingMessage("Loading scales...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -90,10 +90,10 @@ public class KeyManager : MonoBehaviour {
 					numLoaded++;
 
 					// If over time, skip until next frame
-					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+					if (Time.realtimeSinceStartup - startTime > Game.targetDeltaTime) {
 						yield return null;
 						startTime = Time.realtimeSinceStartup;
-						GameManager.instance.ReportLoaded(numLoaded);
+						Game.ReportLoaded(numLoaded);
 				
 						numLoaded = 0;
 					}
@@ -103,7 +103,7 @@ public class KeyManager : MonoBehaviour {
 		}
 
 		// Finish loading
-		MusicManager.instance.FinishLoading();
+		Music.FinishLoading();
 		yield return null;
 
 	}

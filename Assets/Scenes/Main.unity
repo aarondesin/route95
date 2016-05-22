@@ -10799,35 +10799,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 622006809}
+        m_MethodName: MenuClick2
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1664068197}
         m_MethodName: PlayRiffLoop
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1585738786}
-        m_MethodName: TogglePlayRiffButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1664068199}
-        m_MethodName: PlayOneShot
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 8300000, guid: 5f28d112f6413e44baa2ced59af01738,
-            type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -12707,7 +12695,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838191495}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.94612306
+  m_Size: 0.9461232
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14825,9 +14813,7 @@ MonoBehaviour:
   horizontalPadding: 2
   verticalPadding: 2
   iconScale: 0.8
-  fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
   fontSize: 3
-  font: {fileID: 12800000, guid: 8db80b3f7b8ad7e488136bc8b3fd6400, type: 3}
 --- !u!114 &537561991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20974,6 +20960,7 @@ MonoBehaviour:
   terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   terrainDebugMaterial: {fileID: 2100000, guid: d1cad6307feb3e84084988a715c5efff,
     type: 2}
+  visualization: {fileID: 1277712146}
   wind: {x: 0, y: 0, z: 0}
   doDecorate: 1
   maxDecorations: 0
@@ -21159,7 +21146,7 @@ MonoBehaviour:
     atime7: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 5
-  chunkUpdatesPerCycle: 2
+  chunkUpdatesPerCycle: 1
   freqArraySize: 256
   freqFFTWindow: 0
   decorationsPerStep: 100
@@ -28219,8 +28206,8 @@ TrailRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Time: 0.25
-  m_StartWidth: 10
+  m_Time: 0.4
+  m_StartWidth: 15
   m_EndWidth: 0
   m_Colors:
     m_Color[0]:
@@ -28680,7 +28667,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 848.99994, y: 430.99997}
+  m_AnchoredPosition: {x: 17.5, y: 23.220947}
   m_SizeDelta: {x: 1698, y: 862}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1276947391
@@ -28760,7 +28747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1277712145
 Transform:
   m_ObjectHideFlags: 0
@@ -28787,7 +28774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numberOfObjects: 50
   height: 250
-  radius: 1000
+  radius: 200
   points: []
   scale: 50
   opacity: 0.5
@@ -34177,8 +34164,6 @@ MonoBehaviour:
   playRiffButton: {fileID: 412077796}
   editRiffButton: {fileID: 358849372}
   addRiffReminder: {fileID: 383313053}
-  play: {fileID: 21300000, guid: 5a63a9880030c94469da624501f0a408, type: 3}
-  pause: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
 --- !u!114 &1585738787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36581,7 +36566,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288437014}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9793874
+  m_Size: 0.9793875
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

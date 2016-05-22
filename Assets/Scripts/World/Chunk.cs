@@ -3,13 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
- * A chunk is a square mesh that's part of the larger terrain object.
- * Chunks dynamically load and unload as the player gets closer and farther.
- * This un/loading will be taken care of by the DynamicTerrain class. 
- */
-
-public class Chunk: MonoBehaviour {
+ /// <summary>
+ /// A chunk is a square mesh that's part of the larger terrain object.
+ /// Chunks dynamically load and unload as the player gets closer and farther.
+ /// This un/loading will be taken care of by the DynamicTerrain class. 
+ /// </summary>
+public class Chunk: MonoBehaviour, IPoolable {
 
 	#region Chunk Vars
 
@@ -44,6 +43,17 @@ public class Chunk: MonoBehaviour {
 	bool isUpdatingVerts = false;          // is the chunk currently updating its vertices?
 	bool needsColliderUpdate = false;      // does the chunk need a collider update?
 	bool needsColorUpdate = false;         // does the chunk need a color update?
+
+	#endregion
+	#region IPoolable Implementations
+
+	void IPoolable.OnPool() {
+		gameObject.SetActive(false);
+	}
+
+	void IPoolable.OnDepool() {
+		gameObject.SetActive(true);
+	}
 
 	#endregion
 	#region Chunk Methods
@@ -214,8 +224,12 @@ public class Chunk: MonoBehaviour {
 		}
 		return uniformArray;
 	}
-		
-	//takes the number of vertices per side, returns a uniform array of UV coords for a square vertex array
+
+	/// <summary>
+	/// Takes the number of vertices per side, returns a uniform array of UV coords for a square vertex array
+	/// </summary>
+	/// <param name="vertexSize"></param>
+	/// <returns></returns>
 	Vector2[] CreateUniformUVArray(int vertexSize) {
 		int numVertices = vertexSize * vertexSize;
 		Vector2[] uniformUVArray = new Vector2[numVertices];
@@ -229,7 +243,11 @@ public class Chunk: MonoBehaviour {
 		return uniformUVArray;
 	}
 
-	//takes the number of vertices per side, returns indices (each group of three defines a triangle) into a square vertex array to form mesh 
+	/// <summary>
+	/// Takes the number of vertices per side, returns indices (each group of three defines a triangle) into a square vertex array to form mesh 
+	/// </summary>
+	/// <param name="vertexSize"></param>
+	/// <returns></returns>
 	int[] CreateSquareArrayTriangles (int vertexSize){ 
 		int numTriangles = 2 * vertexSize * (vertexSize - 1);//a mesh with n^2 vertices has 2n(n-1) triangles
 		int[] triangleArray = new int[numTriangles * 3]; //three points per triangle 
@@ -349,7 +367,7 @@ public class Chunk: MonoBehaviour {
 				priority++;
 				needsColliderUpdate = true;
 				verts[index].y = height;
-				mesh.vertices = verts;
+				//mesh.vertices = verts;
 			}
 
 		} catch (IndexOutOfRangeException e) {
@@ -569,6 +587,10 @@ public class Chunk: MonoBehaviour {
 			WorldManager.instance.RemoveDecoration(decoration);
 	}
 
+	/// <summary>
+	/// Sets terrain debug colors.
+	/// </summary>
+	/// <param name="color"></param>
 	public void SetDebugColors (DynamicTerrain.DebugColors color) {
 		switch (color) {
 		case DynamicTerrain.DebugColors.Constrained:

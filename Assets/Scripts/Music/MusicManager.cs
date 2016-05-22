@@ -47,7 +47,7 @@ public enum Tempo {
 /// <summary>
 /// Instanced MonoBehaviour class to manage all music-related operations.
 /// </summary>
-public class MusicManager : MonoBehaviour {
+public class MusicManager : InstancedMonoBehaviour {
 
 	#region Sound Struct
 
@@ -67,7 +67,9 @@ public class MusicManager : MonoBehaviour {
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("MusicManager Status")]
 	
-	public static MusicManager instance;                               // Quick reference to this instance
+	GameManager Game;
+	WorldManager World;
+	KeyManager Keys;
 
 	AudioSource source;                                                // Global MM audio source
 
@@ -191,15 +193,21 @@ public class MusicManager : MonoBehaviour {
 			Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 	}
 
+	void Start () {
+		Game = GameManager.instance as GameManager;
+		World = WorldManager.instance as WorldManager;
+		Keys = KeyManager.instance as KeyManager;
+	}
+
 	void FixedUpdate() {
 
 		// Return if not playing or game is paused
 		if (!playing) return;
-		if (GameManager.instance.paused) return;
+		if (Game.paused) return;
 
 		// If new beat
 		if (BeatTimer <= 0f) {
-			switch (GameManager.instance.currentState) {
+			switch (Game.currentState) {
 
 				// Setup mode (riff editor)
 				case GameManager.State.Setup:
@@ -211,7 +219,7 @@ public class MusicManager : MonoBehaviour {
 					if (beat >= Riff.MAX_BEATS && loop) beat = 0;
 
 					// Decrement shaker density
-					WorldManager.instance.shakers -= 2;
+					World.shakers -= 2;
 					break;
 
 				// Live mode
@@ -232,7 +240,7 @@ public class MusicManager : MonoBehaviour {
 						brassNotes = 0;
 
 						// Reset shaker density
-						WorldManager.instance.shakers = 0;
+						World.shakers = 0;
 						
 						// If another song available, switch
 						if (currentPlayingSong < currentProject.songs.Count-1) {
@@ -248,7 +256,7 @@ public class MusicManager : MonoBehaviour {
 								beatsElapsedInPlaylist = 0;
 
 							// Otherwise go to postplay menu
-							} else GameManager.instance.SwitchToPostplay();
+							} else Game.SwitchToPostplay();
 						}
 					}
 
@@ -258,7 +266,7 @@ public class MusicManager : MonoBehaviour {
 					// Calculate song progress
 					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
-					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
+					Game.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 
 					// Increment vars
 					beat++;
@@ -269,9 +277,9 @@ public class MusicManager : MonoBehaviour {
 					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
 					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
 					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
-					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
-					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
+					World.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
+					World.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
+					World.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
 
@@ -304,7 +312,7 @@ public class MusicManager : MonoBehaviour {
 	IEnumerator LoadSounds () {
 
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
+		Game.ChangeLoadingMessage("Loading sounds...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -319,10 +327,10 @@ public class MusicManager : MonoBehaviour {
 				numLoaded++;
 
 				// If over time
-				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+				if (Time.realtimeSinceStartup - startTime > Game.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
-					GameManager.instance.ReportLoaded (numLoaded);
+					Game.ReportLoaded (numLoaded);
 					numLoaded = 0;
 				}
 			}
@@ -350,7 +358,7 @@ public class MusicManager : MonoBehaviour {
 	IEnumerator LoadInstruments () {
 
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+		Game.ChangeLoadingMessage("Loading instruments...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -419,17 +427,17 @@ public class MusicManager : MonoBehaviour {
 			numLoaded++;
 
 			// If over time
-			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+			if (Time.realtimeSinceStartup - startTime > Game.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
-				GameManager.instance.ReportLoaded (numLoaded);
+				Game.ReportLoaded (numLoaded);
 				numLoaded = 0;
 			}
 		}
 
 		// When done, start building scales
 		if (instrumentAudioSources.Count == Instrument.AllInstruments.Count)
-			KeyManager.instance.DoBuildScales();
+			Keys.DoBuildScales();
 		yield return null;
 	}
 
@@ -442,14 +450,14 @@ public class MusicManager : MonoBehaviour {
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 
 		// Start loading WorldManager
-		WorldManager.instance.Load();
+		World.Load();
 	}
 
 	#endregion
 	#region MusicManager Callbacks
 
 	public static void PlayMenuSound (AudioClip sound) {
-		instance.source.PlayOneShot (sound, 1f);
+		((MusicManager)instance).source.PlayOneShot (sound, 1f);
 	}
 
 	/// <summary>

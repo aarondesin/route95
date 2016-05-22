@@ -2,14 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Decoration : MonoBehaviour {
+/// <summary>
+/// Class to store decoration data.
+/// </summary>
+public class Decoration : MonoBehaviour, IPoolable {
 
+	#region Decoration Enums
+
+	/// <summary>
+	/// Type of decoration distribution.
+	/// </summary>
 	public enum Distribution {
-		Random, // truly random, based on density
-		Roadside, // for signs, placed alongside road facing either direction
-		CloseToRoad // placed close to road (good for small objects)
+		Random,     // Truly random, based on density
+		Roadside,   // For signs, placed alongside road facing either direction
+		CloseToRoad // Placed close to road (good for small objects)
 	}
 
+	/// <summary>
+	/// Group to assign decoration to.
+	/// </summary>
 	public enum Group {
 		None,
 		Vegetation,
@@ -17,6 +28,12 @@ public class Decoration : MonoBehaviour {
 		RoadSigns
 	}
 
+	#endregion
+	#region Decoration Structs
+
+	/// <summary>
+	/// Info for relevant decoration group.
+	/// </summary>
 	[System.Serializable]
 	public struct GroupInfo {
 		public Group group;
@@ -24,28 +41,48 @@ public class Decoration : MonoBehaviour {
 		public int maxActive;
 	}
 
+	#endregion
 	#region Decoration Vars
 
-	public static Dictionary<Group, int> numDecorations;
+	[Tooltip("Decoration group.")]
 	public Group group = Group.None;
+
+	[Tooltip("Is this decoration dynamic/physics-enabled?")]
 	public bool dynamic = false;
 
 	[Tooltip("Average number of this decoration per chunk.")]
 	public float density;
-	public Distribution distribution;
 
+	[Tooltip("Distribution type to use for this decoration.")]
+	public Distribution distribution; // Distribution type to use
+
+	[Tooltip("Base position offset to use when placing.")]
 	public Vector3 positionOffset;
+
+	[Tooltip("Base rotation offset to use when placing.")]
 	public Vector3 rotationOffset;
 
+	[Tooltip("Range of randomization in height.")]
 	public Vector2 heightRange;
+
+	[Tooltip("Range of randomization in width.")]
 	public Vector2 widthRange;
 
+	[Tooltip("Range of randomization in pitch.")]
 	public Vector2 pitchRange;
+
+	[Tooltip("Range of randomization in yaw.")]
 	public Vector2 yawRange;
+
+	[Tooltip("Range of randomization in roll.")]
 	public Vector2 rollRange;
 
 	#endregion
 	#region Unity Callbacks
+
+	void Awake () {
+		Randomize();
+	}
 
 	void FixedUpdate () {
 		if (dynamic) {
@@ -57,6 +94,19 @@ public class Decoration : MonoBehaviour {
 			// Push with wind
 			GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
 		}
+	}
+
+	#endregion
+	#region IPoolable Implementations
+
+	void IPoolable.OnPool() {
+		gameObject.SetActive(false);
+	}
+
+	void IPoolable.OnDepool() {
+		gameObject.SetActive(true);
+		transform.localScale = Vector3.one;
+		Randomize();
 	}
 
 	#endregion

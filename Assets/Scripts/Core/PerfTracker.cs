@@ -49,26 +49,30 @@ public class PerfTracker : MonoBehaviour {
 	#endregion
 	#region PerfTracker Vars
 
+	GameManager Game;
+
 	Dictionary<GameManager.State, Info> perfTracker; // Dictionary to map game states to Info structs
 
 	#endregion
 	#region UnityCallbacks
 
-	void Start () {
+	void Awake () {
 
 		// Init dictionary
 		perfTracker = new Dictionary<GameManager.State, Info>();
+
+		Game = GameManager.instance as GameManager;
 	}
 	
 	void Update () {
 
 		// Add new key for current game state if it doesn't exist
-		if (!perfTracker.ContainsKey(GameManager.instance.currentState))
-			perfTracker.Add(GameManager.instance.currentState, new Info());
+		if (!perfTracker.ContainsKey(Game.currentState))
+			perfTracker.Add(Game.currentState, new Info());
 
 		// Otherwise, update appropriate Info
 		else {
-			Info perf = perfTracker[GameManager.instance.currentState];
+			Info perf = perfTracker[Game.currentState];
 			perf.seconds += Time.deltaTime;
 			perf.frames += 1;
 			perf.avgFPS += ((1f/Time.deltaTime) - perf.avgFPS) / perf.frames;

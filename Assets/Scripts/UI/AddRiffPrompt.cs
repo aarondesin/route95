@@ -6,11 +6,12 @@ using System.Collections.Generic;
 /// <summary>
 /// Class to control "Add Riff" prompt.
 /// </summary>
-public class AddRiffPrompt : MonoBehaviour {
+public class AddRiffPrompt : InstancedMonoBehaviour {
 
 	#region AddRiffPrompt Vars
 
-	public static AddRiffPrompt instance; // Quick reference to the AddRiffPrompt instance
+	GameManager Game;
+	MusicManager Music;
 
 	[Tooltip("Riff name input field.")]
 	public InputField inputField;
@@ -34,6 +35,8 @@ public class AddRiffPrompt : MonoBehaviour {
 	}
 
 	void Start () {
+		Game = GameManager.instance as GameManager;
+		Music = MusicManager.instance as MusicManager;
 		Refresh();
 	}
 
@@ -76,6 +79,7 @@ public class AddRiffPrompt : MonoBehaviour {
 	/// Adds a riff from the prompt.
 	/// </summary>
 	public void AddRiff () {
+		
 
 		// Create riff
 		Riff temp = new Riff(dropdown.value);
@@ -84,13 +88,13 @@ public class AddRiffPrompt : MonoBehaviour {
 		temp.name = inputField.text;
 
 		// Register riff with song
-		MusicManager.instance.currentSong.RegisterRiff (temp);
+		Music.currentSong.RegisterRiff (temp);
 
 		// Go to riff editor
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
-		GameManager.instance.Hide (gameObject);
-		GameManager.instance.GoToRiffEditor();
+		Game.Hide (gameObject);
+		Game.GoToRiffEditor();
 	}
 
 	#endregion

@@ -40,7 +40,8 @@ public class SongPiece {
 	/// <param name="pos">Beat at which to play notes.</param>
 	public void PlaySongPiece (int pos){
 		int measureNum = pos/4;
-		Song song = MusicManager.instance.currentSong;
+		MusicManager Music = MusicManager.instance as MusicManager;
+		Song song = Music.currentSong;
 		Measure measure = song.measures[measureNum];
 
 		// Play all riffs

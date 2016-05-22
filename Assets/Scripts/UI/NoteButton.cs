@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// A special use of DraggableButton for the riff editor not buttons.
+/// </summary>
 public class NoteButton : DraggableButton {
 
 	#region NoteButton Vars
@@ -17,7 +20,7 @@ public class NoteButton : DraggableButton {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		maxDragDistanceUp = vDragDistance;
 		maxDragDistanceDown = vDragDistance;
 		maxDragDistanceLeft = hDragDistance;
@@ -27,25 +30,19 @@ public class NoteButton : DraggableButton {
 	}
 
 	#endregion
-	#region NoteButton Methods
+	#region DraggableButton Overrides
 
 	public override void OnMouseDown() {
 		oldVolume = targetNote.volume;
 	}
 
-	public override void OnMouseUp() {
-		//Debug.Log(targetNote.volume);
-	}
 
 	public override void DragDown (float actionRatio) {
-		//targetNote.volume += 0.5f - (actionRatio / 2f);
 		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);
-		volumeImage.fillAmount = targetNote.volume;//0.5f - (actionRatio / 2f);
-		//Debug.Log("DragDown("+actionRatio+")");
+		volumeImage.fillAmount = targetNote.volume;
 	}
 
 	public override void DragUp (float actionRatio) {
-		//targetNote.volume = 0.5f + (actionRatio / 2f);
 		targetNote.volume = Mathf.Clamp01 (oldVolume + actionRatio);
 		volumeImage.fillAmount = targetNote.volume;
 	}

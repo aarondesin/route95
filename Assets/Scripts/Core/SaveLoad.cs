@@ -80,15 +80,17 @@ public static class SaveLoad {
 	/// Saves the current open project.
 	/// </summary>
 	public static void SaveCurrentProject () {
+		GameManager Game = GameManager.instance as GameManager;
+		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Build paths
-		string directoryPath = GameManager.instance.projectSavePath;
-		string filePath = directoryPath + MusicManager.instance.currentProject.name + projectSaveExtension;
+		string directoryPath = Game.projectSavePath;
+		string filePath = directoryPath + Music.currentProject.name + projectSaveExtension;
 
 		try {
 
 			// Save project
-			Save<Project>(MusicManager.instance.currentProject, directoryPath, filePath);
+			Save<Project>(Music.currentProject, directoryPath, filePath);
 
 			// Prompt
 			Prompt.instance.PromptMessage("Save Project", "Successfully saved project to \"" + filePath + "\".", "Okay");
@@ -121,7 +123,8 @@ public static class SaveLoad {
 	/// Saves the currently open song.
 	/// </summary>
 	public static void SaveCurrentSong() {
-		Song song = MusicManager.instance.currentSong;
+		MusicManager Music = MusicManager.instance as MusicManager;
+		Song song = Music.currentSong;
 
 		// Check if song is null
 		if (song == null) {
@@ -191,26 +194,28 @@ public static class SaveLoad {
 	/// </summary>
 	/// <param name="path">Project path.</param>
 	public static void LoadProject (string path) {
+		GameManager Game = GameManager.instance as GameManager;
+		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Backup project and song
-		Project backupProject = MusicManager.instance.currentProject;
-		Song backupSong = MusicManager.instance.currentSong;
+		Project backupProject = Music.currentProject;
+		Song backupSong = Music.currentSong;
 
 		try {
 
 			// Load project
 			Project project = Load<Project>(path);
-			MusicManager.instance.currentProject = project;
+			Music.currentProject = project;
 
 			// Load first song, if available
 			if (!project.Empty)
-				MusicManager.instance.currentSong = project.songs[0];
+				Music.currentSong = project.songs[0];
 
 			// Refresh name field on playlist browser
 			PlaylistBrowser.instance.RefreshName();
 	
 			// Go to playlist menu if not there already
-			GameManager.instance.GoToPlaylistMenu();
+			Game.GoToPlaylistMenu();
 
 		// Catch and print any FailedToLoadExceptions
 		} catch (FailedToLoadException f) {
@@ -219,8 +224,8 @@ public static class SaveLoad {
 			Debug.LogError(f.Message);
 
 			// Restore backups
-			MusicManager.instance.currentProject = backupProject;
-			MusicManager.instance.currentSong = backupSong;
+			Music.currentProject = backupProject;
+			Music.currentSong = backupSong;
 
 			// Prompt
 			Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
@@ -233,15 +238,16 @@ public static class SaveLoad {
 	/// </summary>
 	/// <param name="path">Song path.</param>
 	public static void LoadSongToProject (string path) {
+		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Load song
 		Song song = LoadSong(path);
 
 		// Add song to project
-		MusicManager.instance.currentProject.AddSong(song);
+		Music.currentProject.AddSong(song);
 
 		// Set current song to song
-		MusicManager.instance.currentSong = song;
+		Music.currentSong = song;
 	}
 
 	/// <summary>

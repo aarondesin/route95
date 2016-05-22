@@ -2,17 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
-// Class to manage CameraControl
+/// <summary>
+/// Class to manage the game camera.
+/// </summary>
 public class CameraControl : MonoBehaviour {
 
 	#region CameraControl Enums
 
+	/// <summary>
+	/// Current state of the game camera.
+	/// </summary>
 	public enum State {
 		Setup,
 		Live,
 		Free
 	}
 
+	/// <summary>
+	/// Current type of camera control.
+	/// </summary>
 	public enum CameraControlMode {
 		Manual, // Angles only change on user input
 		Random  // Angles cycle randomly through all available angles
@@ -21,15 +29,39 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region CameraControl Vars
 
-	public static CameraControl instance;
-
 	[Header("General camera settings")]
 
-	public float rotateSensitivity = 0.25f;
-	public float moveSensitivity = 0.4f;
+	public static CameraControl instance; // Quick reference to this instance
+
+	[Tooltip("Current camera state.")]
 	public State state = State.Setup;
+
+	[Tooltip("Free camera rotate sensitivity.")]
+	public float rotateSensitivity = 0.25f;
+
+	[Tooltip("Free camera movement sensitivity.")]
+	public float moveSensitivity = 0.4f;
+
+	[Tooltip("Camera sway speed.")]
 	public float swaySpeed = 1f;
+
+	[Tooltip("Camera base sway amount.")]
 	public float baseSway = 1f;
+
+	const float DEFAULT_SPEED = 0.2f;     // Default camera speed
+
+	// Camera interp vars
+	Transform start;                      // Camera lerp start transform
+	Transform target;                     // Camera lerp target transform
+	float speed = DEFAULT_SPEED;          // Camera speed
+	bool moving = false;                  // Is the camera currently lerping?
+	float progress = 0f;                  // Lerp progress
+
+	// Live mode camera angle vars
+	CameraView currentAngle;              // Current live mode angle
+	List<CameraView> angles;              // List of all live mode angles
+	float transitionTimer;                // Timer to next angle change
+	bool paused = false;                  // Is live mode paused?
 
 	[Tooltip("Initial position for camera")]
 	public Transform initialPosition;
@@ -57,21 +89,6 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Initial control mode.")]
 	public CameraControlMode controlMode = CameraControlMode.Random;
 
-	const float DEFAULT_SPEED = 0.2f;
-
-	// Camera interp vars
-	Transform start;
-	Transform target;
-	float speed = DEFAULT_SPEED;
-	bool moving = false;
-	float progress = 0f;
-
-	// Live mode camera angle vars
-	CameraView currentAngle;
-	List<CameraView> angles;
-	float transitionTimer;
-	bool paused = false;
-
 	// Mappings of keys to camera angle indices
 	static Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
 		{ KeyCode.F1, 0 },
@@ -89,11 +106,12 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start() {
+	void Awake () {
 		instance = this;
 		SnapToPosition (initialPosition);
 		transitionTimer = liveModeTransitionFreq;
 
+		// Init live mode angles
 		angles  = new List<CameraView> () {
 
 			// On the hood, forwards
@@ -296,7 +314,9 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region CameraControl Live Mode Methods
 
-	// Set for live mode
+	/// <summary>
+	/// Start camera live mode.
+	/// </summary>
 	public void StartLiveMode () {
 		if (state == State.Free) return;
 		state = State.Live;
@@ -304,12 +324,18 @@ public class CameraControl : MonoBehaviour {
 		paused = false;
 	}
 
+	/// <summary>
+	/// Pause camera live mode.
+	/// </summary>
 	public void StopLiveMode () {
 		state = State.Setup;
 		LerpToPosition(ViewChase);
 		paused = true;
 	}
 
+	/// <summary>
+	/// Start camera free mode.
+	/// </summary>
 	public void StartFreeMode () {
 		state = State.Free;
 		transform.rotation = Quaternion.identity;
@@ -320,25 +346,39 @@ public class CameraControl : MonoBehaviour {
 		Cursor.visible = false;
 	}
 
+	/// <summary>
+	/// Stop camera free mode.
+	/// </summary>
 	public void StopFreeMode () {
 		state = State.Setup;
 		LerpToPosition(ViewChase);
 	}
 
+	/// <summary>
+	/// Pause camera movement.
+	/// </summary>
 	public void Pause () {
 		paused = true;
 	}
 
+	/// <summary>
+	/// Unpause camera movement.
+	/// </summary>
 	public void Unpause () {
 		paused = false;
 	}
 
-	// Pick a new random camera angle
+	/// <summary>
+	/// Pick a random live camera angle.
+	/// </summary>
 	public void ChangeAngle () {
 		ChangeAngle (Random.Range (0, angles.Count));
 	}
 
-	// Pick a specific camera angle
+	/// <summary>
+	/// Pick a specific live camera angle.
+	/// </summary>
+	/// <param name="camView"></param>
 	public void ChangeAngle (int camView) {
 		currentAngle = angles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
@@ -359,7 +399,9 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 
-	// Prewarms all angles
+	/// <summary>
+	/// Warms all live mode camera angles.
+	/// </summary>
 	void UpdateAllAngles () {
 		foreach (CameraView angle in angles) {
 			if (angle.transform != null) {
@@ -389,7 +431,12 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 
-	// Piks a random position
+	/// <summary>
+	/// Picks a random position.
+	/// </summary>
+	/// <param name="minHeight"></param>
+	/// <param name="maxHeight"></param>
+	/// <returns></returns>
 	Vector3 PickRandomPosition (float minHeight, float maxHeight) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
@@ -403,12 +450,18 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region CameraControl Non-Live Mode Methods
 
-	// Externally set speed
+	/// <summary>
+	/// Sets the camera lerp speed.
+	/// </summary>
+	/// <param name="newSpeed"></param>
 	public void SetSpeed (float newSpeed) {
 		speed = newSpeed;
 	}
 
-	// Teleport camera to position
+	/// <summary>
+	/// Teleports the camera to a position.
+	/// </summary>
+	/// <param name="newPosition"></param>
 	public void SnapToPosition (Transform newPosition) {
 		start = newPosition;
 		target = newPosition;
@@ -416,7 +469,11 @@ public class CameraControl : MonoBehaviour {
 		transform.rotation = newPosition.rotation;
 	}
 
-	// Lerp to position
+	/// <summary>
+	/// Linearly interpolates the camera to a position.
+	/// </summary>
+	/// <param name="newPosition"></param>
+	/// <param name="newSpeed"></param>
 	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
 		Camera.main.fieldOfView = 75f;
 		start = transform;

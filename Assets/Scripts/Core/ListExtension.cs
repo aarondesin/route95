@@ -26,7 +26,13 @@ public static class ListExtension {
 		return list[list.Count-1];
 	}
 
-	
+	/// <summary>
+	/// Inserts an element into a sorted list.
+	/// </summary>
+	/// <typeparam name="T">Must implement IComparable.</typeparam>
+	/// <param name="list"></param>
+	/// <param name="toInsert">Element to insert.</param>
+	/// <param name="highestFirst">Is the list greatest to least?</param>
 	public static void InsertSorted<T> (this List<T> list, T toInsert, bool highestFirst) where T : IComparable {
 		if (list.Count == 0) list.Add (toInsert);
 		else {
