@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // Class to manage CameraControl
 public class CameraControl : MonoBehaviour {
 
-	public static CameraControl instance;
+	#region CameraControl Enums
 
 	public enum State {
 		Setup,
@@ -17,14 +17,17 @@ public class CameraControl : MonoBehaviour {
 		Manual, // Angles only change on user input
 		Random  // Angles cycle randomly through all available angles
 	}
-		
-	#region Exposed Vars
+
+	#endregion
+	#region CameraControl Vars
+
+	public static CameraControl instance;
 
 	[Header("General camera settings")]
 
-	public float rotateSensitivity = 0.4f;
-	public float moveSensitivity = 0.5f;
-	State state = State.Setup;
+	public float rotateSensitivity = 0.25f;
+	public float moveSensitivity = 0.4f;
+	public State state = State.Setup;
 	public float swaySpeed = 1f;
 	public float baseSway = 1f;
 
@@ -54,15 +57,14 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Initial control mode.")]
 	public CameraControlMode controlMode = CameraControlMode.Random;
 
-	#endregion
-	#region Hidden Vars
+	const float DEFAULT_SPEED = 0.2f;
 
 	// Camera interp vars
 	Transform start;
 	Transform target;
-	float speed = 1f;
-	float sTime;
+	float speed = DEFAULT_SPEED;
 	bool moving = false;
+	float progress = 0f;
 
 	// Live mode camera angle vars
 	CameraView currentAngle;
@@ -216,7 +218,7 @@ public class CameraControl : MonoBehaviour {
 
 				if (Vector3.Distance(start.position, target.position) != 0f) {
 
-					float progress = (Time.time-sTime) *speed * Time.deltaTime / 
+					progress += speed * Time.deltaTime / 
 						Vector3.Distance(start.position, target.transform.position);
 
 					// Lerp position
@@ -267,15 +269,16 @@ public class CameraControl : MonoBehaviour {
 			// Rotate camera
 			Vector3 d = InputManager.instance.mouseDelta;
 			Vector3 old = transform.rotation.eulerAngles;
+			bool slow = Input.GetAxisRaw("Slow") != 0f;
 			old.z = 0f;
-			old.x += -d.y * rotateSensitivity;
-			old.y += d.x * rotateSensitivity;
+			old.x += -d.y * rotateSensitivity * (slow ? 0.05f : 1f);
+			old.y += d.x * rotateSensitivity * (slow ? 0.05f : 1f);
 			transform.rotation = Quaternion.Euler(old);
 
 			// Translate camera
-			float forward = Input.GetAxisRaw("Forward") * moveSensitivity;
-			float up = Input.GetAxisRaw("Up") * moveSensitivity;
-			float right = Input.GetAxisRaw("Right") * moveSensitivity;
+			float forward = Input.GetAxisRaw("Forward") * moveSensitivity * (slow ? 0.05f : 1f);
+			float up = Input.GetAxisRaw("Up") * moveSensitivity * (slow ? 0.05f : 1f);
+			float right = Input.GetAxisRaw("Right") * moveSensitivity * (slow ? 0.05f : 1f);
 			transform.Translate(new Vector3 (right, up, forward));
 
 			break;
@@ -295,13 +298,16 @@ public class CameraControl : MonoBehaviour {
 
 	// Set for live mode
 	public void StartLiveMode () {
+		if (state == State.Free) return;
 		state = State.Live;
 		ChangeAngle();
+		paused = false;
 	}
 
 	public void StopLiveMode () {
 		state = State.Setup;
 		LerpToPosition(ViewChase);
+		paused = true;
 	}
 
 	public void StartFreeMode () {
@@ -310,6 +316,8 @@ public class CameraControl : MonoBehaviour {
 		GameManager.instance.MoveCasetteBack();
 		GameManager.instance.HideAll();
 		GameManager.instance.Hide(GameManager.instance.systemButtons);
+		Cursor.lockState = CursorLockMode.Confined;
+		Cursor.visible = false;
 	}
 
 	public void StopFreeMode () {
@@ -334,8 +342,8 @@ public class CameraControl : MonoBehaviour {
 	public void ChangeAngle (int camView) {
 		currentAngle = angles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
-		//if (Debug.isDebugBuild) 
-		//	Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
+		if (Debug.isDebugBuild) 
+			Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 		
 		switch (currentAngle.placementMode) {
 
@@ -363,7 +371,7 @@ public class CameraControl : MonoBehaviour {
 
 				case CameraView.CameraFollowMode.Lead:
 					angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
-				angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
+					angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
 					break;
 
 				case CameraView.CameraFollowMode.Static:
@@ -409,12 +417,13 @@ public class CameraControl : MonoBehaviour {
 	}
 
 	// Lerp to position
-	public void LerpToPosition (Transform newPosition) {
+	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
 		Camera.main.fieldOfView = 75f;
-		start = GetComponent<Transform>();
-		sTime = Time.time;
+		start = transform;
 		target = newPosition;
 		moving = true;
+		speed = newSpeed;
+		progress = 0f;
 	}
 		
 	#endregion

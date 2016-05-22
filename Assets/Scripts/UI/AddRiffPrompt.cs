@@ -3,70 +3,90 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-// Class for "Add Riff Prompt"
+/// <summary>
+/// Class to control "Add Riff" prompt.
+/// </summary>
 public class AddRiffPrompt : MonoBehaviour {
-	public static AddRiffPrompt instance;
 
-	#region Inspector Vars
+	#region AddRiffPrompt Vars
 
-	[Tooltip("Riff name input field")]
+	public static AddRiffPrompt instance; // Quick reference to the AddRiffPrompt instance
+
+	[Tooltip("Riff name input field.")]
 	public InputField inputField;
 
-	[Tooltip("Instrument select dropdown")]
+	[Tooltip("Instrument select dropdown.")]
 	public Dropdown dropdown;
 
-	[Tooltip("Confirm button")]
+	[Tooltip("Confirm button.")]
 	public Button confirmButton;
 
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		instance = this;
 
-		inputField.onEndEdit.RemoveAllListeners ();
+		// Reset listeners
 		inputField.onEndEdit.AddListener (delegate { 
 			confirmButton.interactable = true;
 		});
 	}
 
+	void Start () {
+		Refresh();
+	}
+
 	#endregion
 	#region AddRiffPrompt Callbacks
 
-	//
-	// Resets all selections on the prompt
-	//
+	/// <summary>
+	/// Refreshes the "Add Riff" prompt.
+	/// </summary>
 	public void Refresh () {
-		SetupDropdown();
+
+		// Set riff name input field to be blank
 		inputField.text = "";
-		dropdown.value = 0;
+
+		// Refresh dropdown
+		SetupDropdown();
+
+		// Set confirm button to be non-interactable
 		confirmButton.interactable = false;
 	}
 
-	//
-	// Initializes the instrument selection dropdown
-	//
+	/// <summary>
+	/// Refreshes the instrument selection dropdown.
+	/// </summary>
 	void SetupDropdown () {
+
+		// Clear old options
 		dropdown.ClearOptions ();
+
+		// Reset options
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
-		for (int i=0; i<Instrument.AllInstruments.Count; i++) {
-			Sprite sprite = Instrument.AllInstruments[i].icon;
-			string instName = Instrument.AllInstruments[i].name;
-			Dropdown.OptionData option = new Dropdown.OptionData (instName, sprite);
-			options.Add(option);
-		}
+		foreach (Instrument inst in Instrument.AllInstruments)
+			options.Add (new Dropdown.OptionData (inst.name, inst.icon));
+
 		dropdown.AddOptions(options);
+		dropdown.value = 0;
 	}
 		
-	//
-	// Creates a new riff with the filled in properties
-	//
+	/// <summary>
+	/// Adds a riff from the prompt.
+	/// </summary>
 	public void AddRiff () {
-		Riff temp = new Riff();
-		temp.instrumentIndex = dropdown.value;
-		temp.instrument = Instrument.AllInstruments[dropdown.value];
+
+		// Create riff
+		Riff temp = new Riff(dropdown.value);
+
+		// Name riff
 		temp.name = inputField.text;
+
+		// Register riff with song
 		MusicManager.instance.currentSong.RegisterRiff (temp);
+
+		// Go to riff editor
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
 		GameManager.instance.Hide (gameObject);

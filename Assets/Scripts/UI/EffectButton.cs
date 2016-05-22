@@ -3,50 +3,143 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Audio;
 
+/// <summary>
+/// Class to handle effect sliders and buttons.
+/// </summary>
 public class EffectButton : MonoBehaviour {
 
 	public Image image;
 
+	/// <summary>
+	/// Toggles the active status of the distortion filter.
+	/// </summary>
 	public void ToggleDistortion () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioDistortionFilter>().enabled = !source.GetComponent<AudioDistortionFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioDistortionFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle distortion
+		AudioDistortionFilter distortion = source.GetComponent<AudioDistortionFilter>();
+		distortion.enabled = !distortion.enabled;
+		riff.distortionEnabled = distortion.enabled;
+
+		// Update button art
+		image.sprite = (distortion.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (distortion.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
+	/// <summary>
+	///  Toggles the active status of the echo filter.
+	/// </summary>
 	public void ToggleEcho () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioEchoFilter>().enabled = !source.GetComponent<AudioEchoFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioEchoFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle echo
+		AudioEchoFilter echo = source.GetComponent<AudioEchoFilter>();
+		echo.enabled = !echo.enabled;
+		riff.echoEnabled = echo.enabled;
+
+		// Update button art
+		image.sprite = (echo.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (echo.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
+	/// <summary>
+	/// Toggles the active status of the reverb filter.
+	/// </summary>
 	public void ToggleReverb () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioReverbFilter>().enabled = !source.GetComponent<AudioReverbFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioReverbFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle reverb
+		AudioReverbFilter reverb = source.GetComponent<AudioReverbFilter>();
+		reverb.enabled = !reverb.enabled;
+		riff.reverbEnabled = reverb.enabled;
+		
+		// Update button art
+		image.sprite = (reverb.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (reverb.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
+	/// <summary>
+	/// Toggles the active status of the tremolo filter.
+	/// </summary>
 	public void ToggleTremolo () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioTremoloFilter>().enabled = !source.GetComponent<AudioTremoloFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioTremoloFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle tremolo
+		AudioTremoloFilter tremolo = source.GetComponent<AudioTremoloFilter>();
+		tremolo.enabled = !tremolo.enabled;
+		riff.tremoloEnabled = tremolo.enabled;
+
+		// Update button art
+		image.sprite = (tremolo.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (tremolo.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
+	/// <summary>
+	/// Toggles the active status of the chorus filter.
+	/// </summary>
 	public void ToggleChorus () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioChorusFilter>().enabled = !source.GetComponent<AudioChorusFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioChorusFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle chorus
+		AudioChorusFilter chorus = source.GetComponent<AudioChorusFilter>();
+		chorus.enabled = !chorus.enabled;
+		riff.chorusEnabled = chorus.enabled;
+
+		// Update button art
+		image.sprite = (chorus.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (chorus.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
+	/// <summary>
+	/// Toggles the active status of the flanger filter.
+	/// </summary>
 	public void ToggleFlanger () {
-		GameObject source =
-			MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument].gameObject;
-		source.GetComponent<AudioFlangerFilter>().enabled = !source.GetComponent<AudioFlangerFilter>().enabled;
-		image.sprite = (source.GetComponent<AudioFlangerFilter>().enabled ? InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+		Riff riff = InstrumentSetup.currentRiff;
+		Instrument inst = riff.instrument;
+		GameObject source = MusicManager.instance.instrumentAudioSources [inst].gameObject;
+
+		// Toggle flanger
+		AudioFlangerFilter flanger = source.GetComponent<AudioFlangerFilter>();
+		flanger.enabled = !flanger.enabled;
+		riff.flangerEnabled = flanger.enabled;
+
+		// Update button art
+		image.sprite = (flanger.enabled ? 
+			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
+
+		// Play sound
+		if (flanger.enabled) GameManager.instance.EffectsOn();
+		else GameManager.instance.EffectsOff();
 	}
 
 	public void updatedistortionLevel(Slider slider){

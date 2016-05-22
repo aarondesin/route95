@@ -8,164 +8,189 @@ using System.Linq;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// Class to store sequences of beats, as well as effect data.
+/// </summary>
 [System.Serializable]
 public class Riff {
 
+	#region NonSerialized Riff Vars
+
+	/// <summary>
+	/// Maximum number of 16th notes in a riff.
+	/// </summary>
 	[NonSerialized]
-	public const int MAX_SUBDIVS = 2;
+	public const int MAX_BEATS = 16;
+
 	[NonSerialized]
-	public const int MAX_BEATS = 32;
+	public Instrument instrument;            // Reference to instrument used in riff
+
+	AudioSource source;                      // Source to play notes on
+	AudioDistortionFilter distortion;        // Distortion filter
+	AudioTremoloFilter tremolo;              // Tremolo filter
+	AudioChorusFilter chorus;                // Chorus filter
+	AudioFlangerFilter flanger;              // Flanger filter
+	AudioEchoFilter echo;                    // Echo filter
+	AudioReverbFilter reverb;                // Reverb filter
+
+	#endregion
+	#region Serialized Riff Vars
 
 	[SerializeField]
-	public int index;
+	public string name;                      // User-defined name of the riff
 
-	//Float values from audio effect knobs
-	// Distortion
 	[SerializeField]
-	public bool distortionEnabled = false;
+	public int instrumentIndex = 0;          // Index of instrument used for this riff
+
 	[SerializeField]
-	public float distortionLevel = 0f;
+	public List<int> beatIndices;            // List of indices of all beats used in this riff
+
+	[SerializeField]
+	public bool cutSelf = true;              // If true, sounds will cut themselves off
+
+	[SerializeField]
+	public float volume = 1f;                // Volume scaler for all riff notes.
+
+	[SerializeField]
+	public int index;                        // Project-assigned riff index
+
+	[SerializeField]
+	public bool distortionEnabled = false;   // Is distortion enabled on this riff?
+	[SerializeField]
+	public float distortionLevel = 0f;       // Level of distortion
 
 	// Tremolo
 	[SerializeField]
-	public bool tremoloEnabled = false;
+	public bool tremoloEnabled = false;      // Is tremolo enabled on this riff?
 	[SerializeField]
-	public float tremoloRate = 0f;
+	public float tremoloRate = 0f;           // Rate of tremolo oscillation
 	[SerializeField]
-	public float tremoloDepth = 0f;
+	public float tremoloDepth = 0f;          // Amplitude of tremolo oscillation
 
 	// Chorus
 	[SerializeField]
-	public bool chorusEnabled = false;
+	public bool chorusEnabled = false;       // Is chorus enabled on this riff?
 	[SerializeField]
-	public float chorusDryMix = 0f;
+	public float chorusDryMix = 0f;          // Ratio of dry/wet output
 	[SerializeField]
-	public float chorusRate= 0f;
+	public float chorusRate= 0f;             // Rate of chorus oscillation
 	[SerializeField]
-	public float chorusDepth = 0f;
+	public float chorusDepth = 0f;           // Depth of chorus oscillation
 
 	// Echo
 	[SerializeField]
-	public bool echoEnabled = false;
+	public bool echoEnabled = false;         // Is echo enabled on this riff?
 	[SerializeField]
-	public float echoDecayRatio = 1f;
+	public float echoDecayRatio = 1f;        // Ratio of echo output to previous output
 	[SerializeField]
-	public float echoDelay = 0f;
+	public float echoDelay = 0f;             // Echo delay
 	[SerializeField]
-	public float echoDryMix = 0f;
+	public float echoDryMix = 0f;            // Echo dry/wet ratio
 
 	// Reverb
 	[SerializeField]
-	public bool reverbEnabled = false;
+	public bool reverbEnabled = false;       // Is reverb enabled on this riff?
 	[SerializeField]
-	public float reverbDecayTime = 0f;
+	public float reverbDecayTime = 0f;       // Reverb decay time
 	[SerializeField]
-	public float reverbLevel = 0f;
+	public float reverbLevel = 0f;           // Level of reverb
 
 	// Flanger
 	[SerializeField]
-	public bool flangerEnabled = false;
+	public bool flangerEnabled = false;      // Is flanger enabled on this riff?
 	[SerializeField]
-	public float flangerRate = Mathf.PI/32f;
+	public float flangerRate = Mathf.PI/32f; // Rate of flanger oscillation
 	[SerializeField]
-	public float flangerDryMix = 0f;
+	public float flangerDryMix = 0f;         // Flanger dry/wet mix
 
-	//
-	// VARIABLES SAVED IN PROJECT
-	//
+	#endregion
+	#region Riff Methods
 
-	[SerializeField]
-	public string name; // user-defined name of the riff
-	[SerializeField]
-	public int instrumentIndex = 0; // instrument used for this riff
-	[SerializeField]
-	public List<int> beatIndices = new List<int>(); // contains notes
-	[SerializeField]
-	public bool cutSelf = true; // if true, sounds will cut themselves off
-	[SerializeField]
-	public int beatsShown = 4;
-	[SerializeField]
-	public float volume = 1f;
-
-	//
-	// VARIABLES NOT SAVED IN PROJECT
-	//
-	[NonSerialized]
-	public Instrument instrument;
-
-	public int Length () {
-		return beatIndices.Count;
+	/// <summary>
+	/// Default constructor.
+	/// </summary>
+	public Riff (int instIndex=0) {
+		beatIndices = new List<int>();
+		instrumentIndex = instIndex;
+		Refresh();
 	}
 
+	public void Refresh () {
+
+		// Init references
+		if (instrument == null) instrument = Instrument.AllInstruments[instrumentIndex];
+		source = MusicManager.instance.instrumentAudioSources[instrument];
+		distortion = source.GetComponent<AudioDistortionFilter>();
+		tremolo    = source.GetComponent<AudioTremoloFilter>();
+		chorus     = source.GetComponent<AudioChorusFilter>();
+		flanger    = source.GetComponent<AudioFlangerFilter>();
+		echo       = source.GetComponent<AudioEchoFilter>();
+		reverb     = source.GetComponent<AudioReverbFilter>();
+	}
+
+	/// <summary>
+	/// Checks if a note exists in the riff.
+	/// </summary>
+	/// <param name="filename">Note filename.</param>
+	/// <param name="pos">Beat position.</param>
+	/// <returns>True if a note with the given filename
+	/// exists in the riff.</returns>
 	public bool Lookup (string filename, int pos) {
 		Note temp = new Note(filename);
 		return Lookup (temp, pos);
 	}
 
-	// Returns true is a note is found at a position
+	/// <summary>
+	/// Checks if a note exists in the riff.
+	/// </summary>
+	/// <param name="newNote">Note.</param>
+	/// <param name="pos">Beat position.</param>
+	/// <returns>True if a note with the same filename
+	/// as the given note exists in the riff.</returns>
 	public bool Lookup (Note newNote, int pos) {
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
+
 		try {
-			//return notes[pos].Contains(newNote);
-			foreach (Note note in beat.notes) {
+
+			// Check each note in beat
+			foreach (Note note in beat.notes)
 				if (note.filename == newNote.filename) return true;
-			}
-			return false;
-		} catch (ArgumentOutOfRangeException) {
-			Debug.LogError("Tried to access pos "+pos+" in "+Length()+"-long riff!");
-			return false;
-		}
-	}
 
-	public float VolumeOfNote(string soundName, int pos) {
-		Song song = MusicManager.instance.currentSong;
-		Beat beat = song.beats[beatIndices[pos]];
-		foreach (Note note in beat.notes) {
-			if (note.filename == soundName) {
-				//Debug.Log (note.volume);
-				return note.volume;
-			}
-		}
-		return 1f;
-	}
+			return false;
 		
-
-	public void RemoveNote (Note newNote, int pos) {
-		Song song = MusicManager.instance.currentSong;
-		Beat beat = song.beats[beatIndices[pos]];
-		foreach (Note note in beat.notes) {
-			if (note.filename == newNote.filename) {
-				beat.notes.Remove(note);
-				return;
-			}
+		// Catch invalid beat checks
+		} catch (ArgumentOutOfRangeException) {
+			Debug.LogError("Tried to access pos "+pos+" in "+Length+"-long riff!");
+			return false;
 		}
 	}
 
-	// Removes all notes at position
-	public void Clear (int pos) {
-		Song song = MusicManager.instance.currentSong;
-		Beat beat = song.beats[beatIndices[pos]];
-		beat.Clear();
-	}
-
-	// Adds or removes a note at pos
+	/// <summary>
+	/// Toggles a note at the given position.
+	/// </summary>
+	/// <param name="newNote">Note to toggle.</param>
+	/// <param name="pos">Position at which to add note.</param>
+	/// <returns>True if note was added,
+	/// false if note was removed.</returns>
 	public bool Toggle (Note newNote, int pos) {
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		Instrument instrument = Instrument.AllInstruments[instrumentIndex];
 
-		// Lookup
+		// Check if note exists
 		if (Lookup(newNote, pos)) {
-				// Note with same sound is already there
 			RemoveNote (newNote, pos);
 			return false;
 		}
-		// Note not already there
+
+		// If doesn't exist, add note
 		beat.Add (newNote);
-		AudioSource source = MusicManager.instance.instrumentAudioSources[instrument];
+
+		// Play note
 		newNote.PlayNote(source);
 
+		// Do environmental effects
 		if (instrument.type == Instrument.Type.Percussion) {
 			if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
 			else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
@@ -175,11 +200,8 @@ public class Riff {
 			else if (newNote.IsCymbal()) WorldManager.instance.ShootingStar();
 			else if (newNote.IsWood()) WorldManager.instance.ExhaustPuff();
 		} else {
-			if (instrument == MelodicInstrument.ElectricBass) {
-				//WorldManager.instance.StartWave();
-				//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
-				WorldManager.instance.DeformRandom();
-			} else {
+			if (instrument == MelodicInstrument.ElectricBass) WorldManager.instance.DeformRandom();
+			else {
 				switch (instrument.family) {
 				case Instrument.Family.Guitar:
 					MusicManager.instance.guitarNotes++;
@@ -195,53 +217,81 @@ public class Riff {
 		}
 		return true;
 	}
-	public void PlayRiffLoop (AudioClip clip) {
-		MusicManager.instance.LoopRiff.Stop();
-		MusicManager.instance.LoopRiff.clip = clip;
-		MusicManager.instance.LoopRiff.loop = true;
-	}
 
-	// Plays all the notes at pos
+	/// <summary>
+	/// Plays all notes at the given beat.
+	/// </summary>
+	/// <param name="pos">Beat to play notes from.</param>
 	public void PlayRiff (int pos) { 
 		try {
 			Song song = MusicManager.instance.currentSong;
 			Beat beat = song.beats[beatIndices[pos]];
-			Instrument instrument = Instrument.AllInstruments[instrumentIndex];
-			if (beat.NumNotes() != 0) {
-				AudioSource source = MusicManager.instance.instrumentAudioSources[instrument];
-				source.GetComponent<AudioDistortionFilter>().distortionLevel = distortionLevel;
-				source.GetComponent<AudioTremoloFilter>().depth = tremoloDepth;
-				source.GetComponent<AudioTremoloFilter>().rate = tremoloRate;
-				source.GetComponent<AudioEchoFilter>().decayRatio = echoDecayRatio;
-				source.GetComponent<AudioEchoFilter>().delay = echoDelay;
-				source.GetComponent<AudioEchoFilter>().dryMix = echoDryMix;
-				source.GetComponent<AudioReverbFilter>().decayTime = reverbDecayTime;
-				source.GetComponent<AudioReverbFilter>().reverbLevel = reverbLevel;
-				source.GetComponent<AudioChorusFilter>().dryMix = chorusDryMix;
-				source.GetComponent<AudioChorusFilter>().rate = chorusRate;
-				source.GetComponent<AudioChorusFilter>().depth = chorusDepth;
-				source.GetComponent<AudioFlangerFilter>().rate = flangerRate;
-				source.GetComponent<AudioFlangerFilter>().dryMix = flangerDryMix;
 
-				if (cutSelf) MusicManager.instance.instrumentAudioSources[instrument].Stop();
-				foreach (Note note in beat.notes) {
-					note.PlayNote(source, volume);
+			// Skip if empty
+			if (beat.NoteCount == 0) return;
 
-					if (instrument.type == Instrument.Type.Percussion) {
-						if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
-						else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
-						else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
-						else if (note.IsShaker()) WorldManager.instance.shakers++;
-						else if (note.IsHat()) WorldManager.instance.StarBurst();
-						else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
-						else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
-					} else {
-						if (instrument == MelodicInstrument.ElectricBass) {
-							//WorldManager.instance.StartWave();
-							//WorldManager.instance.MakeWave(PlayerMovement.instance.transform.position, 1f, 1f);
-							WorldManager.instance.DeformRandom();
-						} else {
-							switch (instrument.family) {
+			// Update effect levels
+			if (distortionEnabled) {
+				distortion.enabled = true;
+				distortion.distortionLevel = distortionLevel;
+			} else distortion.enabled = false;
+
+			if (tremoloEnabled) {
+				tremolo.enabled = true;
+				tremolo.depth = tremoloDepth;
+				tremolo.rate = tremoloRate;
+			} else tremolo.enabled = false;
+
+			if (echoEnabled) {
+				echo.enabled = true;
+				echo.decayRatio = echoDecayRatio;
+				echo.delay = echoDelay;
+				echo.dryMix = echoDryMix;
+			} else echo.enabled = false;
+
+			if (reverbEnabled) {
+				reverb.enabled = true;
+				reverb.decayTime = reverbDecayTime;
+				reverb.reverbLevel = reverbLevel;
+			} else reverb.enabled = false;
+
+			if (chorusEnabled) {
+				chorus.enabled = true;
+				chorus.dryMix = chorusDryMix;
+				chorus.rate = chorusRate;
+				chorus.depth = chorusDepth;
+			} else chorus.enabled = false;
+
+			if (flangerEnabled) {
+				flanger.enabled = true;
+				flanger.rate = flangerRate;
+				flanger.dryMix = flangerDryMix;
+			} else flanger.enabled = false;
+
+			// Cutoff
+			if (cutSelf) source.Stop();
+
+			// For each note
+			foreach (Note note in beat.notes) {
+
+				// Play note
+				note.PlayNote(source, volume);
+
+				// Do environmental effects
+				if (instrument.type == Instrument.Type.Percussion) {
+					if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
+					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
+					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
+					else if (note.IsShaker()) WorldManager.instance.shakers++;
+					else if (note.IsHat()) WorldManager.instance.StarBurst();
+					else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+					else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+				} else {
+					if (instrument == MelodicInstrument.ElectricBass)
+						WorldManager.instance.DeformRandom();
+
+					else {
+						switch (instrument.family) {
 							case Instrument.Family.Guitar:
 								MusicManager.instance.guitarNotes++;
 								break;
@@ -251,8 +301,8 @@ public class Riff {
 							case Instrument.Family.Brass:
 								MusicManager.instance.brassNotes++;
 								break;
-							}
 						}
+					
 					}
 				}
 			}
@@ -260,5 +310,62 @@ public class Riff {
 			Debug.LogError("Tried to play out of range of song! Pos: "+pos);
 		}
 	}
-		
+
+	/// <summary>
+	/// Removes the given note from a beat.
+	/// </summary>
+	/// <param name="newNote">Note to remove.</param>
+	/// <param name="pos">Beat to remove note from.</param>
+	public void RemoveNote (Note newNote, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+
+
+		// Look for note in beat
+		foreach (Note note in beat.notes)
+			if (note.filename == newNote.filename) {
+				beat.notes.Remove(note);
+				return;
+			}
+	}
+
+	/// <summary>
+	/// Removes all notes at the given beat.
+	/// </summary>
+	/// <param name="pos">Beat to remove notes at.</param>
+	public void Clear (int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+		beat.Clear();
+	}
+
+	/// <summary>
+	/// Returns the volume of a note with the given filename.
+	/// </summary>
+	/// <param name="fileName">Filename of note to find.</param>
+	/// <param name="pos">Beat to look in.</param>
+	/// <returns>The volume of the note with the given
+	/// filename, or 1 if no note found.</returns>
+	public float VolumeOfNote(string fileName, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+
+		// Check each note in beat
+		foreach (Note note in beat.notes)
+			if (note.filename == fileName) return note.volume;
+
+		// Return 1f if not found
+		return 1f;
+	}
+
+	/// <summary>
+	/// Returns the length of the riff, in number of beats.
+	/// </summary>
+	public int Length {
+		get {
+			return beatIndices.Count;
+		}
+	}
+
+	#endregion
 }

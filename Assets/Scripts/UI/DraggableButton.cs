@@ -1,36 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Enables a button to be draggable.
+/// </summary>
 public class DraggableButton : MonoBehaviour {
 
 	#region DraggableButton Vars
-	public float maxDragDistanceUp;
-	public float maxDragDistanceDown;
-	public float maxDragDistanceLeft;
-	public float maxDragDistanceRight;
 
-	//public float dragThreshold; // threshold for action to be recognized as a drag instead of a click
-	//public bool isDrag = false;
+	public float maxDragDistanceUp;    // Maxmimum drag distance upwards
+	public float maxDragDistanceDown;  // Maxmimum drag distance downwards
+	public float maxDragDistanceLeft;  // Maxmimum drag distance to the left
+	public float maxDragDistanceRight; // Maxmimum drag distance to the right
 
-	const float dragBias = 1.25f; // threshold for drag to recognize one direction over another
+	const float dragBias = 1.25f;      // Threshold for drag to recognize one direction over another
 
 	#endregion
 	#region DraggableButton Methods
 
-	// Calls appropriate functions based on drag direction
+	/// <summary>
+	/// Calls the appropriate function based on drag direction.
+	/// </summary>
+	/// <param name="dragVector">Vector of mouse dragging.</param>
 	public void Drag (Vector3 dragVector) {
 		float hDrag = Mathf.Abs(dragVector.x);
 		float yDrag = Mathf.Abs(dragVector.y);
-
-		//if (dragVector.magnitude >= dragThreshold) isDrag = true;
-		//else isDrag = false;
 
 		if (dragVector.x < 0f) DragLeft (Mathf.Clamp01(hDrag/maxDragDistanceLeft));
 		else DragRight (Mathf.Clamp01(hDrag/maxDragDistanceRight));
 		if (dragVector.y < 0f) DragDown (Mathf.Clamp01(yDrag/maxDragDistanceDown));
 		else DragUp (Mathf.Clamp01(yDrag/maxDragDistanceUp));
 
-		//if (isDrag) Debug.Log("isDrag");
 	}
 
 	public virtual void OnMouseDown () {}

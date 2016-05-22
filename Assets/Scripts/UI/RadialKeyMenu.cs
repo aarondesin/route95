@@ -43,7 +43,7 @@ public class RadialKeyMenu : MonoBehaviour {
 		for (int i=1; i < numKeys; i++) { // i=1 so that it skips Key.None
 			Key key = (Key)i;
 			float angle = (float)i / (float)(numKeys-1) * 2f * Mathf.PI;
-			GameObject button = UI.MakeTextButton(key.ToString());
+			GameObject button = UIHelpers.MakeTextButton(key.ToString());
 
 			RectTransform tr = button.GetComponent<RectTransform>();
 			tr.SetParent (gameObject.GetComponent<RectTransform>());
@@ -67,7 +67,7 @@ public class RadialKeyMenu : MonoBehaviour {
 				text.color = Color.white;
 				img.color = Color.white;
 
-				GameObject hl = UI.MakeImage (key.ToString() +"_SelectedHighlight");
+				GameObject hl = UIHelpers.MakeImage (key.ToString() +"_SelectedHighlight");
 				tr = hl.GetComponent<RectTransform>();
 				tr.SetParent (button.GetComponent<RectTransform>());
 				tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
@@ -88,7 +88,7 @@ public class RadialKeyMenu : MonoBehaviour {
 			});
 
 			ShowHide sh = button.AddComponent<ShowHide>();
-			GameObject highlight = UI.MakeImage (key.ToString() + "_Highlight");
+			GameObject highlight = UIHelpers.MakeImage (key.ToString() + "_Highlight");
 			tr = highlight.GetComponent<RectTransform>();
 			tr.SetParent (button.GetComponent<RectTransform>());
 			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
@@ -114,7 +114,7 @@ public class RadialKeyMenu : MonoBehaviour {
 		for (int i=0; i < numScales; i++) {
 			ScaleInfo scalei = ScaleInfo.AllScales[i];
 			float angle = (float)i / (float)numScales * 2f * Mathf.PI;
-			GameObject button = UI.MakeTextButton(scalei.name);
+			GameObject button = UIHelpers.MakeTextButton(scalei.name);
 
 			RectTransform tr = button.GetComponent<RectTransform>();
 			tr.SetParent (gameObject.GetComponent<RectTransform>());
@@ -145,7 +145,7 @@ public class RadialKeyMenu : MonoBehaviour {
 			});
 
 			ShowHide sh = button.AddComponent<ShowHide>();
-			GameObject highlight = UI.MakeImage (scalei.name + "_Highlight");
+			GameObject highlight = UIHelpers.MakeImage (scalei.name + "_Highlight");
 			tr = highlight.GetComponent<RectTransform>();
 			tr.SetParent (button.GetComponent<RectTransform>());
 			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;

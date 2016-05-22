@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class SongArrangeSetup : MonoBehaviour {
 
+	#region SongArrangeSetup Vars
+
 	public static SongArrangeSetup instance;
 
 	public int selectedRiffIndex; // index of currently selected riff
@@ -13,14 +15,21 @@ public class SongArrangeSetup : MonoBehaviour {
 	public InputField songNameInputField;
 	public GameObject playRiffButton;
 	public GameObject editRiffButton;
+	public GameObject addRiffReminder;
 	public Sprite play;
 	public Sprite pause;
 
-	void Start () {
+	#endregion
+	#region Unity Callbacks
+
+	void Awake () {
 		instance = this;
 		dropdown.onValueChanged.AddListener (delegate { UpdateValue(); });
 		songNameInputField.onEndEdit.AddListener (delegate { MusicManager.instance.currentSong.name = songNameInputField.text;});
 	}
+
+	#endregion
+	#region SongArrangeSetup Methods
 
 	// Refresh all elements on the Song Arrangement UI
 	public void Refresh () {
@@ -55,6 +64,11 @@ public class SongArrangeSetup : MonoBehaviour {
 		playRiffButton.GetComponent<Image>().sprite = play;
 
 		SetValue();
+
+		bool hasRiffs = MusicManager.instance.currentSong.riffs.Count != 0;
+		SongTimeline.instance.SetInteractable (hasRiffs);
+		addRiffReminder.SetActive(!hasRiffs);
+
 	}
 
 	public void UpdateValue () {
@@ -76,5 +90,5 @@ public class SongArrangeSetup : MonoBehaviour {
 		else playRiffButton.GetComponent<Image>().sprite = play;
 	}
 
-				
+	#endregion
 }

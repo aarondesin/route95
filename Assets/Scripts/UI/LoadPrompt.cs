@@ -5,29 +5,35 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+/// <summary>
+/// Class to handle the loading prompt.
+/// </summary>
 public class LoadPrompt : MonoBehaviour {
 
+	#region LoadPrompt Enums
+
+	/// <summary>
+	/// Type of file to display and load.
+	/// </summary>
 	public enum Mode {
 		Project,
 		Song
 	};
 
-	public static LoadPrompt instance;
-
+	#endregion
 	#region LoadPrompt Vars
 
-	public RectTransform fileList; // Transform of the actual panel with all of the files listed
-	public GameObject loadButton;
+	public static LoadPrompt instance; // Quick reference to this instance
 
-	string selectedPath; // Currently selected path
-
-	List<GameObject> fileButtons;
-
-	Mode loadMode;
-
-	public Sprite fillSprite;
-
+	public RectTransform fileList;     // Transform of the actual panel with all of the files listed
 	static Vector2 fileListSize = new Vector2 (84f, 84f);
+	public GameObject loadButton;      // Load button on propmt
+
+	Mode loadMode;                     // Type of file to display and load
+	string selectedPath;               // Currently selected path
+
+	List<GameObject> fileButtons;      // List of created buttons
+	
 
 	static float horizontalPadding = 8f;
 	static float verticalPadding = 4f;
@@ -60,18 +66,16 @@ public class LoadPrompt : MonoBehaviour {
 		switch (mode) {
 		case LoadPrompt.Mode.Project:
 			files.AddRange (Directory.GetFiles(GameManager.instance.projectSavePath, "*"+SaveLoad.projectSaveExtension).ToList<string>());
-			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.projectSaveFolder, "*"+SaveLoad.projectSaveExtension).ToList<string>());
 			break;
 		case LoadPrompt.Mode.Song:
 			files.AddRange (Directory.GetFiles(GameManager.instance.songSavePath, "*"+SaveLoad.songSaveExtension).ToList<string>());
-			files.AddRange (Directory.GetFiles(Application.dataPath + GameManager.instance.songSaveFolder, "*"+SaveLoad.songSaveExtension).ToList<string>());
 			break;
 		}
 		for (int i=0; i<files.Count; i++) {
 			string path = files[i];
 			string filename = Path.GetFileNameWithoutExtension (files[i]);
 
-			GameObject button = UI.MakeButton(filename);
+			GameObject button = UIHelpers.MakeButton(filename);
 
 			RectTransform button_tr = button.RectTransform();
 			button_tr.SetParent(fileList);
@@ -86,10 +90,10 @@ public class LoadPrompt : MonoBehaviour {
 			button_tr.ResetScaleRot();
 
 			Image button_img = button.Image();
-			button_img.sprite = fillSprite;
+			button_img.sprite = GameManager.instance.fillSprite;
 			button_img.color = new Color(1f,1f,1f,0f);
 
-			GameObject text = UI.MakeText(filename+"_Text");
+			GameObject text = UIHelpers.MakeText(filename+"_Text");
 			RectTransform text_tr = text.RectTransform();
 			text_tr.SetParent(button.transform);
 			text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
@@ -114,7 +118,7 @@ public class LoadPrompt : MonoBehaviour {
 				
 			fileButtons.Add(button);
 
-			GameObject highlight = UI.MakeImage (filename+"_Highlight");
+			GameObject highlight = UIHelpers.MakeImage (filename+"_Highlight");
 			RectTransform highlight_tr = highlight.RectTransform();
 			highlight_tr.SetParent (button_tr);
 			highlight_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;

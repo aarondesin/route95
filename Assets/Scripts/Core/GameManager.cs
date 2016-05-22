@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityStandardAssets.ImageEffects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,20 +10,18 @@ using System.IO;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// Instanced class to handle all application functions,
+/// major state changes, and UI interactions.
+/// </summary>
 public class GameManager : MonoBehaviour {
 
 	#region GameManager Enums
 
-	public enum Menu {
-		None,
-		Main,
-		KeySelect,
-		SongArrange,
-		RiffEdit,
-		PostPlay
-	};
-
-	public enum Mode {
+	/// <summary>
+	/// Enum for various game states.
+	/// </summary>
+	public enum State {
 		Loading,
 		Setup,
 		Live,
@@ -32,35 +31,59 @@ public class GameManager : MonoBehaviour {
 	#endregion
 	#region GameManager Vars
 
-	public static GameManager instance;
+	public static GameManager instance;            // Quick reference to the Game Manager
 
-	[Header("Status")]
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Game Status")]
 
+	[Tooltip("Is the game paused?")]
 	public bool paused = false;
-	public Menu currentMenu = Menu.None;
-	public Mode currentMode = Mode.Loading;
-	[NonSerialized]
-	public Dictionary<Menu, GameObject> menus; 
-	public float targetDeltaTime;
 
-	// Loading vars
-	private int loadProgress = 0;
-	private int loadsToDo;
-	bool loading = false;
-	bool initialized = false;
+	[Tooltip("Current game state.")]
+	public State currentState = State.Loading;
+
+	[NonSerialized]
+	public float targetDeltaTime;                  // 1 / Target FPS -- useful for coroutines
+
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Load Status")]
+
+	private int loadProgress = 0;                  // Number of load operations performed
+	private int loadsToDo;                         // Number of load operations to perform
+
+	[Tooltip("Is the game loaded?")]
 	public bool loaded = false;
 
-	// Casette Vars
-	bool casetteMoving = false;
-	bool willMoveCasette = false;
-	public Transform casetteFront;
-	public Transform casetteBack;
-	Transform casetteTarget;
-	Transform casettePosition;
+	bool loading = false;                          // Is the game currently loading?
+
+	float startLoadTime;                           // Time at which loading started
+	public GameObject loadingScreen;               // Parent loading screen object
+	public GameObject loadingBar;                  // Loading bar
+	public GameObject loadingMessage;              // Message above loading bar
+
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Casette Settings")]
+
+	public GameObject casette;                     // Casette GameObject
+	bool casetteMoving = false;                    // Is the casette currently moving?
+	bool willMoveCasette = false;                  // Will the casette move after camera lerp?
+
+	[Tooltip("Speed at which the casette moves.")]
+	[Range(0.5f,2f)]
 	public float casetteMoveSpeed = 1f;
-	float sTime;
 
+	[Tooltip("Position for casette to move in front of camera.")]
+	public Transform casetteFront;  
 
+	[Tooltip("Position for casette to move behind camera.")]
+	public Transform casetteBack;
+
+	Transform casetteTarget;                       // Current casette lerp target
+	Transform casettePosition;                     // Current casette lerp start position
+
+	float sTime;                                   // Start time of casette lerp
+
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI Settings")]
 
 	[Tooltip("(Live Mode) How long to wait before fading the instrument icons.")]
@@ -69,18 +92,21 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("(Live Mode) How quickly to fade the instrument icons.")]
 	public float fadeSpeed;
 
-	float fadeTimer;
-	Vector3 prevMouse = new Vector3 (0f,0f,0f);
+	float fadeTimer;                               // Current fade timer
+	Vector3 prevMouse = Vector3.zero;              // Position of mouse during last frame
 
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("IO Settings")]
-	public string projectSaveFolder = "Projects/";
-	public string songSaveFolder = "Songs/";
+	public string projectSaveFolder = "Projects/"; // Name of the folder in which to save projects
+	public string songSaveFolder = "Songs/";       // Name of the folder in which to save songs
 
 	[NonSerialized]
-	public string projectSavePath;
-	[NonSerialized]
-	public string songSavePath;
+	public string projectSavePath;                 // Full path to which to save projects
 
+	[NonSerialized]
+	public string songSavePath;                    // Full path to which to save songs
+
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI Resources")]
 
 	[Tooltip("Font to use for UI.")]
@@ -99,12 +125,16 @@ public class GameManager : MonoBehaviour {
 	public Sprite fillSprite;
 	public Sprite scribbleCircle;
 
+	[Tooltip("Sound to use when clicking a menu.")]
 	public AudioClip menuClick;
-	//public AudioClip
+	public AudioClip menuClick2;
+	public AudioClip effectsOn;
+	public AudioClip effectsOff;
+	public List<AudioClip> scribbles;
 
+	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Menu Objects")]
 
-	// Parent objects for all menu UI objects
 	public GameObject mainMenu;
 	public GameObject playlistMenu;
 	public GameObject keySelectMenu;
@@ -113,82 +143,93 @@ public class GameManager : MonoBehaviour {
 	public GameObject postPlayMenu;
 	public GameObject pauseMenu;
 
-	// Pop-up menu prompts
-	public GameObject addRiffPrompt; // "Add Riff"
-	public GameObject loadPrompt; // "Load Project"
-	public GameObject prompt; // Generic pop-up prompt
-	public GameObject confirmExitPrompt; // "Would you like to exit..."
+	public GameObject addRiffPrompt;            // "Add Riff"
+	public GameObject loadPrompt;               // "Load Project"
+	public GameObject prompt;                   // Generic pop-up prompt
+	public GameObject confirmExitPrompt;        // "Would you like to exit..."
 
-	// Menu-specific buttons
 	public GameObject keySelectConfirmButton;
 
-	// Parent objects for universal system buttons
-	public GameObject systemButtons; // "Settings" and "Exit"
-	public Image livePlayQuitPrompt; // "Exit"
-	public GameObject liveIcons;
+	public GameObject systemButtons;            // "Settings" and "Exit"
+	public Image livePlayQuitPrompt;            // "Exit"
+	public GameObject liveIcons;                // Parent of instrument icons
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
 
-	float startLoadTime;
-	public int loadingSpeed;
-	public GameObject loadingScreen;
-	public GameObject loadingBar;
-	public GameObject loadingMessage;
+	//-----------------------------------------------------------------------------------------------------------------
+	[Header("Tooltip Settings")]
 
-	public GameObject tooltip;
+	[Tooltip("GameObject to use for tooltip.")]
+	public GameObject tooltip;  
+	
+	[Tooltip("Distance to show tooltip.")]                
 	public float tooltipDistance;
 
-	public GameObject casette;
+	//-----------------------------------------------------------------------------------------------------------------
+	Camera mainCamera;
+	int cullingMaskBackup = 0;
+	CameraClearFlags clearFlagsBackup = CameraClearFlags.Nothing;
 
 	#endregion
 	#region Unity Callbacks
 
 	void Awake () {
+
+		// Check if already initialized
 		if (instance) Debug.LogError ("GameManager: multiple instances! There should only be one.", gameObject);
 		else instance = this;
 
+		// Remove profiler sample limit
 		Profiler.maxNumberOfSamplesPerFrame = -1;
+
+		// Set application target frame rate
 		Application.targetFrameRate = 120;
 		targetDeltaTime = 1f / (float)Application.targetFrameRate;
 
-		// Initialize set of all menus
-		menus = new Dictionary<Menu, GameObject>() {
-			{ Menu.Main, mainMenu },
-			{ Menu.KeySelect, keySelectMenu },
-			{ Menu.SongArrange, songArrangeMenu },
-			{ Menu.RiffEdit, riffEditMenu },
-			{ Menu.PostPlay, postPlayMenu }
-		};
+		// Init save paths
+		//projectSavePath = Application.persistentDataPath + projectSaveFolder;
+		projectSavePath = Application.dataPath + projectSaveFolder;
+		//songSavePath = Application.persistentDataPath + songSaveFolder;
+		songSavePath = Application.dataPath + songSaveFolder;
 
-		projectSavePath = Application.persistentDataPath + projectSaveFolder;
-		songSavePath = Application.persistentDataPath + songSaveFolder;
+		// Create save folders
+		//if (!Directory.Exists(GameManager.instance.projectSavePath)) 
+		//	Directory.CreateDirectory (GameManager.instance.projectSavePath);
 
-		if (!Directory.Exists(GameManager.instance.projectSavePath)) 
-			Directory.CreateDirectory (GameManager.instance.projectSavePath);
+		if (!Directory.Exists(projectSavePath))
+			Directory.CreateDirectory (projectSavePath);
 
-		if (!Directory.Exists(Application.dataPath+projectSaveFolder))
-			Directory.CreateDirectory (Application.dataPath+projectSaveFolder);
+		//if (!Directory.Exists(GameManager.instance.songSavePath)) 
+		//	Directory.CreateDirectory (GameManager.instance.songSavePath);
 
-		if (!Directory.Exists(GameManager.instance.songSavePath)) 
-			Directory.CreateDirectory (GameManager.instance.songSavePath);
-
-		if (!Directory.Exists(Application.dataPath+songSaveFolder))
-			Directory.CreateDirectory (Application.dataPath+songSaveFolder);
+		if (!Directory.Exists(projectSaveFolder))
+			Directory.CreateDirectory (projectSaveFolder);
 	}
 
 	void Start () {
-		ShowAll();
+
+		// Init camera ref
+		mainCamera = Camera.main;
+
+		// Stop 3D rendering while loading
+		StopRendering ();
+
+		// Hide menus
+		HideAll();
+		Hide (prompt);
 	}
 
 	void Update () {
-		if (!initialized) {
-			if (!loading) Load();
-			else return;
-		}
 
-		switch (currentMode) {
+		// Don't update if not loaded
+		if (loading) return;
 
-		case Mode.Setup:
+		// Start loading if not laoded
+		if (!loaded) Load();
+
+		switch (currentState) {
+
+		case State.Setup:
 			
 			// Check for tooltip
 			if (tooltip.activeSelf) {
@@ -207,8 +248,8 @@ public class GameManager : MonoBehaviour {
 			}
 			break;
 
-		case Mode.Live:
-			if (paused) {
+		case State.Live:
+			if (!paused) {
 
 				// Wake/fade UI icons
 				Color temp = livePlayQuitPrompt.color;
@@ -302,11 +343,10 @@ public class GameManager : MonoBehaviour {
 
 		// Update vars
 		loading = false;
-		initialized = true;
 		loaded = true;
 
-		// Change mode
-		currentMode = Mode.Setup;
+		// Change state
+		currentState = State.Setup;
 
 		// Hide all menus
 		loadingScreen.SetActive(false);
@@ -314,6 +354,9 @@ public class GameManager : MonoBehaviour {
 
 		// Show main menu
 		Show (mainMenu);
+
+		// Begin 3D rendering again
+		StartRendering ();
 	}
 
 	#endregion
@@ -374,7 +417,6 @@ public class GameManager : MonoBehaviour {
 
 		Hide (addRiffPrompt);
 		Hide (loadPrompt);
-		Hide (prompt);
 		Hide (liveIcons);
 	}
 
@@ -469,7 +511,7 @@ public class GameManager : MonoBehaviour {
 	public void GoToPlaylistMenu () {
 
 		// Switch modes
-		currentMode = Mode.Setup;
+		currentState = State.Setup;
 
 		// Stop music/live mode operations
 		MusicManager.instance.StopPlaying();
@@ -497,7 +539,7 @@ public class GameManager : MonoBehaviour {
 	public void GoToPostPlayMenu() {
 
 		// Switch mode
-		currentMode = Mode.Postplay;
+		currentState = State.Postplay;
 
 		// Hide other menus
 		MoveCasetteBack();
@@ -516,7 +558,7 @@ public class GameManager : MonoBehaviour {
 	public void SwitchToLive () {
 
 		// Switch mode
-		currentMode = Mode.Live;
+		currentState = State.Live;
 		paused = false;
 
 		// Hide menus
@@ -534,7 +576,6 @@ public class GameManager : MonoBehaviour {
 		if (MusicManager.instance.currentSong != null) {
 			MusicManager.instance.StartPlaylist();
 			MusicManager.instance.StartSong();
-			MusicManager.instance.currentSong.CompileSong();
 		}
 
 		// Start live operations
@@ -549,7 +590,7 @@ public class GameManager : MonoBehaviour {
 	public void SwitchToPostplay () {
 
 		// Switch mode
-		currentMode = Mode.Postplay;
+		currentState = State.Postplay;
 		paused = false;
 
 		// Stop music/live operations
@@ -562,6 +603,30 @@ public class GameManager : MonoBehaviour {
 
 		// Go to postplay menu
 		GoToPostPlayMenu();
+	}
+
+	/// <summary>
+	/// Stops 3D rendering on the main camera.
+	/// </summary>
+	public void StopRendering () {
+		cullingMaskBackup = mainCamera.cullingMask;
+		clearFlagsBackup = mainCamera.clearFlags;
+		mainCamera.cullingMask = 0;
+		mainCamera.clearFlags = CameraClearFlags.Nothing;
+		mainCamera.GetComponent<SunShafts> ().enabled = false;
+		mainCamera.GetComponent<CameraMotionBlur> ().enabled = false;
+		mainCamera.GetComponent<BloomOptimized> ().enabled = false;
+	}
+
+	/// <summary>
+	/// Starts 3D rendering on the main camera
+	/// </summary>
+	public void StartRendering() {
+		mainCamera.cullingMask = cullingMaskBackup;
+		mainCamera.clearFlags = clearFlagsBackup;
+		mainCamera.GetComponent<SunShafts> ().enabled = true;
+		mainCamera.GetComponent<CameraMotionBlur> ().enabled = true;
+		mainCamera.GetComponent<BloomOptimized> ().enabled = true;
 	}
 
 	#endregion
@@ -656,11 +721,11 @@ public class GameManager : MonoBehaviour {
 	/// Attempts to exit the game.
 	/// </summary>
 	public void AttemptExit () {
-		switch (currentMode) {
-		case Mode.Setup: case Mode.Postplay:
+		switch (currentState) {
+		case State.Setup: case State.Postplay:
 			confirmExitPrompt.SetActive(true);
 			break;
-		case Mode.Live:
+		case State.Live:
 			Pause();
 			break;
 		}
@@ -670,7 +735,23 @@ public class GameManager : MonoBehaviour {
 	/// Plays a click noise.
 	/// </summary>
 	public void MenuClick () {
-		MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(menuClick, 1f);
+		MusicManager.PlayMenuSound (menuClick);
+	}
+
+	public void MenuClick2 () {
+		MusicManager.PlayMenuSound (menuClick2);
+	}
+
+	public void EffectsOn () {
+		MusicManager.PlayMenuSound (effectsOn);
+	}
+
+	public void EffectsOff () {
+		MusicManager.PlayMenuSound (effectsOff);
+	}
+
+	public void Scribble () {
+		MusicManager.PlayMenuSound (scribbles[UnityEngine.Random.Range(0,3)]);
 	}
 
 	/// <summary>
