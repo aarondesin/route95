@@ -36,14 +36,14 @@ public class Prompt : MonoBehaviour {
 		titleText.text = title;
 		messageText.text = message;
 		buttonText.text = button;
-		dialog.SetActive(true);
+		GameManager.instance.Show(dialog);
 	}
 
 	/// <summary>
 	/// Hides the dialog.
 	/// </summary>
 	public void HideDialog () {
-		dialog.SetActive(false);
+		GameManager.instance.Hide(dialog);
 	}
 
 	#endregion
