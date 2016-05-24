@@ -194,7 +194,9 @@ public class InstrumentSetup : MonoBehaviour {
 
 		// Resize note panel
 		float x = (numButtons)*buttonWidth + (numButtons+1)*buttonSpacing;
-		float y = (numDrums)*buttonWidth + (numDrums+1)*buttonSpacing;
+		float y = Mathf.Max (
+			(numDrums)*buttonWidth + (numDrums+1)*buttonSpacing,
+			((RectTransform)notePanel.parent).rect.height);
 		notePanel.sizeDelta = new Vector2 (x, y);
 
 		// Resize drum icons panel
@@ -255,17 +257,23 @@ public class InstrumentSetup : MonoBehaviour {
 	// Creates all buttons for percussion setup
 	void MakePercussionButtons (string title, int row, string soundName, Sprite iconGraphic) {
 
+		float yPos = -((float)row + 0.5f) * buttonWidth - (row+1)*buttonSpacing;
+
 		// Make icon for note
 		GameObject drumIcon = UIHelpers.MakeImage (title, iconGraphic);
 		drumIcon.SetParent (iconBar_tr); 
 		drumIcon.SetSideWidth (buttonWidth);
 		drumIcon.AnchorAtPoint (0.5f, 1.0f);
-		drumIcon.SetPosition2D (0f, -buttonWidth - (buttonWidth+buttonSpacing)*row);
+		drumIcon.RectTransform().ResetScaleRot();
+		drumIcon.SetPosition2D (0f, yPos);
 
 		buttons.Add(drumIcon);
 			
 		for (int i = 0; i < numButtons; i ++) {
 			int num = i;
+
+			float scale = (i % 4 - 2 == 0 ? 0.8f : (i % 4 - 1 == 0 || i %4 - 3 == 0 ? 0.6f : 1f));
+			float x = (num + 1) * buttonSpacing + (0.5f + num) * buttonWidth;
 
 			// Check if note is already in riff
 			bool noteExists = currentRiff.Lookup(soundName, num);
@@ -279,22 +287,15 @@ public class InstrumentSetup : MonoBehaviour {
 			button.SetParent(notePanel);
 			button.SetSideWidth(buttonWidth);
 			button.AnchorAtPoint(0f, 1f);
-			
-			button.SetPosition2D(((float)num + 0.5f) * buttonWidth + (num+1)*buttonSpacing, 
-				-((float)row + 0.5f) * buttonWidth - (row+1)*buttonSpacing);
+			button.SetPosition2D(x, yPos);
 
 			// Add StopScrolling tag
 			button.tag = "StopScrolling";
 
 			// Change scale based on beat
 			RectTransform button_tr = button.RectTransform();
-			button_tr.localScale = Vector3.one;
-
-			// Half beat
-			if (i % 4 - 2 == 0) button_tr.localScale *= 0.75f;
-
-			// Quarter beat
-			else if (i % 4 - 1 == 0 || i %4 - 3 == 0) button_tr.localScale *= 0.5f;
+			button_tr.ResetScaleRot();
+			button_tr.localScale = new Vector3 (scale, scale, scale);
 
 			// Create note
 			Note note = new Note (soundName, vol, 1f);

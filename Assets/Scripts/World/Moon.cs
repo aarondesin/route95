@@ -38,14 +38,14 @@ public class Moon : GlobalLightSource {
 	#region Moon Callbacks
 		
 	private void UpdateTransform(){
-		sunTarget = PlayerMovement.instance.transform.position;
+		target = PlayerMovement.instance.transform.position;
 
 		float newX = -xScale * Mathf.Cos(WorldManager.instance.timeOfDay);
 		float newY = -yScale * Mathf.Sin(WorldManager.instance.timeOfDay);
 		float newZ = zScale * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
 		this.transform.position = new Vector3(newX, newY, newZ);
 
-		this.transform.LookAt (sunTarget);
+		this.transform.LookAt (target);
 	}
 
 	#endregion

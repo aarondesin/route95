@@ -89,7 +89,7 @@ public class Project {
 			SaveLoad.SaveSong(song);
 
 			// Generate and add path
-			string path = Application.dataPath + Game.songSaveFolder +
+			string path = Application.dataPath + GameManager.instance.songSaveFolder +
 				song.name + SaveLoad.songSaveExtension;
 			songPaths.Add (path);
 		}
@@ -149,10 +149,10 @@ public class Project {
 		songs.RemoveAt(index);
 
 		// If that was current playing song, choose a new one
-		if (Music.currentPlayingSong == index) {
-			Music.currentPlayingSong = 0;
-			if (songs.Count > 0) Music.currentSong = songs[0];
-			else Music.currentSong = null;
+		if (MusicManager.instance.currentPlayingSong == index) {
+			MusicManager.instance.currentPlayingSong = 0;
+			if (songs.Count > 0) MusicManager.instance.currentSong = songs[0];
+			else MusicManager.instance.currentSong = null;
 		}
 	}
 		

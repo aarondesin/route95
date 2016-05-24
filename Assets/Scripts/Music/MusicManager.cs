@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 
 /// <summary>
-/// All musical keys.
+/// All musical KeyManager.instance.
 /// </summary>
 public enum Key {
 	None,
@@ -47,7 +47,7 @@ public enum Tempo {
 /// <summary>
 /// Instanced MonoBehaviour class to manage all music-related operations.
 /// </summary>
-public class MusicManager : InstancedMonoBehaviour {
+public class MusicManager : MonoBehaviour {
 
 	#region Sound Struct
 
@@ -67,9 +67,7 @@ public class MusicManager : InstancedMonoBehaviour {
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("MusicManager Status")]
 	
-	GameManager Game;
-	WorldManager World;
-	KeyManager Keys;
+	public static MusicManager instance;
 
 	AudioSource source;                                                // Global MM audio source
 
@@ -142,7 +140,7 @@ public class MusicManager : InstancedMonoBehaviour {
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Object References")]
 
-	[Tooltip("Mixer to use for music.")]
+	[Tooltip("Mixer to use for MusicManager.instance.")]
 	public AudioMixer mixer;
 
 	[Tooltip("AudioSource to use for UI sounds.")]
@@ -193,21 +191,15 @@ public class MusicManager : InstancedMonoBehaviour {
 			Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length-1) * ScaleInfo.AllScales.Count;
 	}
 
-	void Start () {
-		Game = GameManager.instance as GameManager;
-		World = WorldManager.instance as WorldManager;
-		Keys = KeyManager.instance as KeyManager;
-	}
-
 	void FixedUpdate() {
 
 		// Return if not playing or game is paused
 		if (!playing) return;
-		if (Game.paused) return;
+		if (GameManager.instance.paused) return;
 
 		// If new beat
 		if (BeatTimer <= 0f) {
-			switch (Game.currentState) {
+			switch (GameManager.instance.currentState) {
 
 				// Setup mode (riff editor)
 				case GameManager.State.Setup:
@@ -219,7 +211,7 @@ public class MusicManager : InstancedMonoBehaviour {
 					if (beat >= Riff.MAX_BEATS && loop) beat = 0;
 
 					// Decrement shaker density
-					World.shakers -= 2;
+					WorldManager.instance.shakers -= 2;
 					break;
 
 				// Live mode
@@ -240,7 +232,7 @@ public class MusicManager : InstancedMonoBehaviour {
 						brassNotes = 0;
 
 						// Reset shaker density
-						World.shakers = 0;
+						WorldManager.instance.shakers = 0;
 						
 						// If another song available, switch
 						if (currentPlayingSong < currentProject.songs.Count-1) {
@@ -256,7 +248,7 @@ public class MusicManager : InstancedMonoBehaviour {
 								beatsElapsedInPlaylist = 0;
 
 							// Otherwise go to postplay menu
-							} else Game.SwitchToPostplay();
+							} else GameManager.instance.SwitchToPostplay();
 						}
 					}
 
@@ -266,7 +258,7 @@ public class MusicManager : InstancedMonoBehaviour {
 					// Calculate song progress
 					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
 					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
-					Game.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
+					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
 
 					// Increment vars
 					beat++;
@@ -277,9 +269,9 @@ public class MusicManager : InstancedMonoBehaviour {
 					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
 					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
 					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
-					World.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-					World.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
-					World.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
+					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
+					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
+					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
 
@@ -312,7 +304,7 @@ public class MusicManager : InstancedMonoBehaviour {
 	IEnumerator LoadSounds () {
 
 		// Update loading message
-		Game.ChangeLoadingMessage("Loading sounds...");
+		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -327,10 +319,10 @@ public class MusicManager : InstancedMonoBehaviour {
 				numLoaded++;
 
 				// If over time
-				if (Time.realtimeSinceStartup - startTime > Game.targetDeltaTime) {
+				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
-					Game.ReportLoaded (numLoaded);
+					GameManager.instance.ReportLoaded (numLoaded);
 					numLoaded = 0;
 				}
 			}
@@ -358,7 +350,7 @@ public class MusicManager : InstancedMonoBehaviour {
 	IEnumerator LoadInstruments () {
 
 		// Update loading message
-		Game.ChangeLoadingMessage("Loading instruments...");
+		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -427,17 +419,17 @@ public class MusicManager : InstancedMonoBehaviour {
 			numLoaded++;
 
 			// If over time
-			if (Time.realtimeSinceStartup - startTime > Game.targetDeltaTime) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
-				Game.ReportLoaded (numLoaded);
+				GameManager.instance.ReportLoaded (numLoaded);
 				numLoaded = 0;
 			}
 		}
 
 		// When done, start building scales
 		if (instrumentAudioSources.Count == Instrument.AllInstruments.Count)
-			Keys.DoBuildScales();
+			KeyManager.instance.DoBuildScales();
 		yield return null;
 	}
 
@@ -450,7 +442,7 @@ public class MusicManager : InstancedMonoBehaviour {
 		Debug.Log("MusicManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
 
 		// Start loading WorldManager
-		World.Load();
+		WorldManager.instance.Load();
 	}
 
 	#endregion
@@ -513,6 +505,7 @@ public class MusicManager : InstancedMonoBehaviour {
 		loopPlaylist = !loopPlaylist;
 
 		// Update sprite
+		if (InstrumentSetup.instance == null) Debug.Log("shit");
 		loopPlaylistButton.sprite = loopPlaylist ? 
 			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
 	}

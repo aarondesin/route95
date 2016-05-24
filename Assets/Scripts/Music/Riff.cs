@@ -133,7 +133,7 @@ public class Riff {
 
 		// Init references
 		if (instrument == null) instrument = Instrument.AllInstruments[instrumentIndex];
-		source = Music.instrumentAudioSources[instrument];
+		source = MusicManager.instance.instrumentAudioSources[instrument];
 		distortion = source.GetComponent<AudioDistortionFilter>();
 		tremolo    = source.GetComponent<AudioTremoloFilter>();
 		chorus     = source.GetComponent<AudioChorusFilter>();
@@ -163,7 +163,7 @@ public class Riff {
 	/// as the given note exists in the riff.</returns>
 	public bool Lookup (Note newNote, int pos) {
 		MusicManager Music = MusicManager.instance as MusicManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 
 		try {
@@ -191,7 +191,7 @@ public class Riff {
 	public bool Toggle (Note newNote, int pos) {
 		MusicManager Music = MusicManager.instance as MusicManager;
 		WorldManager World = WorldManager.instance as WorldManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		Instrument instrument = Instrument.AllInstruments[instrumentIndex];
 
@@ -209,25 +209,25 @@ public class Riff {
 
 		// Do environmental effects
 		if (instrument.type == Instrument.Type.Percussion) {
-			if (newNote.IsSnare()) World.LightningStrike(0.5f * volume * source.volume * newNote.volume);
-			else if (newNote.IsKick()) World.LightningFlash(0.5f * volume * source.volume * newNote.volume);
-			else if (newNote.IsTom()) World.LightningFlash(0.375f * volume * source.volume * newNote.volume);
-			else if (newNote.IsShaker()) World.shakers++;
-			else if (newNote.IsHat()) World.StarBurst();
-			else if (newNote.IsCymbal()) World.ShootingStar();
-			else if (newNote.IsWood()) World.ExhaustPuff();
+			if (newNote.IsSnare()) WorldManager.instance.LightningStrike(0.5f * volume * source.volume * newNote.volume);
+			else if (newNote.IsKick()) WorldManager.instance.LightningFlash(0.5f * volume * source.volume * newNote.volume);
+			else if (newNote.IsTom()) WorldManager.instance.LightningFlash(0.375f * volume * source.volume * newNote.volume);
+			else if (newNote.IsShaker()) WorldManager.instance.shakers++;
+			else if (newNote.IsHat()) WorldManager.instance.StarBurst();
+			else if (newNote.IsCymbal()) WorldManager.instance.ShootingStar();
+			else if (newNote.IsWood()) WorldManager.instance.ExhaustPuff();
 		} else {
-			if (instrument == MelodicInstrument.ElectricBass) World.DeformRandom();
+			if (instrument == MelodicInstrument.ElectricBass) WorldManager.instance.DeformRandom();
 			else {
 				switch (instrument.family) {
 				case Instrument.Family.Guitar:
-					Music.guitarNotes++;
+					MusicManager.instance.guitarNotes++;
 					break;
 				case Instrument.Family.Keyboard:
-					Music.keyboardNotes++;
+					MusicManager.instance.keyboardNotes++;
 					break;
 				case Instrument.Family.Brass:
-					Music.brassNotes++;
+					MusicManager.instance.brassNotes++;
 					break;
 				}
 			}
@@ -241,9 +241,7 @@ public class Riff {
 	/// <param name="pos">Beat to play notes from.</param>
 	public void PlayRiff (int pos) { 
 		try {
-			MusicManager Music = MusicManager.instance as MusicManager;
-			WorldManager World = WorldManager.instance as WorldManager;
-			Song song = Music.currentSong;
+			Song song = MusicManager.instance.currentSong;
 			Beat beat = song.beats[beatIndices[pos]];
 
 			// Skip if empty
@@ -298,27 +296,27 @@ public class Riff {
 
 				// Do environmental effects
 				if (instrument.type == Instrument.Type.Percussion) {
-					if (note.IsSnare()) World.LightningStrike(note.volume * volume * source.volume);
-					else if (note.IsKick()) World.LightningFlash(note.volume * volume * source.volume);
-					else if (note.IsTom()) World.LightningFlash(0.75f * note.volume * volume * source.volume);
-					else if (note.IsShaker()) World.shakers++;
-					else if (note.IsHat()) World.StarBurst();
-					else if (note.IsCymbal()) World.ShootingStar();
-					else if (note.IsWood()) World.ExhaustPuff();
+					if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * volume * source.volume);
+					else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * volume * source.volume);
+					else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * volume * source.volume);
+					else if (note.IsShaker()) WorldManager.instance.shakers++;
+					else if (note.IsHat()) WorldManager.instance.StarBurst();
+					else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+					else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
 				} else {
 					if (instrument == MelodicInstrument.ElectricBass)
-						World.DeformRandom();
+						WorldManager.instance.DeformRandom();
 
 					else {
 						switch (instrument.family) {
 							case Instrument.Family.Guitar:
-								Music.guitarNotes++;
+								MusicManager.instance.guitarNotes++;
 								break;
 							case Instrument.Family.Keyboard:
-								Music.keyboardNotes++;
+								MusicManager.instance.keyboardNotes++;
 								break;
 							case Instrument.Family.Brass:
-								Music.brassNotes++;
+								MusicManager.instance.brassNotes++;
 								break;
 						}
 					
@@ -337,7 +335,7 @@ public class Riff {
 	/// <param name="pos">Beat to remove note from.</param>
 	public void RemoveNote (Note newNote, int pos) {
 		MusicManager Music = MusicManager.instance as MusicManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 
 
@@ -355,7 +353,7 @@ public class Riff {
 	/// <param name="pos">Beat to remove notes at.</param>
 	public void Clear (int pos) {
 		MusicManager Music = MusicManager.instance as MusicManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		beat.Clear();
 	}
@@ -368,8 +366,7 @@ public class Riff {
 	/// <returns>The volume of the note with the given
 	/// filename, or 1 if no note found.</returns>
 	public float VolumeOfNote(string fileName, int pos) {
-		MusicManager Music = MusicManager.instance as MusicManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 
 		// Check each note in beat

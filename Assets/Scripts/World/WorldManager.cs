@@ -8,7 +8,7 @@ using UnityStandardAssets.ImageEffects;
 /// <summary>
 /// Manager for all things world-related.
 /// </summary>
-public class WorldManager : InstancedMonoBehaviour {
+public class WorldManager : MonoBehaviour {
 
 	#region WorldManager Enums
 
@@ -22,6 +22,8 @@ public class WorldManager : InstancedMonoBehaviour {
 
 	#endregion
 	#region WorldManager Vars
+
+	public static WorldManager instance;
 
 	public int loadsToDo;
 
@@ -336,6 +338,7 @@ public class WorldManager : InstancedMonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
+		instance = this;
 
 		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
 		//Debug.Log(maxDecorations);
@@ -354,12 +357,12 @@ public class WorldManager : InstancedMonoBehaviour {
 		decorationPool = new ObjectPool<Decoration>();
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
-		sun = CreateSun(sunScale);
+		sun = CreateSun();
 		sunLight = sun.Light();
 		sunIntensityAmplitude = (maxSunIntensity-minSunIntensity)/2f;
 		sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
 
-		moon = CreateMoon(moonScale);
+		moon = CreateMoon();
 		moonLight = moon.Light();
 		moonIntensityAmplitude = (maxMoonIntensity-maxMoonIntensity)/2f;
 		moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;

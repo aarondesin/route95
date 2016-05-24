@@ -14,7 +14,7 @@ using UnityEditor;
 /// Instanced class to handle all application functions,
 /// major state changes, and UI interactions.
 /// </summary>
-public class GameManager : InstancedMonoBehaviour {
+public class GameManager : MonoBehaviour {
 
 	#region GameManager Enums
 
@@ -31,8 +31,7 @@ public class GameManager : InstancedMonoBehaviour {
 	#endregion
 	#region GameManager Vars
 
-	MusicManager Music;
-	WorldManager World;
+	public static GameManager instance;
 
 	[Header("Game Status")]
 
@@ -174,6 +173,7 @@ public class GameManager : InstancedMonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
+		instance = this;
 
 		// Remove profiler sample limit
 		Profiler.maxNumberOfSamplesPerFrame = -1;
@@ -195,9 +195,6 @@ public class GameManager : InstancedMonoBehaviour {
 	}
 
 	void Start () {
-
-		Music = MusicManager.instance as MusicManager;
-		World = WorldManager.instance as WorldManager;
 
 		// Init camera ref
 		mainCamera = Camera.main;
@@ -297,14 +294,14 @@ public class GameManager : InstancedMonoBehaviour {
 		loadingScreen.SetActive(true);
 
 		// Calculate operations to do
-		loadsToDo = Music.loadsToDo + World.loadsToDo;
+		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
 
 		// Init vars
 		startLoadTime = Time.realtimeSinceStartup;
 		loading = true;
 
 		// Start by loading MusicManager
-		Music.Load();
+		MusicManager.instance.Load();
 	}
 
 	/// <summary>
@@ -450,7 +447,7 @@ public class GameManager : InstancedMonoBehaviour {
 
 		// Enable/disable confirmation button
 		keySelectConfirmButton.GetComponent<Button>().interactable = 
-			Music.currentSong.scale != -1 && Music.currentSong.key != Key.None;
+			MusicManager.instance.currentSong.scale != -1 && MusicManager.instance.currentSong.key != Key.None;
 		
 	}
 
@@ -482,7 +479,7 @@ public class GameManager : InstancedMonoBehaviour {
 		HideAll ();
 
 		// If no scale selected, go to key select first
-		if (Music.currentSong.scale == -1) GoToKeySelectMenu();
+		if (MusicManager.instance.currentSong.scale == -1) GoToKeySelectMenu();
 
 
 		else {
@@ -505,7 +502,7 @@ public class GameManager : InstancedMonoBehaviour {
 		currentState = State.Setup;
 
 		// Stop music/live mode operations
-		Music.StopPlaying();
+		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
 
@@ -559,18 +556,18 @@ public class GameManager : InstancedMonoBehaviour {
 		// Show live menus
 		Show (liveIcons);
 		Show (songProgressBar);
-		if (Music.loopPlaylist) Show(loopIcon);
+		if (MusicManager.instance.loopPlaylist) Show(loopIcon);
 		else Hide(loopIcon);
 
 		// Init music
-		Music.currentPlayingSong = 0;
-		if (Music.currentSong != null) {
-			Music.StartPlaylist();
-			Music.StartSong();
+		MusicManager.instance.currentPlayingSong = 0;
+		if (MusicManager.instance.currentSong != null) {
+			MusicManager.instance.StartPlaylist();
+			MusicManager.instance.StartSong();
 		}
 
 		// Start live operations
-		InstrumentDisplay.Refresh();
+		InstrumentDisplay.instance.Refresh();
 		CameraControl.instance.StartLiveMode();
 		PlayerMovement.instance.StartMoving();
 	}
@@ -585,7 +582,7 @@ public class GameManager : InstancedMonoBehaviour {
 		paused = false;
 
 		// Stop music/live operations
-		Music.StopPlaying();
+		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
 
@@ -709,7 +706,7 @@ public class GameManager : InstancedMonoBehaviour {
 	}
 
 	/// <summary>
-	/// Attempts to exit the game.
+	/// Attempts to exit the GameManager.instance.
 	/// </summary>
 	public void AttemptExit () {
 		switch (currentState) {

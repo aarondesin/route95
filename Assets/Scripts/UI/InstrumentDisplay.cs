@@ -6,32 +6,31 @@ using System.Collections.Generic;
 /// <summary>
 /// Class to handle instrument display on the back of the car.
 /// </summary>
-public class InstrumentDisplay : InstancedMonoBehaviour {
+public class InstrumentDisplay : MonoBehaviour {
 
 	#region InstrumentDisplay Vars
 
-	GameManager Game;
-	MusicManager Music;
+	public static InstrumentDisplay instance;
 
 	public Image glow;                        // Sprite to change for glow
 	public float fadeSpeed;                   // Speed of fade
+	public List<Fadeable> glows;                 // Instrument icons glows
 
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
-		Game = GameManager.instance as GameManager;
-		Music = MusicManager.instance as MusicManager;
+	void Awake () {
+		instance = this;
 	}
 
 	void FixedUpdate () {
 
-		if (Game.currentState != GameManager.State.Live) return;
-		if (Game.paused) return;
+		if (GameManager.instance.currentState != GameManager.State.Live) return;
+		if (GameManager.instance.paused) return;
 
-		Color color = glow.Image().color;
+		Color color = glow.color;
 		color.a -= fadeSpeed;
-		glow.Image().color = color;
+		glow.color = color;
 
 	}
 
@@ -42,17 +41,25 @@ public class InstrumentDisplay : InstancedMonoBehaviour {
 	/// Refreshes the display, changing art if necessary.
 	/// </summary>
 	public void Refresh () {
-		gameObject.Image().sprite = Music.currentInstrument.icon;
-		glow.sprite = Music.currentInstrument.glow;
+		gameObject.Image().sprite = MusicManager.instance.currentInstrument.icon;
+		glow.sprite = MusicManager.instance.currentInstrument.glow;
 	}
 
 	/// <summary>
 	/// Sets glow to full.
 	/// </summary>
 	public void WakeGlow () {
-		Color color = glow.Image().color;
+		Color color = glow.color;
 		color.a = 1f;
-		glow.Image().color = color;
+		glow.color = color;
+	}
+
+	public void WakeGlow (int index) {
+		glows[index].UnFade();
+	}
+
+	public void FadeGlow (int index) {
+		glows[index].Fade();
 	}
 
 	#endregion

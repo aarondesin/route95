@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GlobalLightSource : InstancedMonoBehaviour {
+public class GlobalLightSource : MonoBehaviour {
 
 	
 }

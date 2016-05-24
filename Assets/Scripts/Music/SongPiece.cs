@@ -41,7 +41,7 @@ public class SongPiece {
 	public void PlaySongPiece (int pos){
 		int measureNum = pos/4;
 		MusicManager Music = MusicManager.instance as MusicManager;
-		Song song = Music.currentSong;
+		Song song = MusicManager.instance.currentSong;
 		Measure measure = song.measures[measureNum];
 
 		// Play all riffs

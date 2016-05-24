@@ -39,10 +39,9 @@ public struct IntVector2 {
 	/// </summary>
 	/// <returns></returns>
 	public bool IsCorner () {
-		WorldManager World = WorldManager.instance as WorldManager;
 		return 
-			(x == 0 || x == World.chunkResolution-1) &&
-			(y == 0 || y == World.chunkResolution-1);
+			(x == 0 || x == WorldManager.instance.chunkResolution-1) &&
+			(y == 0 || y == WorldManager.instance.chunkResolution-1);
 	}
 
 	/// <summary>

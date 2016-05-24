@@ -67,12 +67,12 @@ public class PerfTracker : MonoBehaviour {
 	void Update () {
 
 		// Add new key for current game state if it doesn't exist
-		if (!perfTracker.ContainsKey(Game.currentState))
-			perfTracker.Add(Game.currentState, new Info());
+		if (!perfTracker.ContainsKey(GameManager.instance.currentState))
+			perfTracker.Add(GameManager.instance.currentState, new Info());
 
 		// Otherwise, update appropriate Info
 		else {
-			Info perf = perfTracker[Game.currentState];
+			Info perf = perfTracker[GameManager.instance.currentState];
 			perf.seconds += Time.deltaTime;
 			perf.frames += 1;
 			perf.avgFPS += ((1f/Time.deltaTime) - perf.avgFPS) / perf.frames;

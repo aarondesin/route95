@@ -19,7 +19,7 @@ public class Vertex {
 	public bool noDecorations = false;
 	public Vector3 normal = Vector3.up;
 	public float slope = 0f;
-	public float blendValue = UnityEngine.Random.Range (0f, 1.0f);
+	public float blend;
 	public List<GameObject> decorations;
 
 	public Vertex (int x, int y) {
@@ -132,7 +132,7 @@ public class Vertex {
 		// Set height
 		height = h;
 
-		float blend = 0f;
+		blend = 0f;
 		Vertex l = map.VertexAt(x-1,y);
 		blend += (l != null ? Mathf.Abs (h - l.height) : 0f);
 

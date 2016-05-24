@@ -9,14 +9,11 @@ using System.Linq;
 /// <summary>
 /// Instanced class to handle all keyboard and mouse input.
 /// </summary>
-public class InputManager : InstancedMonoBehaviour {
+public class InputManager : MonoBehaviour {
 
 	#region InputManager Vars
 
-	GameManager Game;
-	MusicManager Music;
-	WorldManager World;
-	KeyManager Keys;
+	public static InputManager instance;
 
 	[Header("InputManager Values")]
 
@@ -90,6 +87,7 @@ public class InputManager : InstancedMonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
+		instance = this;
 
 		// Initialize audio sources for all notes
 		audioSources = new List<AudioSource>();
@@ -109,43 +107,36 @@ public class InputManager : InstancedMonoBehaviour {
 		}
 	}
 
-	void Start () {
-		Game = GameManager.instance as GameManager;
-		Music = MusicManager.instance as MusicManager;
-		World = WorldManager.instance as WorldManager;
-		Keys = KeyManager.instance as KeyManager;
-	}
-
 	void Update() {
 
 		// Update mouse delta
 		mouseDelta = Input.mousePosition - prevMouse;
 
-		switch (Game.currentState) {
+		switch (GameManager.instance.currentState) {
 
 			// Live mode
 			case GameManager.State.Live:
 
-				Instrument inst = Music.currentInstrument;
+				Instrument inst = MusicManager.instance.currentInstrument;
 
 				// If available, get current playing song
 				Song song = null;
-				if (Music.currentProject.songs.Count > 0) 
-					song = Music.currentProject.songs[Music.currentPlayingSong];
+				if (MusicManager.instance.currentProject.songs.Count > 0) 
+					song = MusicManager.instance.currentProject.songs[MusicManager.instance.currentPlayingSong];
 
 				// Check for pause
-				if (Input.GetKeyDown (KeyCode.Escape)) Game.TogglePause ();
+				if (Input.GetKeyDown (KeyCode.Escape)) GameManager.instance.TogglePause ();
 
 				// Check for tempo up/down
-				else if (Input.GetKeyDown (KeyCode.UpArrow)) Music.IncreaseTempo ();
-				else if (Input.GetKeyDown (KeyCode.DownArrow))  Music.DecreaseTempo ();
+				else if (Input.GetKeyDown (KeyCode.UpArrow)) MusicManager.instance.IncreaseTempo ();
+				else if (Input.GetKeyDown (KeyCode.DownArrow))  MusicManager.instance.DecreaseTempo ();
 
 				// Check for instrument volume up/down
 				else if (Input.GetKeyDown (KeyCode.LeftArrow)) {
-					AudioSource source = Music.instrumentAudioSources[inst];
+					AudioSource source = MusicManager.instance.instrumentAudioSources[inst];
 					if (source.volume >= 0.1f) source.volume -= 0.1f;
 				} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
-					AudioSource source = Music.instrumentAudioSources[inst];
+					AudioSource source = MusicManager.instance.instrumentAudioSources[inst];
 					if (source.volume <= 0.9f) source.volume += 0.1f;
 				}
 
@@ -155,7 +146,7 @@ public class InputManager : InstancedMonoBehaviour {
 					foreach (KeyValuePair<KeyCode, Instrument> key in keyToInstrument) {
 						if (Input.GetKeyDown(key.Key)) {
 							SwitchInstrument(keyToInstrument[key.Key]);
-							Game.WakeLiveUI();
+							GameManager.instance.WakeLiveUI();
 						}
 					}
 					
@@ -168,40 +159,40 @@ public class InputManager : InstancedMonoBehaviour {
 
 							// If percussion is selected
 							if (inst.type == Instrument.Type.Percussion) {
-								noteIndex = Keys.percussionSets[inst].Count-1-keyToNote[keyPress];
+								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[keyPress];
 								if (noteIndex >= 0) {
-									Note note = new Note(Keys.percussionSets[inst][noteIndex]);
+									Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
 									note.PlayNote(source, 1f, false);
 
 									// If snare, cause lightning strike
-									if (note.IsSnare()) World.LightningStrike(note.volume * source.volume);
+									if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
 
 									// If kick or tom, cause lightning flash
-									else if (note.IsKick()) World.LightningFlash(note.volume * source.volume);
-									else if (note.IsTom()) World.LightningFlash(0.75f * note.volume * source.volume);
+									else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
+									else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
 
 									// If shaker, increase rain density
-									else if (note.IsShaker()) World.shakers++;
+									else if (note.IsShaker()) WorldManager.instance.shakers++;
 
 									// If hat, create stars
-									else if (note.IsHat()) World.StarBurst();
+									else if (note.IsHat()) WorldManager.instance.StarBurst();
 
 									// If cymbal, create shooting star
-									else if (note.IsCymbal()) World.ShootingStar();
+									else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
 
 									// If wood, create exhaust puff
-									else if (note.IsWood()) World.ExhaustPuff();
+									else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
 								}
 
 							// If melodic is selected (must be a valid song)
 							} else if (song != null && song.scale != -1 && song.key != Key.None){
 
-								Key key = Music.currentSong.key;
-								ScaleInfo scale = ScaleInfo.AllScales[Music.currentSong.scale];
+								Key key = MusicManager.instance.currentSong.key;
+								ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
 
-								noteIndex = Keys.scales[key][scale][(MelodicInstrument)inst].allNotes.Count - 1 - keyToNote[keyPress];
+								noteIndex = KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes.Count - 1 - keyToNote[keyPress];
 								if (noteIndex >= 0) {
-									Note note = new Note(Keys.scales[key][scale][(MelodicInstrument)inst].allNotes[noteIndex]);
+									Note note = new Note(KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes[noteIndex]);
 									if (note != null) note.PlayNote(source, 1f, true);
 								}
 
@@ -209,19 +200,19 @@ public class InputManager : InstancedMonoBehaviour {
 								if (inst.codeName == "ElectricBass") {
 
 									// Cause terrain deformation
-									World.DeformRandom();
+									WorldManager.instance.DeformRandom();
 
 								// All other melodic instruments
 								} else {
 									switch (inst.family) {
 										case Instrument.Family.Guitar:
-											Music.guitarNotes++;
+											MusicManager.instance.guitarNotes++;
 											break;
 										case Instrument.Family.Keyboard:
-											Music.keyboardNotes++;
+											MusicManager.instance.keyboardNotes++;
 											break;
 										case Instrument.Family.Brass:
-											Music.brassNotes++;
+											MusicManager.instance.brassNotes++;
 											break;
 									}
 								}
@@ -299,11 +290,11 @@ public class InputManager : InstancedMonoBehaviour {
 		if (CameraControl.instance.state == CameraControl.State.Free) {
 
 			// Space -> start car movement
-			if (Input.GetKeyDown (KeyCode.Space)) Game.SwitchToLive();
+			if (Input.GetKeyDown (KeyCode.Space)) GameManager.instance.SwitchToLive();
 
 			// Left/Right -> adjust time of day
-			else if (Input.GetKeyDown (KeyCode.LeftArrow)) World.timeOfDay -= Mathf.PI/16f;
-			else if (Input.GetKeyDown (KeyCode.RightArrow)) World.timeOfDay += Mathf.PI/16f;
+			else if (Input.GetKeyDown (KeyCode.LeftArrow)) WorldManager.instance.timeOfDay -= Mathf.PI/16f;
+			else if (Input.GetKeyDown (KeyCode.RightArrow)) WorldManager.instance.timeOfDay += Mathf.PI/16f;
 		}
 
 		// Update prevMouse
@@ -345,9 +336,12 @@ public class InputManager : InstancedMonoBehaviour {
 	/// </summary>
 	/// <param name="instrument">Instrument.</param>
 	void SwitchInstrument (Instrument instrument) {
-		if (instrument != Music.currentInstrument) {
-			Music.currentInstrument = instrument;
-			Music.GetComponent<AudioSource>().PlayOneShot(instrument.switchSound);
+		Instrument inst = MusicManager.instance.currentInstrument;
+		if (instrument != inst) {
+			InstrumentDisplay.instance.FadeGlow (inst.index);
+			MusicManager.instance.currentInstrument = instrument;
+			InstrumentDisplay.instance.WakeGlow(instrument.index);
+			MusicManager.PlayMenuSound(instrument.switchSound);
 			InstrumentDisplay.instance.Refresh();
 		}
 	}

@@ -39,12 +39,12 @@ public class NoteButton : DraggableButton {
 
 	public override void DragDown (float actionRatio) {
 		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);
-		volumeImage.fillAmount = targetNote.volume;
+		UpdateButtonArt();
 	}
 
 	public override void DragUp (float actionRatio) {
 		targetNote.volume = Mathf.Clamp01 (oldVolume + actionRatio);
-		volumeImage.fillAmount = targetNote.volume;
+		UpdateButtonArt();
 	}
 
 	public override void DragLeft (float actionRatio) {
@@ -53,6 +53,14 @@ public class NoteButton : DraggableButton {
 
 	public override void DragRight (float actionRatio) {
 		targetNote.duration = 1 + (float)(notesVisible-1) * actionRatio;
+	}
+
+	#endregion
+	#region DraggableButton Methods
+
+	public void UpdateButtonArt() {
+		volumeImage.fillAmount = targetNote.volume;
+		volumeImage.color = new Color (targetNote.volume, 0f, 0f, 1f);
 	}
 
 	#endregion
