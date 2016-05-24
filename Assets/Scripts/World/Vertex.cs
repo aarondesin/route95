@@ -19,7 +19,7 @@ public class Vertex {
 	public bool noDecorations = false;
 	public Vector3 normal = Vector3.up;
 	public float slope = 0f;
-	public float blend;
+	public float blend = 0f;
 	public List<GameObject> decorations;
 
 	public Vertex (int x, int y) {

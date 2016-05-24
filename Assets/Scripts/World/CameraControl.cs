@@ -50,6 +50,8 @@ public class CameraControl : MonoBehaviour {
 
 	const float DEFAULT_SPEED = 0.2f;     // Default camera speed
 
+	public GameObject CameraBlocker;
+
 	// Camera interp vars
 	Transform start;                      // Camera lerp start transform
 	Transform target;                     // Camera lerp target transform
@@ -275,9 +277,15 @@ public class CameraControl : MonoBehaviour {
 				// Update transition timer
 				if (controlMode == CameraControlMode.Random) {
 					if (transitionTimer <= 0f) {
-						ChangeAngle ();
+						StartFade();
 						transitionTimer = liveModeTransitionFreq;
-					} else transitionTimer--;
+					} else {
+						transitionTimer--;
+						if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
+							GameManager.instance.Hide(CameraBlocker);
+							ChangeAngle();
+						}
+					}
 				}
 			}
 			break;
@@ -354,6 +362,10 @@ public class CameraControl : MonoBehaviour {
 		LerpToPosition(ViewChase);
 	}
 
+	public void StartFade () {
+		GameManager.instance.Show(CameraBlocker);
+	}
+
 	/// <summary>
 	/// Pause camera movement.
 	/// </summary>
@@ -380,6 +392,7 @@ public class CameraControl : MonoBehaviour {
 	/// </summary>
 	/// <param name="camView"></param>
 	public void ChangeAngle (int camView) {
+		if (currentAngle == angles[camView]) return;
 		currentAngle = angles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
 		if (Debug.isDebugBuild) 
@@ -412,7 +425,9 @@ public class CameraControl : MonoBehaviour {
 			switch (angle.followMode) {
 
 				case CameraView.CameraFollowMode.Lead:
-					angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
+					//angle.pos = Vector3.Lerp(angle.pos, angle.targetPos, angle.lag);
+					//angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
+					angle.pos = angle.targetPos;
 					angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
 					break;
 
@@ -440,11 +455,23 @@ public class CameraControl : MonoBehaviour {
 	Vector3 PickRandomPosition (float minHeight, float maxHeight) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
-		return new Vector3 (
+		
+
+		Vector3 point = new Vector3 (
 			PlayerMovement.instance.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
-			PlayerMovement.instance.transform.position.y + Random.Range (minHeight, maxHeight),
+			0f,
 			PlayerMovement.instance.transform.position.z + Random.Range (-chunkSize / 2f, chunkSize / 2f)
 		);
+
+		Vector3 rayOrigin = new Vector3 (point.x, WorldManager.instance.heightScale, point.z);
+
+		RaycastHit hit;
+		if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))
+			point.y = hit.point.y;
+
+		point.y += Random.Range (minHeight, maxHeight);
+
+		return point;
 	}
 
 	#endregion

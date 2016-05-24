@@ -77,10 +77,27 @@ public class Decoration : MonoBehaviour, IPoolable {
 	[Tooltip("Range of randomization in roll.")]
 	public Vector2 rollRange;
 
+	public AnimationCurve heightAnimation;
+
+	public AnimationCurve widthAnimation;
+
+	public float animationSpeed = 0.5f;
+
+	Vector3 normalScale;
+
+	ParticleSystem partSystem;
+
 	#endregion
 	#region Unity Callbacks
 
 	void Awake () {
+		normalScale = transform.localScale;
+		partSystem = ((GameObject)Instantiate(WorldManager.instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
+		partSystem.gameObject.transform.parent = transform.parent;
+	}
+
+	void Start () {
+		
 		Randomize();
 	}
 
@@ -100,12 +117,12 @@ public class Decoration : MonoBehaviour, IPoolable {
 	#region IPoolable Implementations
 
 	void IPoolable.OnPool() {
+		transform.parent = null;
 		gameObject.SetActive(false);
 	}
 
 	void IPoolable.OnDepool() {
 		gameObject.SetActive(true);
-		transform.localScale = Vector3.one;
 		Randomize();
 	}
 
@@ -114,6 +131,7 @@ public class Decoration : MonoBehaviour, IPoolable {
 
 	// Starts with base position/rotation, and adds variance
 	public void Randomize () {
+		transform.localScale = normalScale;
 		transform.position += positionOffset;
 		transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
 
@@ -130,6 +148,27 @@ public class Decoration : MonoBehaviour, IPoolable {
 			Random.Range (yawRange[0], yawRange[1]),
 			Random.Range (rollRange[0], rollRange[1])
 		), Space.World);
+
+		partSystem.transform.position = transform.position;
+		partSystem.Play();
+
+		StartCoroutine (Animate());
+	}
+
+	IEnumerator Animate () {
+		Vector3 baseScale = transform.localScale;
+		float progress = 0f;
+		while (progress < 1f) {
+			Vector3 scale = new Vector3 (
+				baseScale.x * widthAnimation.Evaluate(progress),
+				baseScale.y * heightAnimation.Evaluate(progress),
+				baseScale.z * widthAnimation.Evaluate(progress)
+			);
+			transform.localScale = scale;
+			progress += animationSpeed * Time.deltaTime;
+			yield return null;
+		}
+		yield break;
 	}
 
 	#endregion

@@ -384,12 +384,9 @@ public class GameManager : MonoBehaviour {
 	public void Hide (GameObject menu) {
 		Fadeable fade = menu.GetComponent<Fadeable>();
 		if (fade != null) {
-			if (fade.disableAfterFading) {
-				fade.Fade();
-				return;
-			}
+			fade.Fade();
+			return;
 		}
-		menu.SetActive(false);
 	}
 
 	/// <summary>

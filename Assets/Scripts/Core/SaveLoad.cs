@@ -121,7 +121,6 @@ public static class SaveLoad {
 	/// Saves the currently open song.
 	/// </summary>
 	public static void SaveCurrentSong() {
-		MusicManager Music = MusicManager.instance as MusicManager;
 		Song song = MusicManager.instance.currentSong;
 
 		// Check if song is null
@@ -192,8 +191,6 @@ public static class SaveLoad {
 	/// </summary>
 	/// <param name="path">Project path.</param>
 	public static void LoadProject (string path) {
-		GameManager Game = GameManager.instance as GameManager;
-		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Backup project and song
 		Project backupProject = MusicManager.instance.currentProject;
@@ -236,7 +233,6 @@ public static class SaveLoad {
 	/// </summary>
 	/// <param name="path">Song path.</param>
 	public static void LoadSongToProject (string path) {
-		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Load song
 		Song song = LoadSong(path);

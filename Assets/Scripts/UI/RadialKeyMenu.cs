@@ -149,7 +149,7 @@ public class RadialKeyMenu : MonoBehaviour {
 			// Set button text
 			Text text = button.GetComponentInChildren<Text>();
 			text.font = GameManager.instance.font;
-			text.fontSize = (int)(baseScale/2f);
+			text.fontSize = (int)(baseScale/6f);
 			text.color = gray;
 
 			// Set button image

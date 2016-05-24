@@ -162,6 +162,8 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Template to use for grass particle emitters.")]
 	public GameObject grassEmitterTemplate;
 
+	public ParticleSystem decorationParticleEmitter;
+
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Effects Settings")]
 
@@ -217,8 +219,11 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Number of mesh subdivisions per road segment.")]
 	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
-	[Tooltip("Radius within which to trigger extending the road.")]
+	[NonSerialized]
 	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
+
+	[NonSerialized]
+	public float roadCleanupRadius;
 
 	[Tooltip("Radius within which to place road.")]
 	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
@@ -350,6 +355,8 @@ public class WorldManager : MonoBehaviour {
 
 		visualization.enabled = false;
 
+		//roadPlacementDistance = chunkSize * 2f;
+		roadCleanupRadius = chunkSize * (chunkLoadRadius);
 		roadExtendRadius = chunkSize * (chunkLoadRadius-2);
 		road = CreateRoad();
 
@@ -478,6 +485,7 @@ public class WorldManager : MonoBehaviour {
 					if (!loaded) GameManager.instance.ReportLoaded(numLoaded);
 					numLoaded = 0;
 				}
+
 			} else {
 				yield return null;
 			}
@@ -576,24 +584,26 @@ public class WorldManager : MonoBehaviour {
 			typeof (Sun)
 		);
 
-		//sun.GetComponent<Sun>().
-
 		Light light = sun.Light();
-		
-		sun.GetComponent<Light> ().shadows = LightShadows.Soft;
-		sun.GetComponent<Light>().flare = sunFlare;
+		sun.Light().shadows = LightShadows.Soft;
+		sun.Light().flare = sunFlare;
 
 		return sun;
 	}
 
 	GameObject CreateMoon(){
-		GameObject moon = new GameObject ("Moon");
-		moon.AddComponent<Light> ();
-		moon.AddComponent<Moon> ();
-		//moon.GetComponent<Moon> ().setPosScales (LIGHT_X_SCALE, LIGHT_Y_SCALE, LIGHT_Z_SCALE);
-		moon.GetComponent<Light> ().shadows = LightShadows.Soft;
-		moon.AddComponent<SpriteRenderer>();
-		moon.GetComponent<SpriteRenderer>().sprite = moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
+		GameObject moon = new GameObject ("Moon",
+			typeof (Light),
+			typeof (Moon),
+			typeof (SpriteRenderer)
+		);
+
+		Light light = moon.Light();
+		light.shadows = LightShadows.Soft;
+
+		// Random moon phase
+		moon.GetComponent<SpriteRenderer>().sprite = 
+			moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
 		return  moon;
 	}
 
@@ -688,6 +698,13 @@ public class WorldManager : MonoBehaviour {
 				vegetationGroup.numActive++;
 				break;
 			}
+
+
+			decorationParticleEmitter.transform.position = decoration.transform.position;
+			//ParticleSystem.EmitParams emitOverride = new ParticleSystem.EmitParams();
+			//emitOverride.position = decoration.transform.position;
+			//decorationParticleEmitter.Emit(emitOverride, 5);
+			decorationParticleEmitter.Emit(5);
 				
 			return true;
 		}
@@ -761,7 +778,7 @@ public class WorldManager : MonoBehaviour {
 
 		// Deparent decoration
 		deco.transform.parent = null;
-		//Debug.Log("removing " + deco.name);
+
 
 		// Deregister
 		switch (d.group) {

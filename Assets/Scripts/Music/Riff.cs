@@ -129,7 +129,6 @@ public class Riff {
 	}
 
 	public void Refresh () {
-		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Init references
 		if (instrument == null) instrument = Instrument.AllInstruments[instrumentIndex];
@@ -162,7 +161,6 @@ public class Riff {
 	/// <returns>True if a note with the same filename
 	/// as the given note exists in the riff.</returns>
 	public bool Lookup (Note newNote, int pos) {
-		MusicManager Music = MusicManager.instance as MusicManager;
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 
@@ -189,8 +187,6 @@ public class Riff {
 	/// <returns>True if note was added,
 	/// false if note was removed.</returns>
 	public bool Toggle (Note newNote, int pos) {
-		MusicManager Music = MusicManager.instance as MusicManager;
-		WorldManager World = WorldManager.instance as WorldManager;
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		Instrument instrument = Instrument.AllInstruments[instrumentIndex];
@@ -334,7 +330,6 @@ public class Riff {
 	/// <param name="newNote">Note to remove.</param>
 	/// <param name="pos">Beat to remove note from.</param>
 	public void RemoveNote (Note newNote, int pos) {
-		MusicManager Music = MusicManager.instance as MusicManager;
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 
@@ -352,7 +347,6 @@ public class Riff {
 	/// </summary>
 	/// <param name="pos">Beat to remove notes at.</param>
 	public void Clear (int pos) {
-		MusicManager Music = MusicManager.instance as MusicManager;
 		Song song = MusicManager.instance.currentSong;
 		Beat beat = song.beats[beatIndices[pos]];
 		beat.Clear();

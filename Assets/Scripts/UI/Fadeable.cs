@@ -45,12 +45,28 @@ public class Fadeable : MonoBehaviour {
 			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
 			
 		// Initially fade if necessary
-		alpha = (startFaded ? 0f : 1f);
-		ColorAll();
+		if (startFaded) {
+			alpha = 0f;
+			ColorAll();
+			if (disableAfterFading) gameObject.SetActive(false);
+		}
+		
 	}
 
 	#endregion
 	#region Fadeable Methods
+
+	public bool DoneFading {
+		get {
+			return alpha == 0f;
+		}
+	}
+
+	public bool DoneUnfading {
+		get {
+			return alpha == 1f;
+		}
+	}
 
 	/// <summary>
 	/// Starts fading the object.
@@ -66,8 +82,9 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	public void UnFade () {
 		StopCoroutine("DoFade");
-		if (!gameObject.activeSelf) return; 
+		gameObject.SetActive(true);
 		StartCoroutine("DoUnFade");
+		
 	}
 
 	/// <summary>
@@ -81,7 +98,7 @@ public class Fadeable : MonoBehaviour {
 
 				ColorAll();
 					
-				yield return 0;
+				yield return null;
 			} else {
 				if (disableAfterFading) gameObject.SetActive(false);
 				alpha = 0f;
@@ -101,7 +118,7 @@ public class Fadeable : MonoBehaviour {
 
 				ColorAll();
 
-				yield return 0;
+				yield return null;
 			} else {
 				alpha = 1f;
 				yield break;

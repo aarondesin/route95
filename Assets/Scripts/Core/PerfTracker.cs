@@ -49,8 +49,6 @@ public class PerfTracker : MonoBehaviour {
 	#endregion
 	#region PerfTracker Vars
 
-	GameManager Game;
-
 	Dictionary<GameManager.State, Info> perfTracker; // Dictionary to map game states to Info structs
 
 	#endregion
@@ -60,8 +58,6 @@ public class PerfTracker : MonoBehaviour {
 
 		// Init dictionary
 		perfTracker = new Dictionary<GameManager.State, Info>();
-
-		Game = GameManager.instance as GameManager;
 	}
 	
 	void Update () {

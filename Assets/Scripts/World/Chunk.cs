@@ -164,6 +164,8 @@ public class Chunk: MonoBehaviour, IPoolable {
 		// Assign particle system emission rate
 		ParticleSystem.EmissionModule emit = sys.emission;
 		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
+
+		UpdateCollider();
 	}
 
 	/// <summary>
@@ -203,8 +205,7 @@ public class Chunk: MonoBehaviour, IPoolable {
 	
 		}
 
-		// Mark chunk for collider update
-		needsColliderUpdate = true;
+		UpdateCollider();
 	}
 
 	/// <summary>

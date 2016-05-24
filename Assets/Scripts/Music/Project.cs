@@ -77,7 +77,6 @@ public class Project {
 	/// <param name="context"></param>
 	[OnSerializing()]
 	internal void UpdatePaths (StreamingContext context) {
-		GameManager Game = GameManager.instance as GameManager;
 
 		// Refresh song paths
 		songPaths.Clear();
@@ -143,7 +142,6 @@ public class Project {
 	/// </summary>
 	/// <param name="index">Index of song to remove.</param>
 	public void RemoveSong (int index) {
-		MusicManager Music = MusicManager.instance as MusicManager;
 
 		// Remove song
 		songs.RemoveAt(index);
