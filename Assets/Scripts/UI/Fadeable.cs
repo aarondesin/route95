@@ -56,12 +56,18 @@ public class Fadeable : MonoBehaviour {
 	#endregion
 	#region Fadeable Methods
 
+	/// <summary>
+	/// Returns true if the object is done fading.
+	/// </summary>
 	public bool DoneFading {
 		get {
 			return alpha == 0f;
 		}
 	}
 
+	/// <summary>
+	/// Returns true if the object is done unfading.
+	/// </summary>
 	public bool DoneUnfading {
 		get {
 			return alpha == 1f;
@@ -72,8 +78,8 @@ public class Fadeable : MonoBehaviour {
 	/// Starts fading the object.
 	/// </summary>
 	public void Fade () {
-		StopCoroutine ("DoUnFade");
-		if (!gameObject.activeSelf) return;
+		if (gameObject.activeSelf) StopCoroutine ("DoUnFade");
+		else return;
 		StartCoroutine("DoFade");
 	}
 
@@ -81,10 +87,9 @@ public class Fadeable : MonoBehaviour {
 	/// Starts unfading the object.
 	/// </summary>
 	public void UnFade () {
-		StopCoroutine("DoFade");
-		gameObject.SetActive(true);
+		if (gameObject.activeSelf) StopCoroutine("DoFade");
+		else gameObject.SetActive(true);
 		StartCoroutine("DoUnFade");
-		
 	}
 
 	/// <summary>
@@ -102,6 +107,7 @@ public class Fadeable : MonoBehaviour {
 			} else {
 				if (disableAfterFading) gameObject.SetActive(false);
 				alpha = 0f;
+				ColorAll();
 				yield break;
 			}
 		}
@@ -112,22 +118,24 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	IEnumerator DoUnFade () {
-		while (true) {
-			if (alpha <= 1f-fadeSpeed && originalColors != null) {
-				alpha += fadeSpeed;
+		while (alpha <= 1f-fadeSpeed && originalColors != null) {
+			alpha += fadeSpeed;
 
-				ColorAll();
+			ColorAll();
 
-				yield return null;
-			} else {
-				alpha = 1f;
-				yield break;
-			}
+			yield return null;
 		}
+		alpha = 1f;
+		ColorAll();
+		yield break;
 	}
 
+	/// <summary>
+	/// Updates the alphas of parent and all children.
+	/// </summary>
 	void ColorAll () {
 		foreach (MaskableGraphic graphic in originalColors.Keys) {
+			//graphic.SetAlpha(alpha);
 			Color newColor = originalColors[graphic];
 			newColor.a *= alpha;
 			graphic.color = newColor;

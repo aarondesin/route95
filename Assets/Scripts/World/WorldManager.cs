@@ -585,8 +585,8 @@ public class WorldManager : MonoBehaviour {
 		);
 
 		Light light = sun.Light();
-		sun.Light().shadows = LightShadows.Soft;
-		sun.Light().flare = sunFlare;
+		light.shadows = LightShadows.Soft;
+		light.flare = sunFlare;
 
 		return sun;
 	}

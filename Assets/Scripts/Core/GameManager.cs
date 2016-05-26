@@ -196,6 +196,8 @@ public class GameManager : MonoBehaviour {
 
 	void Start () {
 
+		ShowAll();
+
 		// Init camera ref
 		mainCamera = Camera.main;
 
@@ -213,7 +215,10 @@ public class GameManager : MonoBehaviour {
 		if (loading) return;
 
 		// Start loading if not laoded
-		if (!loaded) Load();
+		if (!loaded) {
+			HideAll();
+			Load();
+		}
 
 		switch (currentState) {
 
@@ -291,7 +296,7 @@ public class GameManager : MonoBehaviour {
 		HideAll ();
 
 		// Show loading screen
-		loadingScreen.SetActive(true);
+		Show (loadingScreen);
 
 		// Calculate operations to do
 		loadsToDo = MusicManager.instance.loadsToDo + WorldManager.instance.loadsToDo;
@@ -337,7 +342,7 @@ public class GameManager : MonoBehaviour {
 		currentState = State.Setup;
 
 		// Hide all menus
-		loadingScreen.SetActive(false);
+		Hide (loadingScreen);
 		HideAll ();
 
 		// Show main menu
@@ -356,8 +361,8 @@ public class GameManager : MonoBehaviour {
 	/// <param name="menu">Menu to show.</param>
 	public void Show (GameObject menu) {
 		menu.SetActive(true);
-		if (menu.GetComponent<Fadeable>() != null)
-			menu.GetComponent<Fadeable>().UnFade();
+		Fadeable fade = menu.GetComponent<Fadeable>();
+		if (fade != null) fade.UnFade();
 	}
 
 	/// <summary>
@@ -383,10 +388,7 @@ public class GameManager : MonoBehaviour {
 	/// <param name="menu">Menu to hide.</param>
 	public void Hide (GameObject menu) {
 		Fadeable fade = menu.GetComponent<Fadeable>();
-		if (fade != null) {
-			fade.Fade();
-			return;
-		}
+		if (fade != null) fade.Fade();
 	}
 
 	/// <summary>
@@ -403,6 +405,7 @@ public class GameManager : MonoBehaviour {
 		Hide (addRiffPrompt);
 		Hide (loadPrompt);
 		Hide (liveIcons);
+		Hide (pauseMenu);
 	}
 
 	#endregion
@@ -505,6 +508,8 @@ public class GameManager : MonoBehaviour {
 
 		// Hide other menus
 		HideAll ();
+		Hide (liveIcons);
+		Hide (songProgressBar);
 
 		// Show playlist menu
 		Show (playlistMenu);
@@ -578,6 +583,9 @@ public class GameManager : MonoBehaviour {
 		currentState = State.Postplay;
 		paused = false;
 
+		Hide (liveIcons);
+		Hide (songProgressBar);
+
 		// Stop music/live operations
 		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
@@ -628,16 +636,16 @@ public class GameManager : MonoBehaviour {
 	/// Shows the load prompt for projects.
 	/// </summary>
 	public void ShowLoadPromptForProjects () {
-		Show (loadPrompt);
 		LoadPrompt.instance.Refresh(LoadPrompt.Mode.Project);
+		Show (loadPrompt);
 	}
 
 	/// <summary>
 	/// Shows the load prompt for songs.
 	/// </summary>
 	public void ShowLoadPromptForSongs () {
-		Show (loadPrompt);
 		LoadPrompt.instance.Refresh(LoadPrompt.Mode.Song);
+		Show (loadPrompt);
 	}
 
 	#endregion
@@ -673,21 +681,6 @@ public class GameManager : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Toggles the visibility of an object.
-	/// </summary>
-	/// <param name="obj">Object.</param>
-	public void Toggle (GameObject obj) {
-		obj.SetActive (!obj.activeSelf);
-	}
-		
-	/// <summary>
-	/// Toggles the system buttons.
-	/// </summary>
-	public void ToggleSystemButtons () {
-		systemButtons.SetActive(!systemButtons.activeSelf);
-	}
-
-	/// <summary>
 	/// Wakes the live UI.
 	/// </summary>
 	public void WakeLiveUI () {
@@ -708,10 +701,11 @@ public class GameManager : MonoBehaviour {
 	public void AttemptExit () {
 		switch (currentState) {
 		case State.Setup: case State.Postplay:
-			confirmExitPrompt.SetActive(true);
+			Show(confirmExitPrompt);
 			break;
 		case State.Live:
-			Pause();
+			if (paused) Show(confirmExitPrompt);
+			else Pause();
 			break;
 		}
 	}
@@ -780,7 +774,7 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void Pause () {
 		paused = true;
-		pauseMenu.SetActive(true);
+		Show(pauseMenu);
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.Pause();
 	}
@@ -790,7 +784,7 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void Unpause () {
 		paused = false;
-		pauseMenu.SetActive(false);
+		Hide (pauseMenu);
 		PlayerMovement.instance.StartMoving();
 		CameraControl.instance.Unpause();
 	}

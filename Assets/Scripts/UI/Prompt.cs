@@ -11,7 +11,6 @@ public class Prompt : MonoBehaviour {
 
 	public static Prompt instance; // Quick reference to this instance
 
-	public GameObject dialog;      // Object to use for modal popups
 	public Text titleText;         // Reference to title text
 	public Text messageText;       // Reference to message body text
 	public Text buttonText;        // Reference to button text
@@ -36,14 +35,14 @@ public class Prompt : MonoBehaviour {
 		titleText.text = title;
 		messageText.text = message;
 		buttonText.text = button;
-		GameManager.instance.Show(dialog);
+		GameManager.instance.Show(gameObject);
 	}
 
 	/// <summary>
 	/// Hides the dialog.
 	/// </summary>
 	public void HideDialog () {
-		GameManager.instance.Hide(dialog);
+		GameManager.instance.Hide(gameObject);
 	}
 
 	#endregion

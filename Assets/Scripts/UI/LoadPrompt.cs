@@ -28,6 +28,7 @@ public class LoadPrompt : MonoBehaviour {
 	public RectTransform fileList;     // Transform of the actual panel with all of the files listed
 	static Vector2 fileListSize = new Vector2 (84f, 84f);
 	public GameObject loadButton;      // Load button on propmt
+	public Text loadButtonText;        // Text on load button
 
 	Mode loadMode;                     // Type of file to display and load
 	string selectedPath;               // Currently selected path
@@ -45,8 +46,8 @@ public class LoadPrompt : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-		fileButtons = new List<GameObject>();
 		instance = this;
+		fileButtons = new List<GameObject>();
 	}
 
 	#endregion
@@ -54,9 +55,9 @@ public class LoadPrompt : MonoBehaviour {
 
 	// 
 	public void Refresh (Mode mode) {
-		foreach (GameObject fileButton in fileButtons) {
+		foreach (GameObject fileButton in fileButtons)
 			Destroy(fileButton);
-		}
+
 		fileButtons.Clear();
 
 		loadMode = mode;
@@ -108,11 +109,15 @@ public class LoadPrompt : MonoBehaviour {
 			text_text.font = GameManager.instance.font;
 			text_text.alignment = TextAnchor.MiddleLeft;
 
+			Fadeable text_fade = text.AddComponent<Fadeable>();
+			text_fade.startFaded = false;
+
 			button.Button().onClick.AddListener(()=>{
 				GameManager.instance.MenuClick();
 				ResetButtons();
 				selectedPath = path;
 				loadButton.Button().interactable = true;
+				loadButtonText.color = loadButton.Button().colors.normalColor;
 				button.Image().color = new Color(1f,1f,1f,0.5f);
 			});
 				

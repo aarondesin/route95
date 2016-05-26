@@ -92,30 +92,60 @@ public class Vertex {
 		//Debug.Log(h);
 	}
 
+	/// <summary>
+	/// Returns true if the given x/y coordinate is an edge between chunks.
+	/// </summary>
+	/// <param name="coord"></param>
+	/// <returns></returns>
 	bool IsEdge (int coord) {
 		return (coord % (chunkRes-1) == 0);
 	}
 
+	/// <summary>
+	/// Converts a coordinate into chunk space.
+	/// </summary>
+	/// <param name="coord"></param>
+	/// <returns></returns>
 	int ChunkAt (int coord) {
 		return coord / (chunkRes-1) - (coord < 0 ? 1 : 0);
 	}
 
+	/// <summary>
+	/// Returns the left-/down-most chunk on an edge.
+	/// </summary>
+	/// <param name="coord"></param>
+	/// <returns></returns>
 	int ChunkMin (int coord) {
-		int result = coord / (chunkRes - 1) - (coord < 0 ? 1 : coord % (chunkRes-1) == 0 ? 1 : 0);
-		return result;
+		return ChunkMax(coord) - 1;
 	}
 
+	/// <summary>
+	/// Returns the right-/up-most chunk on an edge.
+	/// </summary>
+	/// <param name="coord"></param>
+	/// <returns></returns>
 	int ChunkMax (int coord) {
-		int result = coord / (chunkRes - 1) - (coord < 0 ? 1 : 0 );
-		return result;
+		return coord / (chunkRes-1);
 	}
 
+	/// <summary>
+	/// Converts a vertex coordinate to a mesh vert index.
+	/// </summary>
+	/// <param name="chunkX"></param>
+	/// <param name="chunkY"></param>
+	/// <returns></returns>
 	int CoordToIndex (int chunkX, int chunkY) {
-		int localX = x - chunkX * (chunkRes-1);
+		int localX;
+		if (chunkX >= 0) localX = x - chunkX * (chunkRes-1);
+		else localX = x + Mathf.Abs(chunkX) * (chunkRes-1);
+
 		if (localX >= chunkRes || localX < 0)
 			throw new ArgumentOutOfRangeException ("Vertex.CoordToIndex(): x coord "+x+" not on chunk "+chunkX+"!");
 
-		int localY = y - chunkY * (chunkRes-1);
+		int localY;
+		if (chunkY >= 0) localY = y - chunkY * (chunkRes-1);
+		else localY = y + Mathf.Abs(chunkY) * (chunkRes-1);
+
 		if (localY >= chunkRes || localY < 0) 
 			throw new ArgumentOutOfRangeException ("Vertex.CoordToIndex(): y coord "+y+" not on chunk "+chunkY+"!");
 
@@ -148,6 +178,8 @@ public class Vertex {
 		blend /= (WorldManager.instance.heightScale/10f);
 		blend = Mathf.Clamp01(blend);
 
+		int index;
+
 		if (IsEdge (x)) {
 
 			// Corner
@@ -155,40 +187,46 @@ public class Vertex {
 
 				Chunk ul = terrain.ChunkAt (ChunkMin(x), ChunkMax (y));
 				if (ul != null) {
-					ul.UpdateVertex (CoordToIndex (ul.x, ul.y), height);
-					ul.UpdateColor (CoordToIndex (ul.x, ul.y), blend);
+					index = CoordToIndex (ul.x, ul.y);
+					ul.UpdateVertex (index, height, true);
+					ul.UpdateColor (index, blend);
 				}
 
 				Chunk ur = terrain.ChunkAt (ChunkMax(x), ChunkMax (y));
 				if (ur != null) {
-					ur.UpdateVertex (CoordToIndex (ur.x, ur.y), height);
-					ur.UpdateColor (CoordToIndex (ur.x, ur.y), blend);
+					index = CoordToIndex (ur.x, ur.y);
+					ur.UpdateVertex (index, height, true);
+					ur.UpdateColor (index, blend);
 				}
 
 				Chunk dl = terrain.ChunkAt (ChunkMin(x), ChunkMin (y));
 				if (dl != null) {
-					dl.UpdateVertex (CoordToIndex (dl.x, dl.y), height);
-					dl.UpdateColor (CoordToIndex (dl.x, dl.y), blend);
+					index = CoordToIndex (dl.x, dl.y);
+					dl.UpdateVertex (index, height, true);
+					dl.UpdateColor (index, blend);
 				}
 
 				Chunk dr = terrain.ChunkAt (ChunkMax(x), ChunkMin (y));
 				if (dr != null) {
-					dr.UpdateVertex (CoordToIndex (dr.x, dr.y), height);
-					dr.UpdateColor (CoordToIndex (dr.x, dr.y), blend);
+					index = CoordToIndex (dr.x, dr.y);
+					dr.UpdateVertex (index, height, true);
+					dr.UpdateColor (index, blend);
 				}
 
 			// X edge
 			} else {
 				Chunk left = terrain.ChunkAt(ChunkMin (x), ChunkAt(y));
 				if (left != null) {
-					left.UpdateVertex (CoordToIndex (left.x, left.y), height);
-					left.UpdateColor (CoordToIndex (left.x, left.y), blend);
+					index = CoordToIndex (left.x, left.y);
+					left.UpdateVertex (index, height, true);
+					left.UpdateColor (index, blend);
 				} 
 
 				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkAt(y));
 				if (right != null) {
-					right.UpdateVertex(CoordToIndex(right.x, right.y), height);
-					right.UpdateColor (CoordToIndex (right.x, right.y), blend);
+					index = CoordToIndex(right.x, right.y);
+					right.UpdateVertex(index, height, true);
+					right.UpdateColor (index, blend);
 				}
 			} 
 
@@ -196,22 +234,25 @@ public class Vertex {
 		} else if (IsEdge (y)) {
 			Chunk bottom = terrain.ChunkAt(ChunkAt(x), ChunkMin(y));
 			if (bottom != null) {
-				bottom.UpdateVertex (CoordToIndex (bottom.x, bottom.y), height);
-				bottom.UpdateColor (CoordToIndex (bottom.x, bottom.y), blend);
+				index = CoordToIndex (bottom.x, bottom.y);
+				bottom.UpdateVertex (index, height, true);
+				bottom.UpdateColor (index, blend);
 			}
 
 			Chunk top = terrain.ChunkAt(ChunkAt(x), ChunkMax(y));
 			if (top != null) {
-				top.UpdateVertex (CoordToIndex (top.x, top.y), height);
-				top.UpdateColor (CoordToIndex (top.x, top.y), blend);
+				index = CoordToIndex (top.x, top.y);
+				top.UpdateVertex (index, height, true);
+				top.UpdateColor (index, blend);
 			}
 		
 		// No edge
 		} else {
 			Chunk chunk = terrain.ChunkAt(ChunkAt(x), ChunkAt(y));
 			if (chunk != null) {
-				chunk.UpdateVertex (CoordToIndex (chunk.x, chunk.y), height);
-				chunk.UpdateColor (CoordToIndex (chunk.x, chunk.y), blend);
+				index = CoordToIndex (chunk.x, chunk.y);
+				chunk.UpdateVertex (index, height, false);
+				chunk.UpdateColor (index, blend);
 			}
 		}
 	}

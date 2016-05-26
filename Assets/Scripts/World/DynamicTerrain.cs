@@ -8,7 +8,6 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-
 /// <summary>
 /// Class to manage chunks. 
 /// </summary>
@@ -28,7 +27,7 @@ public class DynamicTerrain : MonoBehaviour {
 
 	bool loaded = false;                 // is the terrain loaded?
 
-	ObjectPool<Chunk> chunkPool;                // pool of chunk GameObjects
+	ObjectPool<Chunk> chunkPool;         // pool of chunk GameObjects
 	List<Chunk> chunksToUpdate;          // list of chunks to be updated
 	int chunkUpdatesPerCycle;            // number of chunks to update each cycle (copied from WM)
 
@@ -117,6 +116,7 @@ public class DynamicTerrain : MonoBehaviour {
 	GameObject CreateChunk (int x, int y) {
 
 		GameObject chunk;
+		Chunk c;
 
 		// If no chunks available to reuse
 		if (chunkPool.Empty) {
@@ -130,8 +130,10 @@ public class DynamicTerrain : MonoBehaviour {
 				typeof(Chunk)
 			);
 
+			c = chunk.GetComponent<Chunk>();
+
 			// Initialize chunk
-			chunk.GetComponent<Chunk>().Initialize(x, y);
+			c.Initialize(x, y);
 
 		// If a chunk is available to reuse
 		} else {
@@ -139,15 +141,17 @@ public class DynamicTerrain : MonoBehaviour {
 			// Take a chunk from the pool
 			chunk = chunkPool.Get().gameObject;
 
+			c = chunk.GetComponent<Chunk>();
+
 			// Reuse chunk
-			chunk.GetComponent<Chunk>().Reuse(x, y);
+			c.Reuse(x, y);
 		}
 
 		// Parent chunk to terrain
 		chunk.transform.parent = transform;
 
 		// Register chunk as active
-		activeChunks.Add(chunk.GetComponent<Chunk>());
+		activeChunks.Add(c);
 
 		return chunk;
 	}
@@ -250,11 +254,12 @@ public class DynamicTerrain : MonoBehaviour {
 					try {
 						chunksToUpdate [i].ChunkUpdate ();
 						chunksToUpdate[i].priority = 0;
-					}catch (ArgumentOutOfRangeException a) {
+					} catch (ArgumentOutOfRangeException a) {
 						Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
 						continue;
 					}
 				}
+			
 
 				// Take a break if target frame rate missed
 				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
@@ -310,8 +315,12 @@ public class DynamicTerrain : MonoBehaviour {
 		// Deregister from lists/map
 		DeregisterChunk(chunk);
 
+		chunksToUpdate.Remove(chunk);
+
 		// Pool chunk
 		chunkPool.Add(chunk);
+
+		
 	}
 
 	/// <summary>

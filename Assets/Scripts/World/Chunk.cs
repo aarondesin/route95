@@ -3,12 +3,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public class ChunkComparer : IComparer<Chunk> {
+
+	int IComparer<Chunk>.Compare(Chunk x, Chunk y) {
+		return x.priority.CompareTo(y.priority);
+	}
+
+}
+
  /// <summary>
  /// A chunk is a square mesh that's part of the larger terrain object.
  /// Chunks dynamically load and unload as the player gets closer and farther.
  /// This un/loading will be taken care of by the DynamicTerrain class. 
  /// </summary>
-public class Chunk: MonoBehaviour, IPoolable {
+public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 	#region Chunk Vars
 
@@ -45,10 +53,23 @@ public class Chunk: MonoBehaviour, IPoolable {
 	bool needsColorUpdate = false;         // does the chunk need a color update?
 
 	#endregion
+	#region IComparable Implementations
+
+	int IComparable<Chunk>.CompareTo(Chunk other) {
+		if (other == null)
+			throw new ArgumentException ("Other object not a chunk!");
+
+		if (priority > other.priority) return 1;
+		else if (priority == other.priority) return 0;
+		else return -1;
+	}
+
+	#endregion
 	#region IPoolable Implementations
 
 	void IPoolable.OnPool() {
 		gameObject.SetActive(false);
+		priority = 0;
 	}
 
 	void IPoolable.OnDepool() {
@@ -185,6 +206,8 @@ public class Chunk: MonoBehaviour, IPoolable {
 
 		// Update chunk name
 		gameObject.name = "Chunk ("+x+","+y+") Position:"+transform.position.ToString();
+
+		priority = 0f;
 
 		// Clear decoration list
 		decorations.Clear();
@@ -360,15 +383,15 @@ public class Chunk: MonoBehaviour, IPoolable {
 	/// <param name="index">Index.</param>
 	/// <param name="height">Height.</param>
 	/// <param name="normal">Normal.</param>
-	public void UpdateVertex (int index, float height) {
+	public void UpdateVertex (int index, float height, bool forceUpdate=false) {
 		try {
 			
 			// Check if height update is needed
 			if (verts[index].y != height) {
 				priority++;
-				needsColliderUpdate = true;
 				verts[index].y = height;
-				//mesh.vertices = verts;
+				if (forceUpdate) mesh.vertices = verts;
+				needsColliderUpdate = true;
 			}
 
 		} catch (IndexOutOfRangeException e) {
@@ -407,6 +430,8 @@ public class Chunk: MonoBehaviour, IPoolable {
 	/// </summary>
 	/// <returns>The verts.</returns>
 	private IEnumerator UpdateVerts() {
+
+		if (!GameManager.instance.loaded) yield break;
 		
 		isUpdatingVerts = true;
 		float margin = WorldManager.instance.chunkSize / 2;
@@ -426,8 +451,10 @@ public class Chunk: MonoBehaviour, IPoolable {
 			// Update vertex height
 			UpdateVertex (v, vert.height);
 
+			if (terrain.freqData == null) yield break;
+
 			// If vertex is not locked and there is frequency data to use
-			if (GameManager.instance.loaded && !vert.locked && terrain.freqData != null) { 
+			if (!vert.locked) { 
 
 				// Distance between player and vertex
 				Vector3 vertPos = chunkPos + verts [v];
@@ -483,6 +510,8 @@ public class Chunk: MonoBehaviour, IPoolable {
 
 		// Update verts if possible
 		if (!isUpdatingVerts) StartCoroutine("UpdateVerts");
+
+		priority = 0f;
 	}
 
 	/// <summary>

@@ -358,7 +358,7 @@ public class Road : Bezier {
 		uvs.Clear ();
 		tris.Clear ();
 
-		float UVoffset = 0.4f;
+		float UVoffset = 0.2f;
 		float UVslope = slope;
 
 		float progressI = 0f;
