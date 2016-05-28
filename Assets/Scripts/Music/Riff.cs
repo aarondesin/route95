@@ -62,7 +62,10 @@ public class Riff {
 	public bool cutSelf = true;              // If true, sounds will cut themselves off
 
 	[SerializeField]
-	public float volume = 1f;                // Volume scaler for all riff notes.
+	public float volume = 1f;                // Volume scaler for all riff notes
+
+	[SerializeField]
+	public float panning = 0f;               // Stereo panning value
 
 	[SerializeField]
 	public int index;                        // Project-assigned riff index

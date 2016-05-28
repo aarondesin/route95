@@ -11,6 +11,9 @@ public class Moon : GlobalLightSource {
 	public static Moon instance;  // Quick reference to this instance
 	Light _light;                 // Reference to this light component
 
+	public float radius;
+	public float scale;
+
 	private float xScale = 1000f;
 	private float yScale = 1000f;
 	private float zScale = 1000f;
@@ -22,12 +25,15 @@ public class Moon : GlobalLightSource {
 
 	void Awake () {
 		instance = this;
-		this.GetComponent<Light> ().range = 100f;
-		this.GetComponent<Light> ().type = LightType.Directional;
-		GetComponent<Light>().shadowBias = 1f;
+		//this.GetComponent<Light> ().range = 100f;
+		//this.GetComponent<Light> ().type = LightType.Directional;
+		//GetComponent<Light>().shadowBias = 1f;
 		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
+	}
+
+	void Start () {
 		transform.SetParent (PlayerMovement.instance.transform);
-		transform.localScale = new Vector3 (100f, 100f, 100f);
+		transform.localScale = new Vector3 (scale, scale, scale);
 	}
 
 	void Update() {
@@ -40,9 +46,9 @@ public class Moon : GlobalLightSource {
 	private void UpdateTransform(){
 		target = PlayerMovement.instance.transform.position;
 
-		float newX = -xScale * Mathf.Cos(WorldManager.instance.timeOfDay);
-		float newY = -yScale * Mathf.Sin(WorldManager.instance.timeOfDay);
-		float newZ = zScale * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
+		float newX = -radius * Mathf.Cos(WorldManager.instance.timeOfDay);
+		float newY = -radius * Mathf.Sin(WorldManager.instance.timeOfDay);
+		float newZ = -radius * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
 		this.transform.position = new Vector3(newX, newY, newZ);
 
 		this.transform.LookAt (target);

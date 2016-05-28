@@ -8,7 +8,9 @@ public class Road : Bezier {
 
 	#region Road Vars
 
+	public bool loading = false;
 	public bool loaded = false;
+	List<Vector3> toCheck;
 
 	DynamicTerrain terrain;   // Reference to terrain
 
@@ -40,7 +42,8 @@ public class Road : Bezier {
 	#region Unity Callbacks
 
 	void Awake () {
-		loaded = false;
+
+		toCheck = new List<Vector3>();
 
 		verts = new List<Vector3> ();
 		uvs = new List<Vector2> ();
@@ -71,16 +74,22 @@ public class Road : Bezier {
 		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
 
 		terrain = WorldManager.instance.terrain;
-
-		// Build mesh
-		Reset ();
 		
 	}
 
 	public void Update () {
+		if (!loading) return;
 
-		if (!loaded) return;
-
+		if (!loaded) {
+			List<string> loadMessages = new List<string>() {
+				"Blazing a trail...",
+				"Rerouting...",
+				"Following star maps..."
+			};
+			GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+			float startTime = Time.realtimeSinceStartup;
+		}
+			
 		// These values may have changed, so get them from WM
 		variance = WorldManager.instance.roadVariance;
 		maxSlope = WorldManager.instance.roadMaxSlope;
@@ -103,7 +112,7 @@ public class Road : Bezier {
 			PlayerMovement.instance.progress = numerator / CurveCount;
 
 			changesMade = true;
-		}
+		} else
 
 		// If road beginning is too close
 		if (Vector3.Distance (points.Head(), playerPosition) < generateRoadRadius) {
@@ -131,9 +140,16 @@ public class Road : Bezier {
 			changesMade = true;
 
 		
-		} 
+		} else if (!loaded)  {
+			loaded = true;
+			PlayerMovement.instance.transform.position = GetPoint(0.5f) + new Vector3(0f, 2.27f + height, 0f);
+			if (WorldManager.instance.doDecorate)
+				WorldManager.instance.DoLoadDecorations();
+			else WorldManager.instance.FinishLoading();
+		}
 
 		if (changesMade) Build();
+		else if (toCheck.Count > 0) Check(toCheck.PopFront());
 
 	}
 
@@ -173,39 +189,9 @@ public class Road : Bezier {
 	}
 
 	public void DoLoad () {
-		StartCoroutine("Load");
-	}
-
-	IEnumerator Load () {
-		GameManager.instance.ChangeLoadingMessage("Loading road...");
-		float startTime = Time.realtimeSinceStartup;
-
-		while (true) {
-			if (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
-
-				float progress = PlayerMovement.instance.progress;
-				float numerator = progress * CurveCount;
-
-				AddCurve();
-				PlayerMovement.instance.progress = numerator / CurveCount;
-
-				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-					yield return null;
-					startTime = Time.realtimeSinceStartup;
-				}
-				loaded = false;
-
-			} else {
-				loaded = true;
-				PlayerMovement.instance.transform.position = GetPoint(0.5f) + new Vector3(0f, 2.27f + height, 0f);
-				CameraControl.instance.SnapToPosition(CameraControl.instance.ViewOutsideCar);
-				terrain.CheckAllChunksForRoad();
-				if (WorldManager.instance.doDecorate)
-					WorldManager.instance.DoLoadDecorations();
-				else WorldManager.instance.FinishLoading();
-				yield break;
-			}
-		}
+		// Build mesh
+		Reset ();
+		loading = true;
 	}
 
 	// Adds a new curve to the road bezier
@@ -239,6 +225,8 @@ public class Road : Bezier {
 			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
 				if (ignoreMaxSlope) point.y = hit.point.y;
 				else point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
+			} else {
+				throw new InvalidOperationException("Failed to place road point!");
 			}
 			points.Add(point);
 		}
@@ -314,11 +302,7 @@ public class Road : Bezier {
 		float resolution = WorldManager.instance.roadPathCheckResolution * diff;
 		while (progress < endProgress) {
 			Vector3 point = GetPoint(progress);
-			List<Vector3> points = new List<Vector3> () {
-				point
-			};
-
-			terrain.vertexmap.DoCheckRoads (points);
+			toCheck.Add (point);
 			progress += diff / resolution;
 
 			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
@@ -327,6 +311,10 @@ public class Road : Bezier {
 			}
 		}
 		yield return null;
+	}
+
+	void Check (Vector3 point) {
+		terrain.vertexmap.DoCheckRoads(point);
 	}
 
 	// Sets the road mesh
@@ -398,27 +386,26 @@ public class Road : Bezier {
 			Vector3 rightF = BezRight(dirF);
 			Vector3 downF = BezDown(dirF);
 
-			UVProgress += Vector3.Distance (pointF, pointI);
-			float UVValue = 0.5f + 0.5f * Mathf.Sin(UVProgress);
+			UVProgress += Vector3.Distance (pointF, pointI) / 20f;
 
 			// Left down
 			verts.Add(pointF + width * -rightF);
-			uvs.Add(new Vector2(-UVoffset, UVValue));
+			uvs.Add(new Vector2(-UVoffset, UVProgress));
 			int leftDownF = num * 4;
 
 			// Right down
 			verts.Add(pointF + width * rightF);
-			uvs.Add(new Vector2(1f + UVoffset, UVValue));
+			uvs.Add(new Vector2(1f + UVoffset, UVProgress));
 			int rightDownF = num * 4 + 1;
 
 			// Left up
 			verts.Add(pointF + slope * width * -rightF + height * -downF);
-			uvs.Add(new Vector2(-UVoffset + UVslope, UVValue));
+			uvs.Add(new Vector2(-UVoffset + UVslope, UVProgress));
 			int leftUpF = num * 4 + 2;
 
 			// Right up
 			verts.Add(pointF + slope * width * rightF + height * -downF);
-			uvs.Add(new Vector2(1f + UVoffset - UVslope, UVValue));
+			uvs.Add(new Vector2(1f + UVoffset - UVslope, UVProgress));
 			int rightUpF = num * 4 + 3;
 
 

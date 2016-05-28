@@ -48,30 +48,41 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Camera base sway amount.")]
 	public float baseSway = 1f;
 
-	const float DEFAULT_SPEED = 0.2f;     // Default camera speed
+	const float DEFAULT_SPEED = 1f;     // Default camera speed
+	const float DEFAULT_FOV = 75f;
 
 	public GameObject CameraBlocker;
 
 	// Camera interp vars
-	Transform start;                      // Camera lerp start transform
-	Transform target;                     // Camera lerp target transform
-	float speed = DEFAULT_SPEED;          // Camera speed
+	CameraView initialView;
+	Transform startTransform;                      // Camera lerp start transform
+	float startFOV;
+	CameraView targetView;
+
+	float speed;						  // Camera speed
 	bool moving = false;                  // Is the camera currently lerping?
+
+	[SerializeField]
 	float progress = 0f;                  // Lerp progress
 
 	// Live mode camera angle vars
 	CameraView currentAngle;              // Current live mode angle
-	List<CameraView> angles;              // List of all live mode angles
+	List<CameraView> setupAngles;         // List of all setup angles
+	List<CameraView> liveAngles;          // List of all live mode angles
 	float transitionTimer;                // Timer to next angle change
 	bool paused = false;                  // Is live mode paused?
 
 	[Tooltip("Initial position for camera")]
-	public Transform initialPosition;
+	//public Transform initialView;
 
 	public Transform ViewOutsideCar;
 	public Transform ViewDriving;
 	public Transform ViewRadio;
 	public Transform ViewChase;
+
+	public CameraView OutsideCar;
+	public CameraView Driving;
+	public CameraView Radio;
 
 	public Transform HoodForward;
 	public Transform HoodBackward;
@@ -110,11 +121,50 @@ public class CameraControl : MonoBehaviour {
 
 	void Awake () {
 		instance = this;
-		SnapToPosition (initialPosition);
 		transitionTimer = liveModeTransitionFreq;
+		speed = DEFAULT_SPEED;
+
+		// Outside car
+		OutsideCar = new CameraView () {
+			name = "OutsideCar",
+			transform = ViewOutsideCar,
+			targetPos = ViewOutsideCar.position,
+			targetRot = ViewOutsideCar.rotation,
+			fov = DEFAULT_FOV,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		// Driving
+		Driving = new CameraView () {
+			name = "Driving",
+			transform = ViewDriving,
+			targetPos = ViewDriving.position,
+			targetRot = ViewDriving.rotation,
+			fov = DEFAULT_FOV,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		// Radio
+		Radio = new CameraView () {
+			name = "Radio",
+			transform = ViewRadio,
+			targetPos = ViewRadio.position,
+			targetRot = ViewRadio.rotation,
+			fov = 20f,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		setupAngles = new List<CameraView> () {
+			OutsideCar,
+			Driving,
+			Radio
+		};
+
+		initialView = OutsideCar;
+		SnapToView (initialView);
 
 		// Init live mode angles
-		angles  = new List<CameraView> () {
+		liveAngles  = new List<CameraView> () {
 
 			// On the hood, forwards
 			new CameraView () {
@@ -122,7 +172,7 @@ public class CameraControl : MonoBehaviour {
 				transform = HoodForward,
 				targetPos = HoodForward.position,
 				targetRot = HoodForward.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static
 			},
 
@@ -132,7 +182,7 @@ public class CameraControl : MonoBehaviour {
 				transform = NearChase,
 				targetPos = NearChase.position,
 				targetRot = NearChase.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Lead,
 				placementMode = CameraView.CameraPlacementMode.Fixed,
 				lag = 0.04f
@@ -144,7 +194,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FarChase,
 				targetPos = FarChase.position,
 				targetRot = FarChase.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Lead,
 				placementMode = CameraView.CameraPlacementMode.Fixed,
 				lag = 0.2f
@@ -156,7 +206,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FrontRightWheel,
 				targetPos = FrontRightWheel.position,
 				targetRot = FrontRightWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -167,7 +217,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FrontLeftWheel,
 				targetPos = FrontLeftWheel.position,
 				targetRot = FrontLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -178,7 +228,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearRightWheel,
 				targetPos = RearRightWheel.position,
 				targetRot = RearRightWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -189,7 +239,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearLeftWheel,
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -200,7 +250,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearLeftWheel,
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -224,7 +274,7 @@ public class CameraControl : MonoBehaviour {
 			}
 		};
 
-		foreach (CameraView angle in angles) {
+		foreach (CameraView angle in liveAngles) {
 			angle.pos = angle.targetPos;
 			angle.rot = angle.targetRot;
 		}
@@ -236,21 +286,24 @@ public class CameraControl : MonoBehaviour {
 		case State.Setup:
 			if (moving) {
 
-				if (Vector3.Distance(start.position, target.position) != 0f) {
+				if (progress < 1f) {
 
-					progress += speed * Time.deltaTime / 
-						Vector3.Distance(start.position, target.transform.position);
+					progress += speed * Time.deltaTime;
 
 					// Lerp position
-					transform.position = Vector3.Lerp(start.position, target.position, progress);
+					transform.position = Vector3.Slerp(startTransform.position, targetView.transform.position, progress);
 
 					// Lerp Rotation
-					transform.rotation = Quaternion.Lerp(start.rotation, target.rotation, progress);
+					transform.rotation = Quaternion.Slerp(startTransform.rotation, targetView.transform.rotation, progress);
+
+					Camera.main.fieldOfView = Mathf.Lerp (startFOV, targetView.fov, Mathf.Sqrt(progress));
 
 				} else {
-					GameManager.instance.AttemptMoveCasette();
-					start = target;
 					moving = false;
+					startTransform = targetView.transform;
+					transform.position = startTransform.position;
+					transform.rotation = startTransform.rotation;
+					OnCompleteLerp();
 				}
 			}
 			break;
@@ -312,8 +365,8 @@ public class CameraControl : MonoBehaviour {
 		}
 
 		// Calculate sway
-		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway;
-		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway;
+		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
 
 		// Do sway
 		transform.Rotate (bx, by, 0f);
@@ -337,7 +390,6 @@ public class CameraControl : MonoBehaviour {
 	/// </summary>
 	public void StopLiveMode () {
 		state = State.Setup;
-		LerpToPosition(ViewChase);
 		paused = true;
 	}
 
@@ -359,7 +411,6 @@ public class CameraControl : MonoBehaviour {
 	/// </summary>
 	public void StopFreeMode () {
 		state = State.Setup;
-		LerpToPosition(ViewChase);
 	}
 
 	public void StartFade () {
@@ -384,7 +435,7 @@ public class CameraControl : MonoBehaviour {
 	/// Pick a random live camera angle.
 	/// </summary>
 	public void ChangeAngle () {
-		ChangeAngle (Random.Range (0, angles.Count));
+		ChangeAngle (Random.Range (0, liveAngles.Count));
 	}
 
 	/// <summary>
@@ -392,11 +443,11 @@ public class CameraControl : MonoBehaviour {
 	/// </summary>
 	/// <param name="camView"></param>
 	public void ChangeAngle (int camView) {
-		if (currentAngle == angles[camView]) return;
-		currentAngle = angles[camView];
+		if (currentAngle == liveAngles[camView]) return;
+		currentAngle = liveAngles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
-		if (Debug.isDebugBuild) 
-			Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
+		//if (Debug.isDebugBuild) 
+			//Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 		
 		switch (currentAngle.placementMode) {
 
@@ -416,7 +467,7 @@ public class CameraControl : MonoBehaviour {
 	/// Warms all live mode camera angles.
 	/// </summary>
 	void UpdateAllAngles () {
-		foreach (CameraView angle in angles) {
+		foreach (CameraView angle in liveAngles) {
 			if (angle.transform != null) {
 				angle.targetPos = angle.transform.position;
 				angle.targetRot = angle.transform.rotation;
@@ -489,25 +540,32 @@ public class CameraControl : MonoBehaviour {
 	/// Teleports the camera to a position.
 	/// </summary>
 	/// <param name="newPosition"></param>
-	public void SnapToPosition (Transform newPosition) {
-		start = newPosition;
-		target = newPosition;
-		transform.position = newPosition.position;
-		transform.rotation = newPosition.rotation;
+	public void SnapToView (CameraView newView) {
+		targetView = newView;
+		startTransform = newView.transform;
+		transform.position = newView.transform.position;
+		transform.rotation = newView.transform.rotation;
+		Camera.main.fieldOfView = newView.fov;
 	}
 
-	/// <summary>
-	/// Linearly interpolates the camera to a position.
-	/// </summary>
-	/// <param name="newPosition"></param>
-	/// <param name="newSpeed"></param>
-	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
-		Camera.main.fieldOfView = 75f;
-		start = transform;
-		target = newPosition;
+	public void LerpToView (CameraView newView, float newSpeed= DEFAULT_SPEED) {
+		if (targetView == newView) {
+			OnCompleteLerp();
+			return;
+		}
+
+		CameraView oldView = targetView;
+		startFOV = oldView.fov;
+		startTransform = oldView.transform;
+
+		targetView = newView;
 		moving = true;
 		speed = newSpeed;
 		progress = 0f;
+	}
+
+	void OnCompleteLerp () {
+		GameManager.instance.AttemptMoveCasette();
 	}
 		
 	#endregion

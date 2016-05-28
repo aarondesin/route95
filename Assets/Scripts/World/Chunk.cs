@@ -137,7 +137,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 			// Init normal/color
 			normals [i] = Vector3.up;
-			colors[i] = new Color (1f, 1f, 1f, 0.5f);
+			colors[i] = Color.white;
 
 			// Get VMap coords
 			IntVector2 coord = IntToV2 (i);
@@ -148,11 +148,12 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 			// If vertex exists, get height
 			UpdateVertex (i, mapVerts[i].height);
+			UpdateColor (i, mapVerts[i].color);
 		}
 
 		// Assign material
 		MeshRenderer renderer = GetComponent<MeshRenderer> ();
-		renderer.material = WorldManager.instance.terrainMaterial;
+		renderer.sharedMaterial = WorldManager.instance.terrainMaterial;
 		renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
@@ -227,6 +228,8 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 			UpdateVertex (i, mapVerts[i].height);
 	
 		}
+
+		hasCheckedForRoad = false;
 
 		UpdateCollider();
 	}
@@ -317,7 +320,6 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <param name="normals">Normals.</param>
 	/// <param name="UVcoords">U vcoords.</param>
 	/// <param name="triangles">Triangles.</param>
-	//GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
 	Mesh CreateChunkMesh() {
 
 		// Create mesh
@@ -349,7 +351,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 		// Reassign mesh vertices/normals
 		mesh.vertices = verts;
-		mesh.normals = normals;
+		mesh.normals = normals; // NEEDED FOR PROPER LIGHTING
 
 		// Recalculate bounding box
 		mesh.RecalculateBounds();
@@ -405,11 +407,11 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// </summary>
 	/// <param name="index">Index.</param>
 	/// <param name="blendValue">Blend value.</param>
-	public void UpdateColor (int index, float blendValue) {
+	public void UpdateColor (int index, Color color) {
 
 		// Check if color update is needed
-		if (colors[index].a != blendValue) {
-			colors[index].a = blendValue;
+		if (colors[index] != color) {
+			colors[index] = color;
 			needsColorUpdate = true;
 		}
 	}
@@ -505,7 +507,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 		if (needsColorUpdate) UpdateColors();
 
 		// Check for road if necessary
-		if (!hasCheckedForRoad)
+		if (!hasCheckedForRoad && WorldManager.instance.road.loaded)
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 
 		// Update verts if possible

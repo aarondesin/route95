@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour {
 	[Tooltip("Is the game loaded?")]
 	public bool loaded = false;
 
-	bool loading = false;                          // Is the game currently loading?
+	public bool loading = false;                          // Is the game currently loading?
 
 	float startLoadTime;                           // Time at which loading started
 	public GameObject loadingScreen;               // Parent loading screen object
@@ -80,7 +80,8 @@ public class GameManager : MonoBehaviour {
 	Transform casetteTarget;                       // Current casette lerp target
 	Transform casettePosition;                     // Current casette lerp start position
 
-	float sTime;                                   // Start time of casette lerp
+	[SerializeField]
+	float progress;                                // Start time of casette lerp
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("UI Settings")]
@@ -110,6 +111,9 @@ public class GameManager : MonoBehaviour {
 
 	[Tooltip("Font to use for UI.")]
 	public Font font;
+
+	[Tooltip("Handwritten-style font to use for UI.")]
+	public Font handwrittenFont;
 
 	public Sprite arrowIcon;
 	public Sprite addIcon;
@@ -192,6 +196,9 @@ public class GameManager : MonoBehaviour {
 
 		if (!Directory.Exists(projectSaveFolder))
 			Directory.CreateDirectory (projectSaveFolder);
+
+		casetteTarget = casetteBack;
+		casettePosition = casetteBack;
 	}
 
 	void Start () {
@@ -265,21 +272,19 @@ public class GameManager : MonoBehaviour {
 			
 		// Move casette
 		if (casetteMoving) {
-			float progress = (Time.time - sTime) * casetteMoveSpeed;
-			float dist = Vector3.Distance (casetteTarget.position, casettePosition.position);
-			if (dist == 0f) return;
+			if (progress < 1f) {
 
-			float journey = progress / dist;
-			Vector3 pos = Vector3.Lerp (casettePosition.position, casetteTarget.position, journey);
-			Quaternion rot = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, journey);
-			casette.transform.position = pos;
-			casette.transform.rotation = rot;
+				progress += casetteMoveSpeed * Time.deltaTime;
+			
+				Vector3 pos = Vector3.Lerp (casettePosition.position, casetteTarget.position, progress);
+				Quaternion rot = Quaternion.Lerp (casettePosition.rotation, casetteTarget.rotation, progress);
+				casette.transform.position = pos;
+				casette.transform.rotation = rot;
 
-			if (journey >= 1f) {
-				casetteMoving = false;
-				casette.transform.position = casetteTarget.position;
-				casette.transform.rotation = casetteTarget.rotation;
-			}
+			} else casetteMoving = false;
+		} else {
+			casette.transform.position = casetteTarget.position;
+			casette.transform.rotation = casetteTarget.rotation;
 		}
 
 	}
@@ -341,12 +346,16 @@ public class GameManager : MonoBehaviour {
 		// Change state
 		currentState = State.Setup;
 
+		SnapCasetteBack();
+
 		// Hide all menus
 		Hide (loadingScreen);
 		HideAll ();
 
 		// Show main menu
 		Show (mainMenu);
+
+		CameraControl.instance.SnapToView(CameraControl.instance.OutsideCar);
 
 		// Begin 3D rendering again
 		StartRendering ();
@@ -424,7 +433,7 @@ public class GameManager : MonoBehaviour {
 		Show (mainMenu);
 
 		// Move camera to outside view
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
+		CameraControl.instance.LerpToView (CameraControl.instance.OutsideCar);
 	}
 
 	/// <summary>
@@ -440,7 +449,7 @@ public class GameManager : MonoBehaviour {
 		Show (keySelectMenu);
 
 		// Move camera to driving view
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
+		CameraControl.instance.LerpToView (CameraControl.instance.Driving);
 
 		// Refresh radial menu
 		RadialKeyMenu.instance.Refresh();
@@ -466,7 +475,7 @@ public class GameManager : MonoBehaviour {
 		SongTimeline.instance.RefreshTimeline();
 
 		// Move camera to radio view
-		CameraControl.instance.LerpToPosition(CameraControl.instance.ViewRadio);
+		CameraControl.instance.LerpToView(CameraControl.instance.Radio);
 	}
 
 	/// <summary>
@@ -489,7 +498,7 @@ public class GameManager : MonoBehaviour {
 			InstrumentSetup.instance.Initialize ();
 
 			// Move camera to driving view
-			CameraControl.instance.LerpToPosition (CameraControl.instance.ViewDriving);
+			CameraControl.instance.LerpToView (CameraControl.instance.Driving);
 		}
 	}
 
@@ -516,11 +525,11 @@ public class GameManager : MonoBehaviour {
 		PlaylistBrowser.instance.Refresh();
 		PlaylistBrowser.instance.RefreshName();
 
-		// Move camera to outside view
-		CameraControl.instance.LerpToPosition (CameraControl.instance.ViewOutsideCar);
-
 		// Queue casette to move when done moving camera
 		willMoveCasette = true;
+
+		// Move camera to outside view
+		CameraControl.instance.LerpToView (CameraControl.instance.OutsideCar);
 	}
 
 	/// <summary>
@@ -658,7 +667,7 @@ public class GameManager : MonoBehaviour {
 		casetteMoving = true;
 		casettePosition = casette.transform;
 		casetteTarget = casetteFront;
-		sTime = Time.time;
+		progress = 0f;
 		willMoveCasette = false;
 	}
 
@@ -669,7 +678,14 @@ public class GameManager : MonoBehaviour {
 		casetteMoving = true;
 		casettePosition = casette.transform;
 		casetteTarget = casetteBack;
-		sTime = Time.time;
+		progress = 0f;
+		willMoveCasette = false;
+	}
+
+	public void SnapCasetteBack () {
+		casetteMoving = false;
+		casettePosition = casetteBack;
+		casetteTarget = casetteBack;
 		willMoveCasette = false;
 	}
 

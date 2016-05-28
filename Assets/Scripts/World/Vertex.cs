@@ -19,8 +19,9 @@ public class Vertex {
 	public bool noDecorations = false;
 	public Vector3 normal = Vector3.up;
 	public float slope = 0f;
-	public float blend = 0f;
+	public Color color;
 	public List<GameObject> decorations;
+	public bool loaded = false;
 
 	public Vertex (int x, int y) {
 		this.x = x;
@@ -29,6 +30,12 @@ public class Vertex {
 		decorations = new List<GameObject>();
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkSize = WorldManager.instance.chunkSize;
+		color = new Color (
+			0f,
+			UnityEngine.Random.Range(0f, 1f), 
+			UnityEngine.Random.Range(0f, 0.75f), 
+			0.5f
+		);
 	}
 
 	public void SmoothHeight (float h, float factor, float range) {
@@ -154,29 +161,106 @@ public class Vertex {
 		return i;
 	}
 
+	void CalculateBlend () {
+		bool debug = (UnityEngine.Random.Range(0,10000) == 1);
+		if (debug) Debug.Log(ToString());
+
+		int numNeighbors = 0;
+		float delta = 0f;
+
+		Vertex l = map.VertexAt(x-1, y);
+		if (l != null && l.loaded) {
+			numNeighbors++;
+			float diff = Mathf.Abs (height - l.height);
+			if (debug) Debug.Log("Left: "+l.ToString()+" "+diff);
+			delta += diff;
+		}
+
+		Vertex r = map.VertexAt(x+1, y);
+		if (r != null && r.loaded) {
+			numNeighbors++;
+			float diff = Mathf.Abs (height - r.height);
+			if (debug) Debug.Log("Right: "+r.ToString()+" "+diff);
+			delta += diff;
+		}
+
+		Vertex u = map.VertexAt(x, y+1);
+		if (u != null && u.loaded) {
+			numNeighbors++;
+			float diff = Mathf.Abs (height - u.height);
+			if (debug) Debug.Log("Up: "+u.ToString()+" "+diff);
+			delta += diff;
+		}
+
+		Vertex d = map.VertexAt(x, y-1);
+		if (d != null && d.loaded) {
+			numNeighbors++;
+			float diff = Mathf.Abs (height - d.height);
+			if (debug) Debug.Log("Down: "+d.ToString()+" "+diff);
+			delta += diff;
+		}
+
+		color.a = delta / (float)numNeighbors / 100f;
+		if (debug) Debug.Log("final blend: "+color.a);
+	}
+
+	void CalculateBlend2 () {
+		float max = 0f;
+
+		Vertex l = map.VertexAt(x-1, y);
+		if (l != null && l.loaded) {
+			float diff = Mathf.Abs(l.height - height);
+			if (diff > max) max = diff;
+		}
+
+		Vertex r = map.VertexAt(x+1, y);
+		if (r != null && r.loaded) {
+			float diff = Mathf.Abs(r.height - height);
+			if (diff > max) max = diff;
+		}
+
+		Vertex u = map.VertexAt(x, y+1);
+		if (u != null && u.loaded) {
+			float diff = Mathf.Abs(u.height - height);
+			if (diff > max) max = diff;
+		}
+
+		Vertex d = map.VertexAt(x, y-1);
+		if (d != null && d.loaded) {
+			float diff = Mathf.Abs(d.height - height);
+			if (diff > max) max = diff;
+		}
+
+		color.a = Mathf.Clamp01 (max / 50f);
+	}
+
 		
 	public void SetHeight (float h) {
 		// Skip locked vertices
 		if (locked || h == height) return;
 
+		loaded = true;
+
 		// Set height
 		height = h;
 
-		blend = 0f;
-		Vertex l = map.VertexAt(x-1,y);
-		blend += (l != null ? Mathf.Abs (h - l.height) : 0f);
+		color.a = 0f;
+		/*Vertex l = map.VertexAt(x-1,y);
+		color.a += (l != null ? Mathf.Abs (h - l.height) : 0f);
 
 		Vertex r = map.VertexAt(x+1,y);
-		blend += (r != null ? Mathf.Abs (h - r.height) : 0f);
+		color.a += (r != null ? Mathf.Abs (h - r.height) : 0f);
 
 		Vertex u = map.VertexAt(x,y+1);
-		blend += (u != null ? Mathf.Abs (h - u.height) : 0f);
+		color.a += (u != null ? Mathf.Abs (h - u.height) : 0f);
 
 		Vertex d = map.VertexAt(x,y-1);
-		blend += (d != null ? Mathf.Abs (h - d.height) : 0f);
+		color.a += (d != null ? Mathf.Abs (h - d.height) : 0f);
 
-		blend /= (WorldManager.instance.heightScale/10f);
-		blend = Mathf.Clamp01(blend);
+		color.a /= (WorldManager.instance.heightScale/10f);
+		color.a = Mathf.Clamp01(color.a);*/
+
+		CalculateBlend2();
 
 		int index;
 
@@ -189,28 +273,28 @@ public class Vertex {
 				if (ul != null) {
 					index = CoordToIndex (ul.x, ul.y);
 					ul.UpdateVertex (index, height, true);
-					ul.UpdateColor (index, blend);
+					ul.UpdateColor (index, color);
 				}
 
 				Chunk ur = terrain.ChunkAt (ChunkMax(x), ChunkMax (y));
 				if (ur != null) {
 					index = CoordToIndex (ur.x, ur.y);
 					ur.UpdateVertex (index, height, true);
-					ur.UpdateColor (index, blend);
+					ur.UpdateColor (index, color);
 				}
 
 				Chunk dl = terrain.ChunkAt (ChunkMin(x), ChunkMin (y));
 				if (dl != null) {
 					index = CoordToIndex (dl.x, dl.y);
 					dl.UpdateVertex (index, height, true);
-					dl.UpdateColor (index, blend);
+					dl.UpdateColor (index, color);
 				}
 
 				Chunk dr = terrain.ChunkAt (ChunkMax(x), ChunkMin (y));
 				if (dr != null) {
 					index = CoordToIndex (dr.x, dr.y);
 					dr.UpdateVertex (index, height, true);
-					dr.UpdateColor (index, blend);
+					dr.UpdateColor (index, color);
 				}
 
 			// X edge
@@ -219,14 +303,14 @@ public class Vertex {
 				if (left != null) {
 					index = CoordToIndex (left.x, left.y);
 					left.UpdateVertex (index, height, true);
-					left.UpdateColor (index, blend);
+					left.UpdateColor (index, color);
 				} 
 
 				Chunk right = terrain.ChunkAt(ChunkMax (x), ChunkAt(y));
 				if (right != null) {
 					index = CoordToIndex(right.x, right.y);
 					right.UpdateVertex(index, height, true);
-					right.UpdateColor (index, blend);
+					right.UpdateColor (index, color);
 				}
 			} 
 
@@ -236,14 +320,14 @@ public class Vertex {
 			if (bottom != null) {
 				index = CoordToIndex (bottom.x, bottom.y);
 				bottom.UpdateVertex (index, height, true);
-				bottom.UpdateColor (index, blend);
+				bottom.UpdateColor (index, color);
 			}
 
 			Chunk top = terrain.ChunkAt(ChunkAt(x), ChunkMax(y));
 			if (top != null) {
 				index = CoordToIndex (top.x, top.y);
 				top.UpdateVertex (index, height, true);
-				top.UpdateColor (index, blend);
+				top.UpdateColor (index, color);
 			}
 		
 		// No edge
@@ -252,7 +336,7 @@ public class Vertex {
 			if (chunk != null) {
 				index = CoordToIndex (chunk.x, chunk.y);
 				chunk.UpdateVertex (index, height, false);
-				chunk.UpdateColor (index, blend);
+				chunk.UpdateColor (index, color);
 			}
 		}
 	}

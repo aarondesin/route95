@@ -20,7 +20,7 @@ public class Sun : GlobalLightSource {
 		float newY = yScale * Mathf.Sin(WorldManager.instance.timeOfDay);
 		float newZ = -zScale * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
 		this.transform.position = new Vector3(newX, newY, newZ);
-		transform.localScale = new Vector3 (100f, 100f, 100f);
+		transform.localScale = new Vector3 (200f, 200f, 200f);
 
 		this.transform.LookAt (sunTarget);
 		if (invert) this.transform.Rotate(new Vector3 (180f, 0f, 0f));
@@ -29,9 +29,9 @@ public class Sun : GlobalLightSource {
 	void Start() {
 		instance = this;
 		transform.parent = PlayerMovement.instance.transform;
-		this.GetComponent<Light> ().range = 100f;
-		this.GetComponent<Light> ().type = LightType.Directional;
-		GetComponent<Light>().shadowBias = 1f;
+		//this.GetComponent<Light> ().range = 100f;
+		//this.GetComponent<Light> ().type = LightType.Directional;
+		//GetComponent<Light>().shadowBias = 1f;
 		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
 	}
 	

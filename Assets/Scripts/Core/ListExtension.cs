@@ -48,6 +48,16 @@ public static class ListExtension {
 			list.Add (toInsert);
 		}
 	}
+
+	public static T PopFront<T> (this List<T> list) {
+		T result = list[0];
+		list.RemoveAt(0);
+		return result;
+	}
+
+	public static T Random<T> (this List<T> list) {
+		return list[UnityEngine.Random.Range(0, list.Count)];
+	}
 	
 }
 

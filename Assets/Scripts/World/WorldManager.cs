@@ -25,6 +25,8 @@ public class WorldManager : MonoBehaviour {
 
 	public static WorldManager instance;
 
+	public GameObject vertexIndicator;
+
 	public int loadsToDo;
 
 	// Chunk vars
@@ -251,17 +253,18 @@ public class WorldManager : MonoBehaviour {
 	[Range(0f, 2f*Mathf.PI)]
 	public float timeOfDay;
 
-	GameObject sun;                                      // Sun object
+	public GameObject sun;                               // Sun object
 	Light sunLight;                                      // Sun object's light
 
 	[Tooltip("Scale to use for the sun.")]
 	public float sunScale;
 
 	[Tooltip("Daytime intensity of the sun.")]
-	[Range(0.1f, 1.5f)]
+	[Range(0f, 8f)]
 	public float maxSunIntensity;
 
 	[Tooltip("Nighttime intensity of the sun.")]
+	[Range(0f, 8f)]
 	public float minSunIntensity;
 
 	float sunIntensityAxis;                              // Axis of sun intensity oscillation
@@ -270,17 +273,18 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Flare texture to use for the sun.")]
 	public Flare sunFlare;
 
-	GameObject moon;                                     // Moon object
+	public GameObject moon;                              // Moon object
 	Light moonLight;                                     // Moon object's light
 
 	[Tooltip("Scale to use for the moon.")]
 	public float moonScale;
 
 	[Tooltip("Nighttime intensity of the moon.")]
-	[Range(0.1f, 1.5f)]
+	[Range(0f, 8f)]
 	public float maxMoonIntensity;
 
 	[Tooltip("Daytime intensity of the moon.")]
+	[Range(0f, 8f)]
 	public float minMoonIntensity;
 
 	float moonIntensityAxis;                             // Axis of moon intensity oscillation
@@ -357,34 +361,38 @@ public class WorldManager : MonoBehaviour {
 
 		//roadPlacementDistance = chunkSize * 2f;
 		roadCleanupRadius = chunkSize * (chunkLoadRadius);
-		roadExtendRadius = chunkSize * (chunkLoadRadius-2);
+		roadPlacementDistance = chunkSize * 0.4f;
+		roadExtendRadius = chunkSize * (chunkLoadRadius/2);
 		road = CreateRoad();
 
 		numDecorations = 0;
 		decorationPool = new ObjectPool<Decoration>();
 
 		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
-		sun = CreateSun();
+		CreateSun();
 		sunLight = sun.Light();
 		sunIntensityAmplitude = (maxSunIntensity-minSunIntensity)/2f;
 		sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
 
-		moon = CreateMoon();
+		CreateMoon();
 		moonLight = moon.Light();
 		moonIntensityAmplitude = (maxMoonIntensity-maxMoonIntensity)/2f;
 		moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
 
-		RenderSettings.ambientMode = AmbientMode.Flat;
-		RenderSettings.ambientIntensity = 0.5f;
+		//RenderSettings.ambientMode = AmbientMode.Flat;
+		//RenderSettings.ambientIntensity = 0.5f;
 
 		lightningStriker.SetActive(false);
 		rainEmitter.SetRate(0f);
 		shootingStarTemplate.SetActive(false);
 
-		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
-			(doDecorate ? maxDecorations + decorationPaths.Count : 0);
-
 		terrainMaterial.SetFloat("_WaveProgress", 1f);
+	}
+
+	void Start () {
+		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
+			(doDecorate ? maxDecorations + decorationPaths.Count : 0) +
+			terrain.loadsToDo;
 	}
 
 	// Update is called once per frame
@@ -411,6 +419,8 @@ public class WorldManager : MonoBehaviour {
 	#region WorldManager Methods
 
 	public void Load () {
+
+		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 
 		// Get start time
 		startLoadTime = Time.realtimeSinceStartup;
@@ -466,7 +476,14 @@ public class WorldManager : MonoBehaviour {
 	}
 
 	IEnumerator DecorationLoop () {
-		if (!loaded) GameManager.instance.ChangeLoadingMessage("Decorating terrain...");
+
+		List<string> loadMessages = new List<string>() {
+			"Planting cacti...",
+			"Placing doodads...",
+			"Landscaping...",
+		};
+
+		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
 		float startTime = Time.realtimeSinceStartup;
 		int numLoaded = 0;
 
@@ -566,32 +583,49 @@ public class WorldManager : MonoBehaviour {
 			switch (deco.distribution) {
 			case Decoration.Distribution.Random:
 				Chunk chunk = terrain.RandomChunk ();
+				if (chunk == null) return false;
 				return DecorateRandom (chunk, decoration, createNew);
 			case Decoration.Distribution.Roadside:
 				float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
 				return DecorateRoadside (bezierProg, decoration, createNew);
 			case Decoration.Distribution.CloseToRoad:
-				return DecorateRandom (terrain.RandomCloseToRoadChunk(), decoration, createNew);
+				Chunk chunk2 = terrain.RandomCloseToRoadChunk();
+				if (chunk2 == null) return false;
+				return DecorateRandom (chunk2, decoration, createNew);
 			}
 		}
 	
 		return false;
 	}
     
-	GameObject CreateSun(){
+	/*GameObject CreateSun(){
 		GameObject sun = new GameObject ("Sun",
 			typeof (Light),
-			typeof (Sun)
+			typeof (Sun),
+			typeof (LensFlare)
 		);
 
 		Light light = sun.Light();
 		light.shadows = LightShadows.Soft;
 		light.flare = sunFlare;
 
+		LensFlare flare = sun.GetComponent<LensFlare>();
+		flare.flare = sunFlare;
+		//flare.
+
 		return sun;
+	}*/
+
+	void CreateSun () {
+
 	}
 
-	GameObject CreateMoon(){
+	void CreateMoon () {
+		moon.GetComponent<SpriteRenderer>().sprite = 
+			moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
+	}
+
+	/*GameObject CreateMoon(){
 		GameObject moon = new GameObject ("Moon",
 			typeof (Light),
 			typeof (Moon),
@@ -605,7 +639,7 @@ public class WorldManager : MonoBehaviour {
 		moon.GetComponent<SpriteRenderer>().sprite = 
 			moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
 		return  moon;
-	}
+	}*/
 
 	Road CreateRoad() {
 
@@ -618,7 +652,7 @@ public class WorldManager : MonoBehaviour {
 
 		// Change renderer properties
 		MeshRenderer roadRenderer = roadObj.GetComponent<MeshRenderer>();
-		roadRenderer.material = roadMaterial;
+		roadRenderer.sharedMaterial = roadMaterial;
 		roadRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
 
 		// Pass on road properties

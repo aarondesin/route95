@@ -304,7 +304,7 @@ public class MusicManager : MonoBehaviour {
 	IEnumerator LoadSounds () {
 
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
+		GameManager.instance.ChangeLoadingMessage("Tuning instruments...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -349,8 +349,14 @@ public class MusicManager : MonoBehaviour {
 	/// <returns></returns>
 	IEnumerator LoadInstruments () {
 
+		List<string> loadMessages = new List<string>() {
+			"Renting instruments...",
+			"Grabbing instruments...",
+			"Unpacking instruments..."
+		};
+
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;

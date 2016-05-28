@@ -135,6 +135,10 @@ Material:
         first:
           name: _InvFade
         second: 1.44
+      data:
+        first:
+          name: _Emission
+        second: 0
     m_Colors:
       data:
         first:
