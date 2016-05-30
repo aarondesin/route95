@@ -241,7 +241,7 @@ Material:
       data:
         first:
           name: _Normal
-        second: 0.517
+        second: 1
     m_Colors:
       data:
         first:

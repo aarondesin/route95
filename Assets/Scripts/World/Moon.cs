@@ -11,6 +11,8 @@ public class Moon : GlobalLightSource {
 	public static Moon instance;  // Quick reference to this instance
 	Light _light;                 // Reference to this light component
 
+	public Light shadowCaster;
+
 	public float radius;
 	public float scale;
 

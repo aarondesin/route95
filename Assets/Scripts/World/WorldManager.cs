@@ -521,9 +521,13 @@ public class WorldManager : MonoBehaviour {
 
 		sunLight.intensity = sunIntensityAxis + sunIntensityAmplitude * Mathf.Sin (timeOfDay);
 		sunLight.color = primaryColor;
+		sun.GetComponent<Sun>().shadowCaster.intensity = sunLight.intensity/2f;
+		sun.GetComponent<Sun>().shadowCaster.color = sunLight.color;
 
 		moonLight.color = Color.white;
 		moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay-(Mathf.PI/2f));
+		moon.GetComponent<Moon>().shadowCaster.intensity = moonLight.intensity/2f;
+		moon.GetComponent<Moon>().shadowCaster.color = moonLight.color;
 
 		RenderSettings.fogColor = secondaryColor;
 		RenderSettings.ambientLight = secondaryColor;

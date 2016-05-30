@@ -78,11 +78,11 @@ MonoBehaviour:
   group: 2
   dynamic: 0
   density: 2
-  distribution: 2
+  distribution: 0
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}
-  heightRange: {x: 0.5, y: 3}
-  widthRange: {x: 0.5, y: 3}
+  heightRange: {x: 0.5, y: 10}
+  widthRange: {x: 0.5, y: 10}
   pitchRange: {x: -5, y: 5}
   yawRange: {x: 0, y: 360}
   rollRange: {x: -5, y: 5}

@@ -81,8 +81,8 @@ MonoBehaviour:
   distribution: 0
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}
-  heightRange: {x: 0.8, y: 1.2}
-  widthRange: {x: 0.9, y: 1.1}
+  heightRange: {x: 0.8, y: 2}
+  widthRange: {x: 0.9, y: 2}
   pitchRange: {x: -5, y: 5}
   yawRange: {x: 0, y: 360}
   rollRange: {x: -5, y: 5}

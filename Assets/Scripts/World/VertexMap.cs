@@ -27,7 +27,7 @@ public class VertexMap {
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
-		noDecorationsDistance = WorldManager.instance.roadWidth * 2f;
+		noDecorationsDistance = WorldManager.instance.roadWidth * 3f;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Map<Vertex>(width);

@@ -310,6 +310,7 @@ public class Road : Bezier {
 				startTime = Time.realtimeSinceStartup;
 			}
 		}
+		toCheck.Add (GetPoint(endProgress));
 		yield return null;
 	}
 

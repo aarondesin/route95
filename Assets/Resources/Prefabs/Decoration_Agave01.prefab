@@ -77,12 +77,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group: 1
   dynamic: 0
-  density: 3
+  density: 4
   distribution: 0
   positionOffset: {x: 0, y: 0.5, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}
-  heightRange: {x: 1, y: 2}
-  widthRange: {x: 1, y: 2}
+  heightRange: {x: 1.5, y: 4}
+  widthRange: {x: 1.5, y: 4}
   pitchRange: {x: -5, y: 5}
   yawRange: {x: 0, y: 360}
   rollRange: {x: -5, y: 5}

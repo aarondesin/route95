@@ -6,6 +6,8 @@ using System.Collections;
 public class Sun : GlobalLightSource {
 	public static Sun instance;
 
+	public Light shadowCaster;
+
 	private float xScale = 1000;
 	private float yScale = 1000;
 	private float zScale = 1000;
