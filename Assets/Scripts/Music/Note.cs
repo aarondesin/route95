@@ -15,7 +15,7 @@ public class Note {
 
 	#region Note Vars
 
-	const float DEFAULT_VOLUME = 1f;          // Default volume
+	const float DEFAULT_VOLUME = 0.75f;          // Default volume
 	const float DEFAULT_DURATION = 1f;        // Default duration
 
 	[SerializeField]

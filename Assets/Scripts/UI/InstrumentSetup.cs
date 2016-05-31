@@ -13,6 +13,7 @@ public class InstrumentSetup : MonoBehaviour {
 	#region InstrumentSetup Vars
 
 	public static InstrumentSetup instance; // Quick reference to this instance
+	public bool initialized = false;
 	public RiffAI riffai;                   // RiffAI instance to use (inactive)
 	public static Riff currentRiff;         // Current riff being edited
 	
@@ -93,6 +94,7 @@ public class InstrumentSetup : MonoBehaviour {
 	/// Sets up riff editor and calls appropriate init function.
 	/// </summary>
 	public void Initialize () {
+		initialized = false;
 		
 		// Check if riff is valid
 		if (currentRiff == null) {
@@ -156,6 +158,8 @@ public class InstrumentSetup : MonoBehaviour {
 
 		// Update riff volume slider
 		riffVolumeSlider.value = currentRiff.volume;
+
+		initialized = true;
 	}
 
 	/// <summary>

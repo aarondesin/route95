@@ -87,7 +87,6 @@ public class Road : Bezier {
 				"Following star maps..."
 			};
 			GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
-			float startTime = Time.realtimeSinceStartup;
 		}
 			
 		// These values may have changed, so get them from WM
@@ -117,25 +116,28 @@ public class Road : Bezier {
 		// If road beginning is too close
 		if (Vector3.Distance (points.Head(), playerPosition) < generateRoadRadius) {
 
-			int curvesDone = Mathf.FloorToInt (progress * CurveCount);
-			float curveProgress = progress % (1f / CurveCount);
+			float numerator = progress * CurveCount * 2f;
+			float denominatorOld = CurveCount * 2f;
 
 			// Generate backwards
 			Backtrack();
 
 			// Update player progress
-			PlayerMovement.instance.progress = (curvesDone + 1) * (1f / CurveCount) + curveProgress;
+			PlayerMovement.instance.progress = (numerator + 2f) / (denominatorOld + 2f);
 
 			changesMade = true;
 
 		// If road beginning is too far away
 		} else if (Vector3.Distance (points.Head(), playerPosition) > cleanupRoadRadius) {
 
+			float numerator = progress * CurveCount * 2f;
+			float denominator = CurveCount * 2f;
+
 			// Remove first curve
 			RemoveCurve();
 
 			// Update player progress
-			PlayerMovement.instance.progress -= 0.5f / (float)CurveCount;
+			PlayerMovement.instance.progress = (numerator - 2f) / (denominator - 2f);
 
 			changesMade = true;
 

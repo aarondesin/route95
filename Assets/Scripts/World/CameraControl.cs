@@ -67,7 +67,6 @@ public class CameraControl : MonoBehaviour {
 
 	// Live mode camera angle vars
 	CameraView currentAngle;              // Current live mode angle
-	List<CameraView> setupAngles;         // List of all setup angles
 	List<CameraView> liveAngles;          // List of all live mode angles
 	float transitionTimer;                // Timer to next angle change
 	bool paused = false;                  // Is live mode paused?
@@ -152,12 +151,6 @@ public class CameraControl : MonoBehaviour {
 			targetRot = ViewRadio.rotation,
 			fov = 20f,
 			followMode = CameraView.CameraFollowMode.Static
-		};
-
-		setupAngles = new List<CameraView> () {
-			OutsideCar,
-			Driving,
-			Radio
 		};
 
 		initialView = OutsideCar;

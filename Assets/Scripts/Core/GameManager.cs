@@ -561,7 +561,7 @@ public class GameManager : MonoBehaviour {
 		paused = false;
 
 		// Hide menus
-		MoveCasetteBack();
+		SnapCasetteBack();
 		HideAll ();
 
 		// Show live menus

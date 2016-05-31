@@ -62,7 +62,7 @@ public class Riff {
 	public bool cutSelf = true;              // If true, sounds will cut themselves off
 
 	[SerializeField]
-	public float volume = 1f;                // Volume scaler for all riff notes
+	public float volume = 0.8f;                // Volume scaler for all riff notes
 
 	[SerializeField]
 	public float panning = 0f;               // Stereo panning value
@@ -204,7 +204,7 @@ public class Riff {
 		beat.Add (newNote);
 
 		// Play note
-		newNote.PlayNote(source);
+		newNote.PlayNote(source, volume, true);
 
 		// Do environmental effects
 		if (instrument.type == Instrument.Type.Percussion) {

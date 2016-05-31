@@ -142,7 +142,7 @@ public class PlaylistBrowser : MonoBehaviour {
 			listing_text_txt.text = (i+1).ToString() + ". " + song.name;
 			listing_text_txt.fontSize = fontSize;
 			listing_text_txt.color = Color.black;
-			listing_text_txt.font = GameManager.instance.font;
+			listing_text_txt.font = GameManager.instance.handwrittenFont;
 			listing_text_txt.alignment = TextAnchor.MiddleLeft;
 
 
@@ -309,7 +309,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		newSong_text_txt.text = "New Song...";
 		newSong_text_txt.fontSize = (int)(fontSize * iconScale);
 		newSong_text_txt.color = Color.black;
-		newSong_text_txt.font = GameManager.instance.font;
+		newSong_text_txt.font = GameManager.instance.handwrittenFont;
 		newSong_text_txt.alignment = TextAnchor.MiddleLeft;
 
 		GameObject newSongButton_highlight = UIHelpers.MakeImage ("Highlight (New Song Button)");
@@ -374,7 +374,7 @@ public class PlaylistBrowser : MonoBehaviour {
 		loadSongButton_text_txt.text = "Load Song...";
 		loadSongButton_text_txt.fontSize = (int)(fontSize * iconScale);
 		loadSongButton_text_txt.color = Color.black;
-		loadSongButton_text_txt.font = GameManager.instance.font;
+		loadSongButton_text_txt.font = GameManager.instance.handwrittenFont;
 		loadSongButton_text_txt.alignment = TextAnchor.MiddleLeft;
 
 		GameObject loadSongButton_highlight = UIHelpers.MakeImage ("Load New Song Highlight");

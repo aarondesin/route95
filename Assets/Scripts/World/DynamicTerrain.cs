@@ -66,6 +66,7 @@ public class DynamicTerrain : MonoBehaviour {
 		// Copy vars from WM
 		chunkUpdatesPerCycle = WorldManager.instance.chunkUpdatesPerCycle;
 		chunkSize = WorldManager.instance.chunkSize;
+		chunkRes = WorldManager.instance.chunkResolution;
 		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
 
 		int verts = 2 * chunkLoadRadius * (chunkRes - 1);

@@ -153,13 +153,36 @@ public class LoadPrompt : MonoBehaviour {
 	public void LoadSelectedPath () {
 		//string fullPath = GameManager.instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
 		Debug.Log("LoadPrompt.LoadSelectedPath(): loading "+selectedPath);
+
 		switch (loadMode) {
-		case LoadPrompt.Mode.Project:
-			SaveLoad.LoadProject (selectedPath);
-			break;
-		case LoadPrompt.Mode.Song:
-			SaveLoad.LoadSongToProject (selectedPath);
-			break;
+			case LoadPrompt.Mode.Project:
+				try {
+					SaveLoad.LoadProject (selectedPath);
+					Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Nice");
+
+					// Refresh name field on playlist browser
+					PlaylistBrowser.instance.RefreshName();
+	
+					Debug.Log("got here");
+					// Go to playlist menu if not there already
+					GameManager.instance.GoToPlaylistMenu();
+					break;
+				} catch (SaveLoad.FailedToLoadException) {
+					// Prompt
+					Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+					break;
+				}
+
+			case LoadPrompt.Mode.Song:
+				try {
+					SaveLoad.LoadSongToProject (selectedPath);
+					Prompt.instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
+					break;
+				} catch (SaveLoad.FailedToLoadException) {
+					// Prompt
+					Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+					break;
+				}
 		}
 	}
 

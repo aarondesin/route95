@@ -8,15 +8,7 @@ using UnityEngine.Audio;
 /// </summary>
 public class EffectButton : MonoBehaviour {
 
-	GameManager Game;
-	MusicManager Music;
-
 	public Image image;
-
-	void Start () {
-		Game = Game as GameManager;
-		Music = Music as MusicManager;
-	}
 
 	/// <summary>
 	/// Toggles the active status of the distortion filter.
@@ -32,6 +24,7 @@ public class EffectButton : MonoBehaviour {
 		riff.distortionEnabled = distortion.enabled;
 
 		// Update button art
+		if (image == null) Debug.Log("shit");
 		image.sprite = (distortion.enabled ? 
 			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty);
 
@@ -155,6 +148,9 @@ public class EffectButton : MonoBehaviour {
 		InstrumentSetup.currentRiff.distortionLevel = slider.value;
 		source.gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = InstrumentSetup.currentRiff.distortionLevel;
 		//instrumentAudioSources[MelodicInstrument.ElectricGuitar].gameObject.GetComponent<AudioDistortionFilter>().distortionLevel = 0.9f;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.distortionEnabled && InstrumentSetup.instance.initialized) ToggleDistortion();
 	}
 
 	public void updateechoDecayRatio(Slider slider){
@@ -162,26 +158,37 @@ public class EffectButton : MonoBehaviour {
 		InstrumentSetup.currentRiff.echoDecayRatio = slider.value;
 		source.gameObject.GetComponent<AudioEchoFilter>().decayRatio = InstrumentSetup.currentRiff.echoDecayRatio;
 
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.echoEnabled && InstrumentSetup.instance.initialized) ToggleEcho();
 	}
 
 
 	public void updateechoDelay(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.echoDelay = slider.value;
-		source.gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;			
+		source.gameObject.GetComponent<AudioEchoFilter>().delay = InstrumentSetup.currentRiff.echoDelay;		
+		
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.echoEnabled && InstrumentSetup.instance.initialized) ToggleEcho();	
 	}
 
 
 	public void updateechoDryMix(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.echoDryMix = slider.value;
-		source.gameObject.GetComponent<AudioEchoFilter>().dryMix = InstrumentSetup.currentRiff.echoDryMix;		
+		source.gameObject.GetComponent<AudioEchoFilter>().dryMix = InstrumentSetup.currentRiff.echoDryMix;	
+		
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.echoEnabled && InstrumentSetup.instance.initialized) ToggleEcho();	
 	}
 
 	public void updatereverbDecayTime(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.reverbDecayTime = slider.value;
-		source.gameObject.GetComponent<AudioReverbFilter>().decayTime = InstrumentSetup.currentRiff.reverbDecayTime;		
+		source.gameObject.GetComponent<AudioReverbFilter>().decayTime = InstrumentSetup.currentRiff.reverbDecayTime;	
+		
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.reverbEnabled && InstrumentSetup.instance.initialized) ToggleReverb();	
 	}
 
 
@@ -189,42 +196,63 @@ public class EffectButton : MonoBehaviour {
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.reverbLevel = slider.value;
 		source.gameObject.GetComponent<AudioReverbFilter>().reverbLevel = InstrumentSetup.currentRiff.reverbLevel;	
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.reverbEnabled && InstrumentSetup.instance.initialized) ToggleReverb();
 	}
 
 	public void updatetremoloRate(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.tremoloRate = slider.value;		
 		source.gameObject.GetComponent<AudioTremoloFilter>().rate = InstrumentSetup.currentRiff.tremoloRate;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.tremoloEnabled && InstrumentSetup.instance.initialized) ToggleTremolo();
 	}
 
 	public void updatetremoloDepth(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.tremoloDepth = slider.value;		
 		source.gameObject.GetComponent<AudioTremoloFilter>().depth = InstrumentSetup.currentRiff.tremoloDepth;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.tremoloEnabled && InstrumentSetup.instance.initialized) ToggleTremolo();
 	}
 
 	public void updatechorusDryMix(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.chorusDryMix = slider.value;
-		source.gameObject.GetComponent<AudioChorusFilter>().dryMix = InstrumentSetup.currentRiff.chorusDryMix;		
+		source.gameObject.GetComponent<AudioChorusFilter>().dryMix = InstrumentSetup.currentRiff.chorusDryMix;	
+		
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.chorusEnabled && InstrumentSetup.instance.initialized) ToggleChorus();	
 	}
 
 	public void updatechorusRate(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.chorusRate = slider.value;
 		source.gameObject.GetComponent<AudioChorusFilter>().rate = InstrumentSetup.currentRiff.chorusRate;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.chorusEnabled && InstrumentSetup.instance.initialized) ToggleChorus();
 	}
 
 	public void updatechorusDepth(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.chorusDepth = slider.value;
 		source.gameObject.GetComponent<AudioChorusFilter>().depth = InstrumentSetup.currentRiff.chorusDepth;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.chorusEnabled && InstrumentSetup.instance.initialized) ToggleChorus();
 	}
 
 	public void updateflangerRate(Slider slider){
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.flangerRate = Mathf.PI/32f + Mathf.PI/32f * slider.value;
 		source.gameObject.GetComponent<AudioFlangerFilter>().rate = InstrumentSetup.currentRiff.flangerRate;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.flangerEnabled && InstrumentSetup.instance.initialized) ToggleFlanger();
 	}
 		
 
@@ -232,6 +260,9 @@ public class EffectButton : MonoBehaviour {
 		AudioSource source = MusicManager.instance.instrumentAudioSources [InstrumentSetup.currentRiff.instrument];
 		InstrumentSetup.currentRiff.flangerDryMix = slider.value;
 		source.gameObject.GetComponent<AudioFlangerFilter>().dryMix = InstrumentSetup.currentRiff.flangerDryMix;
+
+		Riff riff = InstrumentSetup.currentRiff;
+		if (!riff.flangerEnabled && InstrumentSetup.instance.initialized) ToggleFlanger();
 	}
 }
 

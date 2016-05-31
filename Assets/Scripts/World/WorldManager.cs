@@ -404,10 +404,12 @@ public class WorldManager : MonoBehaviour {
 			//terrain.Update(freqDataArray);
 			UpdateTime();
 			UpdateColor();
-			AttemptDecorate();
-			Vector3 dWind = UnityEngine.Random.insideUnitSphere;
-			wind += dWind * Time.deltaTime;
-			wind.Normalize();
+			if (doDecorate) {
+				AttemptDecorate();
+				Vector3 dWind = UnityEngine.Random.insideUnitSphere;
+				wind += dWind * Time.deltaTime;
+				wind.Normalize();
+			}
 			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
 			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
 			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);

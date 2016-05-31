@@ -60,7 +60,7 @@ public class NoteButton : DraggableButton {
 
 	public void UpdateButtonArt() {
 		volumeImage.fillAmount = targetNote.volume;
-		volumeImage.color = new Color (targetNote.volume, 0f, 0f, 1f);
+		volumeImage.color = new Color (0.75f*targetNote.volume + 0.25f, 0.25f, 0.25f, 1f);
 	}
 
 	#endregion

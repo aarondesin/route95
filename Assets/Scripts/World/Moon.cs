@@ -16,10 +16,6 @@ public class Moon : GlobalLightSource {
 	public float radius;
 	public float scale;
 
-	private float xScale = 1000f;
-	private float yScale = 1000f;
-	private float zScale = 1000f;
-
 	private Vector3 target; // target for the sun to point at: the car or the origin
 
 	#endregion
@@ -27,10 +23,8 @@ public class Moon : GlobalLightSource {
 
 	void Awake () {
 		instance = this;
-		//this.GetComponent<Light> ().range = 100f;
-		//this.GetComponent<Light> ().type = LightType.Directional;
-		//GetComponent<Light>().shadowBias = 1f;
-		GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
+		GetComponent<Light>().cullingMask = 
+			(1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
 	}
 
 	void Start () {
