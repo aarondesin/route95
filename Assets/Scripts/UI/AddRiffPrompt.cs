@@ -76,7 +76,6 @@ public class AddRiffPrompt : MonoBehaviour {
 	/// Adds a riff from the prompt.
 	/// </summary>
 	public void AddRiff () {
-		
 
 		// Create riff
 		Riff temp = new Riff(dropdown.value);
@@ -90,6 +89,7 @@ public class AddRiffPrompt : MonoBehaviour {
 		// Go to riff editor
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
+		SongArrangeSetup.instance.SetValue(temp.index);
 		GameManager.instance.Hide (gameObject);
 		GameManager.instance.GoToRiffEditor();
 	}

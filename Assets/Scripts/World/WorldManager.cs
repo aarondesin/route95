@@ -137,7 +137,11 @@ public class WorldManager : MonoBehaviour {
 		new List<GameObject>();
 
 	List<string> decorationPaths = new List<string>() {  // List of load paths for decoration prefabs
-		"Prefabs/Decoration_75MPH",
+		"Prefabs/Decoration_50mph",
+		"Prefabs/Decoration_50mph45night",
+		"Prefabs/Decoration_65MPH",
+		"Prefabs/Decoration_70MPH",
+		"Prefabs/Decoration_75mph",
 		"Prefabs/Decoration_Agave01",
 		"Prefabs/Decoration_BarrelCactus",
 		"Prefabs/Decoration_Boulder01",
@@ -145,6 +149,7 @@ public class WorldManager : MonoBehaviour {
 		"Prefabs/Decoration_Boulder03",
 		"Prefabs/Decoration_Chevron",
 		"Prefabs/Decoration_JoshuaTree01",
+		"Prefabs/Decoration_PassWithCare",
 		"Prefabs/Decoration_Saguaro",
 		"Prefabs/DynamicDecoration_Tumbleweed01"
 	};
@@ -528,7 +533,7 @@ public class WorldManager : MonoBehaviour {
 
 		moonLight.color = Color.white;
 		moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay-(Mathf.PI/2f));
-		moon.GetComponent<Moon>().shadowCaster.intensity = moonLight.intensity/2f;
+		moon.GetComponent<Moon>().shadowCaster.intensity = moonLight.intensity/4f;
 		moon.GetComponent<Moon>().shadowCaster.color = moonLight.color;
 
 		RenderSettings.fogColor = secondaryColor;

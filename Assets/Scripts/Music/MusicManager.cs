@@ -454,8 +454,8 @@ public class MusicManager : MonoBehaviour {
 	#endregion
 	#region MusicManager Callbacks
 
-	public static void PlayMenuSound (AudioClip sound) {
-		((MusicManager)instance).source.PlayOneShot (sound, 1f);
+	public static void PlayMenuSound (AudioClip sound, float volume=1f) {
+		instance.source.PlayOneShot (sound, volume);
 	}
 
 	/// <summary>

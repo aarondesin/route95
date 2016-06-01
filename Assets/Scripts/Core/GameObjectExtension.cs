@@ -104,6 +104,10 @@ public static class GameObjectExtension {
 		obj.RectTransform().sizeDelta = new Vector2 (x, y);
 	}
 
+	public static void SetSize2D (this GameObject obj, Vector2 v) {
+		obj.RectTransform().sizeDelta = v;
+	}
+
 	/// <summary>
 	/// Sets the width (not scale) of a square UI GameObject.
 	/// </summary>

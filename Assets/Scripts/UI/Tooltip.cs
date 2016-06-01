@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
@@ -8,31 +9,23 @@ public class Tooltip : MonoBehaviour {
 
 	#region Tooltip Vars
 
-	[Tooltip("Text to show in tooltip.")]
-	public string text;
+	public static Tooltip instance;
 
-	bool mouseOver = false; // Is the mouse over a tooltip object
+	Text textObj;
 
 	#endregion
 	#region Unity Callbacks
 
-	void Update () {
-		Vector2 mouse = Input.mousePosition;
-		Vector3[] corners = new Vector3[4];
-		gameObject.RectTransform().GetWorldCorners(corners);
+	void Awake () {
+		instance = this;
+		textObj = GetComponentInChildren<Text>();
+	}
 
-		if (mouse.x >= corners[0].x && mouse.x < corners[2].x &&
-			mouse.y >= corners[0].y && mouse.y < corners[2].y) {
-			if (!mouseOver) {
-				GameManager.instance.ShowTooltip(text);
-				mouseOver = true;
-			}
-		} else {
-			if (mouseOver) {
-				GameManager.instance.HideTooltip();
-				mouseOver = false;
-			}
-		}
+	#endregion
+	#region Tooltip Methods
+
+	public void SetText (string text) {
+		textObj.text = text;
 	}
 
 	#endregion

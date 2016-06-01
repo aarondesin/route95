@@ -38,6 +38,18 @@ public class Sounds : MonoBehaviour {
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#4",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D4",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_G#4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B4",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C5",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#5",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D5",
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_D#5",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_E5",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F5",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_F#5",
@@ -46,8 +58,7 @@ public class Sounds : MonoBehaviour {
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A5",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_A#5",
 			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_B5",
-			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C6",
-			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C#6"
+			"Audio/Instruments/Melodic/ElectricGuitar/ElectricGuitar_C6"
 			} },
 
 		//Melodic.ElectricBass

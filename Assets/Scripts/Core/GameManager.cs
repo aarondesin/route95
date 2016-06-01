@@ -758,23 +758,7 @@ public class GameManager : MonoBehaviour {
 	/// Plays a random pen scribble sound.
 	/// </summary>
 	public void Scribble () {
-		MusicManager.PlayMenuSound (scribbles[UnityEngine.Random.Range(0,3)]);
-	}
-
-	/// <summary>
-	/// Shows the tooltip.
-	/// </summary>
-	/// <param name="message">Message.</param>
-	public void ShowTooltip (string message) {
-		tooltip.SetActive(true);
-		tooltip.Text().text = message;
-	}
-
-	/// <summary>
-	/// Hides the tooltip.
-	/// </summary>
-	public void HideTooltip () {
-		tooltip.SetActive(false);
+		MusicManager.PlayMenuSound (scribbles.Random(), 0.75f);
 	}
 
 	/// <summary>

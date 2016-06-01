@@ -144,7 +144,8 @@ public class Road : Bezier {
 		
 		} else if (!loaded)  {
 			loaded = true;
-			PlayerMovement.instance.transform.position = GetPoint(0.5f) + new Vector3(0f, 2.27f + height, 0f);
+			PlayerMovement.instance.transform.position = GetPoint(0.6f) + new Vector3(0f, 2.27f + height, 0f);
+			PlayerMovement.instance.transform.LookAt (GetPoint(0.6f) + GetVelocity(0.6f), Vector3.up);
 			if (WorldManager.instance.doDecorate)
 				WorldManager.instance.DoLoadDecorations();
 			else WorldManager.instance.FinishLoading();

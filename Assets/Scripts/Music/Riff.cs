@@ -182,6 +182,16 @@ public class Riff {
 		}
 	}
 
+	public Note GetNote (string fileName, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+
+		foreach (Note note in beat.notes)
+			if (note.filename == fileName) return note;
+		
+		return null;
+	}
+
 	/// <summary>
 	/// Toggles a note at the given position.
 	/// </summary>
