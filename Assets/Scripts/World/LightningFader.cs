@@ -1,12 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Class to handle fading of lightning.
+/// </summary>
 public class LightningFader : MonoBehaviour {
 
-	Light _light;
-	SpriteRenderer _renderer;
-	public float fadeSpeed;
-	float baseIntensity;
+	#region LightningFader Vars
+
+	Light _light;             // Reference to light
+	SpriteRenderer _renderer; // Lightning sprite renderer
+	public float fadeSpeed;   // Lightning fade speed
+	float baseIntensity;      // Base lightning intensity
+
+	#endregion
+	#region Unity Callbacks
 
 	void Awake () {
 		_light = gameObject.Light();
@@ -29,4 +37,6 @@ public class LightningFader : MonoBehaviour {
 		_renderer.color = temp;
 
 	}
+
+	#endregion
 }

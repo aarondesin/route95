@@ -55,7 +55,9 @@ public class PercussionInstrument : Instrument {
 		iconPaths = new Dictionary <string, string> () {
 			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
 			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom", "UI/Percussion_Tom" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "UI/Percussion_Tom" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom", "UI/Percussion_Tom" },
+			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom", "UI/Percussion_Tom" },
 			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "UI/Percussion_Hat" },
 			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "UI/Percussion_Hat" }
 		}

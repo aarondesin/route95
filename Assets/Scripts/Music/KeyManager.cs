@@ -22,9 +22,7 @@ public class KeyManager : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
-
-		// Init instance
+	void Awake () {
 		instance = this;
 	}
 

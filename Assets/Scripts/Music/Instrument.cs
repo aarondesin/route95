@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Class to store all relevant instrument data and references.
 /// </summary>
-public class Instrument {
+public class Instrument : IComparable {
 
 	#region Instrument Enums
 
@@ -82,6 +82,15 @@ public class Instrument {
 		// Load all instruments
 		foreach (Instrument instrument in AllInstruments)
 			instrument.Load();
+	}
+
+	public int CompareTo (object obj) {
+		if (obj == null) return 1;
+
+		Instrument other = obj as Instrument;
+		if (other != null) return this.index.CompareTo (other.index);
+		else throw new ArgumentException ("Argument is not an instrument.");
+		
 	}
 
 	#endregion

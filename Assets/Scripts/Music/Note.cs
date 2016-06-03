@@ -15,7 +15,7 @@ public class Note {
 
 	#region Note Vars
 
-	const float DEFAULT_VOLUME = 1f;          // Default volume
+	const float DEFAULT_VOLUME = 0.75f;          // Default volume
 	const float DEFAULT_DURATION = 1f;        // Default duration
 
 	[SerializeField]
@@ -98,7 +98,9 @@ public class Note {
 	/// </summary>
 	/// <returns></returns>
 	public bool IsTom () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom";
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom" || 
+			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom" || 
+			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom";
 	}
 
 	/// <summary>

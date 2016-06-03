@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -99,14 +100,21 @@ public class AudioFlangerFilter : MonoBehaviour {
 		int lo = Mathf.FloorToInt(val);
 
 		// Stop if indices are invalid
-		if (hi < 0 || lo < 0) return;
+		if (hi < 0 || lo < 0 || hi >= 5 || lo >= 5) return;
 
 		// Mix old inputs
 		float mix = (val - (float)lo);
 
 		// Populate mixed array
-		for (int i=0; i<len; i++)
-			mixed[i] = oldDatas[hi][i] * mix + oldDatas[lo][i] * (1f-mix);
+		for (int i=0; i<len; i++) {
+
+			try {
+				mixed[i] = oldDatas[hi][i] * mix + oldDatas[lo][i] * (1f-mix);
+			} catch (IndexOutOfRangeException e) {
+				Debug.LogError("i: " + i + " " + e.Message);
+			}
+		}
+		
 	}
 
 	#endregion

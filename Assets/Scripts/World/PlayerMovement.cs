@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour {
 	float minVelocity;
 	float maxVelocity;
 	float velocity;
-	const float velocityToRotation = -10000f;
+	const float velocityToRotation = 10000f;
 	//float acceleration;
 	Vector3 target;
 	float offsetH = 0f;
@@ -79,14 +79,14 @@ public class PlayerMovement : MonoBehaviour {
 		GetComponent<AudioSource>().loop = true;
 		GetComponent<AudioSource>().Play();
 		GetComponent<AudioSource>().volume = 0f;
-		EnableReflections();
+		//EnableReflections();
 	}
 
 	public void StopMoving() {
 		moving = false;
 		foreach (ParticleSystem ps in particles) ps.Pause();
 		GetComponent<AudioSource>().Stop();
-		DisableReflections();
+		//DisableReflections();
 	}
 
 	public void DisableReflections () {
@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour {
 
 				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
 
-				progress += velocity * Time.deltaTime / road.CurveCount;
+				progress += velocity * Time.fixedDeltaTime / road.CurveCount;
 				if (progress >= 1f)
 					progress = 1f;
 				
@@ -131,7 +131,7 @@ public class PlayerMovement : MonoBehaviour {
 					road.BezRight (point) * road.Width / 3f;
 				
 				transform.LookAt (ahead);
-				float rotation = velocity * velocityToRotation;
+				float rotation = velocity * velocityToRotation * Time.deltaTime;
 
 				//Vector2 point2 = new Vector2 (point.x, point.z);
 				//Vector2 ahead2 = new Vector2 (ahead.x, ahead.z);

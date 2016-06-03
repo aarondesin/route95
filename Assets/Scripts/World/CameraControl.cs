@@ -2,17 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
-// Class to manage CameraControl
+/// <summary>
+/// Class to manage the game camera.
+/// </summary>
 public class CameraControl : MonoBehaviour {
 
 	#region CameraControl Enums
 
+	/// <summary>
+	/// Current state of the game camera.
+	/// </summary>
 	public enum State {
 		Setup,
 		Live,
 		Free
 	}
 
+	/// <summary>
+	/// Current type of camera control.
+	/// </summary>
 	public enum CameraControlMode {
 		Manual, // Angles only change on user input
 		Random  // Angles cycle randomly through all available angles
@@ -21,23 +29,62 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region CameraControl Vars
 
-	public static CameraControl instance;
-
 	[Header("General camera settings")]
 
-	public float rotateSensitivity = 0.25f;
-	public float moveSensitivity = 0.4f;
+	public static CameraControl instance; // Quick reference to this instance
+
+	[Tooltip("Current camera state.")]
 	public State state = State.Setup;
+
+	[Tooltip("Free camera rotate sensitivity.")]
+	public float rotateSensitivity = 0.25f;
+
+	[Tooltip("Free camera movement sensitivity.")]
+	public float moveSensitivity = 0.4f;
+
+	[Tooltip("Camera sway speed.")]
 	public float swaySpeed = 1f;
+
+	[Tooltip("Camera base sway amount.")]
 	public float baseSway = 1f;
 
+	const float DEFAULT_SPEED = 1f;     // Default camera speed
+	const float DEFAULT_FOV = 75f;
+
+	public GameObject CameraBlocker;
+
+	// Camera interp vars
+	CameraView initialView;
+	Transform startTransform;                      // Camera lerp start transform
+	float startFOV;
+	CameraView targetView;
+
+	float speed;						  // Camera speed
+	bool moving = false;                  // Is the camera currently lerping?
+
+	[SerializeField]
+	float progress = 0f;                  // Lerp progress
+
+	// Live mode camera angle vars
+	CameraView currentAngle;              // Current live mode angle
+	List<CameraView> liveAngles;          // List of all live mode angles
+
+	[SerializeField]
+	float transitionTimer;                // Timer to next angle change
+	bool paused = false;                  // Is live mode paused?
+	float resetDistance;
+
 	[Tooltip("Initial position for camera")]
-	public Transform initialPosition;
+	//public Transform initialView;
 
 	public Transform ViewOutsideCar;
 	public Transform ViewDriving;
 	public Transform ViewRadio;
 	public Transform ViewChase;
+
+	public CameraView OutsideCar;
+	public CameraView Driving;
+	public CameraView Radio;
 
 	public Transform HoodForward;
 	public Transform HoodBackward;
@@ -57,20 +104,7 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Initial control mode.")]
 	public CameraControlMode controlMode = CameraControlMode.Random;
 
-	const float DEFAULT_SPEED = 0.2f;
-
-	// Camera interp vars
-	Transform start;
-	Transform target;
-	float speed = DEFAULT_SPEED;
-	bool moving = false;
-	float progress = 0f;
-
-	// Live mode camera angle vars
-	CameraView currentAngle;
-	List<CameraView> angles;
-	float transitionTimer;
-	bool paused = false;
+	int targetAngle = -1;
 
 	// Mappings of keys to camera angle indices
 	static Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
@@ -89,12 +123,46 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Start() {
+	void Awake () {
 		instance = this;
-		SnapToPosition (initialPosition);
 		transitionTimer = liveModeTransitionFreq;
+		speed = DEFAULT_SPEED;
 
-		angles  = new List<CameraView> () {
+		// Outside car
+		OutsideCar = new CameraView () {
+			name = "OutsideCar",
+			transform = ViewOutsideCar,
+			targetPos = ViewOutsideCar.position,
+			targetRot = ViewOutsideCar.rotation,
+			fov = DEFAULT_FOV,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		// Driving
+		Driving = new CameraView () {
+			name = "Driving",
+			transform = ViewDriving,
+			targetPos = ViewDriving.position,
+			targetRot = ViewDriving.rotation,
+			fov = DEFAULT_FOV,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		// Radio
+		Radio = new CameraView () {
+			name = "Radio",
+			transform = ViewRadio,
+			targetPos = ViewRadio.position,
+			targetRot = ViewRadio.rotation,
+			fov = 20f,
+			followMode = CameraView.CameraFollowMode.Static
+		};
+
+		initialView = OutsideCar;
+		SnapToView (initialView);
+
+		// Init live mode angles
+		liveAngles  = new List<CameraView> () {
 
 			// On the hood, forwards
 			new CameraView () {
@@ -102,7 +170,7 @@ public class CameraControl : MonoBehaviour {
 				transform = HoodForward,
 				targetPos = HoodForward.position,
 				targetRot = HoodForward.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static
 			},
 
@@ -112,7 +180,7 @@ public class CameraControl : MonoBehaviour {
 				transform = NearChase,
 				targetPos = NearChase.position,
 				targetRot = NearChase.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Lead,
 				placementMode = CameraView.CameraPlacementMode.Fixed,
 				lag = 0.04f
@@ -124,7 +192,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FarChase,
 				targetPos = FarChase.position,
 				targetRot = FarChase.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Lead,
 				placementMode = CameraView.CameraPlacementMode.Fixed,
 				lag = 0.2f
@@ -136,7 +204,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FrontRightWheel,
 				targetPos = FrontRightWheel.position,
 				targetRot = FrontRightWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -147,7 +215,7 @@ public class CameraControl : MonoBehaviour {
 				transform = FrontLeftWheel,
 				targetPos = FrontLeftWheel.position,
 				targetRot = FrontLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -158,7 +226,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearRightWheel,
 				targetPos = RearRightWheel.position,
 				targetRot = RearRightWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -169,7 +237,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearLeftWheel,
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -180,7 +248,7 @@ public class CameraControl : MonoBehaviour {
 				transform = RearLeftWheel,
 				targetPos = RearLeftWheel.position,
 				targetRot = RearLeftWheel.rotation,
-				fov = 75f,
+				fov = DEFAULT_FOV,
 				followMode = CameraView.CameraFollowMode.Static,
 				placementMode = CameraView.CameraPlacementMode.Fixed
 			},
@@ -204,10 +272,16 @@ public class CameraControl : MonoBehaviour {
 			}
 		};
 
-		foreach (CameraView angle in angles) {
+		foreach (CameraView angle in liveAngles) {
 			angle.pos = angle.targetPos;
 			angle.rot = angle.targetRot;
 		}
+	}
+
+	void Start () {
+		resetDistance = WorldManager.instance.chunkLoadRadius * 
+			0.5f * WorldManager.instance.chunkSize;
+		currentAngle = OutsideCar;
 	}
 
 	void Update() {
@@ -216,21 +290,24 @@ public class CameraControl : MonoBehaviour {
 		case State.Setup:
 			if (moving) {
 
-				if (Vector3.Distance(start.position, target.position) != 0f) {
+				if (progress < 1f) {
 
-					progress += speed * Time.deltaTime / 
-						Vector3.Distance(start.position, target.transform.position);
+					progress += speed * Time.deltaTime;
 
 					// Lerp position
-					transform.position = Vector3.Lerp(start.position, target.position, progress);
+					transform.position = Vector3.Slerp(startTransform.position, targetView.transform.position, progress);
 
 					// Lerp Rotation
-					transform.rotation = Quaternion.Lerp(start.rotation, target.rotation, progress);
+					transform.rotation = Quaternion.Slerp(startTransform.rotation, targetView.transform.rotation, progress);
+
+					Camera.main.fieldOfView = Mathf.Lerp (startFOV, targetView.fov, Mathf.Sqrt(progress));
 
 				} else {
-					GameManager.instance.AttemptMoveCasette();
-					start = target;
 					moving = false;
+					startTransform = targetView.transform;
+					transform.position = startTransform.position;
+					transform.rotation = startTransform.rotation;
+					OnCompleteLerp();
 				}
 			}
 			break;
@@ -241,10 +318,11 @@ public class CameraControl : MonoBehaviour {
 
 				// Check each mapped key for input
 				foreach (KeyCode key in keyToView.Keys) {
-					if (Input.GetKeyDown (key)) {
+					if (Input.GetKeyDown (key) && CameraBlocker.GetComponent<Fadeable>().NotFading) {
 						if (controlMode != CameraControlMode.Manual)
 							controlMode = CameraControlMode.Manual;
-						ChangeAngle (keyToView [key]);
+						StartFade();
+						targetAngle = keyToView[key];
 					}
 				}
 					
@@ -257,10 +335,23 @@ public class CameraControl : MonoBehaviour {
 				// Update transition timer
 				if (controlMode == CameraControlMode.Random) {
 					if (transitionTimer <= 0f) {
-						ChangeAngle ();
 						transitionTimer = liveModeTransitionFreq;
-					} else transitionTimer--;
+						targetAngle = -1;
+						StartFade();
+					}  else transitionTimer--;
 				}
+
+				if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
+					Debug.Log("CameraBlocker done unfading");
+					GameManager.instance.Hide(CameraBlocker);
+					if (targetAngle == -1) ChangeAngle();
+					else ChangeAngle(targetAngle);
+				}
+
+				// Check if camera is out of range
+				float distToPlayer = Vector3.Distance (transform.position, PlayerMovement.instance.transform.position);
+				if (distToPlayer > resetDistance && !CameraBlocker.GetComponent<Fadeable>().busy)
+					StartFade();
 			}
 			break;
 
@@ -286,8 +377,8 @@ public class CameraControl : MonoBehaviour {
 		}
 
 		// Calculate sway
-		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway;
-		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway;
+		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
 
 		// Do sway
 		transform.Rotate (bx, by, 0f);
@@ -296,7 +387,9 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region CameraControl Live Mode Methods
 
-	// Set for live mode
+	/// <summary>
+	/// Start camera live mode.
+	/// </summary>
 	public void StartLiveMode () {
 		if (state == State.Free) return;
 		state = State.Live;
@@ -304,12 +397,17 @@ public class CameraControl : MonoBehaviour {
 		paused = false;
 	}
 
+	/// <summary>
+	/// Pause camera live mode.
+	/// </summary>
 	public void StopLiveMode () {
 		state = State.Setup;
-		LerpToPosition(ViewChase);
 		paused = true;
 	}
 
+	/// <summary>
+	/// Start camera free mode.
+	/// </summary>
 	public void StartFreeMode () {
 		state = State.Free;
 		transform.rotation = Quaternion.identity;
@@ -320,30 +418,47 @@ public class CameraControl : MonoBehaviour {
 		Cursor.visible = false;
 	}
 
+	/// <summary>
+	/// Stop camera free mode.
+	/// </summary>
 	public void StopFreeMode () {
 		state = State.Setup;
-		LerpToPosition(ViewChase);
 	}
 
+	public void StartFade () {
+		GameManager.instance.Show(CameraBlocker);
+	}
+
+	/// <summary>
+	/// Pause camera movement.
+	/// </summary>
 	public void Pause () {
 		paused = true;
 	}
 
+	/// <summary>
+	/// Unpause camera movement.
+	/// </summary>
 	public void Unpause () {
 		paused = false;
 	}
 
-	// Pick a new random camera angle
+	/// <summary>
+	/// Pick a random live camera angle.
+	/// </summary>
 	public void ChangeAngle () {
-		ChangeAngle (Random.Range (0, angles.Count));
+		ChangeAngle (Random.Range(0, liveAngles.Count));
 	}
 
-	// Pick a specific camera angle
+	/// <summary>
+	/// Pick a specific live camera angle.
+	/// </summary>
+	/// <param name="camView"></param>
 	public void ChangeAngle (int camView) {
-		currentAngle = angles[camView];
+		currentAngle = liveAngles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
-		if (Debug.isDebugBuild) 
-			Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
+		//if (Debug.isDebugBuild) 
+			//Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 		
 		switch (currentAngle.placementMode) {
 
@@ -359,9 +474,11 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 
-	// Prewarms all angles
+	/// <summary>
+	/// Warms all live mode camera angles.
+	/// </summary>
 	void UpdateAllAngles () {
-		foreach (CameraView angle in angles) {
+		foreach (CameraView angle in liveAngles) {
 			if (angle.transform != null) {
 				angle.targetPos = angle.transform.position;
 				angle.targetRot = angle.transform.rotation;
@@ -370,7 +487,9 @@ public class CameraControl : MonoBehaviour {
 			switch (angle.followMode) {
 
 				case CameraView.CameraFollowMode.Lead:
-					angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
+					//angle.pos = Vector3.Lerp(angle.pos, angle.targetPos, angle.lag);
+					//angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
+					angle.pos = angle.targetPos;
 					angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
 					break;
 
@@ -389,41 +508,75 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 
-	// Piks a random position
+	/// <summary>
+	/// Picks a random position.
+	/// </summary>
+	/// <param name="minHeight"></param>
+	/// <param name="maxHeight"></param>
+	/// <returns></returns>
 	Vector3 PickRandomPosition (float minHeight, float maxHeight) {
 		float chunkSize = WorldManager.instance.chunkSize;
 
-		return new Vector3 (
+		
+
+		Vector3 point = new Vector3 (
 			PlayerMovement.instance.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
-			PlayerMovement.instance.transform.position.y + Random.Range (minHeight, maxHeight),
+			0f,
 			PlayerMovement.instance.transform.position.z + Random.Range (-chunkSize / 2f, chunkSize / 2f)
 		);
+
+		Vector3 rayOrigin = new Vector3 (point.x, WorldManager.instance.heightScale, point.z);
+
+		RaycastHit hit;
+		if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))
+			point.y = hit.point.y;
+
+		point.y += Random.Range (minHeight, maxHeight);
+
+		return point;
 	}
 
 	#endregion
 	#region CameraControl Non-Live Mode Methods
 
-	// Externally set speed
+	/// <summary>
+	/// Sets the camera lerp speed.
+	/// </summary>
+	/// <param name="newSpeed"></param>
 	public void SetSpeed (float newSpeed) {
 		speed = newSpeed;
 	}
 
-	// Teleport camera to position
-	public void SnapToPosition (Transform newPosition) {
-		start = newPosition;
-		target = newPosition;
-		transform.position = newPosition.position;
-		transform.rotation = newPosition.rotation;
+	/// <summary>
+	/// Teleports the camera to a position.
+	/// </summary>
+	/// <param name="newPosition"></param>
+	public void SnapToView (CameraView newView) {
+		targetView = newView;
+		startTransform = newView.transform;
+		transform.position = newView.transform.position;
+		transform.rotation = newView.transform.rotation;
+		Camera.main.fieldOfView = newView.fov;
 	}
 
-	// Lerp to position
-	public void LerpToPosition (Transform newPosition, float newSpeed=DEFAULT_SPEED) {
-		Camera.main.fieldOfView = 75f;
-		start = transform;
-		target = newPosition;
+	public void LerpToView (CameraView newView, float newSpeed= DEFAULT_SPEED) {
+		if (targetView == newView) {
+			OnCompleteLerp();
+			return;
+		}
+
+		CameraView oldView = targetView;
+		startFOV = oldView.fov;
+		startTransform = oldView.transform;
+
+		targetView = newView;
 		moving = true;
 		speed = newSpeed;
 		progress = 0f;
+	}
+
+	void OnCompleteLerp () {
+		GameManager.instance.AttemptMoveCasette();
 	}
 		
 	#endregion

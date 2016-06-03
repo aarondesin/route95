@@ -10,15 +10,16 @@ public class InstrumentDisplay : MonoBehaviour {
 
 	#region InstrumentDisplay Vars
 
-	public static InstrumentDisplay instance; // Quick reference to this instance
+	public static InstrumentDisplay instance;
 
 	public Image glow;                        // Sprite to change for glow
 	public float fadeSpeed;                   // Speed of fade
+	public List<Fadeable> glows;                 // Instrument icons glows
 
 	#endregion
 	#region Unity Callbacks
 
-	void Start () {
+	void Awake () {
 		instance = this;
 	}
 
@@ -27,9 +28,9 @@ public class InstrumentDisplay : MonoBehaviour {
 		if (GameManager.instance.currentState != GameManager.State.Live) return;
 		if (GameManager.instance.paused) return;
 
-		Color color = glow.GetComponent<Image>().color;
+		Color color = glow.color;
 		color.a -= fadeSpeed;
-		glow.GetComponent<Image>().color = color;
+		glow.color = color;
 
 	}
 
@@ -48,9 +49,17 @@ public class InstrumentDisplay : MonoBehaviour {
 	/// Sets glow to full.
 	/// </summary>
 	public void WakeGlow () {
-		Color color = glow.GetComponent<Image>().color;
+		Color color = glow.color;
 		color.a = 1f;
-		glow.GetComponent<Image>().color = color;
+		glow.color = color;
+	}
+
+	public void WakeGlow (int index) {
+		glows[index].UnFade();
+	}
+
+	public void FadeGlow (int index) {
+		glows[index].Fade();
 	}
 
 	#endregion

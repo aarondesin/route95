@@ -3,67 +3,81 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Class to handle the song arrange menu
+/// </summary>
 public class SongArrangeSetup : MonoBehaviour {
 
 	#region SongArrangeSetup Vars
 
-	public static SongArrangeSetup instance;
+	public static SongArrangeSetup instance; // Quick reference to this instance
 
-	public int selectedRiffIndex; // index of currently selected riff
+	[Tooltip("Index of currently selected riff.")]
+	public int selectedRiffIndex;
 
+	[Tooltip("Riff selection dropdown.")]
 	public Dropdown dropdown;
+
+	[Tooltip("Song name input field.")]
 	public InputField songNameInputField;
+
+	[Tooltip("Play riff button.")]
 	public GameObject playRiffButton;
+
+	[Tooltip("Edit riff button.")]
 	public GameObject editRiffButton;
+
+	[Tooltip("Add riff reminder prompt.")]
 	public GameObject addRiffReminder;
-	public Sprite play;
-	public Sprite pause;
 
 	#endregion
 	#region Unity Callbacks
 
 	void Awake () {
 		instance = this;
-		dropdown.onValueChanged.AddListener (delegate { UpdateValue(); });
+
+		// Set song name input field functionality
 		songNameInputField.onEndEdit.AddListener (delegate { MusicManager.instance.currentSong.name = songNameInputField.text;});
 	}
 
 	#endregion
 	#region SongArrangeSetup Methods
 
-	// Refresh all elements on the Song Arrangement UI
+	/// <summary>
+	/// Refreshes all elements on the song arranger UI.
+	/// </summary>
 	public void Refresh () {
 
 		// Update the options in the dropdown to include all riffs
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
+
 		foreach (Riff riff in MusicManager.instance.currentSong.riffs) {
 			Sprite sprite = riff.instrument.icon;
 			Dropdown.OptionData option = new Dropdown.OptionData (riff.name, sprite);
-			//Dropdown.OptionData option = new Dropdown.OptionData (MusicManager.instToString[riff.currentInstrument]);
 			options.Add (option);
 		}
 		dropdown.AddOptions (options);
 
 		if (MusicManager.instance.currentSong.riffs.Count == 0) {
-			//InstrumentSetup.instance.currentRiff = null;
 			dropdown.interactable = false;
-			editRiffButton.GetComponent<Button>().interactable = false;
-			playRiffButton.GetComponent<Button> ().interactable = false;
+			editRiffButton.Button().interactable = false;
+			playRiffButton.Button().interactable = false;
 		} else {
 			dropdown.interactable = true;
-			editRiffButton.GetComponent<Button>().interactable = true;
-			playRiffButton.GetComponent<Button> ().interactable = true;
+			editRiffButton.Button().interactable = true;
+			playRiffButton.Button().interactable = true;
 			if (InstrumentSetup.currentRiff == null)
 				InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs [0];
 		}
 
+		dropdown.value = selectedRiffIndex;
+
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;
 
-		playRiffButton.GetComponent<Image>().sprite = play;
-
-		SetValue();
+		// Update play riff button art
+		playRiffButton.Image().sprite = GameManager.instance.playIcon;
 
 		bool hasRiffs = MusicManager.instance.currentSong.riffs.Count != 0;
 		SongTimeline.instance.SetInteractable (hasRiffs);
@@ -71,23 +85,38 @@ public class SongArrangeSetup : MonoBehaviour {
 
 	}
 
+	/// <summary>
+	/// Sets the selected riff from the dropdown.
+	/// </summary>
 	public void UpdateValue () {
 		selectedRiffIndex = dropdown.value;
 		InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs[selectedRiffIndex];
 	}
 
+	/// <summary>
+	/// Sets the dropdown value from the selected riff.
+	/// </summary>
 	public void SetValue () {
-		//Debug.Log(selectedRiffIndex);
-		dropdown.value = selectedRiffIndex;
+		SetValue (selectedRiffIndex);
 	}
 
+	public void SetValue (int i) {
+		dropdown.value = i;
+	}
+
+	/// <summary>
+	/// Hide the dropdown.
+	/// </summary>
 	public void HideDropdown () {
 		dropdown.Hide();
 	}
 
+	/// <summary>
+	/// Updates the play riff button art.
+	/// </summary>
 	public void TogglePlayRiffButton () {
-		if (playRiffButton.GetComponent<Image>().sprite == play) playRiffButton.GetComponent<Image>().sprite = pause;
-		else playRiffButton.GetComponent<Image>().sprite = play;
+		if (MusicManager.instance.playing) playRiffButton.Image().sprite = GameManager.instance.pauseIcon;
+		else playRiffButton.Image().sprite = GameManager.instance.playIcon;
 	}
 
 	#endregion

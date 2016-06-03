@@ -39,4 +39,13 @@ public static class UIExtension {
 	}
 
 	#endregion
+	#region MaskableGraphic Extensions
+
+	public static void SetAlpha (this MaskableGraphic gr, float alpha) {
+		Color color = gr.color;
+		color.a = alpha;
+		gr.color = color;
+	}
+
+	#endregion
 }

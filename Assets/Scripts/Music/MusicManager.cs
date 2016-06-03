@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 
 /// <summary>
-/// All musical keys.
+/// All musical KeyManager.instance.
 /// </summary>
 public enum Key {
 	None,
@@ -67,7 +67,7 @@ public class MusicManager : MonoBehaviour {
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("MusicManager Status")]
 	
-	public static MusicManager instance;                               // Quick reference to this instance
+	public static MusicManager instance;
 
 	AudioSource source;                                                // Global MM audio source
 
@@ -140,7 +140,7 @@ public class MusicManager : MonoBehaviour {
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Object References")]
 
-	[Tooltip("Mixer to use for music.")]
+	[Tooltip("Mixer to use for MusicManager.instance.")]
 	public AudioMixer mixer;
 
 	[Tooltip("AudioSource to use for UI sounds.")]
@@ -156,10 +156,12 @@ public class MusicManager : MonoBehaviour {
 	[Header("Project References")]
 
 	[Tooltip("Current open project.")]
+	//[NonSerialized]
 	public Project currentProject;
 
-	[NonSerialized]
-	public Song currentSong = null;
+	[Tooltip("Current song being edited/played.")]
+	//[NonSerialized]
+	public Song currentSong;
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Sounds")]
@@ -267,6 +269,7 @@ public class MusicManager : MonoBehaviour {
 					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
 					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
 					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
+					if (WorldManager.instance.shakers > 2) WorldManager.instance.shakers -= 2;
 					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
 					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
 					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
@@ -302,7 +305,7 @@ public class MusicManager : MonoBehaviour {
 	IEnumerator LoadSounds () {
 
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading sounds...");
+		GameManager.instance.ChangeLoadingMessage("Tuning instruments...");
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -347,8 +350,14 @@ public class MusicManager : MonoBehaviour {
 	/// <returns></returns>
 	IEnumerator LoadInstruments () {
 
+		List<string> loadMessages = new List<string>() {
+			"Renting instruments...",
+			"Grabbing instruments...",
+			"Unpacking instruments..."
+		};
+
 		// Update loading message
-		GameManager.instance.ChangeLoadingMessage("Loading instruments...");
+		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
 
 		// Mark start time
 		float startTime = Time.realtimeSinceStartup;
@@ -446,8 +455,13 @@ public class MusicManager : MonoBehaviour {
 	#endregion
 	#region MusicManager Callbacks
 
-	public static void PlayMenuSound (AudioClip sound) {
-		instance.source.PlayOneShot (sound, 1f);
+	/// <summary>
+	/// Plays a one-shot AudioClip.
+	/// </summary>
+	/// <param name="sound">Sound to play.</param>
+	/// <param name="volume">Volume scaler.</param>
+	public static void PlayMenuSound (AudioClip sound, float volume=1f) {
+		instance.source.PlayOneShot (sound, volume);
 	}
 
 	/// <summary>
@@ -503,6 +517,7 @@ public class MusicManager : MonoBehaviour {
 		loopPlaylist = !loopPlaylist;
 
 		// Update sprite
+		if (InstrumentSetup.instance == null) Debug.Log("shit");
 		loopPlaylistButton.sprite = loopPlaylist ? 
 			InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
 	}

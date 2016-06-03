@@ -98,7 +98,7 @@ public class TerrainGeneration : MonoBehaviour {
 		terrain.GetComponent<MeshFilter> ().mesh = mesh;
 
 		//mesh renderer stuff
-		terrain.GetComponent<MeshRenderer> ().material = terrainMat;
+		terrain.GetComponent<MeshRenderer> ().sharedMaterial = terrainMat;
 
 		return terrain;
 	}

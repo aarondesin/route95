@@ -3,13 +3,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
- * A chunk is a square mesh that's part of the larger terrain object.
- * Chunks dynamically load and unload as the player gets closer and farther.
- * This un/loading will be taken care of by the DynamicTerrain class. 
- */
+public class ChunkComparer : IComparer<Chunk> {
 
-public class Chunk: MonoBehaviour {
+	int IComparer<Chunk>.Compare(Chunk x, Chunk y) {
+		return x.priority.CompareTo(y.priority);
+	}
+
+}
+
+ /// <summary>
+ /// A chunk is a square mesh that's part of the larger terrain object.
+ /// Chunks dynamically load and unload as the player gets closer and farther.
+ /// This un/loading will be taken care of by the DynamicTerrain class. 
+ /// </summary>
+public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 	#region Chunk Vars
 
@@ -44,6 +51,30 @@ public class Chunk: MonoBehaviour {
 	bool isUpdatingVerts = false;          // is the chunk currently updating its vertices?
 	bool needsColliderUpdate = false;      // does the chunk need a collider update?
 	bool needsColorUpdate = false;         // does the chunk need a color update?
+
+	#endregion
+	#region IComparable Implementations
+
+	int IComparable<Chunk>.CompareTo(Chunk other) {
+		if (other == null)
+			throw new ArgumentException ("Other object not a chunk!");
+
+		if (priority > other.priority) return 1;
+		else if (priority == other.priority) return 0;
+		else return -1;
+	}
+
+	#endregion
+	#region IPoolable Implementations
+
+	void IPoolable.OnPool() {
+		gameObject.SetActive(false);
+		priority = 0;
+	}
+
+	void IPoolable.OnDepool() {
+		gameObject.SetActive(true);
+	}
 
 	#endregion
 	#region Chunk Methods
@@ -106,7 +137,7 @@ public class Chunk: MonoBehaviour {
 
 			// Init normal/color
 			normals [i] = Vector3.up;
-			colors[i] = new Color (1f, 1f, 1f, 0.5f);
+			colors[i] = Color.white;
 
 			// Get VMap coords
 			IntVector2 coord = IntToV2 (i);
@@ -117,11 +148,12 @@ public class Chunk: MonoBehaviour {
 
 			// If vertex exists, get height
 			UpdateVertex (i, mapVerts[i].height);
+			UpdateColor (i, mapVerts[i].color);
 		}
 
 		// Assign material
 		MeshRenderer renderer = GetComponent<MeshRenderer> ();
-		renderer.material = WorldManager.instance.terrainMaterial;
+		renderer.sharedMaterial = WorldManager.instance.terrainMaterial;
 		renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
@@ -154,6 +186,8 @@ public class Chunk: MonoBehaviour {
 		// Assign particle system emission rate
 		ParticleSystem.EmissionModule emit = sys.emission;
 		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
+
+		UpdateCollider();
 	}
 
 	/// <summary>
@@ -174,6 +208,8 @@ public class Chunk: MonoBehaviour {
 		// Update chunk name
 		gameObject.name = "Chunk ("+x+","+y+") Position:"+transform.position.ToString();
 
+		priority = 0f;
+
 		// Clear decoration list
 		decorations.Clear();
 
@@ -193,8 +229,9 @@ public class Chunk: MonoBehaviour {
 	
 		}
 
-		// Mark chunk for collider update
-		needsColliderUpdate = true;
+		hasCheckedForRoad = false;
+
+		UpdateCollider();
 	}
 
 	/// <summary>
@@ -214,8 +251,12 @@ public class Chunk: MonoBehaviour {
 		}
 		return uniformArray;
 	}
-		
-	//takes the number of vertices per side, returns a uniform array of UV coords for a square vertex array
+
+	/// <summary>
+	/// Takes the number of vertices per side, returns a uniform array of UV coords for a square vertex array
+	/// </summary>
+	/// <param name="vertexSize"></param>
+	/// <returns></returns>
 	Vector2[] CreateUniformUVArray(int vertexSize) {
 		int numVertices = vertexSize * vertexSize;
 		Vector2[] uniformUVArray = new Vector2[numVertices];
@@ -229,7 +270,11 @@ public class Chunk: MonoBehaviour {
 		return uniformUVArray;
 	}
 
-	//takes the number of vertices per side, returns indices (each group of three defines a triangle) into a square vertex array to form mesh 
+	/// <summary>
+	/// Takes the number of vertices per side, returns indices (each group of three defines a triangle) into a square vertex array to form mesh 
+	/// </summary>
+	/// <param name="vertexSize"></param>
+	/// <returns></returns>
 	int[] CreateSquareArrayTriangles (int vertexSize){ 
 		int numTriangles = 2 * vertexSize * (vertexSize - 1);//a mesh with n^2 vertices has 2n(n-1) triangles
 		int[] triangleArray = new int[numTriangles * 3]; //three points per triangle 
@@ -275,7 +320,6 @@ public class Chunk: MonoBehaviour {
 	/// <param name="normals">Normals.</param>
 	/// <param name="UVcoords">U vcoords.</param>
 	/// <param name="triangles">Triangles.</param>
-	//GameObject CreateChunk (Vector3[] vertices, Vector3[] normals, Vector2[] UVcoords, int[] triangles) {
 	Mesh CreateChunkMesh() {
 
 		// Create mesh
@@ -307,7 +351,7 @@ public class Chunk: MonoBehaviour {
 
 		// Reassign mesh vertices/normals
 		mesh.vertices = verts;
-		mesh.normals = normals;
+		mesh.normals = normals; // NEEDED FOR PROPER LIGHTING
 
 		// Recalculate bounding box
 		mesh.RecalculateBounds();
@@ -341,15 +385,15 @@ public class Chunk: MonoBehaviour {
 	/// <param name="index">Index.</param>
 	/// <param name="height">Height.</param>
 	/// <param name="normal">Normal.</param>
-	public void UpdateVertex (int index, float height) {
+	public void UpdateVertex (int index, float height, bool forceUpdate=false) {
 		try {
 			
 			// Check if height update is needed
 			if (verts[index].y != height) {
 				priority++;
-				needsColliderUpdate = true;
 				verts[index].y = height;
-				mesh.vertices = verts;
+				if (forceUpdate) mesh.vertices = verts;
+				needsColliderUpdate = true;
 			}
 
 		} catch (IndexOutOfRangeException e) {
@@ -363,11 +407,11 @@ public class Chunk: MonoBehaviour {
 	/// </summary>
 	/// <param name="index">Index.</param>
 	/// <param name="blendValue">Blend value.</param>
-	public void UpdateColor (int index, float blendValue) {
+	public void UpdateColor (int index, Color color) {
 
 		// Check if color update is needed
-		if (colors[index].a != blendValue) {
-			colors[index].a = blendValue;
+		if (colors[index] != color) {
+			colors[index] = color;
 			needsColorUpdate = true;
 		}
 	}
@@ -388,6 +432,8 @@ public class Chunk: MonoBehaviour {
 	/// </summary>
 	/// <returns>The verts.</returns>
 	private IEnumerator UpdateVerts() {
+
+		if (!GameManager.instance.loaded) yield break;
 		
 		isUpdatingVerts = true;
 		float margin = WorldManager.instance.chunkSize / 2;
@@ -407,8 +453,10 @@ public class Chunk: MonoBehaviour {
 			// Update vertex height
 			UpdateVertex (v, vert.height);
 
+			if (terrain.freqData == null) yield break;
+
 			// If vertex is not locked and there is frequency data to use
-			if (GameManager.instance.loaded && !vert.locked && terrain.freqData != null) { 
+			if (!vert.locked) { 
 
 				// Distance between player and vertex
 				Vector3 vertPos = chunkPos + verts [v];
@@ -459,11 +507,13 @@ public class Chunk: MonoBehaviour {
 		if (needsColorUpdate) UpdateColors();
 
 		// Check for road if necessary
-		if (!hasCheckedForRoad)
+		if (!hasCheckedForRoad && WorldManager.instance.road.loaded)
 			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
 
 		// Update verts if possible
 		if (!isUpdatingVerts) StartCoroutine("UpdateVerts");
+
+		priority = 0f;
 	}
 
 	/// <summary>
@@ -569,6 +619,10 @@ public class Chunk: MonoBehaviour {
 			WorldManager.instance.RemoveDecoration(decoration);
 	}
 
+	/// <summary>
+	/// Sets terrain debug colors.
+	/// </summary>
+	/// <param name="color"></param>
 	public void SetDebugColors (DynamicTerrain.DebugColors color) {
 		switch (color) {
 		case DynamicTerrain.DebugColors.Constrained:

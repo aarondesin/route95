@@ -25,12 +25,25 @@ public class Riff {
 	[NonSerialized]
 	public Instrument instrument;            // Reference to instrument used in riff
 
+	[NonSerialized]
 	AudioSource source;                      // Source to play notes on
+
+	[NonSerialized]
 	AudioDistortionFilter distortion;        // Distortion filter
+
+	[NonSerialized]
 	AudioTremoloFilter tremolo;              // Tremolo filter
+
+	[NonSerialized]
 	AudioChorusFilter chorus;                // Chorus filter
+
+	[NonSerialized]
 	AudioFlangerFilter flanger;              // Flanger filter
+
+	[NonSerialized]
 	AudioEchoFilter echo;                    // Echo filter
+
+	[NonSerialized]
 	AudioReverbFilter reverb;                // Reverb filter
 
 	#endregion
@@ -49,7 +62,10 @@ public class Riff {
 	public bool cutSelf = true;              // If true, sounds will cut themselves off
 
 	[SerializeField]
-	public float volume = 1f;                // Volume scaler for all riff notes.
+	public float volume = 0.8f;                // Volume scaler for all riff notes
+
+	[SerializeField]
+	public float panning = 0f;               // Stereo panning value
 
 	[SerializeField]
 	public int index;                        // Project-assigned riff index
@@ -166,6 +182,16 @@ public class Riff {
 		}
 	}
 
+	public Note GetNote (string fileName, int pos) {
+		Song song = MusicManager.instance.currentSong;
+		Beat beat = song.beats[beatIndices[pos]];
+
+		foreach (Note note in beat.notes)
+			if (note.filename == fileName) return note;
+		
+		return null;
+	}
+
 	/// <summary>
 	/// Toggles a note at the given position.
 	/// </summary>
@@ -188,7 +214,8 @@ public class Riff {
 		beat.Add (newNote);
 
 		// Play note
-		newNote.PlayNote(source);
+		source.panStereo = panning;
+		newNote.PlayNote(source, volume, true);
 
 		// Do environmental effects
 		if (instrument.type == Instrument.Type.Percussion) {
@@ -229,6 +256,8 @@ public class Riff {
 
 			// Skip if empty
 			if (beat.NoteCount == 0) return;
+
+			source.panStereo = panning;
 
 			// Update effect levels
 			if (distortionEnabled) {

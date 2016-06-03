@@ -72,6 +72,11 @@ public static class GameObjectExtension {
 		return obj.GetComponent<Light>();
 	}
 
+	/// <summary>
+	/// Sets a UI GameObject's parent.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="parent"></param>
 	public static void SetParent (this GameObject obj, RectTransform parent) {
 		RectTransform tr = obj.RectTransform();
 		Vector3 scale = tr.localScale;
@@ -79,26 +84,63 @@ public static class GameObjectExtension {
 		tr.localScale = scale;
 	}
 
+	/// <summary>
+	/// Anchors a UI GameObject at a point.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
 	public static void AnchorAtPoint (this GameObject obj, float x, float y) {
 		obj.RectTransform().AnchorAtPoint (new Vector2 (x, y));
 	}
 
+	/// <summary>
+	/// Sets the size (not scale) of a UI GameObject.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
 	public static void SetSize2D (this GameObject obj, float x, float y) {
 		obj.RectTransform().sizeDelta = new Vector2 (x, y);
 	}
 
+	public static void SetSize2D (this GameObject obj, Vector2 v) {
+		obj.RectTransform().sizeDelta = v;
+	}
+
+	/// <summary>
+	/// Sets the width (not scale) of a square UI GameObject.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="width"></param>
 	public static void SetSideWidth (this GameObject obj, float width) {
 		obj.RectTransform().sizeDelta = new Vector2 (width, width);
 	}
 
+	/// <summary>
+	/// Sets the 2D position of a UI GameObject.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
 	public static void SetPosition2D (this GameObject obj, float x, float y) {
 		obj.RectTransform().anchoredPosition = new Vector2 (x, y);
 	}
 
+	/// <summary>
+	/// Sets the text alignment of a text GameObject.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="align"></param>
 	public static void SetTextAlignment (this GameObject obj, TextAnchor align) {
 		obj.Text().alignment = align;
 	}
 
+	/// <summary>
+	/// Sets the font size of a text GameObject.
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="size"></param>
 	public static void SetFontSize (this GameObject obj, int size) {
 		obj.Text().fontSize = size;
 	}
@@ -106,6 +148,11 @@ public static class GameObjectExtension {
 	#endregion
 	#region RectTransform Extensions
 
+	/// <summary>
+	/// Sets the side width (not scale) of a square RectTransform.
+	/// </summary>
+	/// <param name="tr"></param>
+	/// <param name="width"></param>
 	public static void SetSideWidth (this RectTransform tr, float width) {
 		tr.sizeDelta = new Vector2 (width, width);
 	}

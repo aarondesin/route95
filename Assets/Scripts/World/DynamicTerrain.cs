@@ -2,11 +2,11 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
 
 /// <summary>
 /// Class to manage chunks. 
@@ -26,8 +26,10 @@ public class DynamicTerrain : MonoBehaviour {
 	#region DynamicTerrain Vars
 
 	bool loaded = false;                 // is the terrain loaded?
+	bool randomized = false;             // Has the terrain been randomized?
+	public int loadsToDo;
 
-	ObjectPool chunkPool;                // pool of chunk GameObjects
+	ObjectPool<Chunk> chunkPool;         // pool of chunk GameObjects
 	List<Chunk> chunksToUpdate;          // list of chunks to be updated
 	int chunkUpdatesPerCycle;            // number of chunks to update each cycle (copied from WM)
 
@@ -53,7 +55,8 @@ public class DynamicTerrain : MonoBehaviour {
 	int freqSampleSize;                  // sample size to use when reading frequency data (copied from WM)
 	float[] data;                        // raw frequency data
 	FFTWindow fftWindow;                 // FFT window to use when reading frequency data (copied from WM)
-	List<AudioSource> sources;           // list of instrument audio sources to read from (copied from MM)
+	AudioSource[] sources;
+	int numSources;
 
 	#endregion
 	#region Unity Callbacks
@@ -63,10 +66,14 @@ public class DynamicTerrain : MonoBehaviour {
 		// Copy vars from WM
 		chunkUpdatesPerCycle = WorldManager.instance.chunkUpdatesPerCycle;
 		chunkSize = WorldManager.instance.chunkSize;
+		chunkRes = WorldManager.instance.chunkResolution;
 		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
 
+		int verts = 2 * chunkLoadRadius * (chunkRes - 1);
+		loadsToDo = verts * verts;
+
 		// Init chunk pool
-		chunkPool = new ObjectPool();
+		chunkPool = new ObjectPool<Chunk>();
 
 		// Init chunk lists
 		chunksToUpdate = new List<Chunk>();
@@ -89,7 +96,6 @@ public class DynamicTerrain : MonoBehaviour {
 		freqSampleSize = WorldManager.instance.freqArraySize;
 		data = new float[freqSampleSize];
 		fftWindow = WorldManager.instance.freqFFTWindow;
-
 	}
 
 	#endregion
@@ -116,6 +122,7 @@ public class DynamicTerrain : MonoBehaviour {
 	GameObject CreateChunk (int x, int y) {
 
 		GameObject chunk;
+		Chunk c;
 
 		// If no chunks available to reuse
 		if (chunkPool.Empty) {
@@ -129,24 +136,28 @@ public class DynamicTerrain : MonoBehaviour {
 				typeof(Chunk)
 			);
 
+			c = chunk.GetComponent<Chunk>();
+
 			// Initialize chunk
-			chunk.GetComponent<Chunk>().Initialize(x, y);
+			c.Initialize(x, y);
 
 		// If a chunk is available to reuse
 		} else {
 
 			// Take a chunk from the pool
-			chunk = chunkPool.Get();
+			chunk = chunkPool.Get().gameObject;
+
+			c = chunk.GetComponent<Chunk>();
 
 			// Reuse chunk
-			chunk.GetComponent<Chunk>().Reuse(x, y);
+			c.Reuse(x, y);
 		}
 
 		// Parent chunk to terrain
 		chunk.transform.parent = transform;
 
 		// Register chunk as active
-		activeChunks.Add(chunk.GetComponent<Chunk>());
+		activeChunks.Add(c);
 
 		return chunk;
 	}
@@ -160,8 +171,13 @@ public class DynamicTerrain : MonoBehaviour {
 		// Init loading vars
 		float startTime = Time.realtimeSinceStartup;
 
+		List<string> loadMessages = new List<string>() {
+			"Building your new playground...",
+			"Desertifying the desert..."
+		};
+
 		// Change loading screen message
-		if (!loaded) GameManager.instance.ChangeLoadingMessage("Loading chunks...");
+		if (!loaded) GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
 
 		// Main loop
 		while (true) {
@@ -218,16 +234,14 @@ public class DynamicTerrain : MonoBehaviour {
 
 				// Deform initial terrain
 				int res = vertexmap.vertices.Width;
-				CreateMountain (0, 0, res, res, 10f, 20f, -0.03f, 0.03f);
-
-				// Begin loading road
-				WorldManager.instance.DoLoadRoad();
+				StartCoroutine(CreateMountain (0, 0, res, res, 5f, 20f, -0.03f, 0.03f));
 
 			// If updating terrain
-			} else {
+			} else if (randomized)  {
 
 				// Reset list of chunks to update
 				chunksToUpdate.Clear ();
+				int listCount = 0;
 
 				// For each active chunk
 				foreach (Chunk chunk in activeChunks) {
@@ -236,24 +250,24 @@ public class DynamicTerrain : MonoBehaviour {
 					chunk.priority++;
 
 					// Insert chunk into list based on priority
-					if (chunksToUpdate.Count == 0) chunksToUpdate.Add (chunk);
-					else for (int i=0; i<chunksToUpdate.Count; i++) 
+					if (listCount == 0) {
+						chunksToUpdate.Add (chunk);
+						listCount++;
+					}
+					else for (int i=0; i<listCount; i++) 
 						if (chunk.priority > chunksToUpdate[i].priority) {
 							chunksToUpdate.Insert (i, chunk);
+							listCount++;
 							break;
 						}
 				}
 					
 				// Update highest priority chunks
-				for (int i=0; i < chunkUpdatesPerCycle && i < activeChunks.Count && i < chunksToUpdate.Count; i++) {
-					try {
-						chunksToUpdate [i].ChunkUpdate ();
-						chunksToUpdate[i].priority = 0;
-					}catch (ArgumentOutOfRangeException a) {
-						Debug.LogError ("Index: "+i+" Count: "+chunksToUpdate.Count+" "+a.Message);
-						continue;
-					}
+				for (int i=0; i < chunkUpdatesPerCycle && i < activeChunks.Count && i < listCount; i++) {
+					chunksToUpdate [i].ChunkUpdate ();
+					chunksToUpdate[i].priority = 0;
 				}
+			
 
 				// Take a break if target frame rate missed
 				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
@@ -299,6 +313,7 @@ public class DynamicTerrain : MonoBehaviour {
 	/// </summary>
 	/// <param name="chunk">Chunk.</param>
 	void DeleteChunk(Chunk chunk){
+		StopCoroutine ("RoadCheck");
 
 		// Stop chunk updating verts.
 		chunk.StopUpdatingVerts();
@@ -309,8 +324,12 @@ public class DynamicTerrain : MonoBehaviour {
 		// Deregister from lists/map
 		DeregisterChunk(chunk);
 
+		chunksToUpdate.Remove(chunk);
+
 		// Pool chunk
-		chunkPool.Add(chunk.gameObject);
+		chunkPool.Add(chunk);
+
+		
 	}
 
 	/// <summary>
@@ -346,14 +365,6 @@ public class DynamicTerrain : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Checks all active chunks for road.
-	/// </summary>
-	public void CheckAllChunksForRoad() {
-		foreach (Chunk chunk in activeChunks)
-			chunk.CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
-	}
-
-	/// <summary>
 	/// Called when the road is extended.
 	/// </summary>
 	public void OnExtendRoad () {
@@ -368,31 +379,26 @@ public class DynamicTerrain : MonoBehaviour {
 	/// Reads the frequency data put out from instruments.
 	/// </summary>
 	void UpdateFreqData () {
-
-		// Get audio sources from MM
 		if (sources == null) {
-			sources = new List<AudioSource>();
-			sources.AddRange(MusicManager.instance.instrumentAudioSources.Values);
+			sources = MusicManager.instance.instrumentAudioSources.Values.ToArray<AudioSource>();
+			numSources = sources.Length;
 		}
 
 		// For each instrument audio source
-		foreach (AudioSource source in sources) {
+		for (int s = 0; s < numSources; s++) {
 
 			// Skip if disabled
-			if (!source.enabled) continue;
+			if (!sources[s].enabled) continue;
 
 			// Sample audio source
 			float[] sample = new float[freqSampleSize];
-			source.GetSpectrumData (sample, 0, fftWindow);
+			sources[s].GetSpectrumData (sample, 0, fftWindow);
 
 			// Add audio source data into final array
 			for (int i = 0; i < freqSampleSize; i++) {
 				if (sample [i] != float.NaN && sample [i] != 0f) {
-					if (source == MusicManager.instance.instrumentAudioSources [Instrument.AllInstruments[0]]) {
-						data [i] = sample [i];
-					} else {
-						data [i] += sample [i];
-					}
+					if (s == 0)  data [i] = sample [i];
+					else data [i] += sample [i];
 				}
 			}
 		}
@@ -409,10 +415,8 @@ public class DynamicTerrain : MonoBehaviour {
 	public Chunk RandomChunk () {
 
 		// Check if no active chunks
-		if (activeChunks.Count == 0) {
-			Debug.LogError("DynamicTerrain.RandomChunk(): no active chunks!");
+		if (activeChunks.Count == 0)
 			return null;
-		}
 
 		// Pick a random active chunk
 		Chunk chunk = activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
@@ -447,10 +451,8 @@ public class DynamicTerrain : MonoBehaviour {
 	public Chunk RandomRoadChunk() {
 
 		// Check if no active chunks with road
-		if (activeRoadChunks.Count == 0) {
-			Debug.LogError("DynamicTerrain.RandomRoadChunk(): no active road chunks!");
+		if (activeRoadChunks.Count == 0)
 			return null;
-		}
 
 		// Pick a random road chunk
 		Chunk chunk = activeRoadChunks[UnityEngine.Random.Range(0, activeRoadChunks.Count)];
@@ -479,10 +481,8 @@ public class DynamicTerrain : MonoBehaviour {
 	public Chunk RandomCloseToRoadChunk() {
 
 		// Check if no active chunks near a road
-		if (activeCloseToRoadChunks.Count == 0) {
-			Debug.LogError("DynamicTerrain.RandomCloseToRoadChunk(): no active close to road chunks!");
+		if (activeCloseToRoadChunks.Count == 0)
 			return null;
-		}
 
 		// Pick a random chunk near the road.
 		Chunk chunk = activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
@@ -507,52 +507,84 @@ public class DynamicTerrain : MonoBehaviour {
 	/// <param name="rough">Rough.</param>
 	/// <param name="rangeMin">Range minimum.</param>
 	/// <param name="rangeMax">Range max.</param>
-	public void CreateMountain (int x, int y, int width, int depth, float height, float rough, 
+	public IEnumerator CreateMountain (int x, int y, int width, int depth, float height, float rough, 
 		float rangeMin = -0.1f, float rangeMax = 1f) {
 
-		//ensure width and depth are odd
-		if (width % 2 == 0)
-			width++;
-		if (depth % 2 == 0)
-			depth++;
-		int size = Math.Max (width, depth);
-		size--;
-		size = MakePowerTwo (size); //size of the Diamond Square Alg array
-		//Debug.Log("Size is: " + size);
-		if (size < 2) return;
-		float[,] heightmap = new float[size + 1, size + 1];
-		float[] corners = InitializeCorners (vertexmap, x, y, width, depth);
-		FillDiamondSquare (ref heightmap, corners, height, rough, rangeMin, rangeMax);
+		float startTime = Time.realtimeSinceStartup;
+		bool randomizing = false;
+		float[,] heightmap = null;
+		
 
-		//set vertices
-		int minX = x - width/2;
-		int maxX = x + width / 2;
-		int minY = y - depth / 2;
-		int maxY = y + depth / 2;
-		int mapMax = (int)heightmap.GetLongLength (0) - 1;
-		for (int i = minX; i <= maxX; i++) {
-			float normalizedX = (float)(i - minX) / (float)(maxX - minX);
-			int xFloor = Mathf.FloorToInt(normalizedX * (float)mapMax);
-			int xCeil = Mathf.FloorToInt (normalizedX * (float)mapMax);
-			float xT = normalizedX % 1f;
-			for (int j = minY; j <= maxY; j++) {
-				if (vertexmap.ContainsVertex(i, j)) {
-					float normalizedY = (float)(j - minY) / (float)(maxY - minY);
-					int yFloor = Mathf.FloorToInt (normalizedY * (float)mapMax);
-					int yCeil = Mathf.FloorToInt (normalizedY * (float)mapMax);
-					float yT = normalizedY % 1f;
-					float p00 = GetFromHMap(heightmap, xFloor, yFloor);
-					float p10 = GetFromHMap(heightmap, xCeil, yFloor);
-					float p01 = GetFromHMap(heightmap, xFloor, yCeil);
-					float p11 = GetFromHMap(heightmap, xCeil, yCeil);
-					float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
-					if (!vertexmap.IsConstrained (i, j) && !vertexmap.IsLocked (i,j)) {
-						vertexmap.SetHeight (i, j, interpH);
+		List<string> loadMessages = new List<string>() {
+			"Literally moving mountains..."
+		};
+
+		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+
+		while (true) {
+
+			if (!randomized && !randomizing) {
+
+				//ensure width and depth are odd
+				if (width % 2 == 0)
+					width++;
+				if (depth % 2 == 0)
+					depth++;
+				int size = Math.Max (width, depth);
+				size--;
+				size = MakePowerTwo (size); //size of the Diamond Square Alg array
+				//Debug.Log("Size is: " + size);
+				if (size < 2) yield break;
+				heightmap = new float[size + 1, size + 1];
+				float[] corners = InitializeCorners (vertexmap, x, y, width, depth);
+				FillDiamondSquare (heightmap, corners, height, rough, rangeMin, rangeMax);
+				randomizing = true;
+
+			} else if (randomized) {
+
+				//set vertices
+				int minX = x - width/2;
+				int maxX = x + width / 2;
+				int minY = y - depth / 2;
+				int maxY = y + depth / 2;
+				int mapMax = (int)heightmap.GetLongLength (0) - 1;
+				for (int i = minX; i <= maxX; i++) {
+					float normalizedX = (float)(i - minX) / (float)(maxX - minX);
+					int xFloor = Mathf.FloorToInt(normalizedX * (float)mapMax);
+					int xCeil = Mathf.FloorToInt (normalizedX * (float)mapMax);
+					float xT = normalizedX % 1f;
+					for (int j = minY; j <= maxY; j++) {
+						if (vertexmap.ContainsVertex(i, j)) {
+							float normalizedY = (float)(j - minY) / (float)(maxY - minY);
+							int yFloor = Mathf.FloorToInt (normalizedY * (float)mapMax);
+							int yCeil = Mathf.FloorToInt (normalizedY * (float)mapMax);
+							float yT = normalizedY % 1f;
+							float p00 = GetFromHMap(heightmap, xFloor, yFloor);
+							float p10 = GetFromHMap(heightmap, xCeil, yFloor);
+							float p01 = GetFromHMap(heightmap, xFloor, yCeil);
+							float p11 = GetFromHMap(heightmap, xCeil, yCeil);
+							float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
+							if (!vertexmap.IsConstrained (i, j) && !vertexmap.IsLocked (i,j)) {
+								vertexmap.SetHeight (i, j, interpH);
+								GameManager.instance.ReportLoaded(1);
+							}
+						} else continue;
+
+						if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+							yield return null;
+							startTime = Time.realtimeSinceStartup;
+						}
+
 					}
-				} else continue;
+				}
+
+				// Begin loading road
+				WorldManager.instance.DoLoadRoad();
+				yield break;
 			}
+
+			yield return null;
 		}
-		foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
 	}
 
 	/// <summary>
@@ -574,7 +606,15 @@ public class DynamicTerrain : MonoBehaviour {
 		return (int)Math.Pow (2, r);
 	}
 
-	// Returns the initial corners for the Diamond Square Algorithm
+	/// <summary>
+	/// Returns the initial corners for the Diamond Square Algorithm.
+	/// </summary>
+	/// <param name="vmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="width"></param>
+	/// <param name="depth"></param>
+	/// <returns></returns>
 	public float[] InitializeCorners(VertexMap vmap, int x, int y, int width, int depth) {
 		float[] corners = new float[4];
 		//corner lower left
@@ -596,17 +636,34 @@ public class DynamicTerrain : MonoBehaviour {
 		return corners;
 	}
 
-	// Fills heightmap with DiamondSquare generated heights, 
-	// using corners as the seeds, height as the initial center 
-	// value, and rough as the height offset value
-	void FillDiamondSquare (ref float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
+	/// <summary>
+	/// Fills heightmap with DiamondSquare generated heights, 
+	/// using corners as the seeds, height as the initial center 
+	/// value, and rough as the height offset value
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="corners"></param>
+	/// <param name="height"></param>
+	/// <param name="rough"></param>
+	/// <param name="rangeMin"></param>
+	/// <param name="rangeMax"></param>
+	void FillDiamondSquare (float[,] heightmap, float[] corners, float height, float rough, float rangeMin, float rangeMax){
 		//set middle of hmap
 		int max = (int)heightmap.GetLongLength(0) - 1;
 		heightmap [max/2 + 1, max/2 + 1] = height; //set middle height
-		Divide(ref heightmap, max, rough, rangeMin, rangeMax);
+		StartCoroutine(Divide(heightmap, max, rough, rangeMin, rangeMax));
 	}
 
-	void Square(ref float[,] heightmap, int x, int y, int size, float offset) {
+	/// <summary>
+	/// Performs the square phase of the diamond-square algorithm.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="size"></param>
+	/// <param name="offset"></param>
+	void Square(float[,] heightmap, int x, int y, int size, float offset) {
+		//Debug.Log("square");
 		float ave = Average (new float[] {
 			GetFromHMap(heightmap, x - size, y - size), //lower left
 		 	GetFromHMap(heightmap, x + size, y - size), //lower right
@@ -616,7 +673,16 @@ public class DynamicTerrain : MonoBehaviour {
 		heightmap [x, y] = ave + offset;
 	}
 
-	void Diamond(ref float[,] heightmap, int x, int y, int size, float offset) {
+	/// <summary>
+	/// Performs the diamond phase of the diamond-square algorithm.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="size"></param>
+	/// <param name="offset"></param>
+	void Diamond(float[,] heightmap, int x, int y, int size, float offset) {
+		//Debug.Log("diamond "+x+" "+y+" "+size+" "+offset);
 		float ave = Average (new float[] {
 			GetFromHMap(heightmap, x, y - size), //bottom
 			GetFromHMap(heightmap, x + size, y), //right
@@ -626,34 +692,78 @@ public class DynamicTerrain : MonoBehaviour {
 		heightmap [x, y] = ave + offset;
 	}
 
-	void Divide(ref float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
-		int x, y, half = size / 2;
-		float scale = size * rough;
-		if (half < 1) //past the minimum size
-			return;
+	/// <summary>
+	/// Calls diamond and square.
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="size"></param>
+	/// <param name="rough"></param>
+	/// <param name="rangeMin"></param>
+	/// <param name="rangeMax"></param>
+	IEnumerator Divide(float[,] heightmap, int size, float rough, float rangeMin, float rangeMax) {
 
-		//do squares
-		for (y = half; y < heightmap.GetLongLength(1) - 1; y += size) {
-			for (x = half; x < heightmap.GetLongLength(0) - 1; x += size) {
-				if (size == heightmap.GetLongLength(0) - 1) { //ignore setting the very center of the mountain
-					continue;
-				}else {
-					Square (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+		//Debug.Log("divide");
+
+		float startTime = Time.realtimeSinceStartup;
+
+		while (true) {
+
+			int x, y, half = size / 2;
+			float scale = size * rough;
+			if (half < 1) {//past the minimum size
+				//Debug.Log("break");
+				randomized = true;
+				yield break;
+			}
+
+			//Debug.Log(heightmap.GetLongLength(0)-1);
+
+			//do squares
+			for (y = half; y < heightmap.GetLongLength(1) - 1; y += size) {
+				for (x = half; x < heightmap.GetLongLength(0) - 1; x += size) {
+					if (size == heightmap.GetLongLength(0) - 1) { //ignore setting the very center of the mountain
+						//Debug.Log("skipping "+x+","+ y);
+						continue;
+					}else {
+						Square (heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+					}
+
+					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
+					}
 				}
 			}
-		}
 
-		//do diamonds
-		for (y = 0; y <= heightmap.GetLongLength (1) - 1; y += half) {
-			for (x = (y + half) % size; x <= heightmap.GetLength (0) - 1; x += size) {
-				Diamond (ref heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+			//do diamonds
+			for (y = 0; y <= heightmap.GetLongLength (1) - 1; y += half) {
+				for (x = (y + half) % size; x <= heightmap.GetLength (0) - 1; x += size) {
+					Diamond (heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
+				
+					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
+					}
+				}
 			}
+
+			size = half;
+
+			yield return null;
+
+			//Debug.Log("reached");
+			//recursive call
+			//Divide (heightmap, half, rough, rangeMin, rangeMax);
 		}
-		//recursive call
-		Divide (ref heightmap, half, rough, rangeMin, rangeMax);
 	}
 
-	//accesses heightmap and returns -INF for out of bounds vertices
+	/// <summary>
+	/// Accesses heightmap and returns -INF for out of bounds vertices
+	/// </summary>
+	/// <param name="heightmap"></param>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <returns></returns>
 	float GetFromHMap (float [,] heightmap, int x, int y) {
 		if (x < 0 || x >= heightmap.GetLength (0) || y < 0 || y >= heightmap.GetLength (1)) {
 			return float.NegativeInfinity;
@@ -661,7 +771,11 @@ public class DynamicTerrain : MonoBehaviour {
 		return heightmap [x, y];
 	}
 
-	//returns the average of 4 corners, excluding non-legal values
+	/// <summary>
+	/// Returns the average of 4 corners, excluding non-legal values
+	/// </summary>
+	/// <param name="corners"></param>
+	/// <returns></returns>
 	float Average(float[] corners) {
 		float count = 4f;
 		float sum = 0f;
@@ -675,6 +789,10 @@ public class DynamicTerrain : MonoBehaviour {
 		return (sum/count);
 	}
 
+	/// <summary>
+	/// Sets all chunks to use debug colors.
+	/// </summary>
+	/// <param name="colors"></param>
 	public void SetDebugColors (DebugColors colors) {
 		switch (colors) {
 		case DebugColors.Constrained:

@@ -77,15 +77,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group: 1
   dynamic: 0
-  density: 3
+  density: 4
   distribution: 0
   positionOffset: {x: 0, y: 0.5, z: 0}
   rotationOffset: {x: -90, y: 0, z: 0}
-  heightRange: {x: 1, y: 2}
-  widthRange: {x: 1, y: 2}
+  heightRange: {x: 1.5, y: 4}
+  widthRange: {x: 1.5, y: 4}
   pitchRange: {x: -5, y: 5}
   yawRange: {x: 0, y: 360}
   rollRange: {x: -5, y: 5}
+  heightAnimation:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  widthAnimation:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 3.202658
+      outSlope: 3.202658
+      tangentMode: 10
+    - time: 0.28942305
+      value: 0.92692304
+      inSlope: 1.6527498
+      outSlope: 1.6527498
+      tangentMode: 10
+    - time: 1
+      value: 1
+      inSlope: 0.10284173
+      outSlope: 0.10284173
+      tangentMode: 10
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  animationSpeed: 0.5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

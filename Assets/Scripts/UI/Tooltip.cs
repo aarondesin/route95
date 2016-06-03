@@ -1,28 +1,32 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// Class to handle generic tooltips.
+/// </summary>
 public class Tooltip : MonoBehaviour {
 
-	public string text;
+	#region Tooltip Vars
 
-	bool mouseOver = false;
+	public static Tooltip instance;
 
-	void Update () {
-		Vector2 mouse = Input.mousePosition;
-		Vector3[] corners = new Vector3[4];
-		GetComponent<RectTransform>().GetWorldCorners(corners);
+	Text textObj;
 
-		if (mouse.x >= corners[0].x && mouse.x < corners[2].x &&
-			mouse.y >= corners[0].y && mouse.y < corners[2].y) {
-			if (!mouseOver) {
-				GameManager.instance.ShowTooltip(text);
-				mouseOver = true;
-			}
-		} else {
-			if (mouseOver) {
-				GameManager.instance.HideTooltip();
-				mouseOver = false;
-			}
-		}
+	#endregion
+	#region Unity Callbacks
+
+	void Awake () {
+		instance = this;
+		textObj = GetComponentInChildren<Text>();
 	}
+
+	#endregion
+	#region Tooltip Methods
+
+	public void SetText (string text) {
+		textObj.text = text;
+	}
+
+	#endregion
 }

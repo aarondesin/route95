@@ -27,7 +27,7 @@ public class VertexMap {
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
-		noDecorationsDistance = WorldManager.instance.roadWidth * 1.5f;
+		noDecorationsDistance = WorldManager.instance.roadWidth * 3f;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Map<Vertex>(width);
@@ -122,64 +122,62 @@ public class VertexMap {
 	}
 	// 
 
-	public void DoCheckRoads (List<Vector3> roadPoints) {
-		WorldManager.instance.StartCoroutine (CheckRoads(roadPoints));
+	public void DoCheckRoads (Vector3 point) {
+		WorldManager.instance.StartCoroutine (CheckRoads(point));
 	}
 
-	IEnumerator CheckRoads (List<Vector3> roadPoints) {
+	IEnumerator CheckRoads (Vector3 roadPoint) {
 		float startTime = Time.realtimeSinceStartup;
 		float xWPos;
 		float yWPos;
 
-		foreach (Vector3 roadPoint in roadPoints) {
-			for (int x = xMin; x <= xMax; x++) {
+		for (int x = xMin; x <= xMax; x++) {
+
+			// Skip if impossible for a point to be in range
+			xWPos = x * chunkSize/(chunkRes-1) - chunkSize/2f;
+			if (Mathf.Abs(xWPos - roadPoint.x) > noDecorationsDistance) 
+				continue;
+
+			for (int y = yMin; y < yMax; y++) {
 
 				// Skip if impossible for a point to be in range
-				xWPos = x * chunkSize/(chunkRes-1) - chunkSize/2f;
-				if (Mathf.Abs(xWPos - roadPoint.x) > noDecorationsDistance) 
+				yWPos = y * chunkSize/(chunkRes-1) - chunkSize/2f ;
+				if (Mathf.Abs(yWPos- roadPoint.z) > noDecorationsDistance) 
 					continue;
-
-				for (int y = yMin; y < yMax; y++) {
-
-					// Skip if impossible for a point to be in range
-					yWPos = y * chunkSize/(chunkRes-1) - chunkSize/2f ;
-					if (Mathf.Abs(yWPos- roadPoint.z) > noDecorationsDistance) 
-						continue;
 					
-					Vertex vert = vertices.At(x,y);
-					if (vert == null) continue;
-					if (vert.locked) continue;
+				Vertex vert = vertices.At(x,y);
+				if (vert == null) continue;
+				if (vert.locked) continue;
 
-					float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
-					vert.noDecorations = dist <= noDecorationsDistance;
+				float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
+				vert.color.g = Mathf.Clamp01 (noDecorationsDistance / (dist+.01f));
+				vert.noDecorations = dist <= noDecorationsDistance;
 
-					if (vert.noDecorations) {
-						vert.nearRoad = dist <= nearbyRoadDistance;
+				if (vert.noDecorations) {
+					vert.nearRoad = dist <= nearbyRoadDistance;
 
-						if (vert.nearRoad) {
-							vert.SmoothHeight(roadPoint.y, UnityEngine.Random.Range(0.98f, 0.99f), UnityEngine.Random.Range(2, 8));
-							foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
-							foreach (GameObject decoration in decorationDeletes) 
-								WorldManager.instance.RemoveDecoration(decoration);
-							decorationDeletes.Clear();
-							vert.locked = true;
-						}
+					if (vert.nearRoad) {
+						vert.SmoothHeight(roadPoint.y, UnityEngine.Random.Range(0.98f, 0.99f), UnityEngine.Random.Range(2, 8));
+						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
+						foreach (GameObject decoration in decorationDeletes) 
+							WorldManager.instance.RemoveDecoration(decoration);
+						decorationDeletes.Clear();
+						vert.locked = true;
+					}
 
-						if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-							yield return null;
-							startTime = Time.realtimeSinceStartup;
-						}
+					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+						yield return null;
+						startTime = Time.realtimeSinceStartup;
 					}
 				}
-
 			}
 
-			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-				yield return null;
-				startTime = Time.realtimeSinceStartup;
-			}
 		}
-		yield return null;
+
+		if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+			yield return null;
+			startTime = Time.realtimeSinceStartup;
+		}
 	}
 
 	public void Randomize (float noise) {

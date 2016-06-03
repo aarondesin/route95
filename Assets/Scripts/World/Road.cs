@@ -5,13 +5,18 @@ using System.Collections.Generic;
 
 public class Road : Bezier {
 
+
+	#region Road Vars
+
+	public bool loading = false;
 	public bool loaded = false;
+	List<Vector3> toCheck;
 
-	#region Road Placement Vars
+	DynamicTerrain terrain;   // Reference to terrain
 
-	DynamicTerrain terrain;   // reference to terrain
-
+	float heightScale;        // World height scale (copied from WM)
 	float generateRoadRadius; // distance from player to generate road (copied from WM)
+	float cleanupRoadRadius;  // Distance from player to cleanup road (copied from WM)
 	float variance;
 	float placementDistance;  // marginal distance to add new road (copied from WM)
 	float maxSlope;           // maximum slope per world unit (copied from WM)
@@ -37,7 +42,8 @@ public class Road : Bezier {
 	#region Unity Callbacks
 
 	void Awake () {
-		loaded = false;
+
+		toCheck = new List<Vector3>();
 
 		verts = new List<Vector3> ();
 		uvs = new List<Vector2> ();
@@ -58,7 +64,9 @@ public class Road : Bezier {
 		height = WorldManager.instance.roadHeight;
 		slope = WorldManager.instance.roadSlope;
 
+		heightScale = WorldManager.instance.heightScale;
 		generateRoadRadius = WorldManager.instance.roadExtendRadius;
+		cleanupRoadRadius = WorldManager.instance.roadCleanupRadius;
 		variance = WorldManager.instance.roadVariance;
 		placementDistance = WorldManager.instance.roadPlacementDistance;
 		maxSlope = WorldManager.instance.roadMaxSlope;
@@ -66,58 +74,115 @@ public class Road : Bezier {
 		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
 
 		terrain = WorldManager.instance.terrain;
-
-		// Build mesh
-		Reset ();
 		
 	}
 
 	public void Update () {
+		if (!loading) return;
 
+		if (!loaded) {
+			List<string> loadMessages = new List<string>() {
+				"Blazing a trail...",
+				"Rerouting...",
+				"Following star maps..."
+			};
+			GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+		}
+			
+		// These values may have changed, so get them from WM
 		variance = WorldManager.instance.roadVariance;
 		maxSlope = WorldManager.instance.roadMaxSlope;
 
-		if (!loaded) return;
+		float progress = PlayerMovement.instance.progress;
 
-		// Remove far away points behind the player
-		if (Vector3.Distance (points.Head(), PlayerMovement.instance.transform.position) > generateRoadRadius) {
+		Vector3 playerPosition = PlayerMovement.instance.transform.position;
 
-			RemoveCurve();
-
-			PlayerMovement.instance.progress -= 0.5f / (float)CurveCount;
-
-		}
+		bool changesMade = false;
 
 		// Create new points in front of player
-		while (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
+		if (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
 
-
-
-			float progress = PlayerMovement.instance.progress;
 			float numerator = progress * CurveCount;
 
+			// Create curve
 			AddCurve ();
 
+			// Update player progress
 			PlayerMovement.instance.progress = numerator / CurveCount;
+
+			changesMade = true;
+		} else
+
+		// If road beginning is too close
+		if (Vector3.Distance (points.Head(), playerPosition) < generateRoadRadius) {
+
+			float numerator = progress * CurveCount * 2f;
+			float denominatorOld = CurveCount * 2f;
+
+			// Generate backwards
+			Backtrack();
+
+			// Update player progress
+			PlayerMovement.instance.progress = (numerator + 2f) / (denominatorOld + 2f);
+
+			changesMade = true;
+
+		// If road beginning is too far away
+		} else if (Vector3.Distance (points.Head(), playerPosition) > cleanupRoadRadius) {
+
+			float numerator = progress * CurveCount * 2f;
+			float denominator = CurveCount * 2f;
+
+			// Remove first curve
+			RemoveCurve();
+
+			// Update player progress
+			PlayerMovement.instance.progress = (numerator - 2f) / (denominator - 2f);
+
+			changesMade = true;
+
+		
+		} else if (!loaded)  {
+			loaded = true;
+			PlayerMovement.instance.transform.position = GetPoint(0.6f) + new Vector3(0f, 2.27f + height, 0f);
+			PlayerMovement.instance.transform.LookAt (GetPoint(0.6f) + GetVelocity(0.6f), Vector3.up);
+			if (WorldManager.instance.doDecorate)
+				WorldManager.instance.DoLoadDecorations();
+			else WorldManager.instance.FinishLoading();
 		}
+
+		if (changesMade) Build();
+		else if (toCheck.Count > 0) Check(toCheck.PopFront());
 
 	}
 
 	#endregion
-	#region Road Functions
+	#region Road Methods
 
-	// Resets curve to default values
+	/// <summary>
+	/// Generates initial road points.
+	/// </summary>
 	public void Reset () {
-		points = new List<Vector3>();
-		Vector3 p = PlayerMovement.instance.transform.position;
-		points.Add(new Vector3 (p.x, 0f, p.y));
-		points.Add(new Vector3 (p.x - 60f, p.y, p.z));
-		points.Add(new Vector3 (p.x + 60f, p.y, p.z + 130f));
-		points.Add(new Vector3 (p.x, p.y, p.z + 150f));
 
-		modes = new List<Bezier.BezierControlPointMode>();
-		for (int i=0; i<points.Count / 2; i++)
-			modes.Add(Bezier.BezierControlPointMode.Mirrored);
+		// Get initial point
+		Vector3 point = new Vector3 (0f, heightScale, 0f);
+
+		// Raycast down to terrain
+		RaycastHit hit;
+		if (Physics.Raycast (point, Vector3.down, out hit, Mathf.Infinity))
+			point.y = hit.point.y;
+
+		// Init points list
+		points = new List<Vector3>() {
+			point
+		};
+
+		// Init modes list
+		modes = new List<BezierControlPointMode>() {
+			BezierControlPointMode.Mirrored
+		};
+
+		AddCurve(true);
 	}
 
 	public float Width {
@@ -127,68 +192,45 @@ public class Road : Bezier {
 	}
 
 	public void DoLoad () {
-		StartCoroutine("Load");
-	}
-
-	IEnumerator Load () {
-		GameManager.instance.ChangeLoadingMessage("Loading road...");
-		float startTime = Time.realtimeSinceStartup;
-
-		while (true) {
-			if (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
-
-				float progress = PlayerMovement.instance.progress;
-				float numerator = progress * CurveCount;
-
-				AddCurve();
-				PlayerMovement.instance.progress = numerator / CurveCount;
-
-				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-					yield return null;
-					startTime = Time.realtimeSinceStartup;
-				}
-				loaded = false;
-
-			//} else if (Vector3.Distance (points.Head(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
-
-			} else {
-				loaded = true;
-				terrain.CheckAllChunksForRoad();
-				if (WorldManager.instance.doDecorate)
-					WorldManager.instance.DoLoadDecorations();
-				else WorldManager.instance.FinishLoading();
-				yield break;
-			}
-		}
+		// Build mesh
+		Reset ();
+		loading = true;
 	}
 
 	// Adds a new curve to the road bezier
-	void AddCurve () {
+	void AddCurve (bool ignoreMaxSlope=false) {
 		float displacedDirection = placementDistance * variance; //placementRange;
 
-		Vector3 point;
-		if (points.Count > 0) point = points.Tail();
-		else point = PlayerMovement.instance.transform.position;
+		Vector3 point = points.Tail();
 		Vector3 old = point;
 
-		Vector3 direction = GetDirection (1f) * placementDistance;
+		Vector3 direction;
+		if (points.Count == 1) {
+			direction = UnityEngine.Random.insideUnitSphere;
+			direction.y = 0f;
+			direction.Normalize();
+			direction *= placementDistance;
+		} else direction = GetDirection (1f) * placementDistance;
 
 		RaycastHit hit;
 
 		for (int i=3; i>0; i--) {
 			float a = UnityEngine.Random.Range (0f, Mathf.PI * 2f);
 			float d = UnityEngine.Random.Range (displacedDirection * 0.75f, displacedDirection);
+			//float d = UnityEngine.Random.Range (0f, variance);
 
-			point += direction + new Vector3 (d*Mathf.Cos(a), 0f, d*Mathf.Sin(a));
+			//point += direction * (1f - d) * placementDistance + new Vector3 (Mathf.Cos(a), 0f, Mathf.Sin(a)) * d * placementDistance;
+			point += direction + new Vector3 (Mathf.Cos(a), 0f, Mathf.Sin(a)) * d;
 				
-			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
+			Vector3 rayStart = point + new Vector3 (0f, heightScale, 0f);
 
 			float dist = Vector2.Distance (new Vector2 (old.x, point.x), new Vector2 (old.z, point.z));
 			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
-				point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
+				if (ignoreMaxSlope) point.y = hit.point.y;
+				else point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
+			} else {
+				throw new InvalidOperationException("Failed to place road point!");
 			}
-
-			//points[PointsCount - i] = point;
 			points.Add(point);
 		}
 
@@ -197,94 +239,73 @@ public class Road : Bezier {
 		modes.Add (modes.Tail());
 		EnforceMode (points.Count - 4);
 		steps += stepsPerCurve;
-		Build();
 		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
-	
 	}
 
 	public void Backtrack () {
 		float displacedDirection = placementDistance * variance; //placementRange;
 
-		Vector3 point;
-		if (points.Count > 0) point = points [0];
-		else point = PlayerMovement.instance.transform.position;
+		Vector3 point = points.Head();
+		Vector3 old = point;
 
 		Vector3 direction = -GetDirection (0f) * placementDistance;
-
-
 
 		RaycastHit hit;
 
 		for (int i=3; i>0; i--) {
 			float a = UnityEngine.Random.Range (0f, Mathf.PI * 2f);
 			float d = UnityEngine.Random.Range (displacedDirection * 0.75f, displacedDirection);
+			//float d = UnityEngine.Random.Range (0f, variance);
 
-			point += direction + new Vector3 (d*Mathf.Cos(a), 0f, d*Mathf.Sin(a));
+			//point += direction * (1f - d) * placementDistance + new Vector3 (Mathf.Cos(a), 0f, Mathf.Sin(a)) * d * placementDistance;
+			point += direction + new Vector3 (Mathf.Cos(a), 0f, Mathf.Sin(a)) * d;
 
-			Vector3 rayStart = point + new Vector3 (0f, WorldManager.instance.heightScale, 0f);
+			Vector3 rayStart = point + new Vector3 (0f, heightScale, 0f);
 
-			float dist = Vector2.Distance (new Vector2 (points [points.Count-4].x, point.x), new Vector2 (points [points.Count-4].z, point.z));
-			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity)) {
+			float dist = Vector2.Distance (new Vector2 (old.x, point.x), new Vector2 (old.z, point.z));
+
+			if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity))
 				point.y += Mathf.Clamp(hit.point.y-point.y, -dist*maxSlope, dist*maxSlope);
-			}
 
-			points[PointsCount - i] = point;
+			points.Insert (0, point);
 		}
 
 		terrain.OnExtendRoad ();
 
-		modes.Add (modes[modes.Count-1]);
-		EnforceMode (points.Count - 4);
+		modes.Add (modes.Tail());
+		EnforceMode (4);
 		steps += stepsPerCurve;
-		Build();
-		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+		DoBulldoze(0f, 1f/(float)CurveCount);
 
 	}
 
+	/// <summary>
+	/// Removes a curve behind the player.
+	/// </summary>
 	void RemoveCurve () {
-
-		// Update points array
-		/*Vector3[] newPoints = new Vector3[points.Length - 3];
-		BezierControlPointMode[] newModes = new BezierControlPointMode[modes.Length-1];
-		for (int i = 0; i < newPoints.Length; i++) {
-			newPoints [i] = points [i + 3];
-			if (i % 3 == 0) newModes[i/3] = modes[i/3 + 1];
-		}
-
-		points = newPoints;
-		modes = newModes;*/
 
 		for (int i=0; i<3; i++) points.RemoveAt(0);
 		modes.RemoveAt(0);
 
 		steps -= stepsPerCurve;
-		Build();
 
 	}
 
 	// Marks all points between player and newly created points for leveling
-	public void DoBulldoze (float startProgress) {
-		StopCoroutine ("Bulldoze");
-		StartCoroutine("Bulldoze", startProgress);
+	public void DoBulldoze (float startProgress, float endProgress=1f) {
+		//StopCoroutine ("Bulldoze");
+		StartCoroutine(Bulldoze( startProgress, endProgress));
 	}
 
-	IEnumerator Bulldoze (float startProgress) {
+	IEnumerator Bulldoze (float startProgress, float endProgress) {
 		float startTime = Time.realtimeSinceStartup;
 		float progress = startProgress;
-		float diff = 1f - progress;
-		float resolution = WorldManager.instance.roadPathCheckResolution * (1f - startProgress);
-		while (progress < 1f) {
-		//	Debug.Log("Bulldoze|Progress: "+progress+"|Point: "+GetPoint(progress));
+		float diff = endProgress - startProgress;
+		if (diff < 0f) yield break;
+		float resolution = WorldManager.instance.roadPathCheckResolution * diff;
+		while (progress < endProgress) {
 			Vector3 point = GetPoint(progress);
-			List<Vector3> points = new List<Vector3> () {
-				point,
-				//point+BezRight(point)*width/3f,
-				//point-BezRight(point)*width/3f,
-				//point+BezRight(point)*width,
-				//point-BezRight(point)*width
-			};
-			//DynamicTerrain.instance.vertexmap.DoCheckRoads (GetPoint(progress));
-			terrain.vertexmap.DoCheckRoads (points);
+			toCheck.Add (point);
 			progress += diff / resolution;
 
 			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
@@ -292,7 +313,12 @@ public class Road : Bezier {
 				startTime = Time.realtimeSinceStartup;
 			}
 		}
+		toCheck.Add (GetPoint(endProgress));
 		yield return null;
+	}
+
+	void Check (Vector3 point) {
+		terrain.vertexmap.DoCheckRoads(point);
 	}
 
 	// Sets the road mesh
@@ -324,7 +350,7 @@ public class Road : Bezier {
 		uvs.Clear ();
 		tris.Clear ();
 
-		float UVoffset = 0.4f;
+		float UVoffset = 0.2f;
 		float UVslope = slope;
 
 		float progressI = 0f;
@@ -364,27 +390,26 @@ public class Road : Bezier {
 			Vector3 rightF = BezRight(dirF);
 			Vector3 downF = BezDown(dirF);
 
-			UVProgress += Vector3.Distance (pointF, pointI);
-			float UVValue = 0.5f + 0.5f * Mathf.Sin(UVProgress);
+			UVProgress += Vector3.Distance (pointF, pointI) / 20f;
 
 			// Left down
 			verts.Add(pointF + width * -rightF);
-			uvs.Add(new Vector2(-UVoffset, UVValue));
+			uvs.Add(new Vector2(-UVoffset, UVProgress));
 			int leftDownF = num * 4;
 
 			// Right down
 			verts.Add(pointF + width * rightF);
-			uvs.Add(new Vector2(1f + UVoffset, UVValue));
+			uvs.Add(new Vector2(1f + UVoffset, UVProgress));
 			int rightDownF = num * 4 + 1;
 
 			// Left up
 			verts.Add(pointF + slope * width * -rightF + height * -downF);
-			uvs.Add(new Vector2(-UVoffset + UVslope, UVValue));
+			uvs.Add(new Vector2(-UVoffset + UVslope, UVProgress));
 			int leftUpF = num * 4 + 2;
 
 			// Right up
 			verts.Add(pointF + slope * width * rightF + height * -downF);
-			uvs.Add(new Vector2(1f + UVoffset - UVslope, UVValue));
+			uvs.Add(new Vector2(1f + UVoffset - UVslope, UVProgress));
 			int rightUpF = num * 4 + 3;
 
 

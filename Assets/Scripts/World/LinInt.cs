@@ -2,41 +2,48 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
-//a class that can linearly interpolate between key points of data
+/// <summary>
+/// A class that can linearly interpolate between key points of data
+/// </summary>
 public class LinInt {
 
 	#region LinInt Vars
 
-	List<float> keyPoints;
-	float averagedEnds;
+	List<float> keyPoints; // All key points (from frequency data)
+	float averagedEnds;    // Averaged endpoints
 
 	#endregion
 	#region LinInt Methods
 
+	/// <summary>
+	/// Default constructor.
+	/// </summary>
 	public LinInt () {
 		keyPoints = new List<float> ();
 		averagedEnds = 0f;
 	}
 
-	public LinInt(float[] data) {
-		Update(data);
-	}
-
+	/// <summary>
+	/// Updates LinInt using frequency data.
+	/// </summary>
+	/// <param name="data"></param>
 	public void Update(float[] data) {
-		keyPoints = new List<float> ();
+		keyPoints.Clear();
 		foreach (float f in data) keyPoints.Add (f);
 		averagedEnds = (keyPoints [0] + keyPoints [keyPoints.Count - 1]) / 2;
-	}
-
-	public void AddKeyPoint (float point) {
-		keyPoints.Add(point);
 	}
 
 	/*takes in a float from 0-1, inclusive
 	 *returns the data value that matches
 	 *the linearly interpreted key points
 	 */
+	 /// <summary>
+	 /// Takes in a float from 0-1, inclusive,
+	 /// and returns the data value that matches
+	 /// the linearly interpreted key points.
+	 /// </summary>
+	 /// <param name="pos"></param>
+	 /// <returns></returns>
 	public float GetDataPoint (float pos){
 		//if input is out of bounds
 		if (pos > 1f) {

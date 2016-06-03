@@ -13,9 +13,9 @@ public class InputManager : MonoBehaviour {
 
 	#region InputManager Vars
 
-	[Header("InputManager Values")]
+	public static InputManager instance;
 
-	public static InputManager instance; // Quick reference to active Input Manager
+	[Header("InputManager Values")]
 
 	[Tooltip("Current selected object.")]
 	public GameObject selected;
@@ -336,9 +336,12 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="instrument">Instrument.</param>
 	void SwitchInstrument (Instrument instrument) {
-		if (instrument != MusicManager.instance.currentInstrument) {
+		Instrument inst = MusicManager.instance.currentInstrument;
+		if (instrument != inst) {
+			InstrumentDisplay.instance.FadeGlow (inst.index);
 			MusicManager.instance.currentInstrument = instrument;
-			MusicManager.instance.GetComponent<AudioSource>().PlayOneShot(instrument.switchSound);
+			InstrumentDisplay.instance.WakeGlow(instrument.index);
+			MusicManager.PlayMenuSound(instrument.switchSound);
 			InstrumentDisplay.instance.Refresh();
 		}
 	}

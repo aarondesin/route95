@@ -10,7 +10,7 @@ public class AddRiffPrompt : MonoBehaviour {
 
 	#region AddRiffPrompt Vars
 
-	public static AddRiffPrompt instance; // Quick reference to the AddRiffPrompt instance
+	public static AddRiffPrompt instance;
 
 	[Tooltip("Riff name input field.")]
 	public InputField inputField;
@@ -89,8 +89,8 @@ public class AddRiffPrompt : MonoBehaviour {
 		// Go to riff editor
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
-		GameManager.instance.Hide (gameObject);
-		GameManager.instance.GoToRiffEditor();
+		SongArrangeSetup.instance.SetValue(temp.index);
+		SongArrangeSetup.instance.Refresh();
 	}
 
 	#endregion

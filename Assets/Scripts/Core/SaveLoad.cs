@@ -150,6 +150,8 @@ public static class SaveLoad {
 
 		try {
 
+			Debug.Log("SaveLoad.Load<" + typeof(T).ToString() + ">(): loading path \"" + filePath + "\".");
+
 			// Init BinaryFormatter
 			BinaryFormatter bf = new BinaryFormatter();
 
@@ -204,25 +206,14 @@ public static class SaveLoad {
 			if (!project.Empty)
 				MusicManager.instance.currentSong = project.songs[0];
 
-			// Refresh name field on playlist browser
-			PlaylistBrowser.instance.RefreshName();
-	
-			// Go to playlist menu if not there already
-			GameManager.instance.GoToPlaylistMenu();
-
 		// Catch and print any FailedToLoadExceptions
 		} catch (FailedToLoadException f) {
-
-			// Print exception
-			Debug.LogError(f.Message);
 
 			// Restore backups
 			MusicManager.instance.currentProject = backupProject;
 			MusicManager.instance.currentSong = backupSong;
 
-			// Prompt
-			Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
-
+			throw f;
 		}
 	}
 

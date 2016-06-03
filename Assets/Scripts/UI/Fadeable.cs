@@ -11,12 +11,23 @@ public class Fadeable : MonoBehaviour {
 
 	#region Fadeable Vars
 
-	public bool startFaded = true;          // If true, graphic will start faded
+	[Tooltip("Does the graphic start faded?")]
+	public bool startFaded = true;
+
+	[Tooltip("Rate of fade/unfade in percent per cycle.")]
 	public float fadeSpeed = 0.05f;         // Speed at which to perform fade
-	public bool fadeAllChildren = false;    // If true, will fade all graphics in children as well
-	public bool disableAfterFading = false; // If true, will disable GameObject after fade is complete
+
+	[Tooltip("Fade all children graphics?")]
+	public bool fadeAllChildren = false;
+
+	[Tooltip("Prevent being faded by parents?")]
+	public bool blockParents = false;
+
+	[Tooltip("Disable GameObject after fading?")]
+	public bool disableAfterFading = false;
 
 	float alpha;                                       // Current fade alpha
+	public bool busy = false;
 	Dictionary<MaskableGraphic, Color> originalColors; // Stores references to each graphic and its original color
 
 	#endregion
@@ -28,16 +39,17 @@ public class Fadeable : MonoBehaviour {
 		originalColors = new Dictionary<MaskableGraphic, Color>();
 		if (fadeAllChildren) {
 			List<MaskableGraphic> allGraphics = GetComponentsInChildren<MaskableGraphic>().ToList<MaskableGraphic>();
-			foreach (MaskableGraphic graphic in allGraphics) originalColors.Add (graphic, graphic.color);
+			foreach (MaskableGraphic graphic in allGraphics)
+				if (graphic.GetComponent<Fadeable>() == null ||
+					!graphic.GetComponent<Fadeable>().blockParents) originalColors.Add (graphic, graphic.color);
 		} else if (GetComponent<MaskableGraphic>() != null)
 			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
-			
+
 		// Initially fade if necessary
-		alpha = (startFaded ? 0f : 1f);
-		foreach (MaskableGraphic graphic in originalColors.Keys) {
-			Color newColor = originalColors[graphic];
-			newColor.a *= alpha;
-			graphic.color = newColor;
+		if (startFaded) {
+			alpha = 0f;
+			ColorAll();
+			if (disableAfterFading) gameObject.SetActive(false);
 		}
 	}
 
@@ -45,11 +57,36 @@ public class Fadeable : MonoBehaviour {
 	#region Fadeable Methods
 
 	/// <summary>
+	/// Returns true if the object is done fading.
+	/// </summary>
+	public bool DoneFading {
+		get {
+			return alpha == 0f && !busy;
+		}
+	}
+
+	/// <summary>
+	/// Returns true if the object is done unfading.
+	/// </summary>
+	public bool DoneUnfading {
+		get {
+			return alpha == 1f && !busy;
+		}
+	}
+
+	public bool NotFading {
+		get {
+			return DoneFading || DoneUnfading;
+		}
+	}
+
+	/// <summary>
 	/// Starts fading the object.
 	/// </summary>
 	public void Fade () {
-		StopCoroutine ("DoUnFade");
-		if (!gameObject.activeSelf) return;
+		if (gameObject.activeSelf) StopCoroutine ("DoUnFade");
+		else return;
+		busy = true;
 		StartCoroutine("DoFade");
 	}
 
@@ -57,8 +94,9 @@ public class Fadeable : MonoBehaviour {
 	/// Starts unfading the object.
 	/// </summary>
 	public void UnFade () {
-		StopCoroutine("DoFade");
-		if (!gameObject.activeSelf) return; 
+		if (gameObject.activeSelf) StopCoroutine("DoFade");
+		else gameObject.SetActive(true);
+		busy = true;
 		StartCoroutine("DoUnFade");
 	}
 
@@ -68,18 +106,17 @@ public class Fadeable : MonoBehaviour {
 	/// <returns></returns>
 	IEnumerator DoFade () {
 		while (true) {
-			if (alpha >= fadeSpeed && originalColors != null) {
-				alpha -= fadeSpeed;
+			if (alpha >= fadeSpeed) {
 
-				foreach (MaskableGraphic graphic in originalColors.Keys) {
-					Color newColor = originalColors[graphic];
-					newColor.a *= alpha;
-					graphic.color = newColor;
-				}
+				alpha -= fadeSpeed;
+				ColorAll();
 					
-				yield return 0;
+				yield return null;
 			} else {
+				busy = false;
 				if (disableAfterFading) gameObject.SetActive(false);
+				alpha = 0f;
+				ColorAll();
 				yield break;
 			}
 		}
@@ -90,20 +127,27 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	IEnumerator DoUnFade () {
-		while (true) {
-			if (alpha <= 1f-fadeSpeed && originalColors != null) {
-				alpha += fadeSpeed;
+		while (alpha <= 1f-fadeSpeed) {
 
-				foreach (MaskableGraphic graphic in originalColors.Keys) {
-					Color newColor = originalColors[graphic];
-					newColor.a *= alpha;
-					graphic.color = newColor;
-				}
+			alpha += fadeSpeed;
+			ColorAll();
 
-				yield return 0;
-			} else {
-				yield break;
-			}
+			yield return null;
+		}
+		busy = false;
+		alpha = 1f;
+		ColorAll();
+		yield break;
+	}
+
+	/// <summary>
+	/// Updates the alphas of parent and all children.
+	/// </summary>
+	void ColorAll () {
+		foreach (MaskableGraphic graphic in originalColors.Keys) {
+			Color newColor = originalColors[graphic];
+			newColor.a *= alpha;
+			graphic.color = newColor;
 		}
 	}
 

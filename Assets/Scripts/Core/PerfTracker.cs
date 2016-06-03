@@ -54,7 +54,7 @@ public class PerfTracker : MonoBehaviour {
 	#endregion
 	#region UnityCallbacks
 
-	void Start () {
+	void Awake () {
 
 		// Init dictionary
 		perfTracker = new Dictionary<GameManager.State, Info>();

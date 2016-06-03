@@ -28,6 +28,7 @@ public class LoadPrompt : MonoBehaviour {
 	public RectTransform fileList;     // Transform of the actual panel with all of the files listed
 	static Vector2 fileListSize = new Vector2 (84f, 84f);
 	public GameObject loadButton;      // Load button on propmt
+	public Text loadButtonText;        // Text on load button
 
 	Mode loadMode;                     // Type of file to display and load
 	string selectedPath;               // Currently selected path
@@ -45,8 +46,8 @@ public class LoadPrompt : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-		fileButtons = new List<GameObject>();
 		instance = this;
+		fileButtons = new List<GameObject>();
 	}
 
 	#endregion
@@ -54,9 +55,9 @@ public class LoadPrompt : MonoBehaviour {
 
 	// 
 	public void Refresh (Mode mode) {
-		foreach (GameObject fileButton in fileButtons) {
+		foreach (GameObject fileButton in fileButtons)
 			Destroy(fileButton);
-		}
+
 		fileButtons.Clear();
 
 		loadMode = mode;
@@ -98,7 +99,7 @@ public class LoadPrompt : MonoBehaviour {
 			text_tr.SetParent(button.transform);
 			text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
 			text_tr.AnchorAtPoint (0.5f, 0.5f);
-			text.GetComponent<RectTransform>().anchoredPosition3D = Vector3.zero;
+			text_tr.anchoredPosition3D = Vector3.zero;
 			text_tr.ResetScaleRot();
 
 			Text text_text = text.Text();
@@ -108,11 +109,15 @@ public class LoadPrompt : MonoBehaviour {
 			text_text.font = GameManager.instance.font;
 			text_text.alignment = TextAnchor.MiddleLeft;
 
+			Fadeable text_fade = text.AddComponent<Fadeable>();
+			text_fade.startFaded = false;
+
 			button.Button().onClick.AddListener(()=>{
 				GameManager.instance.MenuClick();
 				ResetButtons();
 				selectedPath = path;
 				loadButton.Button().interactable = true;
+				loadButtonText.color = loadButton.Button().colors.normalColor;
 				button.Image().color = new Color(1f,1f,1f,0.5f);
 			});
 				
@@ -148,13 +153,37 @@ public class LoadPrompt : MonoBehaviour {
 	public void LoadSelectedPath () {
 		//string fullPath = GameManager.instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
 		Debug.Log("LoadPrompt.LoadSelectedPath(): loading "+selectedPath);
+
 		switch (loadMode) {
-		case LoadPrompt.Mode.Project:
-			SaveLoad.LoadProject (selectedPath);
-			break;
-		case LoadPrompt.Mode.Song:
-			SaveLoad.LoadSongToProject (selectedPath);
-			break;
+			case LoadPrompt.Mode.Project:
+				try {
+					SaveLoad.LoadProject (selectedPath);
+					Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Nice");
+
+					// Refresh name field on playlist browser
+					PlaylistBrowser.instance.RefreshName();
+	
+					Debug.Log("got here");
+					// Go to playlist menu if not there already
+					GameManager.instance.GoToPlaylistMenu();
+					break;
+				} catch (SaveLoad.FailedToLoadException) {
+					// Prompt
+					Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+					break;
+				}
+
+			case LoadPrompt.Mode.Song:
+				try {
+					SaveLoad.LoadSongToProject (selectedPath);
+					PlaylistBrowser.instance.Refresh();
+					Prompt.instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
+					break;
+				} catch (SaveLoad.FailedToLoadException) {
+					// Prompt
+					Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+					break;
+				}
 		}
 	}
 
