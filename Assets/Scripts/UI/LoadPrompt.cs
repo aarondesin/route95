@@ -176,6 +176,7 @@ public class LoadPrompt : MonoBehaviour {
 			case LoadPrompt.Mode.Song:
 				try {
 					SaveLoad.LoadSongToProject (selectedPath);
+					PlaylistBrowser.instance.Refresh();
 					Prompt.instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
 					break;
 				} catch (SaveLoad.FailedToLoadException) {

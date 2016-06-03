@@ -68,8 +68,11 @@ public class CameraControl : MonoBehaviour {
 	// Live mode camera angle vars
 	CameraView currentAngle;              // Current live mode angle
 	List<CameraView> liveAngles;          // List of all live mode angles
+
+	[SerializeField]
 	float transitionTimer;                // Timer to next angle change
 	bool paused = false;                  // Is live mode paused?
+	float resetDistance;
 
 	[Tooltip("Initial position for camera")]
 	//public Transform initialView;
@@ -100,6 +103,8 @@ public class CameraControl : MonoBehaviour {
 
 	[Tooltip("Initial control mode.")]
 	public CameraControlMode controlMode = CameraControlMode.Random;
+
+	int targetAngle = -1;
 
 	// Mappings of keys to camera angle indices
 	static Dictionary <KeyCode, int> keyToView = new Dictionary<KeyCode, int> () {
@@ -273,6 +278,12 @@ public class CameraControl : MonoBehaviour {
 		}
 	}
 
+	void Start () {
+		resetDistance = WorldManager.instance.chunkLoadRadius * 
+			0.5f * WorldManager.instance.chunkSize;
+		currentAngle = OutsideCar;
+	}
+
 	void Update() {
 
 		switch (state) {
@@ -307,10 +318,11 @@ public class CameraControl : MonoBehaviour {
 
 				// Check each mapped key for input
 				foreach (KeyCode key in keyToView.Keys) {
-					if (Input.GetKeyDown (key)) {
+					if (Input.GetKeyDown (key) && CameraBlocker.GetComponent<Fadeable>().NotFading) {
 						if (controlMode != CameraControlMode.Manual)
 							controlMode = CameraControlMode.Manual;
-						ChangeAngle (keyToView [key]);
+						StartFade();
+						targetAngle = keyToView[key];
 					}
 				}
 					
@@ -323,16 +335,23 @@ public class CameraControl : MonoBehaviour {
 				// Update transition timer
 				if (controlMode == CameraControlMode.Random) {
 					if (transitionTimer <= 0f) {
-						StartFade();
 						transitionTimer = liveModeTransitionFreq;
-					} else {
-						transitionTimer--;
-						if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
-							GameManager.instance.Hide(CameraBlocker);
-							ChangeAngle();
-						}
-					}
+						targetAngle = -1;
+						StartFade();
+					}  else transitionTimer--;
 				}
+
+				if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
+					Debug.Log("CameraBlocker done unfading");
+					GameManager.instance.Hide(CameraBlocker);
+					if (targetAngle == -1) ChangeAngle();
+					else ChangeAngle(targetAngle);
+				}
+
+				// Check if camera is out of range
+				float distToPlayer = Vector3.Distance (transform.position, PlayerMovement.instance.transform.position);
+				if (distToPlayer > resetDistance && !CameraBlocker.GetComponent<Fadeable>().busy)
+					StartFade();
 			}
 			break;
 
@@ -428,7 +447,7 @@ public class CameraControl : MonoBehaviour {
 	/// Pick a random live camera angle.
 	/// </summary>
 	public void ChangeAngle () {
-		ChangeAngle (Random.Range (0, liveAngles.Count));
+		ChangeAngle (Random.Range(0, liveAngles.Count));
 	}
 
 	/// <summary>
@@ -436,7 +455,6 @@ public class CameraControl : MonoBehaviour {
 	/// </summary>
 	/// <param name="camView"></param>
 	public void ChangeAngle (int camView) {
-		if (currentAngle == liveAngles[camView]) return;
 		currentAngle = liveAngles[camView];
 		GetComponent<Camera>().fieldOfView = currentAngle.fov;
 		//if (Debug.isDebugBuild) 

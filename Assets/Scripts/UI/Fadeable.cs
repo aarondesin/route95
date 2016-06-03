@@ -27,6 +27,7 @@ public class Fadeable : MonoBehaviour {
 	public bool disableAfterFading = false;
 
 	float alpha;                                       // Current fade alpha
+	public bool busy = false;
 	Dictionary<MaskableGraphic, Color> originalColors; // Stores references to each graphic and its original color
 
 	#endregion
@@ -43,9 +44,7 @@ public class Fadeable : MonoBehaviour {
 					!graphic.GetComponent<Fadeable>().blockParents) originalColors.Add (graphic, graphic.color);
 		} else if (GetComponent<MaskableGraphic>() != null)
 			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
-	}
 
-	void Start () {
 		// Initially fade if necessary
 		if (startFaded) {
 			alpha = 0f;
@@ -62,7 +61,7 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	public bool DoneFading {
 		get {
-			return alpha == 0f;
+			return alpha == 0f && !busy;
 		}
 	}
 
@@ -71,7 +70,13 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	public bool DoneUnfading {
 		get {
-			return alpha == 1f;
+			return alpha == 1f && !busy;
+		}
+	}
+
+	public bool NotFading {
+		get {
+			return DoneFading || DoneUnfading;
 		}
 	}
 
@@ -81,6 +86,7 @@ public class Fadeable : MonoBehaviour {
 	public void Fade () {
 		if (gameObject.activeSelf) StopCoroutine ("DoUnFade");
 		else return;
+		busy = true;
 		StartCoroutine("DoFade");
 	}
 
@@ -90,6 +96,7 @@ public class Fadeable : MonoBehaviour {
 	public void UnFade () {
 		if (gameObject.activeSelf) StopCoroutine("DoFade");
 		else gameObject.SetActive(true);
+		busy = true;
 		StartCoroutine("DoUnFade");
 	}
 
@@ -99,13 +106,14 @@ public class Fadeable : MonoBehaviour {
 	/// <returns></returns>
 	IEnumerator DoFade () {
 		while (true) {
-			if (alpha >= fadeSpeed && originalColors != null) {
-				alpha -= fadeSpeed;
+			if (alpha >= fadeSpeed) {
 
+				alpha -= fadeSpeed;
 				ColorAll();
 					
 				yield return null;
 			} else {
+				busy = false;
 				if (disableAfterFading) gameObject.SetActive(false);
 				alpha = 0f;
 				ColorAll();
@@ -119,13 +127,14 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	/// <returns></returns>
 	IEnumerator DoUnFade () {
-		while (alpha <= 1f-fadeSpeed && originalColors != null) {
-			alpha += fadeSpeed;
+		while (alpha <= 1f-fadeSpeed) {
 
+			alpha += fadeSpeed;
 			ColorAll();
 
 			yield return null;
 		}
+		busy = false;
 		alpha = 1f;
 		ColorAll();
 		yield break;
@@ -136,7 +145,6 @@ public class Fadeable : MonoBehaviour {
 	/// </summary>
 	void ColorAll () {
 		foreach (MaskableGraphic graphic in originalColors.Keys) {
-			//graphic.SetAlpha(alpha);
 			Color newColor = originalColors[graphic];
 			newColor.a *= alpha;
 			graphic.color = newColor;

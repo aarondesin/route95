@@ -158,6 +158,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject liveIcons;                // Parent of instrument icons
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
+	public GameObject cameraBlocker;
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Tooltip Settings")]
@@ -191,11 +192,11 @@ public class GameManager : MonoBehaviour {
 		songSavePath = Application.dataPath + songSaveFolder;
 
 		// Create folders if non-existent
+		if (!Directory.Exists(songSavePath))
+			Directory.CreateDirectory (songSavePath);
+
 		if (!Directory.Exists(projectSavePath))
 			Directory.CreateDirectory (projectSavePath);
-
-		if (!Directory.Exists(projectSaveFolder))
-			Directory.CreateDirectory (projectSaveFolder);
 
 		casetteTarget = casetteBack;
 		casettePosition = casetteBack;
@@ -350,6 +351,7 @@ public class GameManager : MonoBehaviour {
 
 		// Hide all menus
 		Hide (loadingScreen);
+		Hide (cameraBlocker);
 		HideAll ();
 
 		// Show main menu

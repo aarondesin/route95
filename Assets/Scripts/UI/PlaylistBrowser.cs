@@ -167,6 +167,8 @@ public class PlaylistBrowser : MonoBehaviour {
 				Refresh();
 			});
 
+			listing_remove.AddComponent<Tooltippable>().message = "Remove \""+song.name+"\".";
+
 			// Create edit song button
 			GameObject listing_edit = UIHelpers.MakeButton(song.name+"_edit");
 
@@ -197,6 +199,8 @@ public class PlaylistBrowser : MonoBehaviour {
 				listing_remove,
 				listing_bg
 			};
+
+			listing_edit.AddComponent<Tooltippable>().message = "Edit \""+song.name+"\".";
 
 			// Create move song up button if not at top
 			if (num > 0) {
@@ -274,9 +278,10 @@ public class PlaylistBrowser : MonoBehaviour {
 		RectTransform newSongButton_tr = newSongButton.RectTransform();
 		newSongButton_tr.SetParent (playlist);
 		newSongButton_tr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
-		newSongButton_tr.AnchorAtPoint (0f, 1f);
+		newSongButton_tr.AnchorAtPoint (0.15f, 1f);
 		newSongButton_tr.anchoredPosition3D = new Vector3 (
-			horizontalPadding + newSongButton_tr.sizeDelta.x/2f,
+			//horizontalPadding + newSongButton_tr.sizeDelta.x/2f,
+			0f,
 			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);
@@ -340,9 +345,10 @@ public class PlaylistBrowser : MonoBehaviour {
 		RectTransform loadSongButton_tr = loadSongButton.RectTransform();
 		loadSongButton_tr.SetParent (playlist);
 		loadSongButton_tr.sizeDelta = new Vector2 (buttonHeight * iconScale, buttonHeight * iconScale);
-		loadSongButton_tr.AnchorAtPoint (0.5f, 1f);
+		loadSongButton_tr.AnchorAtPoint (0.6f, 1f);
 		loadSongButton_tr.anchoredPosition3D = new Vector3 (
-			horizontalPadding + loadSongButton_tr.sizeDelta.x / 2f,
+			//horizontalPadding + loadSongButton_tr.sizeDelta.x / 2f,
+			0f,
 			-verticalPadding - 0.5f * buttonHeight - (verticalPadding + buttonHeight) * (float)(numSongs),
 			0f
 		);

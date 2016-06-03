@@ -214,6 +214,7 @@ public class Riff {
 		beat.Add (newNote);
 
 		// Play note
+		source.panStereo = panning;
 		newNote.PlayNote(source, volume, true);
 
 		// Do environmental effects
@@ -255,6 +256,8 @@ public class Riff {
 
 			// Skip if empty
 			if (beat.NoteCount == 0) return;
+
+			source.panStereo = panning;
 
 			// Update effect levels
 			if (distortionEnabled) {

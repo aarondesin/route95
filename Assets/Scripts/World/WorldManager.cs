@@ -196,15 +196,29 @@ public class WorldManager : MonoBehaviour {
 	[Tooltip("Cloud particle emitter.")]
 	public ParticleSystem cloudEmitter;
 
+	[Tooltip("Minimum number of cloud particles.")]
+	public float minCloudDensity;
+
+	[Tooltip("Maximum number of cloud particles.")]
+	public float maxCloudDensity;
+
+	[SerializeField]
+	int cloudDensity;
+
 	[Tooltip("Rain particle emitter.")]
 	public ParticleSystem rainEmitter;
 
-	[Tooltip("Number of active shakers.")]
-	public int shakers;
+	[Tooltip("Minimum number of rain particles.")]
+	public float minRainDensity;
+
+	[Tooltip("Maximuim number of rain particles.")]
+	public float maxRainDensity;
 
 	[SerializeField]
-	[Tooltip("Current density of rain.")]
-	float rainDensity;
+	int rainDensity;
+
+	[Tooltip("Number of active shakers.")]
+	public int shakers;
 
 	[Tooltip("All car exhaust puff emitters.")]
 	public List<ParticleSystem> exhaustEmitters;
@@ -415,8 +429,15 @@ public class WorldManager : MonoBehaviour {
 				wind += dWind * Time.deltaTime;
 				wind.Normalize();
 			}
-			cloudEmitter.maxParticles = Mathf.Clamp(100 + Mathf.FloorToInt((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*75f), 100, 300);
-			rainEmitter.SetRate((float)shakers/(float)(MusicManager.instance.beatsElapsedInCurrentSong+1)*100f);
+			
+			float cd = shakers / (Riff.MAX_BEATS * 4f);
+			cloudDensity = Mathf.FloorToInt(minCloudDensity + cd * (maxCloudDensity - minCloudDensity));
+			cloudEmitter.maxParticles = cloudDensity;
+
+			float rd = shakers / (Riff.MAX_BEATS * 2f);
+			rainDensity = Mathf.FloorToInt(minRainDensity + rd * (maxRainDensity - minRainDensity));
+			rainEmitter.SetRate(rainDensity);
+
 			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);
 		}
 

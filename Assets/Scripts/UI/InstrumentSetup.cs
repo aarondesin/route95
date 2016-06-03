@@ -57,6 +57,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public Scrollbar beatsBar;
 	public RectTransform beatsBar_tr;
 	public Slider riffVolumeSlider;
+	public GameObject octaveParent;
 
 	public List<EffectSlider> effectSliders;
 
@@ -81,6 +82,7 @@ public class InstrumentSetup : MonoBehaviour {
 	public Sprite melodicSuggested;
 
 	public Sprite minorSuggestion;
+	public Sprite majorSuggestion;
 	public Sprite powerSuggestion;
 	public Sprite octaveSuggestion;
 
@@ -211,6 +213,8 @@ public class InstrumentSetup : MonoBehaviour {
 	/// <param name="percInst">Percussion instrument to use.</param>
 	void InitializePercussionSetup (PercussionInstrument percInst) {
 
+		octaveParent.SetActive (false);
+
 		// Get all available drum notes
 		List<string> set = KeyManager.instance.percussionSets[percInst];
 		int numDrums = set.Count;
@@ -337,6 +341,7 @@ public class InstrumentSetup : MonoBehaviour {
 			NoteButton noteButton = button.AddComponent<NoteButton>();
 			noteButton.targetNote = note;
 			noteButton.volumeImage = volume.GetComponent<Image>();
+			noteButton.UpdateButtonArt();
 
 			// Create show/hide toggle
 			ShowHide bt_sh = button.AddComponent<ShowHide>();
@@ -368,6 +373,9 @@ public class InstrumentSetup : MonoBehaviour {
 	/// </summary>
 	/// <param name="meloInst">Melodic instrument to use.</param>
 	void InitializeMelodicSetup (MelodicInstrument meloInst) {
+
+		octaveParent.SetActive(true);
+
 		Song song = MusicManager.instance.currentSong;
 		Instrument instrument = currentRiff.instrument;
 
@@ -524,6 +532,7 @@ public class InstrumentSetup : MonoBehaviour {
 			NoteButton noteButton = button.AddComponent<NoteButton>();
 			noteButton.targetNote = note;
 			noteButton.volumeImage = volume.Image();
+			noteButton.UpdateButtonArt();
 
 			// Create show/hide toggle
 			ShowHide bt_sh = button.AddComponent<ShowHide>();
@@ -589,9 +598,18 @@ public class InstrumentSetup : MonoBehaviour {
 	/// Sets the volume of the riff.
 	/// Called from the riff volume slider.
 	/// </summary>
-	/// <param name="slider"></param>
+	/// <param name="slider">Slider to use.</param>
 	public void SetRiffVolume (Slider slider) {
 		currentRiff.volume = slider.value;
+	}
+
+	/// <summary>
+	/// Sets the panning of the riff.
+	/// Called from the riff panning slider.
+	/// </summary>
+	/// <param name="slider">Slider to use.</param>
+	public void SetRiffPanning (Slider slider) {
+		currentRiff.panning = slider.value;
 	}
 
 	public void SyncScrollbars () {
@@ -746,22 +764,28 @@ public class InstrumentSetup : MonoBehaviour {
 		GameManager.instance.Hide(Tooltip.instance.gameObject);
 	}
 
+	void CreateSuggestion (GameObject button, string title, Sprite graphic, string tooltip) {
+		RectTransform tr = button.RectTransform();
+
+		GameObject suggestion = UIHelpers.MakeButton (
+			title, 
+			graphic, 
+			tr,
+			new Vector2 (tr.sizeDelta.y, tr.sizeDelta.y),
+			Vector2.zero
+		);
+		suggestion.Button().onClick.AddListener(delegate { button.Button().onClick.Invoke(); });
+		suggestion.RectTransform().localScale = tr.localScale;
+		suggestion.AddComponent<Tooltippable>().message = tooltip;
+		suggestions.Add(suggestion);
+	}
+
 	/// <summary>
 	/// Suggests a minor chord.
 	/// </summary>
 	/// <param name="button"></param>
 	void SuggestMinorChord (GameObject button) {
-		RectTransform tr = button.RectTransform();
-
-		GameObject suggestion = UIHelpers.MakeImage (
-			"Minor", 
-			minorSuggestion, 
-			tr,
-			new Vector2 (tr.sizeDelta.y, tr.sizeDelta.y),
-			new Vector2 (tr.sizeDelta.x*0.5f, -tr.sizeDelta.y*0.5f)
-		);
-		suggestion.AddComponent<Tooltippable>().message = "Minor chord (sad)";
-		suggestions.Add(suggestion);
+		CreateSuggestion (button, "Minor", minorSuggestion, "Minor chord (sad)");
 	}
 
 	/// <summary>
@@ -769,17 +793,7 @@ public class InstrumentSetup : MonoBehaviour {
 	/// </summary>
 	/// <param name="button"></param>
 	void SuggestMajorChord (GameObject button) {
-		RectTransform tr = button.RectTransform();
-
-		GameObject suggestion = UIHelpers.MakeImage (
-			"Major", 
-			minorSuggestion, 
-			tr,
-			new Vector2 (tr.sizeDelta.y, tr.sizeDelta.y),
-			new Vector2 (tr.sizeDelta.x*0.5f, -tr.sizeDelta.y*0.5f)
-		);
-		suggestion.AddComponent<Tooltippable>().message = "Major Chord (happy)";
-		suggestions.Add(suggestion);
+		CreateSuggestion (button, "Major", majorSuggestion, "Major chord (happy)");
 	}
 
 	/// <summary>
@@ -787,23 +801,7 @@ public class InstrumentSetup : MonoBehaviour {
 	/// </summary>
 	/// <param name="button"></param>
 	void SuggestPowerChord (GameObject button) {
-		RectTransform tr = button.RectTransform();
-
-		GameObject suggestion = UIHelpers.MakeImage (
-			"Power", 
-			powerSuggestion, 
-			tr, 
-			new Vector2 (
-				tr.sizeDelta.y,
-				tr.sizeDelta.y
-			),
-			new Vector2 (
-				tr.sizeDelta.x*0.5f, 
-				-tr.sizeDelta.y*0.5f
-			)
-		);
-		suggestion.AddComponent<Tooltippable>().message = "Power chord (powerful)";
-		suggestions.Add(suggestion);
+		CreateSuggestion (button, "Power", powerSuggestion, "Power chord (powerful)");
 	}
 
 	/// <summary>
@@ -811,23 +809,7 @@ public class InstrumentSetup : MonoBehaviour {
 	/// </summary>
 	/// <param name="button"></param>
 	void SuggestOctave (GameObject button) {
-		RectTransform tr = button.RectTransform();
-
-		GameObject suggestion = UIHelpers.MakeImage (
-			"Octave", 
-			octaveSuggestion, 
-			tr, 
-			new Vector2 (
-				tr.sizeDelta.y,
-				tr.sizeDelta.y
-			),
-			new Vector2 (
-				tr.sizeDelta.x*0.5f, 
-				-tr.sizeDelta.y*0.5f
-			)
-		);
-		suggestion.AddComponent<Tooltippable>().message = "Octave (neutral)";
-		suggestions.Add(suggestion);
+		CreateSuggestion (button, "Octave", octaveSuggestion, "Octave");
 	}
 
 	#endregion
