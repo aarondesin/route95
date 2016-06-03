@@ -23,7 +23,7 @@ public class Spectrum2 : MonoBehaviour {
 		points = new Vector3[numberOfObjects];
 		for (int i=0; i<numberOfObjects; i++) {
 			float angle = i*Mathf.PI*2f/numberOfObjects;
-			Vector3 pos = new Vector3 (Mathf.Cos (angle), 0f, Mathf.Sin(angle))*radius;
+			Vector3 pos = new Vector3 (Mathf.Cos (angle), height/2f, Mathf.Sin(angle))*radius;
 			GameObject point = new GameObject("Point"+i);
 			point.transform.position = pos;
 			point.transform.SetParent(transform);
@@ -39,7 +39,7 @@ public class Spectrum2 : MonoBehaviour {
 		if (terrain.freqData == null) return;
 
 		for (int i = 0; i < numberOfObjects; i++) {
-			float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)(i==0 ? (numberOfObjects-1) : i) / numberOfObjects)) * scale;
+			float y = height/2f + Mathf.Log (terrain.freqData.GetDataPoint ((float)(i==0 ? (numberOfObjects-1) : i) / numberOfObjects)) * scale;
 			if (y != float.NaN) {
 				if (y < points[i].y && points[i].y >= transform.position.y+fallRate)
 					points[i].y -= fallRate;

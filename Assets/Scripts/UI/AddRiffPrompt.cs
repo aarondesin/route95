@@ -90,8 +90,7 @@ public class AddRiffPrompt : MonoBehaviour {
 		InstrumentSetup.currentRiff = temp;
 		SongArrangeSetup.instance.selectedRiffIndex = temp.index;
 		SongArrangeSetup.instance.SetValue(temp.index);
-		GameManager.instance.Hide (gameObject);
-		GameManager.instance.GoToRiffEditor();
+		SongArrangeSetup.instance.Refresh();
 	}
 
 	#endregion

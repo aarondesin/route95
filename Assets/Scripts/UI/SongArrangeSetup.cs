@@ -51,7 +51,6 @@ public class SongArrangeSetup : MonoBehaviour {
 		// Update the options in the dropdown to include all riffs
 		dropdown.ClearOptions ();
 		List<Dropdown.OptionData> options = new List<Dropdown.OptionData> ();
-		dropdown.onValueChanged.RemoveAllListeners();
 
 		foreach (Riff riff in MusicManager.instance.currentSong.riffs) {
 			Sprite sprite = riff.instrument.icon;
@@ -72,15 +71,13 @@ public class SongArrangeSetup : MonoBehaviour {
 				InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs [0];
 		}
 
-		dropdown.onValueChanged.AddListener (delegate { UpdateValue(); });
+		dropdown.value = selectedRiffIndex;
 
 		// Refresh song name input field
 		songNameInputField.text = MusicManager.instance.currentSong.name;
 
 		// Update play riff button art
 		playRiffButton.Image().sprite = GameManager.instance.playIcon;
-
-		SetValue();
 
 		bool hasRiffs = MusicManager.instance.currentSong.riffs.Count != 0;
 		SongTimeline.instance.SetInteractable (hasRiffs);
@@ -92,7 +89,6 @@ public class SongArrangeSetup : MonoBehaviour {
 	/// Sets the selected riff from the dropdown.
 	/// </summary>
 	public void UpdateValue () {
-		Debug.Log ("updatevalue "+ dropdown.value);
 		selectedRiffIndex = dropdown.value;
 		InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs[selectedRiffIndex];
 	}
@@ -101,8 +97,7 @@ public class SongArrangeSetup : MonoBehaviour {
 	/// Sets the dropdown value from the selected riff.
 	/// </summary>
 	public void SetValue () {
-		Debug.Log("setvalue " + selectedRiffIndex);
-		dropdown.value = selectedRiffIndex;
+		SetValue (selectedRiffIndex);
 	}
 
 	public void SetValue (int i) {

@@ -454,6 +454,11 @@ public class MusicManager : MonoBehaviour {
 	#endregion
 	#region MusicManager Callbacks
 
+	/// <summary>
+	/// Plays a one-shot AudioClip.
+	/// </summary>
+	/// <param name="sound">Sound to play.</param>
+	/// <param name="volume">Volume scaler.</param>
 	public static void PlayMenuSound (AudioClip sound, float volume=1f) {
 		instance.source.PlayOneShot (sound, volume);
 	}

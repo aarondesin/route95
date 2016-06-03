@@ -43,14 +43,15 @@ public class Fadeable : MonoBehaviour {
 					!graphic.GetComponent<Fadeable>().blockParents) originalColors.Add (graphic, graphic.color);
 		} else if (GetComponent<MaskableGraphic>() != null)
 			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
-			
+	}
+
+	void Start () {
 		// Initially fade if necessary
 		if (startFaded) {
 			alpha = 0f;
 			ColorAll();
 			if (disableAfterFading) gameObject.SetActive(false);
 		}
-		
 	}
 
 	#endregion

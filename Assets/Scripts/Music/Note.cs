@@ -98,7 +98,9 @@ public class Note {
 	/// </summary>
 	/// <returns></returns>
 	public bool IsTom () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Tom";
+		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom" || 
+			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom" || 
+			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom";
 	}
 
 	/// <summary>

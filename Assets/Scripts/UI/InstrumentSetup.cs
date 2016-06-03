@@ -88,7 +88,6 @@ public class InstrumentSetup : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-
 		// Set instance
 		instance = this;
 
@@ -158,6 +157,9 @@ public class InstrumentSetup : MonoBehaviour {
 
 		numButtons = Riff.MAX_BEATS;
 
+		// Set initial scrollbar values
+		SyncScrollbars();
+
 		// Refresh button grid
 		buttonGrid.Clear ();
 		for(int n = 0; n<numButtons; n++) buttonGrid.Add(new List<GameObject>());
@@ -168,9 +170,6 @@ public class InstrumentSetup : MonoBehaviour {
 		else if (currentRiff.instrument.type == Instrument.Type.Melodic)
 			InitializeMelodicSetup ((MelodicInstrument)currentRiff.instrument);
 		else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
-
-		// Set initial scrollbar values
-		SyncScrollbars();
 
 		// Update riff volume slider
 		riffVolumeSlider.value = currentRiff.volume;
@@ -218,8 +217,8 @@ public class InstrumentSetup : MonoBehaviour {
 
 		// Calculate square size
 		squareSize = new Vector2 (
-			notePanel.rect.width / Riff.MAX_BEATS,
-			notePanel.rect.width / Riff.MAX_BEATS
+			notePanel.rect.width / (float)Riff.MAX_BEATS,
+			notePanel.rect.width / (float)Riff.MAX_BEATS
 		);
 
 		// Calculate button size
@@ -255,6 +254,7 @@ public class InstrumentSetup : MonoBehaviour {
 		int i = 0;
 		foreach (string note in set) 
 			MakePercussionButtons (note.Split('_')[1], i++, note, percInst.icons[note]);
+
 	}
 
 	/// <summary>
@@ -323,8 +323,8 @@ public class InstrumentSetup : MonoBehaviour {
 			GameObject volume = UIHelpers.MakeImage(title+"_volume");
 			RectTransform volume_tr = volume.RectTransform();
 			volume_tr.SetParent(button_tr);
-			volume_tr.sizeDelta = buttonSize * volumeScale;
-			volume_tr.localScale = button_tr.localScale * volumeScale;
+			volume_tr.sizeDelta = buttonSize;
+			volume_tr.localScale = Vector3.one * volumeScale;
 			volume_tr.AnchorAtPoint(0.5f, 0.5f);
 			volume_tr.anchoredPosition3D = Vector3.zero;
 
@@ -441,7 +441,8 @@ public class InstrumentSetup : MonoBehaviour {
 		Color transparentWhite = new Color (1f, 1f, 1f, 0.5f);
 
 		// Calculate y position of buttons in this row
-		float y = rowBackgrounds[row].RectTransform().anchoredPosition3D.y;
+		GameObject bg = rowBackgrounds[row];
+		float y = bg.RectTransform().anchoredPosition3D.y;
 
 		// Create note text
 		GameObject noteText = UIHelpers.MakeText (title);
@@ -454,7 +455,11 @@ public class InstrumentSetup : MonoBehaviour {
 		objects.Add (noteText);
 
 		// Change text color depending on whether or not the note is in the scale
-		noteText.Text().color = (inScale ? Color.white : transparentWhite);
+		if (inScale) {
+			noteText.Text().color = Color.white;
+			bg.Image().SetAlpha(bg.Image().color.a * 3f);
+		} else
+			noteText.Text().color = transparentWhite;
 
 		// Make note buttons
 		for (int i=0; i<numButtons; i++) {

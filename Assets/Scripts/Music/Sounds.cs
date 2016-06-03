@@ -287,7 +287,9 @@ public class Sounds : MonoBehaviour {
 		{ "RockDrums", new List<string> () {
 			"Audio/Instruments/Percussion/RockDrums/RockDrums_Kick",
 			"Audio/Instruments/Percussion/RockDrums/RockDrums_Snare",
-			"Audio/Instruments/Percussion/RockDrums/RockDrums_Tom",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom",
+			"Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom",
 			"Audio/Instruments/Percussion/RockDrums/RockDrums_Hat",
 			"Audio/Instruments/Percussion/RockDrums/RockDrums_Crash"
 			} 

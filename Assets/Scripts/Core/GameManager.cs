@@ -490,12 +490,13 @@ public class GameManager : MonoBehaviour {
 		// If no scale selected, go to key select first
 		if (MusicManager.instance.currentSong.scale == -1) GoToKeySelectMenu();
 
-
 		else {
+			SongArrangeSetup.instance.UpdateValue();
 
 			// Otherwise show riff editor
 			Show (riffEditMenu);
 			InstrumentSetup.instance.Initialize ();
+			
 
 			// Move camera to driving view
 			CameraControl.instance.LerpToView (CameraControl.instance.Driving);
@@ -716,7 +717,7 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void AttemptExit () {
 		switch (currentState) {
-		case State.Setup: case State.Postplay:
+		case State.Loading:  case State.Setup: case State.Postplay:
 			Show(confirmExitPrompt);
 			break;
 		case State.Live:
