@@ -159,6 +159,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject songProgressBar;
 	public GameObject loopIcon;
 	public GameObject cameraBlocker;
+	public GameObject exitButton;
 
 	//-----------------------------------------------------------------------------------------------------------------
 	[Header("Tooltip Settings")]
@@ -234,18 +235,25 @@ public class GameManager : MonoBehaviour {
 			
 			// Check for tooltip
 			if (tooltip.activeSelf) {
-				RectTransform tr = tooltip.GetComponent<RectTransform>();
+				RectTransform tr = tooltip.RectTransform();
 				Vector2 realPosition = new Vector2 (
 					Input.mousePosition.x / Screen.width * ((RectTransform)tr.parent).rect.width, 
 					Input.mousePosition.y / Screen.height * ((RectTransform)tr.parent).rect.height
 				);
-				tr.anchoredPosition3D = new Vector3 (
-					(realPosition.x > 0.5f*Screen.width ?
-						realPosition.x-tr.rect.width/2f-tooltipDistance : realPosition.x+tr.rect.width/2f+tooltipDistance),
-					(realPosition.y > 0.5f*Screen.height ? 
-						realPosition.y-tr.rect.height/2f-tooltipDistance : realPosition.x+tr.rect.height/2f+tooltipDistance),
-					0f
-				);
+
+				float w = tr.rect.width/2f;
+				float h = tr.rect.height/2f;
+
+				Vector3 pos = Vector3.zero;
+				pos.z = Input.mousePosition.z;
+
+				if (Input.mousePosition.x > Screen.width - w) pos.x = realPosition.x - w;
+				else pos.x = realPosition.x + w;
+
+				if (Input.mousePosition.y > Screen.height - w) pos.y = realPosition.y - h;
+				else pos.y = realPosition.y + h;
+
+				tr.anchoredPosition3D = pos;
 			}
 			break;
 
@@ -436,6 +444,7 @@ public class GameManager : MonoBehaviour {
 
 		// Move camera to outside view
 		CameraControl.instance.LerpToView (CameraControl.instance.OutsideCar);
+		CameraControl.instance.doSway = true;
 	}
 
 	/// <summary>
@@ -452,6 +461,7 @@ public class GameManager : MonoBehaviour {
 
 		// Move camera to driving view
 		CameraControl.instance.LerpToView (CameraControl.instance.Driving);
+		CameraControl.instance.doSway = true;
 
 		// Refresh radial menu
 		RadialKeyMenu.instance.Refresh();
@@ -478,6 +488,7 @@ public class GameManager : MonoBehaviour {
 
 		// Move camera to radio view
 		CameraControl.instance.LerpToView(CameraControl.instance.Radio);
+		CameraControl.instance.doSway = false;
 	}
 
 	/// <summary>
@@ -502,6 +513,7 @@ public class GameManager : MonoBehaviour {
 
 			// Move camera to driving view
 			CameraControl.instance.LerpToView (CameraControl.instance.Driving);
+			CameraControl.instance.doSway = true;
 		}
 	}
 
@@ -533,6 +545,7 @@ public class GameManager : MonoBehaviour {
 
 		// Move camera to outside view
 		CameraControl.instance.LerpToView (CameraControl.instance.OutsideCar);
+		CameraControl.instance.doSway = true;
 	}
 
 	/// <summary>
@@ -549,6 +562,8 @@ public class GameManager : MonoBehaviour {
 
 		// Show postplay menu
 		Show (postPlayMenu);
+
+		CameraControl.instance.doSway = true;
 	}
 		
 	#endregion

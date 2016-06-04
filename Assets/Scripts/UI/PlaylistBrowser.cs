@@ -191,7 +191,9 @@ public class PlaylistBrowser : MonoBehaviour {
 			listing_edit_button.onClick.AddListener(()=>{
 				GameManager.instance.MenuClick();
 				MusicManager.instance.currentSong = song;
-				GameManager.instance.GoToSongArrangeMenu();
+				if (song.key == Key.None || song.scale == -1) 
+					GameManager.instance.GoToKeySelectMenu();
+				else GameManager.instance.GoToSongArrangeMenu();
 			});
 				
 			listing_sh.objects = new List<GameObject>() {

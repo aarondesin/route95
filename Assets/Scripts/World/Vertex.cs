@@ -363,6 +363,11 @@ public class Vertex {
 		return result;
 	}
 
+	public void RemoveDecorations () {
+		while (decorations.Count > 0)
+			WorldManager.instance.RemoveDecoration(decorations.PopFront());
+	}
+
 	public override string ToString ()
 	{
 		string result = "Vertex ("+x+","+y+") Height: "+height+" | nearRoad: "+nearRoad;

@@ -30,6 +30,8 @@ public class SongArrangeSetup : MonoBehaviour {
 	[Tooltip("Add riff reminder prompt.")]
 	public GameObject addRiffReminder;
 
+	public GameObject previewSongButton;
+
 	#endregion
 	#region Unity Callbacks
 
@@ -63,10 +65,12 @@ public class SongArrangeSetup : MonoBehaviour {
 			dropdown.interactable = false;
 			editRiffButton.Button().interactable = false;
 			playRiffButton.Button().interactable = false;
+			previewSongButton.Button().interactable = false;
 		} else {
 			dropdown.interactable = true;
 			editRiffButton.Button().interactable = true;
 			playRiffButton.Button().interactable = true;
+			previewSongButton.Button().interactable = true;
 			if (InstrumentSetup.currentRiff == null)
 				InstrumentSetup.currentRiff = MusicManager.instance.currentSong.riffs [0];
 		}

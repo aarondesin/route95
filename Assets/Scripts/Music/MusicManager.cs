@@ -172,6 +172,8 @@ public class MusicManager : MonoBehaviour {
 	[NonSerialized]
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources; // Mapping of instruments to AudioSources
 
+	bool riffMode = true;
+
 	#endregion
 	#region Unity Callbacks
 
@@ -204,14 +206,30 @@ public class MusicManager : MonoBehaviour {
 				// Setup mode (riff editor)
 				case GameManager.State.Setup:
 
-					// Play riff note
-					InstrumentSetup.currentRiff.PlayRiff (beat++);
+					if (riffMode) {
 
-					// Wrap payback
-					if (beat >= Riff.MAX_BEATS && loop) beat = 0;
+						// Play riff note
+						InstrumentSetup.currentRiff.PlayRiff (beat++);
 
-					// Decrement shaker density
-					WorldManager.instance.shakers -= 2;
+						// Wrap payback
+						if (beat >= Riff.MAX_BEATS && loop) beat = 0;
+
+						// Decrement shaker density
+						WorldManager.instance.shakers -= 2;
+
+					} else {
+
+						if (currentSong.Beats == 0) return;
+
+						// If song is finished
+						if (beat >= currentSong.Beats && loop)
+							beat = 0;
+
+						// Play notes
+						currentSong.PlaySong(beat++);
+
+
+					}
 					break;
 
 				// Live mode
@@ -526,7 +544,17 @@ public class MusicManager : MonoBehaviour {
 	/// Toggles looping the current riff.
 	/// </summary>
 	public void PlayRiffLoop(){
+		riffMode = true;
+		Loop ();
+		
+	}
 
+	public void PlaySongLoop() {
+		riffMode = false;
+		Loop();
+	}
+
+	void Loop () {
 		// If looping
 		if (loop) {
 

@@ -96,11 +96,6 @@ public class Decoration : MonoBehaviour, IPoolable {
 		partSystem.gameObject.transform.parent = transform.parent;
 	}
 
-	void Start () {
-		
-		Randomize();
-	}
-
 	void FixedUpdate () {
 		if (dynamic) {
 

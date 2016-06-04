@@ -27,7 +27,7 @@ public class VertexMap {
 		chunkRes = WorldManager.instance.chunkResolution;
 		chunkRadius = WorldManager.instance.chunkLoadRadius;
 		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
-		noDecorationsDistance = WorldManager.instance.roadWidth * 3f;
+		noDecorationsDistance = WorldManager.instance.roadWidth * 1.5f;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Map<Vertex>(width);
@@ -146,12 +146,17 @@ public class VertexMap {
 					continue;
 					
 				Vertex vert = vertices.At(x,y);
-				if (vert == null) continue;
-				if (vert.locked) continue;
 
 				float dist = Vector2.Distance (new Vector2 (xWPos, yWPos), new Vector2 (roadPoint.x, roadPoint.z));
 				vert.color.g = Mathf.Clamp01 (noDecorationsDistance / (dist+.01f));
-				vert.noDecorations = dist <= noDecorationsDistance;
+
+				if (!vert.noDecorations) {
+					vert.noDecorations = dist <= noDecorationsDistance;
+					vert.RemoveDecorations();
+				}
+
+				if (vert == null) continue;
+				if (vert.locked) continue;
 
 				if (vert.noDecorations) {
 					vert.nearRoad = dist <= nearbyRoadDistance;

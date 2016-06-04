@@ -814,7 +814,8 @@ public class WorldManager : MonoBehaviour {
 		deco.Randomize();
 
 		// Point decoration in road direction
-		decoration.transform.rotation = Quaternion.LookRotation (road.GetDirection(prog), Vector3.up);
+		Vector3 target = coordinate + road.GetVelocity(prog);
+		decoration.transform.LookAt (target, Vector3.up);
 		decoration.transform.Rotate(-90f, side == 1 ? 180f : 0f, 0f);
 
 		// Parent to nearest chunk

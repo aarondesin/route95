@@ -48,6 +48,8 @@ public class CameraControl : MonoBehaviour {
 	[Tooltip("Camera base sway amount.")]
 	public float baseSway = 1f;
 
+	public bool doSway = true;
+
 	const float DEFAULT_SPEED = 1f;     // Default camera speed
 	const float DEFAULT_FOV = 75f;
 
@@ -376,12 +378,15 @@ public class CameraControl : MonoBehaviour {
 
 		}
 
-		// Calculate sway
-		float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
-		float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+		if (doSway) {
 
-		// Do sway
-		transform.Rotate (bx, by, 0f);
+			// Calculate sway
+			float bx = ((Mathf.PerlinNoise (0f, Time.time*swaySpeed)-0.5f)) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+			float by = ((Mathf.PerlinNoise (0f, (Time.time*swaySpeed)+100f))-0.5f) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+
+			// Do sway
+			transform.Rotate (bx, by, 0f);
+		}
 	}
 
 	#endregion
@@ -414,6 +419,7 @@ public class CameraControl : MonoBehaviour {
 		GameManager.instance.MoveCasetteBack();
 		GameManager.instance.HideAll();
 		GameManager.instance.Hide(GameManager.instance.systemButtons);
+		GameManager.instance.Hide(GameManager.instance.exitButton);
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
 	}
@@ -516,8 +522,6 @@ public class CameraControl : MonoBehaviour {
 	/// <returns></returns>
 	Vector3 PickRandomPosition (float minHeight, float maxHeight) {
 		float chunkSize = WorldManager.instance.chunkSize;
-
-		
 
 		Vector3 point = new Vector3 (
 			PlayerMovement.instance.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
