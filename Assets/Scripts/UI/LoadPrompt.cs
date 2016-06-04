@@ -163,7 +163,6 @@ public class LoadPrompt : MonoBehaviour {
 					// Refresh name field on playlist browser
 					PlaylistBrowser.instance.RefreshName();
 	
-					Debug.Log("got here");
 					// Go to playlist menu if not there already
 					GameManager.instance.GoToPlaylistMenu();
 					break;

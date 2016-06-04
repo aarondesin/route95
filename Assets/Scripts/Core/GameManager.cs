@@ -434,6 +434,8 @@ public class GameManager : MonoBehaviour {
 	/// Goes to main menu.
 	/// </summary>
 	public void GoToMainMenu () {
+
+		currentState = State.Setup;
 		
 		// Hide other menus
 		HideAll ();
@@ -451,6 +453,8 @@ public class GameManager : MonoBehaviour {
 	/// Goes to key select menu.
 	/// </summary>
 	public void GoToKeySelectMenu () {
+
+		currentState = State.Setup;
 
 		// Hide other menus
 		MoveCasetteBack();
@@ -477,6 +481,8 @@ public class GameManager : MonoBehaviour {
 	/// </summary>
 	public void GoToSongArrangeMenu () {
 
+		currentState = State.Setup;
+
 		// Hide other menus
 		MoveCasetteBack();
 		HideAll ();
@@ -495,6 +501,8 @@ public class GameManager : MonoBehaviour {
 	/// Goes to riff editor.
 	/// </summary>
 	public void GoToRiffEditor () {
+
+		currentState = State.Setup;
 
 		// Hide other menus
 		MoveCasetteBack();
@@ -529,6 +537,7 @@ public class GameManager : MonoBehaviour {
 		MusicManager.instance.StopPlaying();
 		PlayerMovement.instance.StopMoving();
 		CameraControl.instance.StopLiveMode();
+		GameManager.instance.paused = false;
 
 		// Hide other menus
 		HideAll ();
@@ -590,6 +599,8 @@ public class GameManager : MonoBehaviour {
 
 		// Init music
 		MusicManager.instance.currentPlayingSong = 0;
+		MusicManager.instance.currentSong = (
+			MusicManager.instance.currentProject.songs.Count > 0 ? MusicManager.instance.currentProject.songs[0] : null);
 		if (MusicManager.instance.currentSong != null) {
 			MusicManager.instance.StartPlaylist();
 			MusicManager.instance.StartSong();

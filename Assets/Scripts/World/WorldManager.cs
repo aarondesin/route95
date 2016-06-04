@@ -964,7 +964,7 @@ public class WorldManager : MonoBehaviour {
 		IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
 		Vertex v = terrain.vertexmap.VertexAt(coords);
 		if (v == null) v = terrain.vertexmap.AddVertex (coords);
-		if (!v.locked) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
+		if (!v.locked && !v.nearRoad) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
 
 		//Debug.Log(v.ToString());
 	}

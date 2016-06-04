@@ -172,7 +172,7 @@ public class MusicManager : MonoBehaviour {
 	[NonSerialized]
 	public Dictionary<Instrument, AudioSource> instrumentAudioSources; // Mapping of instruments to AudioSources
 
-	bool riffMode = true;
+	public bool riffMode = true;
 
 	#endregion
 	#region Unity Callbacks
@@ -235,62 +235,64 @@ public class MusicManager : MonoBehaviour {
 				// Live mode
 				case GameManager.State.Live:
 
-					// Break if current song is null
-					if (currentSong == null) return;
-					if (currentSong.Beats == 0) return;
+					if (currentProject.songs.Count > 0) {
 
-					// If song is finished
-					if (beat >= currentSong.Beats) {
-						beat = 0;
+						// If song is finished
+						if (beat >= currentSong.Beats || currentSong.Beats == 0) {
+							beat = 0;
 
-						// Reset vars
-						beatsElapsedInCurrentSong = 0;
-						guitarNotes = 0;
-						keyboardNotes = 0;
-						brassNotes = 0;
+							// Reset vars
+							beatsElapsedInCurrentSong = 0;
+							guitarNotes = 0;
+							keyboardNotes = 0;
+							brassNotes = 0;
 
-						// Reset shaker density
-						WorldManager.instance.shakers = 0;
+							// Reset shaker density
+							WorldManager.instance.shakers = 0;
 						
-						// If another song available, switch
-						if (currentPlayingSong < currentProject.songs.Count-1) {
-							DisableAllAudioSources();
-							currentPlayingSong++;
+							// If another song available, switch
+							if (currentPlayingSong < currentProject.songs.Count-1) {
+								DisableAllAudioSources();
+								currentPlayingSong++;
+								currentSong = currentProject.songs[currentPlayingSong];
 
-						// If no more songs to play
-						} else {
+							// If no more songs to play
+							} else {
 
-							// Loop playlist if possible
-							if (loopPlaylist) {
-								currentPlayingSong = 0;
-								beatsElapsedInPlaylist = 0;
+								// Loop playlist if possible
+								if (loopPlaylist) {
+									currentPlayingSong = 0;
+									beatsElapsedInPlaylist = 0;
 
-							// Otherwise go to postplay menu
-							} else GameManager.instance.SwitchToPostplay();
+								// Otherwise go to postplay menu
+								} else GameManager.instance.SwitchToPostplay();
+							}
 						}
+
+						if (currentSong.Beats == 0) return;
+
+						// Play notes
+						currentSong.PlaySong(beat);
+
+						// Calculate song progress
+						float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
+						float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
+						GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
+
+						// Increment vars
+						beat++;
+						beatsElapsedInCurrentSong++;
+						beatsElapsedInPlaylist++;
+
+						// Update instrument densities
+						guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
+						keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
+						brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
+						if (WorldManager.instance.shakers > 2) WorldManager.instance.shakers -= 2;
+						WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
+						WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
+						WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					}
-
-					// Play notes
-					currentSong.PlaySong(beat);
-
-					// Calculate song progress
-					float songTotalTime = currentSong.Beats*7200f/tempoToFloat[tempo]/4f;
-					float songCurrentTime = (beat*7200f/tempoToFloat[tempo]/4f) + (7200f/tempoToFloat[tempo]/4f)-BeatTimer;
-					GameManager.instance.songProgressBar.GetComponent<SongProgressBar>().SetValue(songCurrentTime/songTotalTime);
-
-					// Increment vars
-					beat++;
-					beatsElapsedInCurrentSong++;
-					beatsElapsedInPlaylist++;
-
-					// Update instrument densities
-					guitarDensity = (float)guitarNotes/(float)beatsElapsedInCurrentSong;
-					keyboardDensity = (float)keyboardNotes/(float)beatsElapsedInCurrentSong;
-					brassDensity = (float)brassNotes/(float)beatsElapsedInCurrentSong;
-					if (WorldManager.instance.shakers > 2) WorldManager.instance.shakers -= 2;
-					WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-					WorldManager.instance.roadMaxSlope = Mathf.Clamp (keyboardDensity * 0.002f, 0.002f, 0.001f);
-					WorldManager.instance.decorationDensity = Mathf.Clamp (brassDensity * 2f, 1f, 2f);
 					break;
 				}
 
@@ -544,9 +546,9 @@ public class MusicManager : MonoBehaviour {
 	/// Toggles looping the current riff.
 	/// </summary>
 	public void PlayRiffLoop(){
+		SongArrangeSetup.instance.UpdateValue();
 		riffMode = true;
 		Loop ();
-		
 	}
 
 	public void PlaySongLoop() {

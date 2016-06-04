@@ -119,8 +119,13 @@ public class SongArrangeSetup : MonoBehaviour {
 	/// Updates the play riff button art.
 	/// </summary>
 	public void TogglePlayRiffButton () {
-		if (MusicManager.instance.playing) playRiffButton.Image().sprite = GameManager.instance.pauseIcon;
+		if (MusicManager.instance.playing && MusicManager.instance.riffMode) playRiffButton.Image().sprite = GameManager.instance.pauseIcon;
 		else playRiffButton.Image().sprite = GameManager.instance.playIcon;
+	}
+
+	public void TogglePlaySongButton () {
+		if (MusicManager.instance.playing && !MusicManager.instance.riffMode) previewSongButton.Image().sprite = GameManager.instance.pauseIcon;
+		else previewSongButton.Image().sprite = GameManager.instance.playIcon;
 	}
 
 	#endregion

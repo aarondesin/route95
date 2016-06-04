@@ -83,6 +83,7 @@ public class SongTimeline : MonoBehaviour {
 
 			// Setup column button properties
 			column.Button().onClick.AddListener(()=>{
+				SongArrangeSetup.instance.UpdateValue();
 				Riff riff = MusicManager.instance.currentSong.riffs[SongArrangeSetup.instance.selectedRiffIndex];
 				song.ToggleRiff (riff, num);
 				RefreshColumn (column, song.songPieces[song.songPieceIndices[num]]);

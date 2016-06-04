@@ -11,6 +11,7 @@ public class Spectrum2 : MonoBehaviour {
 	public int numberOfObjects = 20;
 	public float height;
 	public float radius;
+	public Transform[] objects;
 	public Vector3[] points;
 	public float scale = 20f;
 	public float opacity;
@@ -26,11 +27,13 @@ public class Spectrum2 : MonoBehaviour {
 		maxHeight = height + scale;
 
 		// Initialize visualizer points
+		objects= new Transform[numberOfObjects+1];
 		points = new Vector3[numberOfObjects+1];
 		for (int i=0; i<numberOfObjects + 1; i++) {
 			float angle = i*Mathf.PI*2f/numberOfObjects;
 			Vector3 pos = new Vector3 (Mathf.Cos (angle), 0f, Mathf.Sin(angle))*radius;
 			GameObject point = new GameObject("Point"+i);
+			objects[i] = point.transform;
 			point.transform.position = pos;
 			point.transform.SetParent(transform);
 			points[i] = point.transform.position;
@@ -45,8 +48,11 @@ public class Spectrum2 : MonoBehaviour {
 		if (terrain.freqData == null) return;
 
 		for (int i = 0; i < numberOfObjects + 1; i++) {
+			points[i].x = objects[i].position.x;
+			points[i].z = objects[i].position.z;
 			//float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)(i==0 ? (numberOfObjects-1) : i) / numberOfObjects)) * scale;
-			float y = Mathf.Clamp (height + scale * 10f * terrain.freqData.GetDataPoint ((float)(i == numberOfObjects ? 0 : i) / numberOfObjects), minHeight, maxHeight);
+			float r = (float)(i == numberOfObjects ? 0 : i) / numberOfObjects;
+			float y = Mathf.Clamp (height + scale * 10f * terrain.freqData.GetDataPoint (r), minHeight, maxHeight);
 			if (y != float.NaN) {
 				if (y < points[i].y && points[i].y >= minHeight+fallRate)
 					points[i].y -= fallRate;

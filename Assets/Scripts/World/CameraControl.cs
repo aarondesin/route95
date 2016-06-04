@@ -344,7 +344,6 @@ public class CameraControl : MonoBehaviour {
 				}
 
 				if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
-					Debug.Log("CameraBlocker done unfading");
 					GameManager.instance.Hide(CameraBlocker);
 					if (targetAngle == -1) ChangeAngle();
 					else ChangeAngle(targetAngle);

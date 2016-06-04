@@ -61,34 +61,34 @@ public class Vertex {
 	public void SmoothHeight (float h, float factor) {
 		SetHeight (h);
 		Vertex l = map.LeftNeighbor (this);
-		if (l != null && !l.locked) l.Smooth (h, factor);
+		if (l != null && !l.locked && !l.nearRoad) l.Smooth (h, factor);
 
 		Vertex r = map.RightNeighbor (this);
-		if (r != null && !r.locked) r.Smooth (h, factor);
+		if (r != null && !r.locked && r.nearRoad) r.Smooth (h, factor);
 
 		Vertex d = map.DownNeighbor (this);
-		if (d != null && !d.locked) d.Smooth (h, factor);
+		if (d != null && !d.locked && d.nearRoad) d.Smooth (h, factor);
 
 		Vertex u = map.UpNeighbor (this);
-		if (u != null && !u.locked) u.Smooth (h, factor);
+		if (u != null && !u.locked && u.nearRoad) u.Smooth (h, factor);
 
 		float factor_squared = factor * factor;
 
 		if (u != null) {
 			Vertex ul = map.LeftNeighbor (u);
-			if (ul != null && !ul.locked) ul.Smooth (h, factor_squared);
+			if (ul != null && !ul.locked && ul.nearRoad) ul.Smooth (h, factor_squared);
 
 			Vertex ur = map.RightNeighbor (u);
-			if (ur != null && !ur.locked) ur.Smooth (h, factor_squared);
+			if (ur != null && !ur.locked && ur.nearRoad) ur.Smooth (h, factor_squared);
 		}
 
 		if (d != null) {
 
 			Vertex dl = map.LeftNeighbor (d);
-			if (dl != null && !dl.locked) dl.Smooth (h, factor_squared);
+			if (dl != null && !dl.locked && dl.nearRoad) dl.Smooth (h, factor_squared);
 
 			Vertex dr = map.RightNeighbor (d);
-			if (dr != null && !dr.locked) dr.Smooth (h, factor_squared);
+			if (dr != null && !dr.locked && dr.nearRoad) dr.Smooth (h, factor_squared);
 		}
 	}
 
