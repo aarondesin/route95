@@ -86,11 +86,11 @@ public class AudioFlangerFilter : MonoBehaviour {
 	/// </summary>
 	void MixSignals () {
 
-		// Init mixed array if necessary
-		if (mixed == null) mixed = new float[len];
-
 		// Get length of audio signal
 		len = oldDatas[0].Length;
+
+		// Init mixed array if necessary
+		if (mixed == null) mixed = new float[len];
 
 		// Calculate mixing value between old inputs
 		float val = delay / time;
@@ -104,14 +104,17 @@ public class AudioFlangerFilter : MonoBehaviour {
 
 		// Mix old inputs
 		float mix = (val - (float)lo);
+		float oneMinusMix = 1f - mix;
 
 		// Populate mixed array
 		for (int i=0; i<len; i++) {
+			float high = oldDatas[hi][i];
+			float low = oldDatas[lo][i];
 
 			try {
-				mixed[i] = oldDatas[hi][i] * mix + oldDatas[lo][i] * (1f-mix);
+				mixed[i] = (high * mix) + (low * oneMinusMix);
 			} catch (IndexOutOfRangeException e) {
-				Debug.LogError("i: " + i + " " + e.Message);
+				Debug.LogError("i: " + i + " len: " + len + e.Message);
 			}
 		}
 		
