@@ -12,6 +12,20 @@ public class InstrumentSetup : MonoBehaviour {
 
 	#region InstrumentSetup Vars
 
+    /// <summary>
+    /// Sound to use when enabling an effect.
+    /// </summary>
+    [Tooltip("Sound to use when enabling an effect.")]
+    [SerializeField]
+	AudioClip _enableEffectSound;
+
+    /// <summary>
+    /// Sound to use when disabling an effect.
+    /// </summary>
+    [Tooltip("Sound to use when disabling an effect.")]
+    [SerializeField]
+	AudioClip _disableEffectSound;
+
 	public static InstrumentSetup instance; // Quick reference to this instance
 	public bool initialized = false;
 	public static Riff currentRiff;         // Current riff being edited
@@ -189,6 +203,20 @@ public class InstrumentSetup : MonoBehaviour {
 
 		foreach (GameObject obj in objects) Destroy(obj);
 		objects.Clear();
+	}
+
+    /// <summary>
+	/// Plays an effects on noise.
+	/// </summary>
+	public void EffectsOn () {
+		MusicManager.PlayMenuSound (effectsOn);
+	}
+
+	/// <summary>
+	/// Plays an effects off noise.
+	/// </summary>
+	public void EffectsOff () {
+		MusicManager.PlayMenuSound (effectsOff);
 	}
 
 	/// <summary>

@@ -11,6 +11,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 	#region PlaylistBrowser Vars
 
+    /// <summary>
+    /// List of sounds to use when writing playlist name.
+    /// </summary>
+    [Tooltip("List of sounds to use when writing playlist name.")]
+    [SerializeField]
+	List<AudioClip> _scribbleSounds;
+
 	public static PlaylistBrowser instance;  // Quick reference to this instance
 
 	[Tooltip("Playlist name input field.")]
@@ -56,6 +63,13 @@ public class PlaylistBrowser : MonoBehaviour {
 
 	#endregion
 	#region PlaylistBrowser Callbacks
+
+    /// <summary>
+	/// Plays a random pen scribble sound.
+	/// </summary>
+	public void PlayScribbleSound () {
+		MusicManager.PlayMenuSound (scribbles.Random(), 0.75f);
+	}
 
 	/// <summary>
 	/// Gets playlist name from MM.

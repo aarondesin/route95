@@ -5,11 +5,9 @@ using System.Collections;
 /// <summary>
 /// Class for generic modal popups.
 /// </summary>
-public class Prompt : MonoBehaviour {
+public class Prompt : SingletonMonoBehaviour<Prompt> {
 
 	#region Prompt Vars
-
-	public static Prompt instance; // Quick reference to this instance
 
 	public Text titleText;         // Reference to title text
 	public Text messageText;       // Reference to message body text
