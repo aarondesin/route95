@@ -74,7 +74,7 @@ public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	/// </summary>
 	/// <param name="eventData"></param>
 	public void OnPointerEnter (PointerEventData eventData) {
-		if (objects != null && InputManager.instance.selected == null) {
+		if (objects != null && InputManager.Instance.selected == null) {
 			Show();
 		}
 	}
@@ -84,7 +84,7 @@ public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	/// </summary>
 	/// <param name="eventData"></param>
 	public void OnPointerExit (PointerEventData eventData) {
-		if (objects != null && InputManager.instance.selected == null) {
+		if (objects != null && InputManager.Instance.selected == null) {
 			Hide();
 		}
 	}

@@ -11,15 +11,15 @@ public class Tooltippable : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 	public string message;
 
 	public void OnPointerEnter (PointerEventData e) {
-		GameManager.instance.Show(Tooltip.instance.gameObject);
-		Tooltip.instance.SetText (message);
+		GameManager.Instance.Show(Tooltip.Instance.gameObject);
+		Tooltip.Instance.SetText (message);
 	}
 
 	public void OnPointerExit (PointerEventData e) {
-		GameManager.instance.Hide(Tooltip.instance.gameObject);
+		GameManager.Instance.Hide(Tooltip.Instance.gameObject);
 	}
 
 	public void OnPointerClick (PointerEventData e) {
-		GameManager.instance.Hide(Tooltip.instance.gameObject);
+		GameManager.Instance.Hide(Tooltip.Instance.gameObject);
 	}
 }

@@ -92,7 +92,7 @@ public class Decoration : MonoBehaviour, IPoolable {
 
 	void Awake () {
 		normalScale = transform.localScale;
-		partSystem = ((GameObject)Instantiate(WorldManager.instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
+		partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
 		partSystem.gameObject.transform.parent = transform.parent;
 	}
 
@@ -100,11 +100,11 @@ public class Decoration : MonoBehaviour, IPoolable {
 		if (dynamic) {
 
 			// Remove if decoration fell below
-			if (transform.position.y < -WorldManager.instance.heightScale) 
-				WorldManager.instance.RemoveDecoration (gameObject);
+			if (transform.position.y < -WorldManager.Instance.heightScale) 
+				WorldManager.Instance.RemoveDecoration (gameObject);
 
 			// Push with wind
-			GetComponent<Rigidbody>().AddForce(WorldManager.instance.wind);
+			GetComponent<Rigidbody>().AddForce(WorldManager.Instance.wind);
 		}
 	}
 

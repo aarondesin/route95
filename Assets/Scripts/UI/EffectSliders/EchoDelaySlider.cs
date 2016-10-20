@@ -8,13 +8,13 @@ public class EchoDelaySlider : EffectSlider {
 	float max = 1500f;
 
 	public override void Initialize () {
-		UpdateSlider ((InstrumentSetup.currentRiff.echoDelay - min) / (max- min));
+		UpdateSlider ((RiffEditor.currentRiff.echoDelay - min) / (max- min));
 	}
 
 	public override void ChangeValue () {
 		float val = (max-min) * slider.value + min;
 		Debug.Log("changevalue " + val);
-		InstrumentSetup.currentRiff.echoDelay = val;
+		RiffEditor.currentRiff.echoDelay = val;
 	}
 
 }

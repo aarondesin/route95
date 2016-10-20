@@ -18,11 +18,11 @@ namespace Route95.Music {
 
         [Tooltip("Name of the project.")]
         [SerializeField]
-        public string name;
+        string _name;
 
         [Tooltip("File paths of all songs in the project.")]
         [SerializeField]
-        public List<string> songPaths;
+        List<string> _songPaths;
 
         [SerializeField]
         List<Song> _songs;            // All songs used in the project
@@ -42,6 +42,8 @@ namespace Route95.Music {
         #endregion
         #region Properties
 
+        public string Name { get { return _name; } }
+
         /// <summary>
         /// Returns a list of all songs in this project (read-only).
         /// </summary>
@@ -60,10 +62,10 @@ namespace Route95.Music {
         public Project() {
 
             // Default name
-            name = "New Project";
+            _name = "New Project";
 
             // Init lists
-            songPaths = new List<string>();
+            _songPaths = new List<string>();
             _songs = new List<Song>();
             songPieces = new List<SongPiece>();
             measures = new List<Measure>();
@@ -80,7 +82,7 @@ namespace Route95.Music {
         public void Refresh(StreamingContext context) {
 
             // Init any null lists
-            if (songPaths == null) songPaths = new List<string>();
+            if (_songPaths == null) _songPaths = new List<string>();
             if (_songs == null) _songs = new List<Song>();
             if (songPieces == null) songPieces = new List<SongPiece>();
             if (measures == null) measures = new List<Measure>();
@@ -88,7 +90,7 @@ namespace Route95.Music {
             if (beats == null) beats = new List<Beat>();
 
             // Load all listed songs
-            foreach (string path in songPaths) AddSong(SaveLoad.LoadSong(path));
+            foreach (string path in _songPaths) AddSong(SaveLoad.LoadSong(path));
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Route95.Music {
         internal void UpdatePaths(StreamingContext context) {
 
             // Refresh song paths
-            songPaths.Clear();
+            _songPaths.Clear();
 
             // For each song in the project
             foreach (Song song in _songs) {
@@ -111,8 +113,16 @@ namespace Route95.Music {
                 // Generate and add path
                 string path = Application.dataPath + GameManager.Instance.SongSaveFolder +
                     song.Name + SaveLoad.songSaveExtension;
-                songPaths.Add(path);
+                _songPaths.Add(path);
             }
+        }
+
+        /// <summary>
+        /// Sets the name of this project.
+        /// </summary>
+        /// <param name="name">New project name.</param>
+        public void SetName (string name) {
+            _name = name;
         }
 
         /// <summary>

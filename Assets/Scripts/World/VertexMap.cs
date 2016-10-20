@@ -23,11 +23,11 @@ public class VertexMap {
 	public VertexMap () {
 		decorationDeletes = new List<GameObject>();
 
-		chunkSize = WorldManager.instance.chunkSize;
-		chunkRes = WorldManager.instance.chunkResolution;
-		chunkRadius = WorldManager.instance.chunkLoadRadius;
-		nearbyRoadDistance = WorldManager.instance.roadWidth * 0.75f;
-		noDecorationsDistance = WorldManager.instance.roadWidth * 1.5f;
+		chunkSize = WorldManager.Instance.chunkSize;
+		chunkRes = WorldManager.Instance.chunkResolution;
+		chunkRadius = WorldManager.Instance.chunkLoadRadius;
+		nearbyRoadDistance = WorldManager.Instance.roadWidth * 0.75f;
+		noDecorationsDistance = WorldManager.Instance.roadWidth * 1.5f;
 		int width = chunkRadius*(chunkRes-1);
 		if (width %2 == 1) width++;
 		vertices = new Map<Vertex>(width);
@@ -123,7 +123,7 @@ public class VertexMap {
 	// 
 
 	public void DoCheckRoads (Vector3 point) {
-		WorldManager.instance.StartCoroutine (CheckRoads(point));
+		WorldManager.Instance.StartCoroutine (CheckRoads(point));
 	}
 
 	IEnumerator CheckRoads (Vector3 roadPoint) {
@@ -165,12 +165,12 @@ public class VertexMap {
 						vert.SmoothHeight(roadPoint.y, UnityEngine.Random.Range(0.98f, 0.99f), UnityEngine.Random.Range(2, 8));
 						foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
 						foreach (GameObject decoration in decorationDeletes) 
-							WorldManager.instance.RemoveDecoration(decoration);
+							WorldManager.Instance.RemoveDecoration(decoration);
 						decorationDeletes.Clear();
 						vert.locked = true;
 					}
 
-					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+					if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 						yield return null;
 						startTime = Time.realtimeSinceStartup;
 					}
@@ -179,7 +179,7 @@ public class VertexMap {
 
 		}
 
-		if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+		if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 			yield return null;
 			startTime = Time.realtimeSinceStartup;
 		}
@@ -301,7 +301,7 @@ public class VertexMap {
 		avgH += (ContainsVertex(x+1, y) ? vertices[x+1,y].height/4f : 0f);
 		avgH += (ContainsVertex(x, y +1) ? vertices[x,y+1].height/4f : 0f);
 		avgH += (ContainsVertex(x, y-1) ? vertices[x,y-1].height/4f : 0f);
-		avgH += Random.Range (-WorldManager.instance.heightScale/4f, WorldManager.instance.heightScale/4f);
+		avgH += Random.Range (-WorldManager.Instance.heightScale/4f, WorldManager.Instance.heightScale/4f);
 		//if (Random.Range (0,100) == 0) Debug.Log(avgH);
 		SetHeight (new IntVector2 (x,y), avgH);*/
 

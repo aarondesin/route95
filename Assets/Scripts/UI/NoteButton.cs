@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 
+using Route95.Music;
+
 /// <summary>
 /// A special use of DraggableButton for the riff editor not buttons.
 /// </summary>

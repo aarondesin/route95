@@ -60,20 +60,20 @@ public class Road : Bezier {
 	public void Start () {
 
 		// Copy vars from WM
-		width = WorldManager.instance.roadWidth;
-		height = WorldManager.instance.roadHeight;
-		slope = WorldManager.instance.roadSlope;
+		width = WorldManager.Instance.roadWidth;
+		height = WorldManager.Instance.roadHeight;
+		slope = WorldManager.Instance.roadSlope;
 
-		heightScale = WorldManager.instance.heightScale;
-		generateRoadRadius = WorldManager.instance.roadExtendRadius;
-		cleanupRoadRadius = WorldManager.instance.roadCleanupRadius;
-		variance = WorldManager.instance.roadVariance;
-		placementDistance = WorldManager.instance.roadPlacementDistance;
-		maxSlope = WorldManager.instance.roadMaxSlope;
+		heightScale = WorldManager.Instance.heightScale;
+		generateRoadRadius = WorldManager.Instance.roadExtendRadius;
+		cleanupRoadRadius = WorldManager.Instance.roadCleanupRadius;
+		variance = WorldManager.Instance.roadVariance;
+		placementDistance = WorldManager.Instance.roadPlacementDistance;
+		maxSlope = WorldManager.Instance.roadMaxSlope;
 
-		stepsPerCurve = WorldManager.instance.roadStepsPerCurve;
+		stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
 
-		terrain = WorldManager.instance.terrain;
+		terrain = WorldManager.Instance.terrain;
 		
 	}
 
@@ -86,21 +86,21 @@ public class Road : Bezier {
 				"Rerouting...",
 				"Following star maps..."
 			};
-			GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+			GameManager.Instance.ChangeLoadingMessage(loadMessages.Random());
 		}
 			
 		// These values may have changed, so get them from WM
-		variance = WorldManager.instance.roadVariance;
-		maxSlope = WorldManager.instance.roadMaxSlope;
+		variance = WorldManager.Instance.roadVariance;
+		maxSlope = WorldManager.Instance.roadMaxSlope;
 
-		float progress = PlayerMovement.instance.progress;
+		float progress = PlayerMovement.Instance.progress;
 
-		Vector3 playerPosition = PlayerMovement.instance.transform.position;
+		Vector3 playerPosition = PlayerMovement.Instance.transform.position;
 
 		bool changesMade = false;
 
 		// Create new points in front of player
-		if (Vector3.Distance (points.Tail(), PlayerMovement.instance.transform.position) < generateRoadRadius) {
+		if (Vector3.Distance (points.Tail(), PlayerMovement.Instance.transform.position) < generateRoadRadius) {
 
 			float numerator = progress * CurveCount;
 
@@ -108,7 +108,7 @@ public class Road : Bezier {
 			AddCurve ();
 
 			// Update player progress
-			PlayerMovement.instance.progress = numerator / CurveCount;
+			PlayerMovement.Instance.progress = numerator / CurveCount;
 
 			changesMade = true;
 		} else
@@ -123,7 +123,7 @@ public class Road : Bezier {
 			Backtrack();
 
 			// Update player progress
-			PlayerMovement.instance.progress = (numerator + 2f) / (denominatorOld + 2f);
+			PlayerMovement.Instance.progress = (numerator + 2f) / (denominatorOld + 2f);
 
 			changesMade = true;
 
@@ -137,18 +137,18 @@ public class Road : Bezier {
 			RemoveCurve();
 
 			// Update player progress
-			PlayerMovement.instance.progress = (numerator - 2f) / (denominator - 2f);
+			PlayerMovement.Instance.progress = (numerator - 2f) / (denominator - 2f);
 
 			changesMade = true;
 
 		
 		} else if (!loaded)  {
 			loaded = true;
-			PlayerMovement.instance.transform.position = GetPoint(0.6f) + new Vector3(0f, 2.27f + height, 0f);
-			PlayerMovement.instance.transform.LookAt (GetPoint(0.6f) + GetVelocity(0.6f), Vector3.up);
-			if (WorldManager.instance.doDecorate)
-				WorldManager.instance.DoLoadDecorations();
-			else WorldManager.instance.FinishLoading();
+			PlayerMovement.Instance.transform.position = GetPoint(0.6f) + new Vector3(0f, 2.27f + height, 0f);
+			PlayerMovement.Instance.transform.LookAt (GetPoint(0.6f) + GetVelocity(0.6f), Vector3.up);
+			if (WorldManager.Instance.doDecorate)
+				WorldManager.Instance.DoLoadDecorations();
+			else WorldManager.Instance.FinishLoading();
 		}
 
 		if (changesMade) Build();
@@ -239,7 +239,7 @@ public class Road : Bezier {
 		modes.Add (modes.Tail());
 		EnforceMode (points.Count - 4);
 		steps += stepsPerCurve;
-		DoBulldoze(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+		DoBulldoze(PlayerMovement.Instance.moving ? PlayerMovement.Instance.progress : 0f);
 	}
 
 	public void Backtrack () {
@@ -302,13 +302,13 @@ public class Road : Bezier {
 		float progress = startProgress;
 		float diff = endProgress - startProgress;
 		if (diff < 0f) yield break;
-		float resolution = WorldManager.instance.roadPathCheckResolution * diff;
+		float resolution = WorldManager.Instance.roadPathCheckResolution * diff;
 		while (progress < endProgress) {
 			Vector3 point = GetPoint(progress);
 			toCheck.Add (point);
 			progress += diff / resolution;
 
-			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}

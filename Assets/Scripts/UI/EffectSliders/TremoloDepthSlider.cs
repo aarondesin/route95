@@ -5,11 +5,11 @@ using System.Collections;
 public class TremoloDepthSlider : EffectSlider {
 
 	public override void Initialize () {
-		UpdateSlider (InstrumentSetup.currentRiff.tremoloDepth);
+		UpdateSlider (RiffEditor.currentRiff.tremoloDepth);
 	}
 
 	public override void ChangeValue () {
-		InstrumentSetup.currentRiff.tremoloDepth = slider.value;
+		RiffEditor.currentRiff.tremoloDepth = slider.value;
 	}
 
 }

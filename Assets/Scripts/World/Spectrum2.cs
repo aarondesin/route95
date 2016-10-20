@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Spectrum2 : MonoBehaviour {
-	public static Spectrum2 instance;
+	public static Spectrum2 Instance;
 
 	DynamicTerrain terrain;
 
@@ -21,7 +21,7 @@ public class Spectrum2 : MonoBehaviour {
 	float maxHeight;
 
 	void Awake () {
-		instance = this;
+		Instance = this;
 
 		minHeight = height - scale;
 		maxHeight = height + scale;
@@ -44,7 +44,7 @@ public class Spectrum2 : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (terrain == null) terrain = WorldManager.instance.terrain;
+		if (terrain == null) terrain = WorldManager.Instance.terrain;
 		if (terrain.freqData == null) return;
 
 		for (int i = 0; i < numberOfObjects + 1; i++) {

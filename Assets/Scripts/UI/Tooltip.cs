@@ -5,19 +5,17 @@ using System.Collections;
 /// <summary>
 /// Class to handle generic tooltips.
 /// </summary>
-public class Tooltip : MonoBehaviour {
+public class Tooltip : MenuBase<Tooltip> {
 
 	#region Tooltip Vars
-
-	public static Tooltip instance;
 
 	Text textObj;
 
 	#endregion
 	#region Unity Callbacks
 
-	void Awake () {
-		instance = this;
+	new void Awake () {
+		// Init vars
 		textObj = GetComponentInChildren<Text>();
 	}
 

@@ -5,11 +5,11 @@ using System.Collections;
 public class DistortionLevelSlider : EffectSlider {
 
 	public override void Initialize () {
-		UpdateSlider (InstrumentSetup.currentRiff.distortionLevel);
+		UpdateSlider (RiffEditor.currentRiff.distortionLevel);
 	}
 
 	public override void ChangeValue () {
-		InstrumentSetup.currentRiff.distortionLevel = slider.value;
+		RiffEditor.currentRiff.distortionLevel = slider.value;
 	}
 
 }

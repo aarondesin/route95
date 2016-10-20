@@ -280,8 +280,8 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 	}
 
 	void Start () {
-		resetDistance = WorldManager.instance.chunkLoadRadius * 
-			0.5f * WorldManager.instance.chunkSize;
+		resetDistance = WorldManager.Instance.chunkLoadRadius * 
+			0.5f * WorldManager.Instance.chunkSize;
 		currentAngle = OutsideCar;
 	}
 
@@ -343,13 +343,13 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 				}
 
 				if (CameraBlocker.GetComponent<Fadeable>().DoneUnfading) {
-					GameManager.instance.Hide(CameraBlocker);
+					GameManager.Instance.Hide(CameraBlocker);
 					if (targetAngle == -1) ChangeAngle();
 					else ChangeAngle(targetAngle);
 				}
 
 				// Check if camera is out of range
-				float distToPlayer = Vector3.Distance (transform.position, PlayerMovement.instance.transform.position);
+				float distToPlayer = Vector3.Distance (transform.position, PlayerMovement.Instance.transform.position);
 				if (distToPlayer > resetDistance && !CameraBlocker.GetComponent<Fadeable>().busy)
 					StartFade();
 			}
@@ -358,7 +358,7 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 		case State.Free:
 
 			// Rotate camera
-			Vector3 d = InputManager.instance.mouseDelta;
+			Vector3 d = InputManager.Instance.mouseDelta;
 			Vector3 old = transform.rotation.eulerAngles;
 			bool slow = Input.GetAxisRaw("Slow") != 0f;
 			old.z = 0f;
@@ -414,10 +414,10 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 	public void StartFreeMode () {
 		state = State.Free;
 		transform.rotation = Quaternion.identity;
-		GameManager.instance.MoveCasetteBack();
-		GameManager.instance.HideAll();
-		GameManager.instance.Hide(GameManager.instance.systemButtons);
-		GameManager.instance.Hide(GameManager.instance.exitButton);
+		GameManager.Instance.MoveCasetteBack();
+		GameManager.Instance.HideAll();
+		GameManager.Instance.Hide(GameManager.Instance.systemButtons);
+		GameManager.Instance.Hide(GameManager.Instance.exitButton);
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
 	}
@@ -430,7 +430,7 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 	}
 
 	public void StartFade () {
-		GameManager.instance.Show(CameraBlocker);
+		GameManager.Instance.Show(CameraBlocker);
 	}
 
 	/// <summary>
@@ -494,7 +494,7 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 					//angle.pos = Vector3.Lerp(angle.pos, angle.targetPos, angle.lag);
 					//angle.pos = angle.pos + (angle.targetPos - angle.pos) * angle.lag;
 					angle.pos = angle.targetPos;
-					angle.rot = Quaternion.LookRotation (PlayerMovement.instance.transform.position + PlayerMovement.instance.transform.forward *20f - angle.pos, Vector3.up);
+					angle.rot = Quaternion.LookRotation (PlayerMovement.Instance.transform.position + PlayerMovement.Instance.transform.forward *20f - angle.pos, Vector3.up);
 					break;
 
 				case CameraView.CameraFollowMode.Static:
@@ -504,7 +504,7 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 
 				case CameraView.CameraFollowMode.Shaky:
 					angle.pos = angle.targetPos;
-				transform.LookAt (PlayerMovement.instance.transform.position, Vector3.up);
+				transform.LookAt (PlayerMovement.Instance.transform.position, Vector3.up);
 					angle.rot = transform.rotation;
 					break;
 			}
@@ -519,15 +519,15 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 	/// <param name="maxHeight"></param>
 	/// <returns></returns>
 	Vector3 PickRandomPosition (float minHeight, float maxHeight) {
-		float chunkSize = WorldManager.instance.chunkSize;
+		float chunkSize = WorldManager.Instance.chunkSize;
 
 		Vector3 point = new Vector3 (
-			PlayerMovement.instance.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
+			PlayerMovement.Instance.transform.position.x + Random.Range (-chunkSize / 2f, chunkSize / 2f),
 			0f,
-			PlayerMovement.instance.transform.position.z + Random.Range (-chunkSize / 2f, chunkSize / 2f)
+			PlayerMovement.Instance.transform.position.z + Random.Range (-chunkSize / 2f, chunkSize / 2f)
 		);
 
-		Vector3 rayOrigin = new Vector3 (point.x, WorldManager.instance.heightScale, point.z);
+		Vector3 rayOrigin = new Vector3 (point.x, WorldManager.Instance.heightScale, point.z);
 
 		RaycastHit hit;
 		if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))
@@ -578,7 +578,7 @@ public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 	}
 
 	void OnCompleteLerp () {
-		GameManager.instance.AttemptMoveCasette();
+		GameManager.Instance.AttemptMoveCasette();
 	}
 		
 	#endregion

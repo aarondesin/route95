@@ -200,8 +200,8 @@ namespace Route95.Music {
             _riffs.Add(riff);
             for (int i = 0; i < 16; i++) {
                 Beat beat = new Beat();
-                beat.index = _beats.Count;
-                riff.beatIndices.Add(beat.index);
+                beat.Index = _beats.Count;
+                riff.beatIndices.Add(beat.Index);
                 _beats.Add(beat);
             }
         }

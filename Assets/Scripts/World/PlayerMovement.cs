@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class PlayerMovement : MonoBehaviour {
-	public static PlayerMovement instance;
+	public static PlayerMovement Instance;
 	Road road;
 
 	public GameObject lightRight;
@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-		instance = this;
+		Instance = this;
 		lights = false;
 		moving = false;
 		velocity = 0f;
@@ -68,11 +68,11 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void Start () {
-		road = WorldManager.instance.road;
+		road = WorldManager.Instance.road;
 	}
 
 	public void StartMoving() {
-		roadHeight = WorldManager.instance.roadHeight;
+		roadHeight = WorldManager.Instance.roadHeight;
 		moving = true;
 		foreach (ParticleSystem ps in particles) ps.Play();
 		GetComponent<AudioSource>().clip = engineClip;
@@ -111,13 +111,13 @@ public class PlayerMovement : MonoBehaviour {
 		if (!initialized)
 			Initialize ();
 
-		if (Sun.instance != null) {
-			if (moving && !GameManager.instance.paused) {
+		if (Sun.Instance != null) {
+			if (moving && !GameManager.Instance.paused) {
 				
 				dOffset += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 0.5f);
 				velocityOffset = Mathf.Clamp (velocityOffset + dOffset, minVelocity, maxVelocity);
 
-				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
+				velocity = MusicManager.tempoToFloat [MusicManager.Instance.tempo] * distPerBeat + velocityOffset;
 
 				progress += velocity * Time.fixedDeltaTime / road.CurveCount;
 				if (progress >= 1f)
@@ -155,8 +155,8 @@ public class PlayerMovement : MonoBehaviour {
 
 			}
 
-			lights = (WorldManager.instance.timeOfDay  > (Mathf.PI * (7f / 8f))
-				|| WorldManager.instance.timeOfDay <= Mathf.PI * (1f / 8f));
+			lights = (WorldManager.Instance.timeOfDay  > (Mathf.PI * (7f / 8f))
+				|| WorldManager.Instance.timeOfDay <= Mathf.PI * (1f / 8f));
 			lightRight.GetComponent<Light> ().enabled = lights;
 			lightLeft.GetComponent<Light> ().enabled = lights;
 		}

@@ -104,6 +104,14 @@ namespace Route95.Core {
         }
 
         #endregion
+        #region Properties
+
+        public bool WillMove {
+            get { return _willMoveCasette; }
+            set { _willMoveCasette = value; }
+        }
+
+        #endregion
         #region Methods
 
         /// <summary>

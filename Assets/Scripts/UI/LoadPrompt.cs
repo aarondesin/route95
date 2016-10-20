@@ -27,8 +27,6 @@ namespace Route95.UI {
         #endregion
         #region LoadPrompt Vars
 
-        public static LoadPrompt instance; // Quick reference to this instance
-
         public RectTransform fileList;     // Transform of the actual panel with all of the files listed
         static Vector2 fileListSize = new Vector2(84f, 84f);
         public GameObject loadButton;      // Load button on propmt
@@ -119,7 +117,7 @@ namespace Route95.UI {
                 text_fade.startFaded = false;
 
                 button.Button().onClick.AddListener(() => {
-                    GameManager.instance.MenuClick();
+                    UIManager.Instance.PlayMenuClickSound();
                     ResetButtons();
                     selectedPath = path;
                     loadButton.Button().interactable = true;
@@ -157,38 +155,38 @@ namespace Route95.UI {
 
         // calls save_load to load the currently selected file
         public void LoadSelectedPath() {
-            //string fullPath = GameManager.instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
+            //string fullPath = GameManager.Instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
             Debug.Log("LoadPrompt.LoadSelectedPath(): loading " + selectedPath);
 
             switch (loadMode) {
                 case LoadPrompt.Mode.Project:
                     try {
                         SaveLoad.LoadProject(selectedPath);
-                        Prompt.instance.PromptMessage("Load Project", "Successfully loaded project!", "Nice");
+                        Prompt.Instance.PromptMessage("Load Project", "Successfully loaded project!", "Nice");
 
                         // Refresh name field on playlist browser
-                        PlaylistBrowser.instance.RefreshName();
+                        PlaylistBrowser.Instance.RefreshName();
 
                         // Go to playlist menu if not there already
-                        GameManager.instance.GoToPlaylistMenu();
+                        UIManager.Instance.GoToPlaylistMenu();
                         break;
                     }
                     catch (SaveLoad.FailedToLoadException) {
                         // Prompt
-                        Prompt.instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
+                        Prompt.Instance.PromptMessage("Failed to load project", "File is corrupted.", "Okay");
                         break;
                     }
 
                 case LoadPrompt.Mode.Song:
                     try {
                         SaveLoad.LoadSongToProject(selectedPath);
-                        PlaylistBrowser.instance.Refresh();
-                        Prompt.instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
+                        PlaylistBrowser.Instance.Refresh();
+                        Prompt.Instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
                         break;
                     }
                     catch (SaveLoad.FailedToLoadException) {
                         // Prompt
-                        Prompt.instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
+                        Prompt.Instance.PromptMessage("Failed to load song", "File is corrupted.", "Okay");
                         break;
                     }
             }

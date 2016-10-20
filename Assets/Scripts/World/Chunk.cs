@@ -86,15 +86,15 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <param name="y">The y coordinate.</param>
 	public void Initialize (int x, int y) {
 
-		terrain = WorldManager.instance.terrain;
+		terrain = WorldManager.Instance.terrain;
 
 		// Init vars
 		this.x = x;
 		this.y = y;
 
 		vmap = terrain.vertexmap;
-		chunkRes = WorldManager.instance.chunkResolution;
-		chunkSize = WorldManager.instance.chunkSize;
+		chunkRes = WorldManager.Instance.chunkResolution;
+		chunkSize = WorldManager.Instance.chunkSize;
 
 		// Generate vertices
 		verts = CreateUniformVertexArray (chunkRes);
@@ -153,7 +153,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 		// Assign material
 		MeshRenderer renderer = GetComponent<MeshRenderer> ();
-		renderer.sharedMaterial = WorldManager.instance.terrainMaterial;
+		renderer.sharedMaterial = WorldManager.Instance.terrainMaterial;
 		renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 		renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
@@ -170,13 +170,13 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 		rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
 		// Add grass system
-		grassEmitter = GameObject.Instantiate (WorldManager.instance.grassEmitterTemplate);
+		grassEmitter = GameObject.Instantiate (WorldManager.Instance.grassEmitterTemplate);
 		grassEmitter.transform.parent = transform;
 		grassEmitter.transform.localPosition = Vector3.zero;
 
 		// Randomize grass density
 		ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
-		sys.maxParticles = UnityEngine.Random.Range(0,WorldManager.instance.grassPerChunk);
+		sys.maxParticles = UnityEngine.Random.Range(0,WorldManager.Instance.grassPerChunk);
 		sys.playOnAwake = true;
 
 		// Assign particle system emission shape
@@ -185,7 +185,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 		// Assign particle system emission rate
 		ParticleSystem.EmissionModule emit = sys.emission;
-		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.instance.decorationsPerStep);
+		emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.Instance.decorationsPerStep);
 
 		UpdateCollider();
 	}
@@ -196,7 +196,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
 	public void Reuse (int x, int y) {
-		terrain = WorldManager.instance.terrain;
+		terrain = WorldManager.Instance.terrain;
 
 		// Update vars
 		this.x = x;
@@ -240,8 +240,8 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <returns>The uniform vertex array.</returns>
 	/// <param name="vertexSize">Vertex size.</param>
 	Vector3[] CreateUniformVertexArray (int vertexSize) { 
-		float chunkSize = WorldManager.instance.chunkSize;
-		int chunkRes = WorldManager.instance.chunkResolution;
+		float chunkSize = WorldManager.Instance.chunkSize;
+		int chunkRes = WorldManager.Instance.chunkResolution;
 		float scale = chunkSize / (chunkRes-1);
 		int numVertices = vertexSize * vertexSize;
 		Vector3[] uniformArray = new Vector3 [numVertices];
@@ -433,12 +433,12 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <returns>The verts.</returns>
 	private IEnumerator UpdateVerts() {
 
-		if (!GameManager.instance.loaded) yield break;
+		if (!GameManager.Instance.loaded) yield break;
 		
 		isUpdatingVerts = true;
-		float margin = WorldManager.instance.chunkSize / 2;
+		float margin = WorldManager.Instance.chunkSize / 2;
 		float startTime = Time.realtimeSinceStartup;
-		Vector3 playerPos = PlayerMovement.instance.transform.position;
+		Vector3 playerPos = PlayerMovement.Instance.transform.position;
 		Vector3 chunkPos = transform.position;
 
 		int v = 0;
@@ -463,14 +463,14 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 				float distance = Vector3.Distance (vertPos, playerPos);
 
 				// If vertex is close enough
-				if (CheckDist (distance, WorldManager.instance.vertexUpdateDistance, margin)) {
+				if (CheckDist (distance, WorldManager.Instance.vertexUpdateDistance, margin)) {
 
 					// Calculate new height
 					Vector3 angleVector = vertPos - playerPos;
 					float angle = Vector3.Angle (Vector3.right, angleVector);
 					float linIntInput = angle / 360f;
 					float newY = terrain.freqData.GetDataPoint (linIntInput) *
-					              WorldManager.instance.heightScale;
+					              WorldManager.Instance.heightScale;
 
 					// If new height, set it
 					//if (newY != vmap.VertexAt(coord, false).height) vmap.SetHeight (coord, newY);
@@ -481,7 +481,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 			if (v == numVerts-1) {
 				isUpdatingVerts = false;
 				yield break;
-			} else if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+			} else if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -507,8 +507,8 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 		if (needsColorUpdate) UpdateColors();
 
 		// Check for road if necessary
-		if (!hasCheckedForRoad && WorldManager.instance.road.loaded)
-			CheckForRoad(PlayerMovement.instance.moving ? PlayerMovement.instance.progress : 0f);
+		if (!hasCheckedForRoad && WorldManager.Instance.road.loaded)
+			CheckForRoad(PlayerMovement.Instance.moving ? PlayerMovement.Instance.progress : 0f);
 
 		// Update verts if possible
 		if (!isUpdatingVerts) StartCoroutine("UpdateVerts");
@@ -522,9 +522,9 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <param name="startProgress">Start progress.</param>
 	public void CheckForRoad (float startProgress) {
 		hasCheckedForRoad = true;
-		Road road = WorldManager.instance.road;
+		Road road = WorldManager.Instance.road;
 		Vector3 chunkPos = transform.position;
-		float checkResolution = (1f - startProgress) * WorldManager.instance.roadPathCheckResolution;
+		float checkResolution = (1f - startProgress) * WorldManager.Instance.roadPathCheckResolution;
 
 		// Set boundaries for "near road" consideration
 		Vector2 nearMin = new Vector2 (chunkPos.x - chunkSize, chunkPos.z - chunkSize);
@@ -586,7 +586,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// <returns>The to v2.</returns>
 	/// <param name="i">The index.</param>
 	IntVector2 IntToV2 (int i) {
-		int chunkRes = WorldManager.instance.chunkResolution;
+		int chunkRes = WorldManager.Instance.chunkResolution;
 
 		int xi = x * (chunkRes-1) + i % chunkRes;
 		int yi = y * (chunkRes-1) + i / chunkRes;
@@ -604,7 +604,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 
 			// Raycast down
 			RaycastHit hit;
-			Vector3 rayOrigin = new Vector3 (tr.position.x, WorldManager.instance.heightScale, tr.position.z);
+			Vector3 rayOrigin = new Vector3 (tr.position.x, WorldManager.Instance.heightScale, tr.position.z);
 			if (Physics.Raycast(rayOrigin, Vector3.down,out hit, Mathf.Infinity))
 				tr.position = new Vector3 (tr.position.x, hit.point.y + 
 					tr.gameObject.GetComponent<Decoration>().positionOffset.y, tr.position.z);
@@ -616,7 +616,7 @@ public class Chunk: MonoBehaviour, IComparable<Chunk>, IPoolable {
 	/// </summary>
 	public void RemoveDecorations () {
 		foreach (GameObject decoration in decorations)
-			WorldManager.instance.RemoveDecoration(decoration);
+			WorldManager.Instance.RemoveDecoration(decoration);
 	}
 
 	/// <summary>

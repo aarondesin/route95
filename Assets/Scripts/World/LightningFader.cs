@@ -22,7 +22,7 @@ public class LightningFader : MonoBehaviour {
 	}
 
 	void Start () {
-		baseIntensity = WorldManager.instance.baseLightningIntensity;
+		baseIntensity = WorldManager.Instance.baseLightningIntensity;
 	}
 
 	void Update () {

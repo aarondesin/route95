@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Route95.Music;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,196 +8,199 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
-/// <summary>
-/// Class to handle the song arranger timeline.
-/// </summary>
-public class SongTimeline : MonoBehaviour {
+namespace Route95.UI {
 
-	#region SongTimeline Vars
+    /// <summary>
+    /// Class to handle the song arranger timeline.
+    /// </summary>
+    public class SongTimeline : MonoBehaviour {
 
-	public static SongTimeline instance; // Quick reference to the song timeline
-	RectTransform timeline_tr;           // Transform of the timeline
+        #region SongTimeline Vars
 
-	static int NUM_COLUMNS = 4;          // Number of columns shown on timeline
+        public static SongTimeline Instance; // Quick reference to the song timeline
+        RectTransform timeline_tr;           // Transform of the timeline
 
-	[Tooltip("Sprite to use for columns.")]
-	public Sprite graphic;
+        static int NUM_COLUMNS = 4;          // Number of columns shown on timeline
 
-	List<GameObject> columns;            // List of active columns
+        [Tooltip("Sprite to use for columns.")]
+        public Sprite graphic;
 
-	[Tooltip("Reference to scrollbar.")]
-	public GameObject scrollbar;
+        List<GameObject> columns;            // List of active columns
 
-	float columnWidth;                   // Calculated width of columns
-	float columnHeight;                  // Calculated height of columns
+        [Tooltip("Reference to scrollbar.")]
+        public GameObject scrollbar;
 
-	#endregion
-	#region Unity Callbacks
+        float columnWidth;                   // Calculated width of columns
+        float columnHeight;                  // Calculated height of columns
 
-	void Awake () {
-		instance = this;
-		
-		// Init lists
-		columns = new List<GameObject>();
+        #endregion
+        #region Unity Callbacks
 
-		// Init vars
-		timeline_tr = gameObject.RectTransform();
-		columnWidth = timeline_tr.rect.width/(float)NUM_COLUMNS;
-		columnHeight = ((RectTransform)timeline_tr.parent).rect.height;
-	}
+        void Awake() {
+            Instance = this;
 
-	#endregion
-	#region SongTimeline Methods
+            // Init lists
+            columns = new List<GameObject>();
 
-	/// <summary>
-	/// Inits all song piece columns on the timeline.
-	/// </summary>
-	public void MakeColumns () {
-		Song song = MusicManager.instance.currentSong;
-		int numSongPieces = MusicManager.instance.currentSong.songPieceIndices.Count;
+            // Init vars
+            timeline_tr = gameObject.RectTransform();
+            columnWidth = timeline_tr.rect.width / (float)NUM_COLUMNS;
+            columnHeight = ((RectTransform)timeline_tr.parent).rect.height;
+        }
 
-		// Clear current columns
-		columns.Clear();
+        #endregion
+        #region SongTimeline Methods
 
-		// Resize timeline
-		timeline_tr.sizeDelta = new Vector2 (
-			(numSongPieces +1 ) * columnWidth, columnHeight
-		);
-			
-		// Make columns
-		for (int i = 0; i < numSongPieces; i++) {
-			GameObject column = new GameObject("Column"+i,
-				typeof (RectTransform),
-				typeof (CanvasRenderer),
-				typeof (Button),
-				typeof (Image)
-			);
+        /// <summary>
+        /// Inits all song piece columns on the timeline.
+        /// </summary>
+        public void MakeColumns() {
+            Song song = MusicManager.Instance.currentSong;
+            int numSongPieces = MusicManager.Instance.currentSong.songPieceIndices.Count;
 
-			RectTransform tr = column.RectTransform();
-			column.SetParent(timeline_tr);
-			tr.sizeDelta = new Vector2 (columnWidth, columnHeight);
-			tr.AnchorAtPoint (0f, 0f);
-			tr.anchoredPosition3D = new Vector3 ((i+0.5f)*columnWidth, columnHeight/2f, 0f);
-			tr.ResetScaleRot();
+            // Clear current columns
+            columns.Clear();
 
-			int num = i; // avoid pointer problems
+            // Resize timeline
+            timeline_tr.sizeDelta = new Vector2(
+                (numSongPieces + 1) * columnWidth, columnHeight
+            );
 
-			// Setup column button properties
-			column.Button().onClick.AddListener(()=>{
-				SongArrangeSetup.instance.UpdateValue();
-				Riff riff = MusicManager.instance.currentSong.riffs[SongArrangeSetup.instance.selectedRiffIndex];
-				song.ToggleRiff (riff, num);
-				RefreshColumn (column, song.songPieces[song.songPieceIndices[num]]);
-			});
+            // Make columns
+            for (int i = 0; i < numSongPieces; i++) {
+                GameObject column = new GameObject("Column" + i,
+                    typeof(RectTransform),
+                    typeof(CanvasRenderer),
+                    typeof(Button),
+                    typeof(Image)
+                );
 
-			column.Image().sprite = GameManager.instance.fillSprite;
-			Color color = Color.white;
-			color.a = (i % 2 == 1) ? 0.2f : 0.4f;
-			column.Image().color = color;
-			columns.Add(column);
-		}
+                RectTransform tr = column.RectTransform();
+                column.SetParent(timeline_tr);
+                tr.sizeDelta = new Vector2(columnWidth, columnHeight);
+                tr.AnchorAtPoint(0f, 0f);
+                tr.anchoredPosition3D = new Vector3((i + 0.5f) * columnWidth, columnHeight / 2f, 0f);
+                tr.ResetScaleRot();
 
-		// Refresh all columns
-		for (int i=0; i<columns.Count; i++)
-			RefreshColumn (columns[i], song.songPieces[song.songPieceIndices[i]]);
+                int num = i; // avoid pointer problems
 
-		// Create add columns button
-		GameObject addColumnButton = new GameObject("AddColumnButton",
-			typeof (RectTransform),
-			typeof (CanvasRenderer),
-			typeof (Button),
-			typeof (Image)
-		);
+                // Setup column button properties
+                column.Button().onClick.AddListener(() => {
+                    SongArrangeMenu.Instance.UpdateValue();
+                    Riff riff = MusicManager.Instance.currentSong.riffs[SongArrangeMenu.Instance.selectedRiffIndex];
+                    song.ToggleRiff(riff, num);
+                    RefreshColumn(column, song.songPieces[song.songPieceIndices[num]]);
+                });
 
-		RectTransform atr = addColumnButton.RectTransform();
-		addColumnButton.SetParent(gameObject.RectTransform());
-		float width = Mathf.Min(columnWidth, columnHeight)/3f;
-		atr.SetSideWidth (width);
-		atr.AnchorAtPoint (1f, 0f);
-		atr.anchoredPosition3D = new Vector3 (-columnWidth/2f, columnHeight/2f, 0f);
-		atr.ResetScaleRot();
-			
-		addColumnButton.Button().onClick.AddListener(()=>{
-			MusicManager.instance.currentSong.NewSongPiece();
-			RefreshTimeline();
-		});
+                column.Image().sprite = GameManager.Instance.fillSprite;
+                Color color = Color.white;
+                color.a = (i % 2 == 1) ? 0.2f : 0.4f;
+                column.Image().color = color;
+                columns.Add(column);
+            }
 
-		addColumnButton.Image().sprite = GameManager.instance.addIcon;
-		columns.Add(addColumnButton);
-	}
+            // Refresh all columns
+            for (int i = 0; i < columns.Count; i++)
+                RefreshColumn(columns[i], song.songPieces[song.songPieceIndices[i]]);
 
-	/// <summary>
-	/// Clears and remakes all columns.
-	/// </summary>
-	public void RefreshTimeline () {
-		while (columns.Count != 0) {
-			GameObject temp = columns[0];
-			Destroy(temp);
-			columns.RemoveAt(0);
-		}
-		MakeColumns();
-	}
+            // Create add columns button
+            GameObject addColumnButton = new GameObject("AddColumnButton",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Button),
+                typeof(Image)
+            );
 
-	/// <summary>
-	/// Refreshes a column.
-	/// </summary>
-	/// <param name="column">Column to refresh.</param>
-	/// <param name="songpiece">Song piece to use for column.</param>
-	void RefreshColumn (GameObject column, SongPiece songpiece) {
-		Song song = MusicManager.instance.currentSong;
-		RectTransform column_tr = column.RectTransform();
+            RectTransform atr = addColumnButton.RectTransform();
+            addColumnButton.SetParent(gameObject.RectTransform());
+            float width = Mathf.Min(columnWidth, columnHeight) / 3f;
+            atr.SetSideWidth(width);
+            atr.AnchorAtPoint(1f, 0f);
+            atr.anchoredPosition3D = new Vector3(-columnWidth / 2f, columnHeight / 2f, 0f);
+            atr.ResetScaleRot();
 
-		// Clear all chuldren from column
-		foreach (RectTransform child in column_tr)
-			Destroy(child.gameObject);
+            addColumnButton.Button().onClick.AddListener(() => {
+                MusicManager.Instance.currentSong.NewSongPiece();
+                RefreshTimeline();
+            });
 
-		int i = 0;
-		float height = columnHeight/Instrument.AllInstruments.Count;
-		Measure measure = song.measures[songpiece.measureIndices[0]];
+            addColumnButton.Image().sprite = GameManager.Instance.addIcon;
+            columns.Add(addColumnButton);
+        }
 
-		foreach (int r in measure.riffIndices) {
-			Riff riff = song.riffs[r];
-			
-			float y = (float)(Instrument.AllInstruments.Count-1-i);
+        /// <summary>
+        /// Clears and remakes all columns.
+        /// </summary>
+        public void RefreshTimeline() {
+            while (columns.Count != 0) {
+                GameObject temp = columns[0];
+                Destroy(temp);
+                columns.RemoveAt(0);
+            }
+            MakeColumns();
+        }
 
-			// Riff name label
-			GameObject label = UIHelpers.MakeText (riff.name);
-			RectTransform label_tr = label.RectTransform();
-			label.SetParent(column_tr);
-			label_tr.sizeDelta = new Vector2 (columnWidth, height);
-			label_tr.AnchorAtPoint (0f, 0f);
-			label_tr.anchoredPosition3D = new Vector3 (2f * height, height * y, 0f);
-			label_tr.ResetScaleRot();
-			
-			// Instrument icon
-			GameObject icon = UIHelpers.MakeImage (riff.name + "Icon", riff.instrument.icon);
-			RectTransform icon_tr = icon.RectTransform();
-			icon_tr.SetParent (column_tr);
-			icon_tr.SetSideWidth (height);
-			icon_tr.AnchorAtPoint (0f, 0f);
-			icon_tr.anchoredPosition3D = new Vector3 (height, height * y, 0f);
-			icon_tr.ResetScaleRot();
+        /// <summary>
+        /// Refreshes a column.
+        /// </summary>
+        /// <param name="column">Column to refresh.</param>
+        /// <param name="songpiece">Song piece to use for column.</param>
+        void RefreshColumn(GameObject column, SongPiece songpiece) {
+            Song song = MusicManager.Instance.currentSong;
+            RectTransform column_tr = column.RectTransform();
 
-			Text label_text = label.Text();
-			label_text.text = riff.name;
-			label_text.color = Color.white;
-			label_text.fontStyle = FontStyle.Normal;
-			label_text.fontSize = 4;
-			label_text.font = GameManager.instance.font;
-			label_text.alignment = TextAnchor.MiddleCenter;
+            // Clear all chuldren from column
+            foreach (RectTransform child in column_tr)
+                Destroy(child.gameObject);
 
-			i++;
-		}
-	}
+            int i = 0;
+            float height = columnHeight / Instrument.AllInstruments.Count;
+            Measure measure = song.measures[songpiece.measureIndices[0]];
 
-	/// <summary>
-	/// Toggles interactivity of the timeline.
-	/// </summary>
-	/// <param name="inter"></param>
-	public void SetInteractable (bool inter) {
-		foreach (Selectable selectable in GetComponentsInChildren<Selectable>())
-			selectable.interactable = inter;
-	}
+            foreach (int r in measure.riffIndices) {
+                Riff riff = song.riffs[r];
 
-	#endregion
+                float y = (float)(Instrument.AllInstruments.Count - 1 - i);
+
+                // Riff name label
+                GameObject label = UIHelpers.MakeText(riff.name);
+                RectTransform label_tr = label.RectTransform();
+                label.SetParent(column_tr);
+                label_tr.sizeDelta = new Vector2(columnWidth, height);
+                label_tr.AnchorAtPoint(0f, 0f);
+                label_tr.anchoredPosition3D = new Vector3(2f * height, height * y, 0f);
+                label_tr.ResetScaleRot();
+
+                // Instrument icon
+                GameObject icon = UIHelpers.MakeImage(riff.name + "Icon", riff.instrument.icon);
+                RectTransform icon_tr = icon.RectTransform();
+                icon_tr.SetParent(column_tr);
+                icon_tr.SetSideWidth(height);
+                icon_tr.AnchorAtPoint(0f, 0f);
+                icon_tr.anchoredPosition3D = new Vector3(height, height * y, 0f);
+                icon_tr.ResetScaleRot();
+
+                Text label_text = label.Text();
+                label_text.text = riff.name;
+                label_text.color = Color.white;
+                label_text.fontStyle = FontStyle.Normal;
+                label_text.fontSize = 4;
+                label_text.font = GameManager.Instance.font;
+                label_text.alignment = TextAnchor.MiddleCenter;
+
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// Toggles interactivity of the timeline.
+        /// </summary>
+        /// <param name="inter"></param>
+        public void SetInteractable(bool inter) {
+            foreach (Selectable selectable in GetComponentsInChildren<Selectable>())
+                selectable.interactable = inter;
+        }
+
+        #endregion
+    }
 }

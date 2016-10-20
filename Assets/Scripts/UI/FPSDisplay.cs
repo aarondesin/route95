@@ -24,7 +24,7 @@ public class FPSDisplay : MonoBehaviour {
 	}
 
 	void OnGUI() {
-		if (CameraControl.instance.state != CameraControl.State.Free) {
+		if (CameraControl.Instance.state != CameraControl.State.Free) {
 			int w = Screen.width, h = Screen.height;
 
 			GUIStyle style = new GUIStyle();

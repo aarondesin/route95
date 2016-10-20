@@ -238,12 +238,18 @@ namespace Route95.Core {
         /// <summary>
         /// Returns true if the game is paused (read-only).
         /// </summary>
-        public bool Paused { get { return _paused; } }
+        public bool Paused {
+            get { return _paused; }
+            set { _paused = value; }
+        }
 
         /// <summary>
         /// Returns GameManager's current state (read-only).
         /// </summary>
-        public State CurrentState { get { return _currentState; } }
+        public State CurrentState {
+            get { return _currentState; }
+            set { _currentState = value; }
+        }
 
         /// <summary>
         /// Returns the folder to which to save songs (read-only).
@@ -264,7 +270,7 @@ namespace Route95.Core {
         #region GameManager Loading Methods
 
         /// <summary>
-        /// Load this instance.
+        /// Load this Instance.
         /// </summary>
         void Load() {
             // Hide all menus
@@ -375,7 +381,7 @@ namespace Route95.Core {
         /// Shows the load prompt for projects.
         /// </summary>
         public void ShowLoadPromptForProjects() {
-            LoadPrompt.instance.Refresh(LoadPrompt.Mode.Project);
+            LoadPrompt.Instance.Refresh(LoadPrompt.Mode.Project);
             UIManager.Instance.ShowMenu(LoadPrompt.Instance);
         }
 
@@ -383,7 +389,7 @@ namespace Route95.Core {
         /// Shows the load prompt for songs.
         /// </summary>
         public void ShowLoadPromptForSongs() {
-            LoadPrompt.instance.Refresh(LoadPrompt.Mode.Song);
+            LoadPrompt.Instance.Refresh(LoadPrompt.Mode.Song);
             UIManager.Instance.ShowMenu(LoadPrompt.Instance);
         }
 
@@ -391,7 +397,7 @@ namespace Route95.Core {
         #region Application Methods
 
         /// <summary>
-        /// Attempts to exit the GameManager.instance.
+        /// Attempts to exit the GameManager.Instance.
         /// </summary>
         public void AttemptExit() {
             switch (_currentState) {
@@ -417,22 +423,22 @@ namespace Route95.Core {
         }
 
         /// <summary>
-        /// Pause this instance.
+        /// Pause this Instance.
         /// </summary>
         public void Pause() {
             _paused = true;
             PauseMenu.Instance.Show();
-            PlayerMovement.instance.StopMoving();
+            PlayerMovement.Instance.StopMoving();
             CameraControl.Instance.Pause();
         }
 
         /// <summary>
-        /// Unpause this instance.
+        /// Unpause this Instance.
         /// </summary>
         public void Unpause() {
             _paused = false;
             PauseMenu.Instance.Hide();
-            PlayerMovement.instance.StartMoving();
+            PlayerMovement.Instance.StartMoving();
             CameraControl.Instance.Unpause();
         }
 
@@ -444,7 +450,7 @@ namespace Route95.Core {
         }
 
         /// <summary>
-        /// Exit this instance.
+        /// Exit this Instance.
         /// </summary>
         public void Exit() {
             Application.Quit();

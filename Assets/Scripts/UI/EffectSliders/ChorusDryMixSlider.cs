@@ -5,11 +5,11 @@ using System.Collections;
 public class ChorusDryMixSlider : EffectSlider {
 
 	public override void Initialize () {
-		UpdateSlider (InstrumentSetup.currentRiff.chorusDryMix);
+		UpdateSlider (RiffEditor.currentRiff.chorusDryMix);
 	}
 
 	public override void ChangeValue () {
-		InstrumentSetup.currentRiff.chorusDryMix = slider.value;
+		RiffEditor.currentRiff.chorusDryMix = slider.value;
 	}
 
 }

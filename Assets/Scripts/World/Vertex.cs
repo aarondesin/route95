@@ -28,8 +28,8 @@ public class Vertex {
 		this.y = y;
 		chunkVertices = new List<KeyValuePair<IntVector2, int>>();
 		decorations = new List<GameObject>();
-		chunkRes = WorldManager.instance.chunkResolution;
-		chunkSize = WorldManager.instance.chunkSize;
+		chunkRes = WorldManager.Instance.chunkResolution;
+		chunkSize = WorldManager.Instance.chunkSize;
 		color = new Color (
 			0f,
 			UnityEngine.Random.Range(0f, 1f), 
@@ -257,7 +257,7 @@ public class Vertex {
 		Vertex d = map.VertexAt(x,y-1);
 		color.a += (d != null ? Mathf.Abs (h - d.height) : 0f);
 
-		color.a /= (WorldManager.instance.heightScale/10f);
+		color.a /= (WorldManager.Instance.heightScale/10f);
 		color.a = Mathf.Clamp01(color.a);*/
 
 		CalculateBlend2();
@@ -354,9 +354,9 @@ public class Vertex {
 	public Vector3 WorldPos () {
 		Vector3 result = new Vector3 (
 			(float)x / (float)(chunkRes-1) * chunkSize - chunkSize/2f,
-			//x * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f,
+			//x * WorldManager.Instance.chunkSize - WorldManager.Instance.chunkSize/2f,
 			height,
-			//y * WorldManager.instance.chunkSize - WorldManager.instance.chunkSize/2f
+			//y * WorldManager.Instance.chunkSize - WorldManager.Instance.chunkSize/2f
 			(float)y / (float)(chunkRes-1) * chunkSize - chunkSize/2f
 		);
 		//Debug.Log(ToString() + result.ToString());
@@ -365,7 +365,7 @@ public class Vertex {
 
 	public void RemoveDecorations () {
 		while (decorations.Count > 0)
-			WorldManager.instance.RemoveDecoration(decorations.PopFront());
+			WorldManager.Instance.RemoveDecoration(decorations.PopFront());
 	}
 
 	public override string ToString ()

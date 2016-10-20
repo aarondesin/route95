@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+using Route95.Music;
+using Route95.UI;
+using UnityEngine;
 using UnityEngine.Rendering;
 using System;
 using System.Collections;
@@ -10,626 +13,626 @@ using UnityStandardAssets.ImageEffects;
 /// </summary>
 public class WorldManager : SingletonMonoBehaviour<WorldManager> {
 
-	#region WorldManager Enums
+    #region WorldManager Enums
 
-	/// <summary>
-	/// Modes to generate chunks around player.
-	/// </summary>
-	public enum ChunkGenerationMode {
-		Square,
-		Circular
-	}
+    /// <summary>
+    /// Modes to generate chunks around player.
+    /// </summary>
+    public enum ChunkGenerationMode {
+        Square,
+        Circular
+    }
 
-	#endregion
-	#region WorldManager Vars
+    #endregion
+    #region WorldManager Vars
 
-	public static WorldManager instance;
+    public GameObject vertexIndicator;
 
-	public GameObject vertexIndicator;
+    public int loadsToDo;
 
-	public int loadsToDo;
+    // Chunk vars
+    const float DEFAULT_CHUNK_SIZE = 100;                // Default chunk size (world units)
+    const int DEFAULT_CHUNK_RESOLUTION = 8;              // Default number of vertices per chunk edge
+    const int DEFAULT_CHUNK_LOAD_RADIUS = 4;             // Default player radius to load chunks (chunks)
 
-	// Chunk vars
-	const float DEFAULT_CHUNK_SIZE = 100;                // Default chunk size (world units)
-	const int DEFAULT_CHUNK_RESOLUTION = 8;              // Default number of vertices per chunk edge
-	const int DEFAULT_CHUNK_LOAD_RADIUS = 4;             // Default player radius to load chunks (chunks)
+    // Terrain vars
+    const float DEFAULT_HEIGHT_SCALE = 800f;             // Default terrain height scale (world units)
+    const float DEFAULT_VERTEX_UPDATE_DISTANCE = 600f;   // Default player radius to update vertices (world units)
 
-	// Terrain vars
-	const float DEFAULT_HEIGHT_SCALE = 800f;             // Default terrain height scale (world units)
-	const float DEFAULT_VERTEX_UPDATE_DISTANCE = 600f;   // Default player radius to update vertices (world units)
+    // Decoration vars
+    const int DEFAULT_MAX_DECORATIONS = 1000;            // Default hard decoration limit
+    const int DEFAULT_DECORATIONS_PER_STEP = 100;        // Default max number of decorations to place each cycle
 
-	// Decoration vars
-	const int DEFAULT_MAX_DECORATIONS = 1000;            // Default hard decoration limit
-	const int DEFAULT_DECORATIONS_PER_STEP = 100;        // Default max number of decorations to place each cycle
+    // Road vars
+    const float DEFAULT_ROAD_WIDTH = 10f;                // Default road width (world units)
+    const float DEFAULT_ROAD_HEIGHT = 0.2f;              // Default road height (world units)
+    const float DEFAULT_ROAD_SLOPE = 0.9f;               // Default ratio of road top plane to bottom plane (percent)
+    const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;      // Default player radius to extend road (world units)
+    const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;        // Default number of road mesh subdivision steps per segment
+    const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;        // Default limit on road slope per world unit
+    const float DEFAULT_ROAD_PLACEMENT_DISTANCE = 30f;   // Default distance to place road (world units)
+    const float DEFAULT_ROAD_VARIANCE = 0.4f;            // Default radius of road placement circle (percent)
 
-	// Road vars
-	const float DEFAULT_ROAD_WIDTH = 10f;                // Default road width (world units)
-	const float DEFAULT_ROAD_HEIGHT = 0.2f;              // Default road height (world units)
-	const float DEFAULT_ROAD_SLOPE = 0.9f;               // Default ratio of road top plane to bottom plane (percent)
-	const float DEFAULT_ROAD_EXTEND_RADIUS = 1000f;      // Default player radius to extend road (world units)
-	const int DEFAULT_ROAD_STEPS_PER_CURVE = 100;        // Default number of road mesh subdivision steps per segment
-	const float DEFAULT_ROAD_MAX_SLOPE = 0.0015f;        // Default limit on road slope per world unit
-	const float DEFAULT_ROAD_PLACEMENT_DISTANCE = 30f;   // Default distance to place road (world units)
-	const float DEFAULT_ROAD_VARIANCE = 0.4f;            // Default radius of road placement circle (percent)
+    // Day/night cycle vars
+    const float DEFAULT_TIME_SCALE = 0.01f;              // Default time scale multiplier
 
-	// Day/night cycle vars
-	const float DEFAULT_TIME_SCALE = 0.01f;              // Default time scale multiplier
+    // Performance vars
+    const int DEFAULT_CHUNK_UPDATES_PER_CYCLE = 4;       // Default number of chunks to update per cycle
+    const int DEFAULT_FREQ_ARRAY_SIZE = 256;             // Default size of frequency data array (power of 2)
+    const float DEFAULT_ROAD_PATH_CHECK_RESOLUTION = 4f; // Default resolution at which to check the road
 
-	// Performance vars
-	const int DEFAULT_CHUNK_UPDATES_PER_CYCLE = 4;       // Default number of chunks to update per cycle
-	const int DEFAULT_FREQ_ARRAY_SIZE = 256;             // Default size of frequency data array (power of 2)
-	const float DEFAULT_ROAD_PATH_CHECK_RESOLUTION = 4f; // Default resolution at which to check the road
+    #endregion
+    #region WorldManager Vars
 
-	#endregion
-	#region WorldManager Vars
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Chunk Settings")]
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Chunk Settings")]
+    [Tooltip("The length of one side of a chunk.")]
+    [Range(1f, 200f)]
+    public float chunkSize = DEFAULT_CHUNK_SIZE;
 
-	[Tooltip("The length of one side of a chunk.")]
-	[Range(1f, 200f)]
-	public float chunkSize = DEFAULT_CHUNK_SIZE;
+    [Tooltip("The number of vertices along one side of a chunk.")]
+    [Range(2, 32)]
+    public int chunkResolution = DEFAULT_CHUNK_RESOLUTION;
 
-	[Tooltip("The number of vertices along one side of a chunk.")]
-	[Range(2, 32)]
-	public int chunkResolution = DEFAULT_CHUNK_RESOLUTION;
+    [Tooltip("The radius around the player within which to draw chunks.")]
+    [Range(4, 32)]
+    public int chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
 
-	[Tooltip("The radius around the player within which to draw chunks.")]
-	[Range(4, 32)]
-	public int chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
+    [Tooltip("Mode to generate chunks.")]
+    public ChunkGenerationMode chunkGenerationMode = ChunkGenerationMode.Circular;
 
-	[Tooltip("Mode to generate chunks.")]
-	public ChunkGenerationMode chunkGenerationMode = ChunkGenerationMode.Circular;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Terrain Settings")]
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Terrain Settings")]
+    [Tooltip("Height scale of generated terrain.")]
+    [Range(100f, 1000f)]
+    public float heightScale = DEFAULT_HEIGHT_SCALE;
 
-	[Tooltip("Height scale of generated terrain.")]
-	[Range(100f, 1000f)]
-	public float heightScale = DEFAULT_HEIGHT_SCALE;
+    [Tooltip("The distance from the player at which vertices should update.")]
+    [Range(100f, 1000f)]
+    public float vertexUpdateDistance = DEFAULT_VERTEX_UPDATE_DISTANCE;
 
-	[Tooltip("The distance from the player at which vertices should update.")]
-	[Range(100f, 1000f)]
-	public float vertexUpdateDistance = DEFAULT_VERTEX_UPDATE_DISTANCE;
+    [Tooltip("Material to use for terrain.")]
+    public Material terrainMaterial;
 
-	[Tooltip("Material to use for terrain.")]
-	public Material terrainMaterial;
+    [Tooltip("Material to use when debugging terrain.")]
+    public Material terrainDebugMaterial;
 
-	[Tooltip("Material to use when debugging terrain.")]
-	public Material terrainDebugMaterial;
+    [NonSerialized]
+    public DynamicTerrain terrain;                       // Reference to terrain
 
-	[NonSerialized]
-	public DynamicTerrain terrain;                       // Reference to terrain
+    public Spectrum2 visualization;
 
-	public Spectrum2 visualization;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Physics Settings")]
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Physics Settings")]
+    [Tooltip("Current wind vector.")]
+    public Vector3 wind;
 
-	[Tooltip("Current wind vector.")]
-	public Vector3 wind;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Decoration Settings")]
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Decoration Settings")]
+    [Tooltip("Enable/disable decoration.")]
+    public bool doDecorate = true;
 
-	[Tooltip("Enable/disable decoration.")]
-	public bool doDecorate = true;
+    [SerializeField]
+    [Tooltip("Total max decorations.")]
+    private int maxDecorations;
 
-	[SerializeField]
-	[Tooltip("Total max decorations.")]
-	private int maxDecorations;
+    [SerializeField]
+    [Tooltip("Current number of active decorations")]
+    private int numDecorations;
 
-	[SerializeField]
-	[Tooltip("Current number of active decorations")]
-	private int numDecorations;
+    [Tooltip("Decoration group info for vegetation.")]
+    public Decoration.GroupInfo vegetationGroup;
 
-	[Tooltip("Decoration group info for vegetation.")]
-	public Decoration.GroupInfo vegetationGroup;
+    [Tooltip("Decoration group info for road signs.")]
+    public Decoration.GroupInfo roadSignGroup;
 
-	[Tooltip("Decoration group info for road signs.")]
-	public Decoration.GroupInfo roadSignGroup;
+    [Tooltip("Decoration group info for rocks.")]
+    public Decoration.GroupInfo rockGroup;
 
-	[Tooltip("Decoration group info for rocks.")]
-	public Decoration.GroupInfo rockGroup;
+    [NonSerialized]
+    public List<GameObject> decorations =                // List of all active decorations
+        new List<GameObject>();
 
-	[NonSerialized]
-	public List<GameObject> decorations =                // List of all active decorations
-		new List<GameObject>();
-
-	List<string> decorationPaths = new List<string>() {  // List of load paths for decoration prefabs
+    List<string> decorationPaths = new List<string>() {  // List of load paths for decoration prefabs
 		"Prefabs/Decoration_50mph",
-		"Prefabs/Decoration_50mph45night",
-		"Prefabs/Decoration_65MPH",
-		"Prefabs/Decoration_70MPH",
-		"Prefabs/Decoration_75mph",
-		"Prefabs/Decoration_Agave01",
-		"Prefabs/Decoration_BarrelCactus",
-		"Prefabs/Decoration_Boulder01",
-		"Prefabs/Decoration_Boulder02",
-		"Prefabs/Decoration_Boulder03",
-		"Prefabs/Decoration_Chevron",
-		"Prefabs/Decoration_JoshuaTree01",
-		"Prefabs/Decoration_PassWithCare",
-		"Prefabs/Decoration_Saguaro",
-		"Prefabs/DynamicDecoration_Tumbleweed01"
-	};
-		
-	ObjectPool<Decoration> decorationPool;                           // Decoration pool to use
-	
-	[Tooltip("Current global decoration density.")]
-	[Range(0f,2f)]
-	public float decorationDensity = 1f;
+        "Prefabs/Decoration_50mph45night",
+        "Prefabs/Decoration_65MPH",
+        "Prefabs/Decoration_70MPH",
+        "Prefabs/Decoration_75mph",
+        "Prefabs/Decoration_Agave01",
+        "Prefabs/Decoration_BarrelCactus",
+        "Prefabs/Decoration_Boulder01",
+        "Prefabs/Decoration_Boulder02",
+        "Prefabs/Decoration_Boulder03",
+        "Prefabs/Decoration_Chevron",
+        "Prefabs/Decoration_JoshuaTree01",
+        "Prefabs/Decoration_PassWithCare",
+        "Prefabs/Decoration_Saguaro",
+        "Prefabs/DynamicDecoration_Tumbleweed01"
+    };
 
-	[Tooltip("Mesh to use for grass particles.")]
-	public Mesh grassModel;
+    ObjectPool<Decoration> decorationPool;                           // Decoration pool to use
 
-	[Tooltip("Material to use for vegetation decorations.")]
-	public Material vegetationMaterial;
+    [Tooltip("Current global decoration density.")]
+    [Range(0f, 2f)]
+    public float decorationDensity = 1f;
 
-	[Tooltip("Template to use for grass particle emitters.")]
-	public GameObject grassEmitterTemplate;
+    [Tooltip("Mesh to use for grass particles.")]
+    public Mesh grassModel;
 
-	public ParticleSystem decorationParticleEmitter;
+    [Tooltip("Material to use for vegetation decorations.")]
+    public Material vegetationMaterial;
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Effects Settings")]
+    [Tooltip("Template to use for grass particle emitters.")]
+    public GameObject grassEmitterTemplate;
 
-	[Tooltip("Base intensity of lightning effects.")]
-	[Range(0.5f, 2f)]
-	public float baseLightningIntensity = 1.5f;
+    public ParticleSystem decorationParticleEmitter;
 
-	[Tooltip("GameObject to use for lightning strikes.")]
-	public GameObject lightningStriker;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Effects Settings")]
 
-	[Tooltip("GameObject to use for in-cloud lightning flashes.")]
-	public GameObject lightningFlash;
+    [Tooltip("Base intensity of lightning effects.")]
+    [Range(0.5f, 2f)]
+    public float baseLightningIntensity = 1.5f;
 
-	[Tooltip("Star particle emitter.")]
-	public ParticleSystem starEmitter;
+    [Tooltip("GameObject to use for lightning strikes.")]
+    public GameObject lightningStriker;
 
-	[Tooltip("Natural star emission rate.")]
-	public float starEmissionRate = 6f;
-	
-	[Tooltip("Template to use to instantiate shooting stars.")]
-	public GameObject shootingStarTemplate;
+    [Tooltip("GameObject to use for in-cloud lightning flashes.")]
+    public GameObject lightningFlash;
 
-	[Tooltip("Cloud particle emitter.")]
-	public ParticleSystem cloudEmitter;
+    [Tooltip("Star particle emitter.")]
+    public ParticleSystem starEmitter;
 
-	[Tooltip("Minimum number of cloud particles.")]
-	public float minCloudDensity;
+    [Tooltip("Natural star emission rate.")]
+    public float starEmissionRate = 6f;
 
-	[Tooltip("Maximum number of cloud particles.")]
-	public float maxCloudDensity;
+    [Tooltip("Template to use to instantiate shooting stars.")]
+    public GameObject shootingStarTemplate;
 
-	[SerializeField]
-	int cloudDensity;
+    [Tooltip("Cloud particle emitter.")]
+    public ParticleSystem cloudEmitter;
 
-	[Tooltip("Rain particle emitter.")]
-	public ParticleSystem rainEmitter;
+    [Tooltip("Minimum number of cloud particles.")]
+    public float minCloudDensity;
 
-	[Tooltip("Minimum number of rain particles.")]
-	public float minRainDensity;
+    [Tooltip("Maximum number of cloud particles.")]
+    public float maxCloudDensity;
 
-	[Tooltip("Maximuim number of rain particles.")]
-	public float maxRainDensity;
+    [SerializeField]
+    int cloudDensity;
 
-	[SerializeField]
-	int rainDensity;
+    [Tooltip("Rain particle emitter.")]
+    public ParticleSystem rainEmitter;
 
-	[Tooltip("Number of active shakers.")]
-	public int shakers;
+    [Tooltip("Minimum number of rain particles.")]
+    public float minRainDensity;
 
-	[Tooltip("All car exhaust puff emitters.")]
-	public List<ParticleSystem> exhaustEmitters;
+    [Tooltip("Maximuim number of rain particles.")]
+    public float maxRainDensity;
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Road Settings")]
+    [SerializeField]
+    int rainDensity;
 
-	[Tooltip("Width of generated road.")]
-	[Range(1f, 20f)]
-	public float roadWidth = DEFAULT_ROAD_WIDTH;
+    [Tooltip("Number of active shakers.")]
+    public int shakers;
 
-	[Tooltip("Height of generated road.")]
-	[Range(0.1f, 1.0f)]
-	public float roadHeight = DEFAULT_ROAD_HEIGHT;
+    [Tooltip("All car exhaust puff emitters.")]
+    public List<ParticleSystem> exhaustEmitters;
 
-	[Tooltip("Ratio of top of road to bottom.")]
-	public float roadSlope = DEFAULT_ROAD_SLOPE;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Road Settings")]
 
-	[Tooltip("Number of mesh subdivisions per road segment.")]
-	public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
+    [Tooltip("Width of generated road.")]
+    [Range(1f, 20f)]
+    public float roadWidth = DEFAULT_ROAD_WIDTH;
 
-	[NonSerialized]
-	public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
+    [Tooltip("Height of generated road.")]
+    [Range(0.1f, 1.0f)]
+    public float roadHeight = DEFAULT_ROAD_HEIGHT;
 
-	[NonSerialized]
-	public float roadCleanupRadius;
+    [Tooltip("Ratio of top of road to bottom.")]
+    public float roadSlope = DEFAULT_ROAD_SLOPE;
 
-	[Tooltip("Radius within which to place road.")]
-	public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
+    [Tooltip("Number of mesh subdivisions per road segment.")]
+    public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
-	[Tooltip("Percentage radius of road placement distance within which to place road.")]
-	public float roadVariance = DEFAULT_ROAD_VARIANCE;
+    [NonSerialized]
+    public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
-	[Tooltip("Max road slope per world unit of distance.")]
-	public float roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
+    [NonSerialized]
+    public float roadCleanupRadius;
 
-	[NonSerialized]
-	public Road road;                                    // Road object
+    [Tooltip("Radius within which to place road.")]
+    public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
 
-	[Tooltip("Material to use for road.")]
-	public Material roadMaterial;
+    [Tooltip("Percentage radius of road placement distance within which to place road.")]
+    public float roadVariance = DEFAULT_ROAD_VARIANCE;
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Day/Night Cycle Settings")]
+    [Tooltip("Max road slope per world unit of distance.")]
+    public float roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
 
-	[Tooltip("Global time scale for day/night cycle.")]
-	[Range(0.001f, 0.1f)]
-	public float timeScale = DEFAULT_TIME_SCALE;
+    [NonSerialized]
+    public Road road;                                    // Road object
 
-	[Tooltip("Current time of day.")]
-	[Range(0f, 2f*Mathf.PI)]
-	public float timeOfDay;
+    [Tooltip("Material to use for road.")]
+    public Material roadMaterial;
 
-	public GameObject sun;                               // Sun object
-	Light sunLight;                                      // Sun object's light
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Day/Night Cycle Settings")]
 
-	[Tooltip("Scale to use for the sun.")]
-	public float sunScale;
+    [Tooltip("Global time scale for day/night cycle.")]
+    [Range(0.001f, 0.1f)]
+    public float timeScale = DEFAULT_TIME_SCALE;
 
-	[Tooltip("Daytime intensity of the sun.")]
-	[Range(0f, 8f)]
-	public float maxSunIntensity;
+    [Tooltip("Current time of day.")]
+    [Range(0f, 2f * Mathf.PI)]
+    public float timeOfDay;
 
-	[Tooltip("Nighttime intensity of the sun.")]
-	[Range(0f, 8f)]
-	public float minSunIntensity;
+    public GameObject sun;                               // Sun object
+    Light sunLight;                                      // Sun object's light
 
-	float sunIntensityAxis;                              // Axis of sun intensity oscillation
-	float sunIntensityAmplitude;                         // Amplitude of sun intensity oscillation
-	
-	[Tooltip("Flare texture to use for the sun.")]
-	public Flare sunFlare;
+    [Tooltip("Scale to use for the sun.")]
+    public float sunScale;
 
-	public GameObject moon;                              // Moon object
-	Light moonLight;                                     // Moon object's light
+    [Tooltip("Daytime intensity of the sun.")]
+    [Range(0f, 8f)]
+    public float maxSunIntensity;
 
-	[Tooltip("Scale to use for the moon.")]
-	public float moonScale;
+    [Tooltip("Nighttime intensity of the sun.")]
+    [Range(0f, 8f)]
+    public float minSunIntensity;
 
-	[Tooltip("Nighttime intensity of the moon.")]
-	[Range(0f, 8f)]
-	public float maxMoonIntensity;
+    float sunIntensityAxis;                              // Axis of sun intensity oscillation
+    float sunIntensityAmplitude;                         // Amplitude of sun intensity oscillation
 
-	[Tooltip("Daytime intensity of the moon.")]
-	[Range(0f, 8f)]
-	public float minMoonIntensity;
+    [Tooltip("Flare texture to use for the sun.")]
+    public Flare sunFlare;
 
-	float moonIntensityAxis;                             // Axis of moon intensity oscillation
-	float moonIntensityAmplitude;                        // Amplitude of moon intensity oscillation
+    public GameObject moon;                              // Moon object
+    Light moonLight;                                     // Moon object's light
 
-	[Tooltip("Sprites to randomize for the moon.")]
-	public List<Sprite> moonSprites;
+    [Tooltip("Scale to use for the moon.")]
+    public float moonScale;
 
-	[Tooltip("Current primary color.")]
-	[SerializeField]
-	private Color primaryColor;
+    [Tooltip("Nighttime intensity of the moon.")]
+    [Range(0f, 8f)]
+    public float maxMoonIntensity;
 
-	[Tooltip("Current secondary color.")]
-	[SerializeField]
-	private Color secondaryColor;
+    [Tooltip("Daytime intensity of the moon.")]
+    [Range(0f, 8f)]
+    public float minMoonIntensity;
 
-	[Tooltip("Primary color cycle.")]
-	public Gradient primaryColors;
+    float moonIntensityAxis;                             // Axis of moon intensity oscillation
+    float moonIntensityAmplitude;                        // Amplitude of moon intensity oscillation
 
-	[Tooltip("Secondary color cycle.")]
-	public Gradient secondaryColors;
+    [Tooltip("Sprites to randomize for the moon.")]
+    public List<Sprite> moonSprites;
 
-	[Tooltip("Skybox transition cycle.")]
-	public Gradient skyboxFade;
+    [Tooltip("Current primary color.")]
+    [SerializeField]
+    private Color primaryColor;
 
-	//-----------------------------------------------------------------------------------------------------------------
-	[Header("Performance Settings")]
+    [Tooltip("Current secondary color.")]
+    [SerializeField]
+    private Color secondaryColor;
 
-	[Tooltip("Maximum number of chunk updates per cycle.")]
-	[Range(1,16)]
-	public int chunkUpdatesPerCycle = DEFAULT_CHUNK_UPDATES_PER_CYCLE;
+    [Tooltip("Primary color cycle.")]
+    public Gradient primaryColors;
 
-	[Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
-	public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
+    [Tooltip("Secondary color cycle.")]
+    public Gradient secondaryColors;
 
-	LineRenderer visualizer;                                // Frequency visualizer
+    [Tooltip("Skybox transition cycle.")]
+    public Gradient skyboxFade;
 
-	[Tooltip("FFT window to use when sampling music frequencies.")]
-	public FFTWindow freqFFTWindow;
+    //-----------------------------------------------------------------------------------------------------------------
+    [Header("Performance Settings")]
 
-	[Tooltip("Maximum number of decorations to place per update cycle.")]
-	[Range(10, 200)]
-	public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
+    [Tooltip("Maximum number of chunk updates per cycle.")]
+    [Range(1, 16)]
+    public int chunkUpdatesPerCycle = DEFAULT_CHUNK_UPDATES_PER_CYCLE;
 
-	[Tooltip("Maximum number of grass particles to place per chunk.")]
-	[Range(0,100)]
-	public int grassPerChunk;
+    [Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
+    public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
 
-	[Tooltip("The accuracy used in road distance checks.")]
-	[Range(1f, 500f)]
-	public float roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
+    LineRenderer visualizer;                                // Frequency visualizer
 
-	float startLoadTime;
-	bool loaded = false;
-	public bool loadedTerrain = false;
-	bool hasRandomized = false;
+    [Tooltip("FFT window to use when sampling music frequencies.")]
+    public FFTWindow freqFFTWindow;
 
-	#endregion
-	#region Unity Callbacks
+    [Tooltip("Maximum number of decorations to place per update cycle.")]
+    [Range(10, 200)]
+    public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
 
-	new void Awake () {
-		base.Awake();
+    [Tooltip("Maximum number of grass particles to place per chunk.")]
+    [Range(0, 100)]
+    public int grassPerChunk;
 
-		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
-		//Debug.Log(maxDecorations);
+    [Tooltip("The accuracy used in road distance checks.")]
+    [Range(1f, 500f)]
+    public float roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
 
-		terrain = new GameObject ("Terrain",
-			typeof(DynamicTerrain)
-		).GetComponent<DynamicTerrain> ();
-		wind = UnityEngine.Random.insideUnitSphere;
+    float startLoadTime;
+    bool loaded = false;
+    public bool loadedTerrain = false;
+    bool hasRandomized = false;
 
-		visualization.enabled = false;
+    #endregion
+    #region Unity Callbacks
 
-		//roadPlacementDistance = chunkSize * 2f;
-		roadCleanupRadius = chunkSize * (chunkLoadRadius);
-		roadPlacementDistance = chunkSize * 0.4f;
-		roadExtendRadius = chunkSize * (chunkLoadRadius/2);
-		road = CreateRoad();
+    new void Awake() {
+        base.Awake();
 
-		numDecorations = 0;
-		decorationPool = new ObjectPool<Decoration>();
+        maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
+        //Debug.Log(maxDecorations);
 
-		timeOfDay = UnityEngine.Random.Range(0, 2*Mathf.PI);
-		CreateSun();
-		sunLight = sun.Light();
-		sunIntensityAmplitude = (maxSunIntensity-minSunIntensity)/2f;
-		sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
+        terrain = new GameObject("Terrain",
+            typeof(DynamicTerrain)
+        ).GetComponent<DynamicTerrain>();
+        wind = UnityEngine.Random.insideUnitSphere;
 
-		CreateMoon();
-		moonLight = moon.Light();
-		moonIntensityAmplitude = (maxMoonIntensity-maxMoonIntensity)/2f;
-		moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
+        visualization.enabled = false;
 
-		//RenderSettings.ambientMode = AmbientMode.Flat;
-		//RenderSettings.ambientIntensity = 0.5f;
+        //roadPlacementDistance = chunkSize * 2f;
+        roadCleanupRadius = chunkSize * (chunkLoadRadius);
+        roadPlacementDistance = chunkSize * 0.4f;
+        roadExtendRadius = chunkSize * (chunkLoadRadius / 2);
+        road = CreateRoad();
 
-		lightningStriker.SetActive(false);
-		rainEmitter.SetRate(0f);
-		shootingStarTemplate.SetActive(false);
+        numDecorations = 0;
+        decorationPool = new ObjectPool<Decoration>();
 
-		terrainMaterial.SetFloat("_WaveProgress", 1f);
-	}
+        timeOfDay = UnityEngine.Random.Range(0, 2 * Mathf.PI);
+        CreateSun();
+        sunLight = sun.Light();
+        sunIntensityAmplitude = (maxSunIntensity - minSunIntensity) / 2f;
+        sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
 
-	void Start () {
-		loadsToDo = chunkLoadRadius * chunkLoadRadius + 
-			(doDecorate ? maxDecorations + decorationPaths.Count : 0) +
-			terrain.loadsToDo;
-	}
+        CreateMoon();
+        moonLight = moon.Light();
+        moonIntensityAmplitude = (maxMoonIntensity - maxMoonIntensity) / 2f;
+        moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
 
-	// Update is called once per frame
-	void Update () {
-		if (loadedTerrain && !hasRandomized) 
-			Load();
-		if (loaded && road.loaded) {
+        //RenderSettings.ambientMode = AmbientMode.Flat;
+        //RenderSettings.ambientIntensity = 0.5f;
 
-			//terrain.Update(freqDataArray);
-			UpdateTime();
-			UpdateColor();
-			if (doDecorate) {
-				AttemptDecorate();
-				Vector3 dWind = UnityEngine.Random.insideUnitSphere;
-				wind += dWind * Time.deltaTime;
-				wind.Normalize();
-			}
-			
-			float cd = shakers / (Riff.MAX_BEATS * 4f);
-			cloudDensity = Mathf.FloorToInt(minCloudDensity + cd * (maxCloudDensity - minCloudDensity));
-			cloudEmitter.maxParticles = cloudDensity;
+        lightningStriker.SetActive(false);
+        rainEmitter.SetRate(0f);
+        shootingStarTemplate.SetActive(false);
 
-			float rd = shakers / (Riff.MAX_BEATS * 2f);
-			rainDensity = Mathf.FloorToInt(minRainDensity + rd * (maxRainDensity - minRainDensity));
-			rainEmitter.SetRate(rainDensity);
+        terrainMaterial.SetFloat("_WaveProgress", 1f);
+    }
 
-			starEmitter.SetRate(0.5f*starEmissionRate*-Mathf.Sin(timeOfDay)+starEmissionRate/2f);
-		}
+    void Start() {
+        loadsToDo = chunkLoadRadius * chunkLoadRadius +
+            (doDecorate ? maxDecorations + decorationPaths.Count : 0) +
+            terrain.loadsToDo;
+    }
 
-	}
+    // Update is called once per frame
+    void Update() {
+        if (loadedTerrain && !hasRandomized)
+            Load();
+        if (loaded && road.loaded) {
 
-	#endregion
-	#region WorldManager Methods
+            //terrain.Update(freqDataArray);
+            UpdateTime();
+            UpdateColor();
+            if (doDecorate) {
+                AttemptDecorate();
+                Vector3 dWind = UnityEngine.Random.insideUnitSphere;
+                wind += dWind * Time.deltaTime;
+                wind.Normalize();
+            }
 
-	public void Load () {
+            float cd = shakers / (Riff.MAX_BEATS * 4f);
+            cloudDensity = Mathf.FloorToInt(minCloudDensity + cd * (maxCloudDensity - minCloudDensity));
+            cloudEmitter.maxParticles = cloudDensity;
 
-		Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
+            float rd = shakers / (Riff.MAX_BEATS * 2f);
+            rainDensity = Mathf.FloorToInt(minRainDensity + rd * (maxRainDensity - minRainDensity));
+            rainEmitter.SetRate(rainDensity);
 
-		// Get start time
-		startLoadTime = Time.realtimeSinceStartup;
+            starEmitter.SetRate(0.5f * starEmissionRate * -Mathf.Sin(timeOfDay) + starEmissionRate / 2f);
+        }
 
-		// Start by loading chunks
-		terrain.DoLoadChunks();
-	}
+    }
 
-	public void FinishLoading() {
+    #endregion
+    #region WorldManager Methods
 
-		loaded = true;
+    public void Load() {
 
-		// Print time taken
-		Debug.Log("WorldManager.Load(): finished in "+(Time.realtimeSinceStartup-startLoadTime).ToString("0.0000")+" seconds.");
+        Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 
-		visualization.enabled = true;
+        // Get start time
+        startLoadTime = Time.realtimeSinceStartup;
 
-		// Call GameManager to finish loading
-		GameManager.instance.FinishLoading();
-	}
-	public void DoLoadRoad () {
-		road.DoLoad();
-	}
+        // Start by loading chunks
+        terrain.DoLoadChunks();
+    }
 
-	public void DoLoadDecorations () {
-		StartCoroutine("LoadDecorations");
-	}
+    public void FinishLoading() {
 
-	IEnumerator LoadDecorations () {
-		GameManager.instance.ChangeLoadingMessage("Loading decorations...");
-		float startTime = Time.realtimeSinceStartup;
-		int numLoaded = 0;
+        loaded = true;
 
-		foreach (string path in decorationPaths) {
-			LoadDecoration (path);
-			numLoaded++;
+        // Print time taken
+        Debug.Log("WorldManager.Load(): finished in " + (Time.realtimeSinceStartup - startLoadTime).ToString("0.0000") + " seconds.");
 
-			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-				yield return null;
-				startTime = Time.realtimeSinceStartup;
-				GameManager.instance.ReportLoaded(numLoaded);
-				numLoaded = 0;
-			}
-		}
+        visualization.enabled = true;
 
-		if (decorations.Count == decorationPaths.Count)
-			DoDecoration();
-		yield return null;
-	}
-
-	public void DoDecoration () {
-		StartCoroutine("DecorationLoop");
-	}
-
-	IEnumerator DecorationLoop () {
-
-		List<string> loadMessages = new List<string>() {
-			"Planting cacti...",
-			"Placing doodads...",
-			"Landscaping...",
-		};
-
-		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
-		float startTime = Time.realtimeSinceStartup;
-		int numLoaded = 0;
-
-		while (true) {
-			if (numDecorations < maxDecorations) {
-				numLoaded += (AttemptDecorate () ? 1 : 0);
-
-				if (numDecorations == maxDecorations && !loaded) {
-					FinishLoading();
-					yield return null;
-				}
-
-				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
-					yield return null;
-					startTime = Time.realtimeSinceStartup;
-					if (!loaded) GameManager.instance.ReportLoaded(numLoaded);
-					numLoaded = 0;
-				}
-
-			} else {
-				yield return null;
-			}
-
-	
-		}
-			
-	}
-		
-	void UpdateColor() {
-		
-		float progress = timeOfDay/(Mathf.PI*2f);
-
-		primaryColor = primaryColors.Evaluate(progress);
-		secondaryColor = secondaryColors.Evaluate(progress);
-
-		sunLight.intensity = sunIntensityAxis + sunIntensityAmplitude * Mathf.Sin (timeOfDay);
-		sunLight.color = primaryColor;
-		sun.GetComponent<Sun>().shadowCaster.intensity = sunLight.intensity/2f;
-		sun.GetComponent<Sun>().shadowCaster.color = sunLight.color;
-
-		moonLight.color = Color.white;
-		moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay-(Mathf.PI/2f));
-		moon.GetComponent<Moon>().shadowCaster.intensity = moonLight.intensity/4f;
-		moon.GetComponent<Moon>().shadowCaster.color = moonLight.color;
-
-		RenderSettings.fogColor = secondaryColor;
-		RenderSettings.ambientLight = secondaryColor;
-
-		RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
-
-		if (Spectrum2.instance != null) {
-
-			if (visualizer == null) visualizer = Spectrum2.instance.GetComponent<LineRenderer>();
-
-			Color temp = primaryColor;
-			temp.a = Spectrum2.instance.opacity;
-
-			visualizer.SetColors (temp, temp);
-			visualizer.material.color = temp;
-		}
-	}
-
-	private void UpdateTime() {
-		timeOfDay += timeScale * Time.deltaTime;
-		while (timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
-			timeOfDay -= 2 * Mathf.PI;
-		}
-	}
-    
-	bool AttemptDecorate () {
-
-		// Pick a random decoration and decorate with it
-		GameObject decoration;
-		bool createNew = false;
-		if (decorationPool.Empty) {
-			decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
-			createNew = true;
-		} else decoration = decorationPool.Peek().gameObject;
-
-		//if (!createNew) Debug.Log("old");
-	
-		Decoration deco = decoration.GetComponent<Decoration>();
-	
-		int numActive = 0;
-		int maxActive = 0;
-		switch (deco.group) {
-		case Decoration.Group.RoadSigns:
-			numActive = roadSignGroup.numActive;
-			maxActive = roadSignGroup.maxActive;
-			break;
-		case Decoration.Group.Rocks:
-			numActive = rockGroup.numActive;
-			maxActive = rockGroup.maxActive;
-			break;
-		case Decoration.Group.Vegetation:
-			numActive = vegetationGroup.numActive;
-			maxActive = vegetationGroup.maxActive;
-			break;
-		}
-		if (numActive < maxActive) {
-			switch (deco.distribution) {
-			case Decoration.Distribution.Random:
-				Chunk chunk = terrain.RandomChunk ();
-				if (chunk == null) return false;
-				return DecorateRandom (chunk, decoration, createNew);
-			case Decoration.Distribution.Roadside:
-				float bezierProg = UnityEngine.Random.Range (PlayerMovement.instance.progress, 1f);
-				return DecorateRoadside (bezierProg, decoration, createNew);
-			case Decoration.Distribution.CloseToRoad:
-				Chunk chunk2 = terrain.RandomCloseToRoadChunk();
-				if (chunk2 == null) return false;
-				return DecorateRandom (chunk2, decoration, createNew);
-			}
-		}
-	
-		return false;
-	}
-    
-	/*GameObject CreateSun(){
+        // Call GameManager to finish loading
+        GameManager.Instance.FinishLoading();
+    }
+    public void DoLoadRoad() {
+        road.DoLoad();
+    }
+
+    public void DoLoadDecorations() {
+        StartCoroutine("LoadDecorations");
+    }
+
+    IEnumerator LoadDecorations() {
+        LoadingScreen.Instance.SetLoadingMessage("Loading decorations...");
+        float startTime = Time.realtimeSinceStartup;
+        int numLoaded = 0;
+
+        foreach (string path in decorationPaths) {
+            LoadDecoration(path);
+            numLoaded++;
+
+            if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
+                yield return null;
+                startTime = Time.realtimeSinceStartup;
+                GameManager.Instance.ReportLoaded(numLoaded);
+                numLoaded = 0;
+            }
+        }
+
+        if (decorations.Count == decorationPaths.Count)
+            DoDecoration();
+        yield return null;
+    }
+
+    public void DoDecoration() {
+        StartCoroutine("DecorationLoop");
+    }
+
+    IEnumerator DecorationLoop() {
+
+        List<string> loadMessages = new List<string>() {
+            "Planting cacti...",
+            "Placing doodads...",
+            "Landscaping...",
+        };
+
+        LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
+        float startTime = Time.realtimeSinceStartup;
+        int numLoaded = 0;
+
+        while (true) {
+            if (numDecorations < maxDecorations) {
+                numLoaded += (AttemptDecorate() ? 1 : 0);
+
+                if (numDecorations == maxDecorations && !loaded) {
+                    FinishLoading();
+                    yield return null;
+                }
+
+                if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
+                    yield return null;
+                    startTime = Time.realtimeSinceStartup;
+                    if (!loaded) GameManager.Instance.ReportLoaded(numLoaded);
+                    numLoaded = 0;
+                }
+
+            }
+            else {
+                yield return null;
+            }
+
+
+        }
+
+    }
+
+    void UpdateColor() {
+
+        float progress = timeOfDay / (Mathf.PI * 2f);
+
+        primaryColor = primaryColors.Evaluate(progress);
+        secondaryColor = secondaryColors.Evaluate(progress);
+
+        sunLight.intensity = sunIntensityAxis + sunIntensityAmplitude * Mathf.Sin(timeOfDay);
+        sunLight.color = primaryColor;
+        sun.GetComponent<Sun>().shadowCaster.intensity = sunLight.intensity / 2f;
+        sun.GetComponent<Sun>().shadowCaster.color = sunLight.color;
+
+        moonLight.color = Color.white;
+        moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay - (Mathf.PI / 2f));
+        moon.GetComponent<Moon>().shadowCaster.intensity = moonLight.intensity / 4f;
+        moon.GetComponent<Moon>().shadowCaster.color = moonLight.color;
+
+        RenderSettings.fogColor = secondaryColor;
+        RenderSettings.ambientLight = secondaryColor;
+
+        RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
+
+        if (Spectrum2.Instance != null) {
+
+            if (visualizer == null) visualizer = Spectrum2.Instance.GetComponent<LineRenderer>();
+
+            Color temp = primaryColor;
+            temp.a = Spectrum2.Instance.opacity;
+
+            visualizer.SetColors(temp, temp);
+            visualizer.material.color = temp;
+        }
+    }
+
+    private void UpdateTime() {
+        timeOfDay += timeScale * Time.deltaTime;
+        while (timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
+            timeOfDay -= 2 * Mathf.PI;
+        }
+    }
+
+    bool AttemptDecorate() {
+
+        // Pick a random decoration and decorate with it
+        GameObject decoration;
+        bool createNew = false;
+        if (decorationPool.Empty) {
+            decoration = decorations[UnityEngine.Random.Range(0, decorations.Count)];
+            createNew = true;
+        }
+        else decoration = decorationPool.Peek().gameObject;
+
+        //if (!createNew) Debug.Log("old");
+
+        Decoration deco = decoration.GetComponent<Decoration>();
+
+        int numActive = 0;
+        int maxActive = 0;
+        switch (deco.group) {
+            case Decoration.Group.RoadSigns:
+                numActive = roadSignGroup.numActive;
+                maxActive = roadSignGroup.maxActive;
+                break;
+            case Decoration.Group.Rocks:
+                numActive = rockGroup.numActive;
+                maxActive = rockGroup.maxActive;
+                break;
+            case Decoration.Group.Vegetation:
+                numActive = vegetationGroup.numActive;
+                maxActive = vegetationGroup.maxActive;
+                break;
+        }
+        if (numActive < maxActive) {
+            switch (deco.distribution) {
+                case Decoration.Distribution.Random:
+                    Chunk chunk = terrain.RandomChunk();
+                    if (chunk == null) return false;
+                    return DecorateRandom(chunk, decoration, createNew);
+                case Decoration.Distribution.Roadside:
+                    float bezierProg = UnityEngine.Random.Range(PlayerMovement.Instance.progress, 1f);
+                    return DecorateRoadside(bezierProg, decoration, createNew);
+                case Decoration.Distribution.CloseToRoad:
+                    Chunk chunk2 = terrain.RandomCloseToRoadChunk();
+                    if (chunk2 == null) return false;
+                    return DecorateRandom(chunk2, decoration, createNew);
+            }
+        }
+
+        return false;
+    }
+
+    /*GameObject CreateSun(){
 		GameObject sun = new GameObject ("Sun",
 			typeof (Light),
 			typeof (Sun),
@@ -647,16 +650,16 @@ public class WorldManager : SingletonMonoBehaviour<WorldManager> {
 		return sun;
 	}*/
 
-	void CreateSun () {
+    void CreateSun() {
 
-	}
+    }
 
-	void CreateMoon () {
-		moon.GetComponent<SpriteRenderer>().sprite = 
-			moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
-	}
+    void CreateMoon() {
+        moon.GetComponent<SpriteRenderer>().sprite =
+            moonSprites[UnityEngine.Random.Range(0, moonSprites.Count)];
+    }
 
-	/*GameObject CreateMoon(){
+    /*GameObject CreateMoon(){
 		GameObject moon = new GameObject ("Moon",
 			typeof (Light),
 			typeof (Moon),
@@ -672,340 +675,344 @@ public class WorldManager : SingletonMonoBehaviour<WorldManager> {
 		return  moon;
 	}*/
 
-	Road CreateRoad() {
-
-		// Create road object
-		GameObject roadObj = new GameObject ("Road",
-			typeof (MeshFilter),
-			typeof (MeshRenderer),
-			typeof (Road)
-		);
-
-		// Change renderer properties
-		MeshRenderer roadRenderer = roadObj.GetComponent<MeshRenderer>();
-		roadRenderer.sharedMaterial = roadMaterial;
-		roadRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
-
-		// Pass on road properties
-		Road rd = roadObj.GetComponent<Road>();
-		rd.width = roadWidth;
-		rd.height = roadHeight;
-
-		return rd;
-	}
-
-	bool DecorateRandom (Chunk chunk, GameObject decorationPrefab, bool createNew) {
-		if (chunk == null) {
-			Debug.LogError("WorldManager.DecorateRandom(): invalid chunk!");
-			return false;
-		}
-
-		//if (!createNew) Debug.Log("old");
-
-		// Pick a random coordinate
-		Vector2 coordinate = new Vector2 (
-			chunk.x*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f),
-			chunk.y*chunkSize+UnityEngine.Random.Range(-chunkSize/2f, chunkSize/2f)
-		);
-
-		// Find nearest vertex
-		IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
-		Vertex vert = terrain.vertexmap.VertexAt (nearestVertex);
-		if (vert == null) {
-			Debug.LogError ("WorldManager.DecorateRandom(): picked nonexistent vertex at " + nearestVertex.ToString ());
-			return false;
-		}
-
-		// Check if constrained
-		if (terrain.vertexmap.VertexAt(nearestVertex).noDecorations) {
-			//Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
-			return false;
-		}
-
-		// Roll based on density
-		float density = decorationPrefab.GetComponent<Decoration>().density;
-		float spawnThreshold = density / terrain.NumActiveChunks * decorationDensity;
-
-		// If roll succeeded
-		if (!createNew || Mathf.PerlinNoise (coordinate.x, coordinate.y) < spawnThreshold) {
-
-			// Instantiate or grab object
-			GameObject decoration;
-			if (createNew) decoration = (GameObject)Instantiate(decorationPrefab);
-			else decoration = decorationPool.Get().gameObject;
-			Decoration deco = decoration.GetComponent<Decoration>();
-
-			// Raycast down 
-			RaycastHit hit;
-			float y;
-			Vector3 rayOrigin = new Vector3 (coordinate.x, heightScale, coordinate.y);
-			if (Physics.Raycast(rayOrigin, Vector3.down,out hit, Mathf.Infinity)) y = hit.point.y;
-			else y = 0f;
-
-			// Transform decoration
-			decoration.transform.position = new Vector3 (coordinate.x, y, coordinate.y);
-
-			// Parent decoration to chunk (if not dynamic)
-			if (deco.dynamic) decoration.transform.parent = terrain.transform;
-			else {
-				decoration.transform.parent = chunk.gameObject.transform;
-				chunk.decorations.Add(decoration);
-			}
-
-			// Register decoration
-			numDecorations++;
-			terrain.vertexmap.RegisterDecoration (nearestVertex, decoration);
-			switch (deco.group) {
-			case Decoration.Group.Rocks:
-				rockGroup.numActive++;
-				break;
-			case Decoration.Group.Vegetation:
-				vegetationGroup.numActive++;
-				break;
-			}
-
-
-			decorationParticleEmitter.transform.position = decoration.transform.position;
-			//ParticleSystem.EmitParams emitOverride = new ParticleSystem.EmitParams();
-			//emitOverride.position = decoration.transform.position;
-			//decorationParticleEmitter.Emit(emitOverride, 5);
-			decorationParticleEmitter.Emit(5);
-				
-			return true;
-		}
-
-		return false;
-	}
-
-	bool DecorateRoadside (float prog, GameObject decorationPrefab, bool createNew) {
-
-		// Get road point
-		Vector3 point = road.GetPoint(prog);
-
-		// Pick a road side
-		int side = UnityEngine.Random.Range (0, 2); // 0 = player side, 1 = other side
-
-		// Calculate coordinate
-		Vector3 coordinate = point + road.BezRight(point) * 
-			roadWidth * UnityEngine.Random.Range(1.5f, 1.6f) * (side == 0 ? 1 : -1);
-
-		// Find nearest chunk
-		int chunkX = Mathf.RoundToInt((coordinate.x-chunkSize/2f)/chunkSize);
-		int chunkY = Mathf.RoundToInt((coordinate.z-chunkSize/2f)/chunkSize);
-		Chunk chunk = terrain.ChunkAt(chunkX,chunkY);
-
-		if (chunk == null) return false;
-
-		// Raycast down
-		RaycastHit hit;
-		Vector3 rayOrigin = new Vector3 (coordinate.x, heightScale, coordinate.y);
-		if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity)) coordinate.y = hit.point.y;
-		else coordinate.y = 0f;
-
-		// Instantiate or grab decoration
-		GameObject decoration;
-		if (createNew) decoration = 
-			(GameObject)Instantiate(decorationPrefab, coordinate, Quaternion.Euler(Vector3.zero));
-		else decoration = decorationPool.Get().gameObject;
-
-		// Randomize
-		Decoration deco = decoration.GetComponent<Decoration>();
-		deco.Randomize();
-
-		// Point decoration in road direction
-		Vector3 target = coordinate + road.GetVelocity(prog);
-		decoration.transform.LookAt (target, Vector3.up);
-		decoration.transform.Rotate(-90f, side == 1 ? 180f : 0f, 0f);
-
-		// Parent to nearest chunk
-		decoration.transform.parent = chunk.gameObject.transform;
-		chunk.decorations.Add(decoration);
-
-		// Register
-		numDecorations++;
-		if (deco.group == Decoration.Group.RoadSigns) roadSignGroup.numActive++;
-
-		return true;
-	}
-
-	void LoadDecoration (string path) {
-		GameObject decoration = (GameObject) Resources.Load(path);
-		if (decoration == null) {
-			Debug.LogError ("Failed to load decoration at "+path);
-		} else {
-			//Debug.Log("Loaded "+path);
-			decorations.Add(decoration);
-			//GameManager.instance.IncrementLoadProgress();
-		}
-	}
-
-	public void RemoveDecoration (GameObject deco) {
-		Decoration d = deco.GetComponent<Decoration>();
-
-		// Deparent decoration
-		deco.transform.parent = null;
-
-
-		// Deregister
-		switch (d.group) {
-		case Decoration.Group.RoadSigns:
-			roadSignGroup.numActive--;
-			break;
-		case Decoration.Group.Rocks:
-			rockGroup.numActive--;
-			break;
-		case Decoration.Group.Vegetation:
-			vegetationGroup.numActive--;
-			break;
-		}
-		numDecorations--;
-
-		// Pool decoration
-		decorationPool.Add(d);
-	}
-
-	/// <summary>
-	/// Creates a lightning strike at a random point in view.
-	/// </summary>
-	public void LightningStrike (float strength) {
-
-		// Find camera forward direction (flat)
-		Vector3 forward = Camera.main.transform.forward;
-		forward.y = 0f;
-		forward.Normalize();
-
-		// Define an offset
-		Vector2 r = UnityEngine.Random.insideUnitCircle;
-		Vector3 offset = new Vector3 (400f*r.x, 250f, 400f*r.y);
-
-		// Pick a point
-		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
-			vertexUpdateDistance + offset;
-
-		// Play sound
-		// TODO
-
-		// Enable lightning striker and move to point
-		lightningStriker.SetActive(true);
-		lightningStriker.transform.position = origin;
-		lightningStriker.Light().intensity = baseLightningIntensity*strength;
-	}
-
-	/// <summary>
-	/// Creates a lightning flash within the clouds.
-	/// </summary>
-	/// <param name="strength">Strength.</param>
-	public void LightningFlash (float strength) {
-
-		// Find camera forward direction (flat)
-		Vector3 forward = Camera.main.transform.forward;
-		forward.y = 0f;
-		forward.Normalize();
-
-		// Define an offset
-		Vector2 r = UnityEngine.Random.insideUnitCircle;
-		Vector3 offset = new Vector3 (800f*r.x, 800f, 800f*r.y);
-
-		// Pick a point
-		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(1.9f, 2.1f) *
-			vertexUpdateDistance + offset;
-
-		// Play sound
-		// TODO
-
-		// Enable lightning flash and move to point
-		lightningFlash.SetActive(true);
-		lightningFlash.transform.position = origin;
-		lightningFlash.Light().intensity = baseLightningIntensity*strength;
-	}
-
-	public void StarBurst () {
-		starEmitter.Emit(UnityEngine.Random.Range(10,20));
-	}
-
-	public void ExhaustPuff () {
-		foreach (ParticleSystem sys in exhaustEmitters) sys.Emit(1);
-	}
-
-	public void ShootingStar () {
-
-		// Find camera forward direction (flat)
-		Vector3 forward = Camera.main.transform.forward;
-		forward.y = 0f;
-		forward.Normalize();
-
-		// Define an offset
-		Vector2 r = UnityEngine.Random.insideUnitCircle;
-		Vector3 offset = new Vector3 (1000f*r.x, 600f, 1000f*r.y);
-
-		// Pick a point
-		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(2.9f, 3.1f) *
-			vertexUpdateDistance + offset;
-		
-		GameObject shootingStar = (GameObject)Instantiate(shootingStarTemplate, origin, Quaternion.identity);
-		shootingStar.SetActive(true);
-	}
-
-	public void DeformRandom () {
-		// Find camera forward direction (flat)
-		Vector3 forward = Camera.main.transform.forward;
-		forward.y = 0f;
-		forward.Normalize();
-
-		// Define an offset
-		Vector2 r = UnityEngine.Random.insideUnitCircle;
-		Vector3 offset = new Vector3 (400f*r.x, 0f, 400f*r.y);
-
-		// Pick a point
-		Vector3 origin = PlayerMovement.instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
-			vertexUpdateDistance + offset;
-
-		IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
-		Vertex v = terrain.vertexmap.VertexAt(coords);
-		if (v == null) v = terrain.vertexmap.AddVertex (coords);
-		if (!v.locked && !v.nearRoad) v.SmoothHeight (v.height + heightScale/32f, 0.95f);
-
-		//Debug.Log(v.ToString());
-	}
-
-    public void ShowWeatherEffect (Note note) {
-        // If snare, cause lightning strike
-                                        if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
-
-                                        // If kick or tom, cause lightning flash
-                                        else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
-                                        else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
-
-                                        // If shaker, increase rain density
-                                        else if (note.IsShaker()) WorldManager.instance.shakers++;
-
-                                        // If hat, create stars
-                                        else if (note.IsHat()) WorldManager.instance.StarBurst();
-
-                                        // If cymbal, create shooting star
-                                        else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
-
-                                        // If wood, create exhaust puff
-                                        else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+    Road CreateRoad() {
+
+        // Create road object
+        GameObject roadObj = new GameObject("Road",
+            typeof(MeshFilter),
+            typeof(MeshRenderer),
+            typeof(Road)
+        );
+
+        // Change renderer properties
+        MeshRenderer roadRenderer = roadObj.GetComponent<MeshRenderer>();
+        roadRenderer.sharedMaterial = roadMaterial;
+        roadRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+
+        // Pass on road properties
+        Road rd = roadObj.GetComponent<Road>();
+        rd.width = roadWidth;
+        rd.height = roadHeight;
+
+        return rd;
     }
 
-	public void DebugTerrain () {
-		terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
-	}
+    bool DecorateRandom(Chunk chunk, GameObject decorationPrefab, bool createNew) {
+        if (chunk == null) {
+            Debug.LogError("WorldManager.DecorateRandom(): invalid chunk!");
+            return false;
+        }
 
-	public void PrintVertexMap () {
-		VertexMap vmap = terrain.vertexmap;
-		string log = "";
-		for (int i = vmap.xMin; i <= vmap.xMax; i++) {
-			for (int j = vmap.yMin; j <= vmap.yMax; j++) {
-				Vertex vert = vmap.VertexAt(i, j);
-				log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
-			}
-			log += "\n";
-		}
-		System.IO.File.WriteAllText(Application.persistentDataPath + "/vmap.txt", log);
-	}
+        //if (!createNew) Debug.Log("old");
 
-	#endregion
+        // Pick a random coordinate
+        Vector2 coordinate = new Vector2(
+            chunk.x * chunkSize + UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f),
+            chunk.y * chunkSize + UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f)
+        );
+
+        // Find nearest vertex
+        IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
+        Vertex vert = terrain.vertexmap.VertexAt(nearestVertex);
+        if (vert == null) {
+            Debug.LogError("WorldManager.DecorateRandom(): picked nonexistent vertex at " + nearestVertex.ToString());
+            return false;
+        }
+
+        // Check if constrained
+        if (terrain.vertexmap.VertexAt(nearestVertex).noDecorations) {
+            //Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
+            return false;
+        }
+
+        // Roll based on density
+        float density = decorationPrefab.GetComponent<Decoration>().density;
+        float spawnThreshold = density / terrain.NumActiveChunks * decorationDensity;
+
+        // If roll succeeded
+        if (!createNew || Mathf.PerlinNoise(coordinate.x, coordinate.y) < spawnThreshold) {
+
+            // Instantiate or grab object
+            GameObject decoration;
+            if (createNew) decoration = (GameObject)Instantiate(decorationPrefab);
+            else decoration = decorationPool.Get().gameObject;
+            Decoration deco = decoration.GetComponent<Decoration>();
+
+            // Raycast down 
+            RaycastHit hit;
+            float y;
+            Vector3 rayOrigin = new Vector3(coordinate.x, heightScale, coordinate.y);
+            if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity)) y = hit.point.y;
+            else y = 0f;
+
+            // Transform decoration
+            decoration.transform.position = new Vector3(coordinate.x, y, coordinate.y);
+
+            // Parent decoration to chunk (if not dynamic)
+            if (deco.dynamic) decoration.transform.parent = terrain.transform;
+            else {
+                decoration.transform.parent = chunk.gameObject.transform;
+                chunk.decorations.Add(decoration);
+            }
+
+            // Register decoration
+            numDecorations++;
+            terrain.vertexmap.RegisterDecoration(nearestVertex, decoration);
+            switch (deco.group) {
+                case Decoration.Group.Rocks:
+                    rockGroup.numActive++;
+                    break;
+                case Decoration.Group.Vegetation:
+                    vegetationGroup.numActive++;
+                    break;
+            }
+
+
+            decorationParticleEmitter.transform.position = decoration.transform.position;
+            //ParticleSystem.EmitParams emitOverride = new ParticleSystem.EmitParams();
+            //emitOverride.position = decoration.transform.position;
+            //decorationParticleEmitter.Emit(emitOverride, 5);
+            decorationParticleEmitter.Emit(5);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool DecorateRoadside(float prog, GameObject decorationPrefab, bool createNew) {
+
+        // Get road point
+        Vector3 point = road.GetPoint(prog);
+
+        // Pick a road side
+        int side = UnityEngine.Random.Range(0, 2); // 0 = player side, 1 = other side
+
+        // Calculate coordinate
+        Vector3 coordinate = point + road.BezRight(point) *
+            roadWidth * UnityEngine.Random.Range(1.5f, 1.6f) * (side == 0 ? 1 : -1);
+
+        // Find nearest chunk
+        int chunkX = Mathf.RoundToInt((coordinate.x - chunkSize / 2f) / chunkSize);
+        int chunkY = Mathf.RoundToInt((coordinate.z - chunkSize / 2f) / chunkSize);
+        Chunk chunk = terrain.ChunkAt(chunkX, chunkY);
+
+        if (chunk == null) return false;
+
+        // Raycast down
+        RaycastHit hit;
+        Vector3 rayOrigin = new Vector3(coordinate.x, heightScale, coordinate.y);
+        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity)) coordinate.y = hit.point.y;
+        else coordinate.y = 0f;
+
+        // Instantiate or grab decoration
+        GameObject decoration;
+        if (createNew) decoration =
+            (GameObject)Instantiate(decorationPrefab, coordinate, Quaternion.Euler(Vector3.zero));
+        else decoration = decorationPool.Get().gameObject;
+
+        // Randomize
+        Decoration deco = decoration.GetComponent<Decoration>();
+        deco.Randomize();
+
+        // Point decoration in road direction
+        Vector3 target = coordinate + road.GetVelocity(prog);
+        decoration.transform.LookAt(target, Vector3.up);
+        decoration.transform.Rotate(-90f, side == 1 ? 180f : 0f, 0f);
+
+        // Parent to nearest chunk
+        decoration.transform.parent = chunk.gameObject.transform;
+        chunk.decorations.Add(decoration);
+
+        // Register
+        numDecorations++;
+        if (deco.group == Decoration.Group.RoadSigns) roadSignGroup.numActive++;
+
+        return true;
+    }
+
+    void LoadDecoration(string path) {
+        GameObject decoration = (GameObject)Resources.Load(path);
+        if (decoration == null) {
+            Debug.LogError("Failed to load decoration at " + path);
+        }
+        else {
+            //Debug.Log("Loaded "+path);
+            decorations.Add(decoration);
+            //GameManager.Instance.IncrementLoadProgress();
+        }
+    }
+
+    public void RemoveDecoration(GameObject deco) {
+        Decoration d = deco.GetComponent<Decoration>();
+
+        // Deparent decoration
+        deco.transform.parent = null;
+
+
+        // Deregister
+        switch (d.group) {
+            case Decoration.Group.RoadSigns:
+                roadSignGroup.numActive--;
+                break;
+            case Decoration.Group.Rocks:
+                rockGroup.numActive--;
+                break;
+            case Decoration.Group.Vegetation:
+                vegetationGroup.numActive--;
+                break;
+        }
+        numDecorations--;
+
+        // Pool decoration
+        decorationPool.Add(d);
+    }
+
+    /// <summary>
+    /// Creates a lightning strike at a random point in view.
+    /// </summary>
+    public void LightningStrike(float strength) {
+
+        // Find camera forward direction (flat)
+        Vector3 forward = Camera.main.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        // Define an offset
+        Vector2 r = UnityEngine.Random.insideUnitCircle;
+        Vector3 offset = new Vector3(400f * r.x, 250f, 400f * r.y);
+
+        // Pick a point
+        Vector3 origin = PlayerMovement.Instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
+            vertexUpdateDistance + offset;
+
+        // Play sound
+        // TODO
+
+        // Enable lightning striker and move to point
+        lightningStriker.SetActive(true);
+        lightningStriker.transform.position = origin;
+        lightningStriker.Light().intensity = baseLightningIntensity * strength;
+    }
+
+    /// <summary>
+    /// Creates a lightning flash within the clouds.
+    /// </summary>
+    /// <param name="strength">Strength.</param>
+    public void LightningFlash(float strength) {
+
+        // Find camera forward direction (flat)
+        Vector3 forward = Camera.main.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        // Define an offset
+        Vector2 r = UnityEngine.Random.insideUnitCircle;
+        Vector3 offset = new Vector3(800f * r.x, 800f, 800f * r.y);
+
+        // Pick a point
+        Vector3 origin = PlayerMovement.Instance.transform.position + forward * UnityEngine.Random.Range(1.9f, 2.1f) *
+            vertexUpdateDistance + offset;
+
+        // Play sound
+        // TODO
+
+        // Enable lightning flash and move to point
+        lightningFlash.SetActive(true);
+        lightningFlash.transform.position = origin;
+        lightningFlash.Light().intensity = baseLightningIntensity * strength;
+    }
+
+    public void StarBurst() {
+        starEmitter.Emit(UnityEngine.Random.Range(10, 20));
+    }
+
+    public void ExhaustPuff() {
+        foreach (ParticleSystem sys in exhaustEmitters) sys.Emit(1);
+    }
+
+    public void ShootingStar() {
+
+        // Find camera forward direction (flat)
+        Vector3 forward = Camera.main.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        // Define an offset
+        Vector2 r = UnityEngine.Random.insideUnitCircle;
+        Vector3 offset = new Vector3(1000f * r.x, 600f, 1000f * r.y);
+
+        // Pick a point
+        Vector3 origin = PlayerMovement.Instance.transform.position + forward * UnityEngine.Random.Range(2.9f, 3.1f) *
+            vertexUpdateDistance + offset;
+
+        GameObject shootingStar = (GameObject)Instantiate(shootingStarTemplate, origin, Quaternion.identity);
+        shootingStar.SetActive(true);
+    }
+
+    public void DeformRandom() {
+        // Find camera forward direction (flat)
+        Vector3 forward = Camera.main.transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        // Define an offset
+        Vector2 r = UnityEngine.Random.insideUnitCircle;
+        Vector3 offset = new Vector3(400f * r.x, 0f, 400f * r.y);
+
+        // Pick a point
+        Vector3 origin = PlayerMovement.Instance.transform.position + forward * UnityEngine.Random.Range(0.9f, 1.1f) *
+            vertexUpdateDistance + offset;
+
+        IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
+        Vertex v = terrain.vertexmap.VertexAt(coords);
+        if (v == null) v = terrain.vertexmap.AddVertex(coords);
+        if (!v.locked && !v.nearRoad) v.SmoothHeight(v.height + heightScale / 32f, 0.95f);
+
+        //Debug.Log(v.ToString());
+    }
+
+    public void ShowWeatherEffect(Note note) {
+
+
+
+        // If snare, cause lightning strike
+        if (note.IsSnare()) WorldManager.Instance.LightningStrike(note.volume);
+
+        // If kick or tom, cause lightning flash
+        else if (note.IsKick()) WorldManager.Instance.LightningFlash(note.volume);
+        else if (note.IsTom()) WorldManager.Instance.LightningFlash(0.75f * note.volume);
+
+        // If shaker, increase rain density
+        else if (note.IsShaker()) WorldManager.Instance.shakers++;
+
+        // If hat, create stars
+        else if (note.IsHat()) WorldManager.Instance.StarBurst();
+
+        // If cymbal, create shooting star
+        else if (note.IsCymbal()) WorldManager.Instance.ShootingStar();
+
+        // If wood, create exhaust puff
+        else if (note.IsWood()) WorldManager.Instance.ExhaustPuff();
+    }
+
+    public void DebugTerrain() {
+        terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
+    }
+
+    public void PrintVertexMap() {
+        VertexMap vmap = terrain.vertexmap;
+        string log = "";
+        for (int i = vmap.xMin; i <= vmap.xMax; i++) {
+            for (int j = vmap.yMin; j <= vmap.yMax; j++) {
+                Vertex vert = vmap.VertexAt(i, j);
+                log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
+            }
+            log += "\n";
+        }
+        System.IO.File.WriteAllText(Application.persistentDataPath + "/vmap.txt", log);
+    }
+
+    #endregion
 
 }

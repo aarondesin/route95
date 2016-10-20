@@ -62,6 +62,10 @@ public class Scale {
         return _allNotes[index];
     }
 
+    public bool HasNote (string note) {
+        return _allNotes.Contains(note);
+    }
+
     public void AddRoot (string note) {
         _root.Add(note);
         _allNotes.Add(note);

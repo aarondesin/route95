@@ -83,7 +83,7 @@ public class UIHelpers : MonoBehaviour {
 		tr.localRotation = Quaternion.Euler(Vector3.zero);
 		Text txt = text.GetComponent<Text>();
 		txt.text = textName;
-		txt.font = GameManager.instance.font;
+		txt.font = GameManager.Instance.font;
 		txt.resizeTextForBestFit = false;
 		txt.fontStyle = FontStyle.Normal;
 		return text;

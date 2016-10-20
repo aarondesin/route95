@@ -64,10 +64,10 @@ public class DynamicTerrain : MonoBehaviour {
 	void Awake () {
 
 		// Copy vars from WM
-		chunkUpdatesPerCycle = WorldManager.instance.chunkUpdatesPerCycle;
-		chunkSize = WorldManager.instance.chunkSize;
-		chunkRes = WorldManager.instance.chunkResolution;
-		chunkLoadRadius = WorldManager.instance.chunkLoadRadius;
+		chunkUpdatesPerCycle = WorldManager.Instance.chunkUpdatesPerCycle;
+		chunkSize = WorldManager.Instance.chunkSize;
+		chunkRes = WorldManager.Instance.chunkResolution;
+		chunkLoadRadius = WorldManager.Instance.chunkLoadRadius;
 
 		int verts = 2 * chunkLoadRadius * (chunkRes - 1);
 		loadsToDo = verts * verts;
@@ -93,9 +93,9 @@ public class DynamicTerrain : MonoBehaviour {
 		playerChunkPos = new IntVector2(0, 0);
 
 		// Init frequency data vars
-		freqSampleSize = WorldManager.instance.freqArraySize;
+		freqSampleSize = WorldManager.Instance.freqArraySize;
 		data = new float[freqSampleSize];
-		fftWindow = WorldManager.instance.freqFFTWindow;
+		fftWindow = WorldManager.Instance.freqFFTWindow;
 	}
 
 	#endregion
@@ -105,7 +105,7 @@ public class DynamicTerrain : MonoBehaviour {
 	/// Starts the chunk update coroutine.
 	/// </summary>
 	public void DoLoadChunks () {
-		WorldManager.instance.StartCoroutine(UpdateChunks());
+		WorldManager.Instance.StartCoroutine(UpdateChunks());
 	}
 
 
@@ -177,7 +177,7 @@ public class DynamicTerrain : MonoBehaviour {
 		};
 
 		// Change loading screen message
-		if (!loaded) GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+		if (!loaded) GameManager.Instance.ChangeLoadingMessage(loadMessages.Random());
 
 		// Main loop
 		while (true) {
@@ -189,7 +189,7 @@ public class DynamicTerrain : MonoBehaviour {
 			}
 
 			// Update player world and chunk positions
-			playerPos = PlayerMovement.instance.transform.position;
+			playerPos = PlayerMovement.Instance.transform.position;
 			playerChunkPos = new IntVector2 (
 				(int)Mathf.RoundToInt((playerPos.x - chunkSize/2f) / chunkSize),
 				(int)Mathf.RoundToInt((playerPos.z -chunkSize/2f) / chunkSize)
@@ -203,7 +203,7 @@ public class DynamicTerrain : MonoBehaviour {
 					if (chunkmap.At(x,y) != null) continue;
 
 					// Skip if chunk too far (circular generation)
-					if (WorldManager.instance.chunkGenerationMode == WorldManager.ChunkGenerationMode.Circular)
+					if (WorldManager.Instance.chunkGenerationMode == WorldManager.ChunkGenerationMode.Circular)
 						if (IntVector2.Distance (new IntVector2(x,y), playerChunkPos) > (float)chunkLoadRadius)
 							continue;
 
@@ -211,7 +211,7 @@ public class DynamicTerrain : MonoBehaviour {
 					chunkmap.Set(x,y, CreateChunk (x, y).GetComponent<Chunk>());
 
 					if (!loaded) {
-						GameManager.instance.ReportLoaded(1);
+						GameManager.Instance.ReportLoaded(1);
 						startTime = Time.realtimeSinceStartup;
 					}
 					yield return null;
@@ -220,7 +220,7 @@ public class DynamicTerrain : MonoBehaviour {
 			}
 
 			// Take a break if target frame rate is missed
-			if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+			if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 				yield return null;
 				startTime = Time.realtimeSinceStartup;
 			}
@@ -270,7 +270,7 @@ public class DynamicTerrain : MonoBehaviour {
 			
 
 				// Take a break if target frame rate missed
-				if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+				if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 					yield return null;
 					startTime = Time.realtimeSinceStartup;
 				}
@@ -290,7 +290,7 @@ public class DynamicTerrain : MonoBehaviour {
 
 		// Check if each active chunk is within chunk load radius
 		foreach (Chunk chunk in activeChunks) {
-			switch (WorldManager.instance.chunkGenerationMode) {
+			switch (WorldManager.Instance.chunkGenerationMode) {
 				case WorldManager.ChunkGenerationMode.Circular:
 					if (IntVector2.Distance (new IntVector2 (chunk.x, chunk.y), playerChunkPos) > chunkLoadRadius)
 						deletions.Add(chunk);
@@ -380,7 +380,7 @@ public class DynamicTerrain : MonoBehaviour {
 	/// </summary>
 	void UpdateFreqData () {
 		if (sources == null) {
-			sources = MusicManager.instance.instrumentAudioSources.Values.ToArray<AudioSource>();
+			sources = MusicManager.Instance.instrumentAudioSources.Values.ToArray<AudioSource>();
 			numSources = sources.Length;
 		}
 
@@ -404,8 +404,8 @@ public class DynamicTerrain : MonoBehaviour {
 		}
 
 		// Convert audio data into LinInt
-		if (freqData == null && GameManager.instance.loaded) freqData = new LinInt();
-		if (GameManager.instance.loaded) freqData.Update(data);
+		if (freqData == null && GameManager.Instance.loaded) freqData = new LinInt();
+		if (GameManager.Instance.loaded) freqData.Update(data);
 	}
 		
 	/// <summary>
@@ -519,7 +519,7 @@ public class DynamicTerrain : MonoBehaviour {
 			"Literally moving mountains..."
 		};
 
-		GameManager.instance.ChangeLoadingMessage(loadMessages.Random());
+		GameManager.Instance.ChangeLoadingMessage(loadMessages.Random());
 
 		while (true) {
 
@@ -566,11 +566,11 @@ public class DynamicTerrain : MonoBehaviour {
 							float interpH = ((1 - xT)*(1-yT))*p00 + ((xT)*(1-yT))*p10 + ((1-xT)*(yT))*p01 + ((xT)*(yT))*p11;
 							if (!vertexmap.IsConstrained (i, j) && !vertexmap.IsLocked (i,j)) {
 								vertexmap.SetHeight (i, j, interpH);
-								GameManager.instance.ReportLoaded(1);
+								GameManager.Instance.ReportLoaded(1);
 							}
 						} else continue;
 
-						if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+						if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 							yield return null;
 							startTime = Time.realtimeSinceStartup;
 						}
@@ -579,7 +579,7 @@ public class DynamicTerrain : MonoBehaviour {
 				}
 
 				// Begin loading road
-				WorldManager.instance.DoLoadRoad();
+				WorldManager.Instance.DoLoadRoad();
 				yield break;
 			}
 
@@ -728,7 +728,7 @@ public class DynamicTerrain : MonoBehaviour {
 						Square (heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
 					}
 
-					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+					if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 						yield return null;
 						startTime = Time.realtimeSinceStartup;
 					}
@@ -740,7 +740,7 @@ public class DynamicTerrain : MonoBehaviour {
 				for (x = (y + half) % size; x <= heightmap.GetLength (0) - 1; x += size) {
 					Diamond (heightmap, x, y, half, UnityEngine.Random.Range (rangeMin, rangeMax) * scale);
 				
-					if (Time.realtimeSinceStartup - startTime > GameManager.instance.targetDeltaTime) {
+					if (Time.realtimeSinceStartup - startTime > GameManager.Instance.targetDeltaTime) {
 						yield return null;
 						startTime = Time.realtimeSinceStartup;
 					}
@@ -797,7 +797,7 @@ public class DynamicTerrain : MonoBehaviour {
 		switch (colors) {
 		case DebugColors.Constrained:
 			foreach (Chunk chunk in activeChunks) {
-				chunk.GetComponent<MeshRenderer>().material = WorldManager.instance.terrainDebugMaterial;
+				chunk.GetComponent<MeshRenderer>().material = WorldManager.Instance.terrainDebugMaterial;
 				chunk.SetDebugColors (colors);
 			}
 			break;

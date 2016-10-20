@@ -9,9 +9,7 @@ namespace Route95.UI {
     /// <summary>
     /// Class to handle instrument icon panel in live mode.
     /// </summary>
-    public class LiveInstrumentIcons : 
-        SingletonMonoBehaviour<LiveInstrumentIcons> 
-    {
+    public class LiveInstrumentIcons : MenuBase<LiveInstrumentIcons> {
         #region Vars
 
         /// <summary>

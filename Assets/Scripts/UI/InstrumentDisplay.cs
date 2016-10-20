@@ -15,8 +15,6 @@ public class InstrumentDisplay : SingletonMonoBehaviour<InstrumentDisplay> {
 
 	#region InstrumentDisplay Vars
 
-	public static InstrumentDisplay instance;
-
 	public Image glow;                        // Sprite to change for glow
 	public float fadeSpeed;                   // Speed of fade
 	public List<Fadeable> glows;                 // Instrument icons glows

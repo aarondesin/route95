@@ -11,7 +11,7 @@ public class ObjectPool<T> where T: MonoBehaviour, IPoolable {
 	List<T> pool; // List of inactive GameObjects
 
 	/// <summary>
-	/// Init this instance.
+	/// Init this Instance.
 	/// </summary>
 	public ObjectPool () {
 		pool = new List<T>();

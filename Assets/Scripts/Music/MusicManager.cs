@@ -17,7 +17,7 @@ using UnityEditor;
 namespace Route95.Music {
 
     /// <summary>
-    /// All musical KeyManager.instance.
+    /// All musical KeyManager.Instance.
     /// </summary>
     public enum Key {
         None,
@@ -145,7 +145,7 @@ namespace Route95.Music {
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Object References")]
 
-        [Tooltip("Mixer to use for MusicManager.instance.")]
+        [Tooltip("Mixer to use for MusicManager.Instance.")]
         public AudioMixer mixer;
 
         [Tooltip("AudioSource to use for UI sounds.")]
@@ -216,13 +216,13 @@ namespace Route95.Music {
                         if (riffMode) {
 
                             // Play riff note
-                            InstrumentSetup.currentRiff.PlayRiff(beat++);
+                            RiffEditor.currentRiff.PlayRiff(beat++);
 
                             // Wrap payback
                             if (beat >= Riff.MAX_BEATS && loop) beat = 0;
 
                             // Decrement shaker density
-                            WorldManager.instance.shakers -= 2;
+                            WorldManager.Instance.shakers -= 2;
 
                         }
                         else {
@@ -256,7 +256,7 @@ namespace Route95.Music {
                                 brassNotes = 0;
 
                                 // Reset shaker density
-                                WorldManager.instance.shakers = 0;
+                                WorldManager.Instance.shakers = 0;
 
                                 // If another song available, switch
                                 if (_currentPlayingSong < _currentProject.Songs.Count - 1) {
@@ -298,10 +298,10 @@ namespace Route95.Music {
                             guitarDensity = (float)guitarNotes / (float)beatsElapsedInCurrentSong;
                             keyboardDensity = (float)keyboardNotes / (float)beatsElapsedInCurrentSong;
                             brassDensity = (float)brassNotes / (float)beatsElapsedInCurrentSong;
-                            if (WorldManager.instance.shakers > 2) WorldManager.instance.shakers -= 2;
-                            WorldManager.instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-                            WorldManager.instance.roadMaxSlope = Mathf.Clamp(keyboardDensity * 0.002f, 0.002f, 0.001f);
-                            WorldManager.instance.decorationDensity = Mathf.Clamp(brassDensity * 2f, 1f, 2f);
+                            if (WorldManager.Instance.shakers > 2) WorldManager.Instance.shakers -= 2;
+                            WorldManager.Instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
+                            WorldManager.Instance.roadMaxSlope = Mathf.Clamp(keyboardDensity * 0.002f, 0.002f, 0.001f);
+                            WorldManager.Instance.decorationDensity = Mathf.Clamp(brassDensity * 2f, 1f, 2f);
                         }
                         break;
                 }
@@ -326,19 +326,28 @@ namespace Route95.Music {
         }
 
         /// <summary>
-        /// Currently opened project (read-only).
+        /// Currently opened project.
         /// </summary>
-        public Project CurrentProject { get { return _currentProject; } }
+        public Project CurrentProject {
+            get { return _currentProject; }
+            set { _currentProject = value; }
+        }
 
         /// <summary>
         /// Returns the index of the current playing sound (read-only).
         /// </summary>
-        public int CurrentPlayingSong { get { return _currentPlayingSong; } }
+        public int CurrentPlayingSong {
+            get { return _currentPlayingSong; }
+            set { _currentPlayingSong = value; }
+        }
 
         /// <summary>
         /// Returns the current song being played/edited (read-only).
         /// </summary>
-        public Song CurrentSong { get { return _currentSong; } }
+        public Song CurrentSong {
+            get { return _currentSong; }
+            set { _currentSong = value; }
+        }
 
         #endregion
         #region Load Methods
@@ -506,7 +515,7 @@ namespace Route95.Music {
             Debug.Log("MusicManager.Load(): finished in " + (Time.realtimeSinceStartup - startLoadTime).ToString("0.0000") + " seconds.");
 
             // Start loading WorldManager
-            WorldManager.instance.Load();
+            WorldManager.Instance.Load();
         }
 
         #endregion
@@ -574,16 +583,16 @@ namespace Route95.Music {
             loopPlaylist = !loopPlaylist;
 
             // Update sprite
-            if (InstrumentSetup.instance == null) Debug.Log("shit");
+            if (RiffEditor.Instance == null) Debug.Log("shit");
             loopPlaylistButton.sprite = loopPlaylist ?
-                InstrumentSetup.instance.percussionFilled : InstrumentSetup.instance.percussionEmpty;
+                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty;
         }
 
         /// <summary>
         /// Toggles looping the current riff.
         /// </summary>
         public void PlayRiffLoop() {
-            SongArrangeSetup.instance.UpdateValue();
+            SongArrangeMenu.Instance.UpdateValue();
             riffMode = true;
             Loop();
         }
@@ -609,7 +618,7 @@ namespace Route95.Music {
                 StopLooping();
 
                 // Stop AudioSource
-                Instrument instrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
+                Instrument instrument = Instrument.AllInstruments[RiffEditor.currentRiff.instrumentIndex];
                 _instrumentAudioSources[instrument].Stop();
 
                 // If not looping, then start
@@ -627,7 +636,7 @@ namespace Route95.Music {
             playing = false;
             loop = false;
             beat = 0;
-            Instrument instrument = Instrument.AllInstruments[InstrumentSetup.currentRiff.instrumentIndex];
+            Instrument instrument = Instrument.AllInstruments[RiffEditor.currentRiff.instrumentIndex];
             _instrumentAudioSources[instrument].Stop();
         }
 
@@ -644,8 +653,8 @@ namespace Route95.Music {
         public void IncreaseTempo() {
             if ((int)tempo < (int)Tempo.NUM_TEMPOS - 1) {
                 tempo = (Tempo)((int)tempo + 1);
-                if (InstrumentSetup.instance != null)
-                    InstrumentSetup.instance.UpdateTempoText();
+                if (RiffEditor.Instance != null)
+                    RiffEditor.Instance.UpdateTempoText();
             }
         }
 
@@ -655,8 +664,8 @@ namespace Route95.Music {
         public void DecreaseTempo() {
             if ((int)tempo > 0) {
                 tempo = (Tempo)((int)tempo - 1);
-                if (InstrumentSetup.instance != null)
-                    InstrumentSetup.instance.UpdateTempoText();
+                if (RiffEditor.Instance != null)
+                    RiffEditor.Instance.UpdateTempoText();
             }
         }
 
@@ -673,11 +682,11 @@ namespace Route95.Music {
             _currentSong.RegisterRiff(temp);
 
             // Update riff editor
-            InstrumentSetup.currentRiff = temp;
+            RiffEditor.currentRiff = temp;
 
             // Update song arrange
-            SongArrangeSetup.instance.selectedRiffIndex = temp.index;
-            SongArrangeSetup.instance.Refresh();
+            SongArrangeMenu.Instance.selectedRiffIndex = temp.index;
+            SongArrangeMenu.Instance.Refresh();
 
             return temp;
         }

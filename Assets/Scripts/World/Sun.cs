@@ -4,7 +4,7 @@ using System.Collections;
 
 
 public class Sun : GlobalLightSource {
-	public static Sun instance;
+	public static Sun Instance;
 
 	public Light shadowCaster;
 
@@ -17,10 +17,10 @@ public class Sun : GlobalLightSource {
 	private Vector3 sunTarget; // target for the sun to point at: the car or the origin
 
 	private void UpdateTransform(){
-		sunTarget = PlayerMovement.instance.transform.position;
-		float newX = xScale * Mathf.Cos(WorldManager.instance.timeOfDay);
-		float newY = yScale * Mathf.Sin(WorldManager.instance.timeOfDay);
-		float newZ = -zScale * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
+		sunTarget = PlayerMovement.Instance.transform.position;
+		float newX = xScale * Mathf.Cos(WorldManager.Instance.timeOfDay);
+		float newY = yScale * Mathf.Sin(WorldManager.Instance.timeOfDay);
+		float newZ = -zScale * Mathf.Cos(WorldManager.Instance.timeOfDay + Mathf.PI/5);
 		this.transform.position = new Vector3(newX, newY, newZ);
 		transform.localScale = new Vector3 (200f, 200f, 200f);
 
@@ -29,8 +29,8 @@ public class Sun : GlobalLightSource {
 	}
 
 	void Start() {
-		instance = this;
-		transform.parent = PlayerMovement.instance.transform;
+		Instance = this;
+		transform.parent = PlayerMovement.Instance.transform;
 		//this.GetComponent<Light> ().range = 100f;
 		//this.GetComponent<Light> ().type = LightType.Directional;
 		//GetComponent<Light>().shadowBias = 1f;

@@ -11,7 +11,7 @@ public class RadialKeyMenu : MonoBehaviour {
 
 	#region RadialKeyMenu Vars
 
-	public static RadialKeyMenu instance; // Quick reference to this instance
+	public static RadialKeyMenu Instance; // Quick reference to this Instance
 
 	List<GameObject> objects;             // All buttons currently instantiated
 
@@ -33,7 +33,7 @@ public class RadialKeyMenu : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-		instance = this;
+		Instance = this;
 		objects = new List<GameObject>();
 	}
 
@@ -75,17 +75,17 @@ public class RadialKeyMenu : MonoBehaviour {
 			// Set button text
 			Text text = button.GetComponentInChildren<Text>();
 			if (key.ToString().Contains("Sharp")) text.text = key.ToString()[0] + "#";
-			text.font = GameManager.instance.font;
+			text.font = GameManager.Instance.font;
 			text.fontSize = (int)(scale/2f);
 			text.color = gray;
 
 			// Set button image
 			Image img = button.Image();
-			img.sprite = GameManager.instance.circleIcon;
+			img.sprite = GameManager.Instance.circleIcon;
 			img.color =  gray;
 
 			// Highlight if selected key
-			if (key == MusicManager.instance.currentSong.key) {
+			if (key == MusicManager.Instance.currentSong.key) {
 				text.color = Color.white;
 				img.color = Color.white;
 
@@ -98,14 +98,14 @@ public class RadialKeyMenu : MonoBehaviour {
 				tr.ResetScaleRot();
 
 				img = hl.Image();
-				img.sprite = GameManager.instance.circleIcon;
+				img.sprite = GameManager.Instance.circleIcon;
 				img.color = Color.white;
 			}
 
 			// Set button functionality
 			button.Button().onClick.AddListener (delegate {
-				GameManager.instance.MenuClick();
-				MusicManager.instance.currentSong.key = key;
+				GameManager.Instance.MenuClick();
+				MusicManager.Instance.currentSong.key = key;
 				Refresh();
 			});
 
@@ -118,7 +118,7 @@ public class RadialKeyMenu : MonoBehaviour {
 			tr.AnchorAtPoint(0.5f, 0.5f);
 			tr.ResetScaleRot();
 			tr.anchoredPosition3D = Vector3.zero;
-			highlight.Image().sprite = GameManager.instance.volumeIcon;
+			highlight.Image().sprite = GameManager.Instance.volumeIcon;
 			highlight.Image().color = Color.white;
 
 			sh.objects = new List<GameObject>();
@@ -148,25 +148,25 @@ public class RadialKeyMenu : MonoBehaviour {
 
 			// Set button text
 			Text text = button.GetComponentInChildren<Text>();
-			text.font = GameManager.instance.font;
+			text.font = GameManager.Instance.font;
 			text.fontSize = (int)(baseScale/6f);
 			text.color = gray;
 
 			// Set button image
 			Image img = button.Image();
-			img.sprite = GameManager.instance.circleIcon;
+			img.sprite = GameManager.Instance.circleIcon;
 			img.color = gray;
 
 			// Set highlighted button
-			if (i == MusicManager.instance.currentSong.scale) {
+			if (i == MusicManager.Instance.currentSong.scale) {
 				text.color = Color.white;
 				img.color = Color.white;
 			}
 
 			// Set button functionality
 			button.Button().onClick.AddListener (delegate {
-				GameManager.instance.MenuClick();
-				MusicManager.instance.currentSong.scale = scalei.scaleIndex;
+				GameManager.Instance.MenuClick();
+				MusicManager.Instance.currentSong.scale = scalei.scaleIndex;
 				Refresh();
 			});
 
@@ -179,7 +179,7 @@ public class RadialKeyMenu : MonoBehaviour {
 			tr.AnchorAtPoint(0.5f, 0.5f);
 			tr.ResetScaleRot();
 			tr.anchoredPosition3D = Vector3.zero;
-			highlight.Image().sprite = GameManager.instance.volumeIcon;
+			highlight.Image().sprite = GameManager.Instance.volumeIcon;
 			highlight.Image().color = Color.white;
 
 			sh.objects = new List<GameObject>();
@@ -192,8 +192,8 @@ public class RadialKeyMenu : MonoBehaviour {
 		}
 
 		// Confirm button
-		if (MusicManager.instance.currentSong.key != Key.None &&
-			MusicManager.instance.currentSong.scale != -1) {
+		if (MusicManager.Instance.currentSong.key != Key.None &&
+			MusicManager.Instance.currentSong.scale != -1) {
 			confirmButton.Button().interactable = true;
 			confirmButton.SetActive (true);
 		} else confirmButton.SetActive (false);

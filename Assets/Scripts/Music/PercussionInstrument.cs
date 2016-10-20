@@ -2,91 +2,94 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to hold percussion instrument data.
-/// </summary>
-public class PercussionInstrument : Instrument {
+namespace Route95.Music {
 
-	#region Percussioninstrument Vars
+    /// <summary>
+    /// Class to hold percussion instrument data.
+    /// </summary>
+    public class PercussionInstrument : Instrument {
 
-	public Dictionary <string, Sprite> icons; // Dictionary of individual drums to icons
-	Dictionary <string, string> iconPaths;    // Paths from which to load icons
+        #region Percussioninstrument Vars
 
-	#endregion
-	#region PercussionInstrument Methods
+        public Dictionary<string, Sprite> icons; // Dictionary of individual drums to icons
+        Dictionary<string, string> iconPaths;    // Paths from which to load icons
 
-	/// <summary>
-	/// Loads this percussion instrument.
-	/// </summary>
-	public override void Load () {
+        #endregion
+        #region PercussionInstrument Methods
 
-		// Load instrument data
-		base.Load();
+        /// <summary>
+        /// Loads this percussion instrument.
+        /// </summary>
+        public override void Load() {
 
-		// Load drum icons
-		icons = new Dictionary<string, Sprite>();
-		foreach (string path in iconPaths.Keys) {
-			Sprite sprite = Resources.Load<Sprite>(iconPaths[path]);
+            // Load instrument data
+            base.Load();
 
-			if (sprite == null) {
-				Debug.LogError ("PercussionInstrument.Load(): failed to load icon "+iconPaths[path]);
-				continue;
-			}
+            // Load drum icons
+            icons = new Dictionary<string, Sprite>();
+            foreach (string path in iconPaths.Keys) {
+                Sprite sprite = Resources.Load<Sprite>(iconPaths[path]);
 
-			icons.Add (path, sprite);
-		}
-	}
+                if (sprite == null) {
+                    Debug.LogError("PercussionInstrument.Load(): failed to load icon " + iconPaths[path]);
+                    continue;
+                }
 
-	#endregion
-	#region PercussionInstrument Instruments
+                icons.Add(path, sprite);
+            }
+        }
 
-	/// <summary>
-	/// Rock drums.
-	/// </summary>
-	public static PercussionInstrument RockDrums = new PercussionInstrument {
-		name = "Rock Drums",
-		codeName = "RockDrums",
-		index = 0,
-		type = Type.Percussion,
-		family = Family.Percussion,
-		iconPath = "UI/Instrument_RockDrums",
-		glowPath = "UI/Instrument_RockDrums_Glow",
-		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
-		iconPaths = new Dictionary <string, string> () {
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "UI/Percussion_Tom" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom", "UI/Percussion_Tom" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom", "UI/Percussion_Tom" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "UI/Percussion_Hat" },
-			{ "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "UI/Percussion_Hat" }
-		}
-	};
+        #endregion
+        #region PercussionInstrument Instruments
 
-	/// <summary>
-	/// Exotic percussion.
-	/// </summary>
-	public static PercussionInstrument ExoticPercussion = new PercussionInstrument {
-		name = "Exotic Percussion",
-		codeName = "ExoticPercussion",
-		index = 1,
-		type = Type.Percussion,
-		family = Family.Percussion,
-		iconPath = "UI/Instrument_ExoticPercussion",
-		glowPath = "UI/Instrument_ExoticPercussion",
-		switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
-		iconPaths = new Dictionary<string, string> () {
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","UI/Percussion_Castinets" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "UI/Percussion_Claves" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "UI/Percussion_Cowbell" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", "UI/Percussion_Cowbell" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", "UI/Percussion_JamBlock" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1", "UI/Percussion_Maracas" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", "UI/Percussion_Maracas" },
-			{ "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "UI/Percussion_Tambourine" }
-		}
-	};
+        /// <summary>
+        /// Rock drums.
+        /// </summary>
+        public static PercussionInstrument RockDrums = new PercussionInstrument {
+            name = "Rock Drums",
+            codeName = "RockDrums",
+            index = 0,
+            type = Type.Percussion,
+            family = Family.Percussion,
+            iconPath = "UI/Instrument_RockDrums",
+            glowPath = "UI/Instrument_RockDrums_Glow",
+            switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+            iconPaths = new Dictionary<string, string>() {
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "UI/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom", "UI/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom", "UI/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "UI/Percussion_Hat" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "UI/Percussion_Hat" }
+        }
+        };
 
-	#endregion
-			
+        /// <summary>
+        /// Exotic percussion.
+        /// </summary>
+        public static PercussionInstrument ExoticPercussion = new PercussionInstrument {
+            name = "Exotic Percussion",
+            codeName = "ExoticPercussion",
+            index = 1,
+            type = Type.Percussion,
+            family = Family.Percussion,
+            iconPath = "UI/Instrument_ExoticPercussion",
+            glowPath = "UI/Instrument_ExoticPercussion",
+            switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+            iconPaths = new Dictionary<string, string>() {
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","UI/Percussion_Castinets" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "UI/Percussion_Claves" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "UI/Percussion_Cowbell" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", "UI/Percussion_Cowbell" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", "UI/Percussion_JamBlock" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1", "UI/Percussion_Maracas" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", "UI/Percussion_Maracas" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "UI/Percussion_Tambourine" }
+        }
+        };
+
+        #endregion
+
+    }
 }

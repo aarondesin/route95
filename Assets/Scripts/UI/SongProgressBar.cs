@@ -5,11 +5,9 @@ using System.Collections;
 /// <summary>
 /// Class to handle the live mode song progress bar.
 /// </summary>
-public class SongProgressBar : SingletonMonoBehaviour<SongProgressBar> {
+public class SongProgressBar : MenuBase<SongProgressBar> {
 
 	#region SongProgressBar Vars
-
-	public static SongProgressBar instance; // Quick reference to this instance
 
 	[Tooltip("Reference to background image.")]
 	public Image background;
@@ -21,10 +19,6 @@ public class SongProgressBar : SingletonMonoBehaviour<SongProgressBar> {
 
 	#endregion
 	#region Unity Callbacks
-
-	void Awake () {
-		instance = this;
-	}
 
 	void Update () {
 		RectTransform bgtr = background.gameObject.RectTransform();

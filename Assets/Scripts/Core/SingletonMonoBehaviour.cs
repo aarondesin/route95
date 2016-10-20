@@ -25,27 +25,27 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour
 	#endregion
 	#region Static Vars
 
-	static SingletonMonoBehaviour<T> _instance;
+	static SingletonMonoBehaviour<T> _Instance;
 
 	#endregion
 	#region Unity Callbacks
 
 	public void Awake () {
 
-		// Check if an instance already exists
-		if (_instance != null)
+		// Check if an Instance already exists
+		if (_Instance != null)
 			throw new MultipleInstanceException();
-		else _instance = this;
+		else _Instance = this;
 	}
 
 	#endregion
 	#region Methods
 
 	/// <summary>
-	/// Returns the instance of this class.
+	/// Returns the Instance of this class.
 	/// </summary>
 	public static T Instance {
-		get { return _instance as T; }
+		get { return _Instance as T; }
 	}
 
 	#endregion

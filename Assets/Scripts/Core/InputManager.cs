@@ -228,7 +228,7 @@ namespace Route95.Core {
                                     if (inst.codeName == "ElectricBass") {
 
                                         // Cause terrain deformation
-                                        WorldManager.instance.DeformRandom();
+                                        WorldManager.Instance.DeformRandom();
 
                                         // All other melodic instruments
                                     }
@@ -326,8 +326,8 @@ namespace Route95.Core {
                 if (Input.GetKeyDown(KeyCode.Space)) UIManager.Instance.SwitchToLive();
 
                 // Left/Right -> adjust time of day
-                else if (Input.GetKeyDown(KeyCode.LeftArrow)) WorldManager.instance.timeOfDay -= Mathf.PI / 16f;
-                else if (Input.GetKeyDown(KeyCode.RightArrow)) WorldManager.instance.timeOfDay += Mathf.PI / 16f;
+                else if (Input.GetKeyDown(KeyCode.LeftArrow)) WorldManager.Instance.timeOfDay -= Mathf.PI / 16f;
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) WorldManager.Instance.timeOfDay += Mathf.PI / 16f;
             }
 
             // Update prevMouse
