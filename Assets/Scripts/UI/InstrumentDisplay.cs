@@ -3,10 +3,15 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+using Route95.Core;
+using Route95.Music;
+
+namespace Route95.UI {
+
 /// <summary>
 /// Class to handle instrument display on the back of the car.
 /// </summary>
-public class InstrumentDisplay : MonoBehaviour {
+public class InstrumentDisplay : SingletonMonoBehaviour<InstrumentDisplay> {
 
 	#region InstrumentDisplay Vars
 
@@ -19,14 +24,10 @@ public class InstrumentDisplay : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Awake () {
-		instance = this;
-	}
-
 	void FixedUpdate () {
 
-		if (GameManager.instance.currentState != GameManager.State.Live) return;
-		if (GameManager.instance.paused) return;
+		if (GameManager.Instance.CurrentState != GameManager.State.Live) return;
+		if (GameManager.Instance.Paused) return;
 
 		Color color = glow.color;
 		color.a -= fadeSpeed;
@@ -41,8 +42,8 @@ public class InstrumentDisplay : MonoBehaviour {
 	/// Refreshes the display, changing art if necessary.
 	/// </summary>
 	public void Refresh () {
-		gameObject.Image().sprite = MusicManager.instance.currentInstrument.icon;
-		glow.sprite = MusicManager.instance.currentInstrument.glow;
+		gameObject.Image().sprite = MusicManager.Instance.CurrentInstrument.icon;
+		glow.sprite = MusicManager.Instance.CurrentInstrument.glow;
 	}
 
 	/// <summary>
@@ -63,4 +64,5 @@ public class InstrumentDisplay : MonoBehaviour {
 	}
 
 	#endregion
+}
 }

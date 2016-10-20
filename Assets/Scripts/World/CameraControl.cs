@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Class to manage the game camera.
 /// </summary>
-public class CameraControl : MonoBehaviour {
+public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 
 	#region CameraControl Enums
 
@@ -30,8 +30,6 @@ public class CameraControl : MonoBehaviour {
 	#region CameraControl Vars
 
 	[Header("General camera settings")]
-
-	public static CameraControl instance; // Quick reference to this instance
 
 	[Tooltip("Current camera state.")]
 	public State state = State.Setup;
@@ -125,8 +123,9 @@ public class CameraControl : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	void Awake () {
-		instance = this;
+	new void Awake () {
+		base.Awake();
+
 		transitionTimer = liveModeTransitionFreq;
 		speed = DEFAULT_SPEED;
 

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ConfirmExitPrompt : MenuBase {
+public class ConfirmExitPrompt : MenuBase<ConfirmExitPrompt> {
 
 	// Use this for initialization
 	void Start () {

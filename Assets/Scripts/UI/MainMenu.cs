@@ -3,7 +3,7 @@
 
 namespace Route95.UI {
 
-    public class MainMenu : MenuBase {
+    public class MainMenu : MenuBase<MainMenu> {
 
 	
     }

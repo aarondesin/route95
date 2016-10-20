@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace Route95.UI {
 
-    public class LoadingScreen : MenuBase {
+    public class LoadingScreen : MenuBase<LoadingScreen> {
 
         #region LoadingScreen Vars
 

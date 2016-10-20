@@ -5,7 +5,7 @@ using System.Collections;
 /// <summary>
 /// Class to handle the live mode song progress bar.
 /// </summary>
-public class SongProgressBar : MonoBehaviour {
+public class SongProgressBar : SingletonMonoBehaviour<SongProgressBar> {
 
 	#region SongProgressBar Vars
 

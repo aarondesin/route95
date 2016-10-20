@@ -103,6 +103,9 @@ namespace Route95.Core {
             }
         }
 
+        #endregion
+        #region Methods
+
         /// <summary>
         /// Moves the casette front.
         /// </summary>
@@ -149,5 +152,7 @@ namespace Route95.Core {
         public void AttemptMove() {
             if (_willMoveCasette) MoveToFront();
         }
+
+        #endregion
     }
 }

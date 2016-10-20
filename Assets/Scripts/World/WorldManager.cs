@@ -8,7 +8,7 @@ using UnityStandardAssets.ImageEffects;
 /// <summary>
 /// Manager for all things world-related.
 /// </summary>
-public class WorldManager : MonoBehaviour {
+public class WorldManager : SingletonMonoBehaviour<WorldManager> {
 
 	#region WorldManager Enums
 
@@ -364,9 +364,8 @@ public class WorldManager : MonoBehaviour {
 	#endregion
 	#region Unity Callbacks
 
-	// Use this for initialization
-	void Awake () {
-		instance = this;
+	new void Awake () {
+		base.Awake();
 
 		maxDecorations = roadSignGroup.maxActive + rockGroup.maxActive + vegetationGroup.maxActive;
 		//Debug.Log(maxDecorations);
@@ -968,6 +967,27 @@ public class WorldManager : MonoBehaviour {
 
 		//Debug.Log(v.ToString());
 	}
+
+    public void ShowWeatherEffect (Note note) {
+        // If snare, cause lightning strike
+                                        if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
+
+                                        // If kick or tom, cause lightning flash
+                                        else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
+                                        else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
+
+                                        // If shaker, increase rain density
+                                        else if (note.IsShaker()) WorldManager.instance.shakers++;
+
+                                        // If hat, create stars
+                                        else if (note.IsHat()) WorldManager.instance.StarBurst();
+
+                                        // If cymbal, create shooting star
+                                        else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+
+                                        // If wood, create exhaust puff
+                                        else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
+    }
 
 	public void DebugTerrain () {
 		terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);

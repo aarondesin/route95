@@ -1,128 +1,145 @@
-﻿using UnityEngine;
+﻿// PerfTracker.cs
+// ©2016 Team 95
+
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to track application performance across its
-/// various states.
-/// </summary>
-public class PerfTracker : MonoBehaviour {
+using UnityEngine;
 
-	#region Nested Structs
+namespace Route95.Core {
 
-	/// <summary>
-	/// Struct to store performance info for a game state.
-	/// </summary>
-	struct Info {
-		public float seconds; // Number of seconds active
-		public float frames;  // Number of frames active
-		public float avgFPS;  // Current average FPS
+    /// <summary>
+    /// Class to track application performance across its
+    /// various states.
+    /// </summary>
+    public class PerfTracker : MonoBehaviour {
 
-		/// <summary>
-		/// Creates a PerfTracker.Info struct.
-		/// </summary>
-		/// <param name="startSeconds"></param>
-		/// <param name="startFrames"></param>
-		/// <param name="startFPS"></param>
-		public Info(float startSeconds=0f, float startFrames=0f, float startFPS=0f)
-		{
-			seconds = startSeconds;
-			frames = startFrames;
-			avgFPS = startFPS;
-		}
+        #region Nested Structs
 
-		/// <summary>
-		/// String conversion.
-		/// </summary>
-		/// <returns>String representation of this PerfTracker.Info.</returns>
-		public override string ToString()
-		{
-			return
-				"Seconds: " + seconds.ToString("##.0000") + "\n" +
-				"Frames: " + frames.ToString("##.00") + "\n" +
-				"Average FPS: " + avgFPS.ToString("##.000") + "\n\n";
-		}
-	};
+        /// <summary>
+        /// Struct to store performance info for a game state.
+        /// </summary>
+        struct Info {
 
-	#endregion
-	#region PerfTracker Vars
+            /// <summary>
+            /// Number of seconds active.
+            /// </summary>
+            public float seconds;
 
-	Dictionary<GameManager.State, Info> perfTracker; // Dictionary to map game states to Info structs
+            /// <summary>
+            /// Number of frames active
+            /// </summary>
+            public float frames;
 
-	#endregion
-	#region UnityCallbacks
+            /// <summary>
+            /// Current average FPS
+            /// </summary>
+            public float avgFPS;
 
-	void Awake () {
+            /// <summary>
+            /// Creates a PerfTracker.Info struct.
+            /// </summary>
+            /// <param name="startSeconds"></param>
+            /// <param name="startFrames"></param>
+            /// <param name="startFPS"></param>
+            public Info(
+                float startSeconds = 0f, 
+                float startFrames = 0f, 
+                float startFPS = 0f
+            ) {
+                seconds = startSeconds;
+                frames = startFrames;
+                avgFPS = startFPS;
+            }
 
-		// Init dictionary
-		perfTracker = new Dictionary<GameManager.State, Info>();
-	}
-	
-	void Update () {
+            /// <summary>
+            /// String conversion.
+            /// </summary>
+            /// <returns>String representation of this PerfTracker.Info.</returns>
+            public override string ToString() {
+                return
+                    "Seconds: " + seconds.ToString("##.0000") + "\n" +
+                    "Frames: " + frames.ToString("##.00") + "\n" +
+                    "Average FPS: " + avgFPS.ToString("##.000") + "\n\n";
+            }
+        };
 
-		// Add new key for current game state if it doesn't exist
-		if (!perfTracker.ContainsKey(GameManager.instance.currentState))
-			perfTracker.Add(GameManager.instance.currentState, new Info());
+        #endregion
+        #region PerfTracker Vars
 
-		// Otherwise, update appropriate Info
-		else {
-			Info perf = perfTracker[GameManager.instance.currentState];
-			perf.seconds += Time.deltaTime;
-			perf.frames += 1;
-			perf.avgFPS += ((1f/Time.deltaTime) - perf.avgFPS) / perf.frames;
-		}
-	}
+        /// <summary>
+        /// Dictionary to map game states to Info structs.
+        /// </summary>
+        Dictionary<GameManager.State, Info> perfTracker;
 
-	void OnApplicationQuit () {
+        #endregion
+        #region UnityCallbacks
 
-		// Only save perf info in debug builds
-		if (Debug.isDebugBuild) {
+        void Awake() {
+            // Init dictionary
+            perfTracker = new Dictionary<GameManager.State, Info>();
+            int numStates = System.Enum.GetValues(typeof(GameManager.State)).Length;
+            for (int i=0; i<numStates; i++) {
+                perfTracker.Add ((GameManager.State)i, new Info());
+            }
+        }
 
-			// Get current time
-			DateTime currTime = System.DateTime.Now;
-			string log = currTime.ToString() + "\n";
+        void Update() {
+            Info perf = perfTracker[GameManager.Instance.CurrentState];
+            perf.seconds += Time.deltaTime;
+            perf.frames += 1;
+            perf.avgFPS += ((1f / Time.deltaTime) - perf.avgFPS) / perf.frames;
+        }
 
-			// Print info for each state
-			foreach (GameManager.State state in Enum.GetValues(typeof (GameManager.State))) {
-				if (perfTracker.ContainsKey(state))
-					log += state.ToString() + "\n-----\n" + perfTracker[state].ToString();
-			}
+        void OnApplicationQuit() {
 
-			// Create PerfInfo directory if possible
-			try {
-				Directory.CreateDirectory (Application.persistentDataPath+"/PerfLogs");
-				System.IO.File.WriteAllText(PerfInfoPath(currTime), log);
-			
-			// If fails, print to console
-			} catch (UnauthorizedAccessException) {
-				Debug.Log (log);
-			}
-		}
-	}
+            // Only save perf info in debug builds
+            if (Debug.isDebugBuild) {
 
-	#endregion
-	#region PerfTracker Callbacks
+                // Get current time
+                DateTime currTime = System.DateTime.Now;
+                string log = currTime.ToString() + "\n";
 
-	/// <summary>
-	/// Returns a path for the PerfInfo file based on the
-	/// current date and time.
-	/// </summary>
-	/// <returns></returns>
-	string PerfInfoPath (DateTime time) {
-		return
-			Application.persistentDataPath +
-			"/PerfLogs/PerfLog_" +
-			time.Year.ToString() +
-			time.Month.ToString() +
-			time.Day.ToString() + "_" +
-			time.Hour.ToString() +
-			time.Minute.ToString() +
-			time.Second.ToString() +
-			".txt";
-	}
+                // Print info for each state
+                foreach (GameManager.State state in Enum.GetValues(typeof(GameManager.State))) {
+                    if (perfTracker.ContainsKey(state))
+                        log += state.ToString() + "\n-----\n" + perfTracker[state].ToString();
+                }
 
-	#endregion
+                // Create PerfInfo directory if possible
+                try {
+                    Directory.CreateDirectory(Application.persistentDataPath + "/PerfLogs");
+                    System.IO.File.WriteAllText(PerfInfoPath(currTime), log);
 
+                    // If fails, print to console
+                }
+                catch (UnauthorizedAccessException) {
+                    Debug.Log(log);
+                }
+            }
+        }
+
+        #endregion
+        #region PerfTracker Callbacks
+
+        /// <summary>
+        /// Returns a path for the PerfInfo file based on the
+        /// current date and time.
+        /// </summary>
+        string PerfInfoPath(DateTime time) {
+            return
+                Application.persistentDataPath +
+                "/PerfLogs/PerfLog_" +
+                time.Year.ToString() +
+                time.Month.ToString() +
+                time.Day.ToString() + "_" +
+                time.Hour.ToString() +
+                time.Minute.ToString() +
+                time.Second.ToString() +
+                ".txt";
+        }
+
+        #endregion
+    }
 }

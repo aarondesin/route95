@@ -3,7 +3,7 @@
 
 namespace Route95.UI {
 
-    public class CameraBlocker : MenuBase {
+    public class CameraBlocker : MenuBase<CameraBlocker> {
 
 	
     }

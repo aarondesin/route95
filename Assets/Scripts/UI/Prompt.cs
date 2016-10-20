@@ -14,13 +14,6 @@ public class Prompt : SingletonMonoBehaviour<Prompt> {
 	public Text buttonText;        // Reference to button text
 
 	#endregion
-	#region Unity Callbacks
-
-	void Awake () {
-		instance = this;
-	}
-
-	#endregion
 	#region Prompt Methods
 
 	/// <summary>

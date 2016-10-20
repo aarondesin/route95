@@ -1,166 +1,171 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-/// <summary>
-/// Class to store all project data.
-/// </summary>
-[System.Serializable]
-public class Project {
+namespace Route95.Music {
 
-	[Tooltip("Name of the project.")]
-	[SerializeField]
-	public string name;
+    /// <summary>
+    /// Class to store all project data.
+    /// </summary>
+    [System.Serializable]
+    public class Project {
 
-	[Tooltip("File paths of all songs in the project.")]
-	[SerializeField]
-	public List<string> songPaths;
+        #region Vars
 
-	[NonSerialized]
-	public List<Song> songs;            // All songs used in the project
+        [Tooltip("Name of the project.")]
+        [SerializeField]
+        public string name;
 
-	[NonSerialized]
-	private List<SongPiece> songPieces; // All songpieces used in the project
+        [Tooltip("File paths of all songs in the project.")]
+        [SerializeField]
+        public List<string> songPaths;
 
-	[NonSerialized]
-	private List<Measure> measures;     // All measures used in the project
+        [SerializeField]
+        List<Song> _songs;            // All songs used in the project
 
-	[NonSerialized]
-	private List<Riff> riffs;           // All riffs used in the project
+        [NonSerialized]
+        private List<SongPiece> songPieces; // All songpieces used in the project
 
-	[NonSerialized]
-	private List<Beat> beats;           // All beats used in the project
+        [NonSerialized]
+        private List<Measure> measures;     // All measures used in the project
 
-	/// <summary>
-	/// Default constructor.
-	/// </summary>
-	public Project () {
+        [NonSerialized]
+        private List<Riff> riffs;           // All riffs used in the project
 
-		// Default name
-		name = "New Project";
+        [NonSerialized]
+        private List<Beat> beats;           // All beats used in the project
 
-		// Init lists
-		songPaths = new List<string>();
-		songs = new List<Song>();
-		songPieces = new List<SongPiece>();
-		measures = new List<Measure>();
-		riffs = new List<Riff>();
-		beats = new List<Beat>();
-	}
+        #endregion
+        #region Properties
 
-	/// <summary>
-	/// Initializes any data not loaded.
-	/// Called after deserialization.
-	/// </summary>
-	/// <param name="context"></param>
-	[OnDeserialized()]
-	public void Refresh (StreamingContext context) {
+        /// <summary>
+        /// Returns a list of all songs in this project (read-only).
+        /// </summary>
+        public List<Song> Songs { get { return _songs; } }
 
-		// Init any null lists
-		if (songPaths == null) songPaths = new List<string>();
-		if (songs == null) songs = new List<Song>();
-		if (songPieces == null) songPieces = new List<SongPiece>();
-		if (measures == null) measures = new List<Measure>();
-		if (riffs == null) riffs = new List<Riff>();
-		if (beats == null) beats = new List<Beat>();
+        /// <summary>
+        /// Returns whether or not the project has no songs (read-only).
+        /// </summary>
+        public bool Empty { get { return _songs.Count == 0; } }
 
-		// Load all listed songs
-		foreach (string path in songPaths) AddSong(SaveLoad.LoadSong(path));
-	}
+        #endregion
 
-	/// <summary>
-	/// Generates paths for all songs used in the project.
-	/// Called on serialization.
-	/// </summary>
-	/// <param name="context"></param>
-	[OnSerializing()]
-	internal void UpdatePaths (StreamingContext context) {
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Project() {
 
-		// Refresh song paths
-		songPaths.Clear();
+            // Default name
+            name = "New Project";
 
-		// For each song in the project
-		foreach (Song song in songs) {
+            // Init lists
+            songPaths = new List<string>();
+            _songs = new List<Song>();
+            songPieces = new List<SongPiece>();
+            measures = new List<Measure>();
+            riffs = new List<Riff>();
+            beats = new List<Beat>();
+        }
 
-			// Save song
-			SaveLoad.SaveSong(song);
+        /// <summary>
+        /// Initializes any data not loaded.
+        /// Called after deserialization.
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserialized()]
+        public void Refresh(StreamingContext context) {
 
-			// Generate and add path
-			string path = Application.dataPath + GameManager.instance.songSaveFolder +
-				song.name + SaveLoad.songSaveExtension;
-			songPaths.Add (path);
-		}
-	}
+            // Init any null lists
+            if (songPaths == null) songPaths = new List<string>();
+            if (_songs == null) _songs = new List<Song>();
+            if (songPieces == null) songPieces = new List<SongPiece>();
+            if (measures == null) measures = new List<Measure>();
+            if (riffs == null) riffs = new List<Riff>();
+            if (beats == null) beats = new List<Beat>();
 
-	/// <summary>
-	/// Adds a song to the project.
-	/// </summary>
-	/// <param name="song">Song to add.</param>
-	public void AddSong (Song song) {
+            // Load all listed songs
+            foreach (string path in songPaths) AddSong(SaveLoad.LoadSong(path));
+        }
 
-		// Check if song is valid
-		if (song == null) {
-			Debug.LogError ("Project.AddSong(): tried to add null song!");
-			return;
-		}
-		
-		// Search for duplicates
-		Song foundSong = null;
-		foreach (Song s in songs) {
-			if (song.Equals (s)) {
-				foundSong = s;
-				break;
-			}
-		}
+        /// <summary>
+        /// Generates paths for all songs used in the project.
+        /// Called on serialization.
+        /// </summary>
+        /// <param name="context"></param>
+        [OnSerializing()]
+        internal void UpdatePaths(StreamingContext context) {
 
-		// If match found, add a copy of the song
-		if (foundSong != null) songs.Add(foundSong);
+            // Refresh song paths
+            songPaths.Clear();
 
-		// Otherwise, add song and all data
-		else {
-			if (songs == null) songs = new List<Song>();
-			songs.Add(song);
+            // For each song in the project
+            foreach (Song song in _songs) {
 
-			if (songPieces == null) songPieces = new List<SongPiece>();
-			if (song.songPieces != null) songPieces.AddRange (song.songPieces);
+                // Save song
+                SaveLoad.SaveSong(song);
 
-			if (measures == null) measures = new List<Measure>();
-			if (song.measures != null) measures.AddRange (song.measures);
+                // Generate and add path
+                string path = Application.dataPath + GameManager.Instance.SongSaveFolder +
+                    song.Name + SaveLoad.songSaveExtension;
+                songPaths.Add(path);
+            }
+        }
 
-			if (riffs == null) riffs = new List<Riff>();
-			if (song.riffs != null) riffs.AddRange (song.riffs);
+        /// <summary>
+        /// Adds a song to the project.
+        /// </summary>
+        /// <param name="song">Song to add.</param>
+        public void AddSong(Song song) {
 
-			if (beats == null) beats = new List<Beat>();
-			if (song.beats != null) beats.AddRange (song.beats);
-		}
-	}
+            // Check if song is valid
+            if (song == null) {
+                Debug.LogError("Project.AddSong(): tried to add null song!");
+                return;
+            }
 
-	/// <summary>
-	/// Removes a song at the specified index.
-	/// </summary>
-	/// <param name="index">Index of song to remove.</param>
-	public void RemoveSong (int index) {
+            // Search for duplicates
+            Song foundSong = null;
+            foreach (Song s in _songs) {
+                if (song.Equals(s)) {
+                    foundSong = s;
+                    break;
+                }
+            }
 
-		// Remove song
-		songs.RemoveAt(index);
+            // If match found, add a copy of the song
+            if (foundSong != null) _songs.Add(foundSong);
 
-		// If that was current playing song, choose a new one
-		if (MusicManager.instance.currentPlayingSong == index) {
-			MusicManager.instance.currentPlayingSong = 0;
-			if (songs.Count > 0) MusicManager.instance.currentSong = songs[0];
-			else MusicManager.instance.currentSong = null;
-		}
-	}
-		
-	/// <summary>
-	/// Returns whether or not the project has no songs.
-	/// </summary>
-	public bool Empty {
-		get {
-			return songs.Count == 0;
-		}
-	}
+            // Otherwise, add song and all data
+            else {
+                if (_songs == null) _songs = new List<Song>();
+                _songs.Add(song);
 
+                if (songPieces == null) songPieces = new List<SongPiece>();
+                if (song.SongPieces != null) songPieces.AddRange(song.SongPieces);
+
+                if (measures == null) measures = new List<Measure>();
+                if (song.Measures != null) measures.AddRange(song.Measures);
+
+                if (riffs == null) riffs = new List<Riff>();
+                if (song.Riffs != null) riffs.AddRange(song.Riffs);
+
+                if (beats == null) beats = new List<Beat>();
+                if (song.Beats != null) beats.AddRange(song.Beats);
+            }
+        }
+
+        /// <summary>
+        /// Removes a song at the specified index.
+        /// </summary>
+        /// <param name="index">Index of song to remove.</param>
+        public void RemoveSong(int index) {
+
+            // Remove song
+            _songs.RemoveAt(index);
+        }
+    }
 }

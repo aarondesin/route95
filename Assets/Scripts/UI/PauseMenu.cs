@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PauseMenu : MenuBase {
+public class PauseMenu : MenuBase<PauseMenu> {
 
 	// Use this for initialization
 	void Start () {

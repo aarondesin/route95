@@ -265,8 +265,8 @@ namespace Route95.UI {
         /// Show the specified menu, fading if possible.
         /// </summary>
         /// <param name="menu">Menu to show.</param>
-        public void ShowMenu(MenuBase menu) {
-            menu.SetActive(true);
+        public void ShowMenu<T>(MenuBase<T> menu) where T : MonoBehaviour {
+            menu.gameObject.SetActive(true);
             Fadeable fade = menu.GetComponent<Fadeable>();
             if (fade != null) fade.UnFade();
         }
@@ -292,7 +292,7 @@ namespace Route95.UI {
         /// Hide the specified menu, fading if possible.
         /// </summary>
         /// <param name="menu">Menu to hide.</param>
-        public void HideMenu(MenuBase menu) {
+        public void HideMenu<T>(MenuBase<T> menu) where T : MonoBehaviour {
             Fadeable fade = menu.GetComponent<Fadeable>();
             if (fade != null) fade.Fade();
         }

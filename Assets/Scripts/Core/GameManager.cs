@@ -1,14 +1,13 @@
 ﻿// GameManager.cs
 // ©2016 Team 95
 
+using Route95.Music;
 using Route95.UI;
 
-using System.Collections.Generic;
 using System.IO;
 
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using UnityStandardAssets.ImageEffects;
 
 #if UNITY_EDITOR
@@ -173,9 +172,15 @@ namespace Route95.Core {
 	    CameraClearFlags _clearFlagsBackup = CameraClearFlags.Nothing;
 
         //----------------------------------------------------------------------
+        /// <summary>
+        /// Invoked when loading begins.
+        /// </summary>
         [HideInInspector]
         public GameEvent onStartLoading;
 
+        /// <summary>
+        /// Invoked when loading is completed.
+        /// </summary>
         [HideInInspector]
         public GameEvent onFinishLoading;
 
@@ -231,9 +236,29 @@ namespace Route95.Core {
         #region GameManager Properties
 
         /// <summary>
+        /// Returns true if the game is paused (read-only).
+        /// </summary>
+        public bool Paused { get { return _paused; } }
+
+        /// <summary>
         /// Returns GameManager's current state (read-only).
         /// </summary>
         public State CurrentState { get { return _currentState; } }
+
+        /// <summary>
+        /// Returns the folder to which to save songs (read-only).
+        /// </summary>
+        public string SongSaveFolder { get { return _songSaveFolder; } }
+
+        /// <summary>
+        /// Returns the path to which to save songs.
+        /// </summary>
+        public string SongSavePath { get { return _songSavePath; } }
+
+        /// <summary>
+        /// Returns the path to which to save projects.
+        /// </summary>
+        public string ProjectSavePath { get { return _projectSavePath; } }
 
         #endregion
         #region GameManager Loading Methods
@@ -242,22 +267,25 @@ namespace Route95.Core {
         /// Load this instance.
         /// </summary>
         void Load() {
-
+            // Hide all menus
             UIManager.Instance.HideAllMenus();
 
             // Show loading screen
             UIManager.Instance.ShowMenu(LoadingScreen.Instance);
 
             // Calculate operations to do
-            _loadOpsToDo = MusicManager.instance.loadsToDo +
-                    WorldManager.instance.loadsToDo;
+            _loadOpsToDo = MusicManager.Instance.loadsToDo +
+                    WorldManager.Instance.loadsToDo;
 
             // Init vars
             _loadStartTime = Time.realtimeSinceStartup;
             _isLoading = true;
 
             // Start by loading MusicManager
-            MusicManager.instance.Load();
+            MusicManager.Instance.Load();
+
+            // Throw event
+            onStartLoading.Invoke();
         }
 
         /// <summary>
@@ -293,14 +321,14 @@ namespace Route95.Core {
             Casette.Instance.SnapBack();
 
             // Hide all menus
-            UIManager.Instance.HideMenu (LoadingScreen.Instance);
-            UIManager.Instance.HideMenu (CameraBlocker.Instance);
+            LoadingScreen.Instance.Hide();
+            CameraBlocker.Instance.Hide();
             UIManager.Instance.HideAllMenus ();
 
             // Show main menu
             UIManager.Instance.ShowMenu(MainMenu.Instance);
 
-            CameraControl.instance.SnapToView(CameraControl.instance.OutsideCar);
+            CameraControl.Instance.SnapToView(CameraControl.Instance.OutsideCar);
 
             // Begin 3D rendering again
             StartRendering();
@@ -348,7 +376,7 @@ namespace Route95.Core {
         /// </summary>
         public void ShowLoadPromptForProjects() {
             LoadPrompt.instance.Refresh(LoadPrompt.Mode.Project);
-            Show(loadPrompt);
+            UIManager.Instance.ShowMenu(LoadPrompt.Instance);
         }
 
         /// <summary>
@@ -356,7 +384,7 @@ namespace Route95.Core {
         /// </summary>
         public void ShowLoadPromptForSongs() {
             LoadPrompt.instance.Refresh(LoadPrompt.Mode.Song);
-            Show(loadPrompt);
+            UIManager.Instance.ShowMenu(LoadPrompt.Instance);
         }
 
         #endregion
@@ -370,7 +398,7 @@ namespace Route95.Core {
                 case State.Loading:
                 case State.Setup:
                 case State.Postplay:
-                    UIManager.Instance.ShowMenu(ConfirmExitPrompt.Instance);
+                    ConfirmExitPrompt.Instance.Show();
                     break;
 
                 case State.Live:
@@ -393,9 +421,9 @@ namespace Route95.Core {
         /// </summary>
         public void Pause() {
             _paused = true;
-            UIManager.Instance.ShowMenu(PauseMenu.Instance);
+            PauseMenu.Instance.Show();
             PlayerMovement.instance.StopMoving();
-            CameraControl.instance.Pause();
+            CameraControl.Instance.Pause();
         }
 
         /// <summary>
@@ -403,9 +431,9 @@ namespace Route95.Core {
         /// </summary>
         public void Unpause() {
             _paused = false;
-            UIManager.Instance.HideMenu(PauseMenu.Instance);
+            PauseMenu.Instance.Hide();
             PlayerMovement.instance.StartMoving();
-            CameraControl.instance.Unpause();
+            CameraControl.Instance.Unpause();
         }
 
         /// <summary>
