@@ -2,169 +2,172 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to store decoration data.
-/// </summary>
-public class Decoration : MonoBehaviour, IPoolable {
+namespace Route95.World {
 
-	#region Decoration Enums
+    /// <summary>
+    /// Class to store decoration data.
+    /// </summary>
+    public class Decoration : MonoBehaviour, IPoolable {
 
-	/// <summary>
-	/// Type of decoration distribution.
-	/// </summary>
-	public enum Distribution {
-		Random,     // Truly random, based on density
-		Roadside,   // For signs, placed alongside road facing either direction
-		CloseToRoad // Placed close to road (good for small objects)
-	}
+        #region Decoration Enums
 
-	/// <summary>
-	/// Group to assign decoration to.
-	/// </summary>
-	public enum Group {
-		None,
-		Vegetation,
-		Rocks,
-		RoadSigns
-	}
+        /// <summary>
+        /// Type of decoration distribution.
+        /// </summary>
+        public enum Distribution {
+            Random,     // Truly random, based on density
+            Roadside,   // For signs, placed alongside road facing either direction
+            CloseToRoad // Placed close to road (good for small objects)
+        }
 
-	#endregion
-	#region Decoration Structs
+        /// <summary>
+        /// Group to assign decoration to.
+        /// </summary>
+        public enum Group {
+            None,
+            Vegetation,
+            Rocks,
+            RoadSigns
+        }
 
-	/// <summary>
-	/// Info for relevant decoration group.
-	/// </summary>
-	[System.Serializable]
-	public struct GroupInfo {
-		public Group group;
-		public int numActive;
-		public int maxActive;
-	}
+        #endregion
+        #region Decoration Structs
 
-	#endregion
-	#region Decoration Vars
+        /// <summary>
+        /// Info for relevant decoration group.
+        /// </summary>
+        [System.Serializable]
+        public struct GroupInfo {
+            public Group group;
+            public int numActive;
+            public int maxActive;
+        }
 
-	[Tooltip("Decoration group.")]
-	public Group group = Group.None;
+        #endregion
+        #region Decoration Vars
 
-	[Tooltip("Is this decoration dynamic/physics-enabled?")]
-	public bool dynamic = false;
+        [Tooltip("Decoration group.")]
+        public Group group = Group.None;
 
-	[Tooltip("Average number of this decoration per chunk.")]
-	public float density;
+        [Tooltip("Is this decoration dynamic/physics-enabled?")]
+        public bool dynamic = false;
 
-	[Tooltip("Distribution type to use for this decoration.")]
-	public Distribution distribution; // Distribution type to use
+        [Tooltip("Average number of this decoration per chunk.")]
+        public float density;
 
-	[Tooltip("Base position offset to use when placing.")]
-	public Vector3 positionOffset;
+        [Tooltip("Distribution type to use for this decoration.")]
+        public Distribution distribution; // Distribution type to use
 
-	[Tooltip("Base rotation offset to use when placing.")]
-	public Vector3 rotationOffset;
+        [Tooltip("Base position offset to use when placing.")]
+        public Vector3 positionOffset;
 
-	[Tooltip("Range of randomization in height.")]
-	public Vector2 heightRange;
+        [Tooltip("Base rotation offset to use when placing.")]
+        public Vector3 rotationOffset;
 
-	[Tooltip("Range of randomization in width.")]
-	public Vector2 widthRange;
+        [Tooltip("Range of randomization in height.")]
+        public Vector2 heightRange;
 
-	[Tooltip("Range of randomization in pitch.")]
-	public Vector2 pitchRange;
+        [Tooltip("Range of randomization in width.")]
+        public Vector2 widthRange;
 
-	[Tooltip("Range of randomization in yaw.")]
-	public Vector2 yawRange;
+        [Tooltip("Range of randomization in pitch.")]
+        public Vector2 pitchRange;
 
-	[Tooltip("Range of randomization in roll.")]
-	public Vector2 rollRange;
+        [Tooltip("Range of randomization in yaw.")]
+        public Vector2 yawRange;
 
-	public AnimationCurve heightAnimation;
+        [Tooltip("Range of randomization in roll.")]
+        public Vector2 rollRange;
 
-	public AnimationCurve widthAnimation;
+        public AnimationCurve heightAnimation;
 
-	public float animationSpeed = 0.5f;
+        public AnimationCurve widthAnimation;
 
-	Vector3 normalScale;
+        public float animationSpeed = 0.5f;
 
-	ParticleSystem partSystem;
+        Vector3 normalScale;
 
-	#endregion
-	#region Unity Callbacks
+        ParticleSystem partSystem;
 
-	void Awake () {
-		normalScale = transform.localScale;
-		partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
-		partSystem.gameObject.transform.parent = transform.parent;
-	}
+        #endregion
+        #region Unity Callbacks
 
-	void FixedUpdate () {
-		if (dynamic) {
+        void Awake() {
+            normalScale = transform.localScale;
+            partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
+            partSystem.gameObject.transform.parent = transform.parent;
+        }
 
-			// Remove if decoration fell below
-			if (transform.position.y < -WorldManager.Instance.heightScale) 
-				WorldManager.Instance.RemoveDecoration (gameObject);
+        void FixedUpdate() {
+            if (dynamic) {
 
-			// Push with wind
-			GetComponent<Rigidbody>().AddForce(WorldManager.Instance.wind);
-		}
-	}
+                // Remove if decoration fell below
+                if (transform.position.y < -WorldManager.Instance.heightScale)
+                    WorldManager.Instance.RemoveDecoration(gameObject);
 
-	#endregion
-	#region IPoolable Implementations
+                // Push with wind
+                GetComponent<Rigidbody>().AddForce(WorldManager.Instance.wind);
+            }
+        }
 
-	void IPoolable.OnPool() {
-		transform.parent = null;
-		gameObject.SetActive(false);
-	}
+        #endregion
+        #region IPoolable Implementations
 
-	void IPoolable.OnDepool() {
-		gameObject.SetActive(true);
-		Randomize();
-	}
+        void IPoolable.OnPool() {
+            transform.parent = null;
+            gameObject.SetActive(false);
+        }
 
-	#endregion
-	#region Decoration Methods
+        void IPoolable.OnDepool() {
+            gameObject.SetActive(true);
+            Randomize();
+        }
 
-	// Starts with base position/rotation, and adds variance
-	public void Randomize () {
-		transform.localScale = normalScale;
-		transform.position += positionOffset;
-		transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
+        #endregion
+        #region Decoration Methods
 
-		// Randomize scale (width and height)
-		transform.localScale = new Vector3 (
-			transform.localScale.x * Random.Range (widthRange[0], widthRange[1]),
-			transform.localScale.y * Random.Range (heightRange[0], heightRange[1]),
-			transform.localScale.z * Random.Range (widthRange[0], widthRange[1])
-		);
+        // Starts with base position/rotation, and adds variance
+        public void Randomize() {
+            transform.localScale = normalScale;
+            transform.position += positionOffset;
+            transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
 
-		// Randomize rotation
-		transform.Rotate ( new Vector3 (
-			Random.Range (pitchRange[0], pitchRange[1]),
-			Random.Range (yawRange[0], yawRange[1]),
-			Random.Range (rollRange[0], rollRange[1])
-		), Space.World);
+            // Randomize scale (width and height)
+            transform.localScale = new Vector3(
+                transform.localScale.x * Random.Range(widthRange[0], widthRange[1]),
+                transform.localScale.y * Random.Range(heightRange[0], heightRange[1]),
+                transform.localScale.z * Random.Range(widthRange[0], widthRange[1])
+            );
 
-		partSystem.transform.position = transform.position;
-		partSystem.Play();
+            // Randomize rotation
+            transform.Rotate(new Vector3(
+                Random.Range(pitchRange[0], pitchRange[1]),
+                Random.Range(yawRange[0], yawRange[1]),
+                Random.Range(rollRange[0], rollRange[1])
+            ), Space.World);
 
-		StartCoroutine (Animate());
-	}
+            partSystem.transform.position = transform.position;
+            partSystem.Play();
 
-	IEnumerator Animate () {
-		Vector3 baseScale = transform.localScale;
-		float progress = 0f;
-		while (progress < 1f) {
-			Vector3 scale = new Vector3 (
-				baseScale.x * widthAnimation.Evaluate(progress),
-				baseScale.y * heightAnimation.Evaluate(progress),
-				baseScale.z * widthAnimation.Evaluate(progress)
-			);
-			transform.localScale = scale;
-			progress += animationSpeed * Time.deltaTime;
-			yield return null;
-		}
-		yield break;
-	}
+            StartCoroutine(Animate());
+        }
 
-	#endregion
+        IEnumerator Animate() {
+            Vector3 baseScale = transform.localScale;
+            float progress = 0f;
+            while (progress < 1f) {
+                Vector3 scale = new Vector3(
+                    baseScale.x * widthAnimation.Evaluate(progress),
+                    baseScale.y * heightAnimation.Evaluate(progress),
+                    baseScale.z * widthAnimation.Evaluate(progress)
+                );
+                transform.localScale = scale;
+                progress += animationSpeed * Time.deltaTime;
+                yield return null;
+            }
+            yield break;
+        }
+
+        #endregion
+    }
 }

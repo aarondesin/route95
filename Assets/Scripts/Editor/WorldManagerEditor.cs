@@ -2,41 +2,44 @@
 using System.Collections;
 using UnityEditor;
 
-/// <summary>
-/// Custom editor for WorldManager.
-/// </summary>
-[CustomEditor(typeof(WorldManager))]
-public class WorldManagerEditor : Editor {
+namespace Route95.World {
 
-	int x = 0;
-	int y = 0;
+    /// <summary>
+    /// Custom editor for WorldManager.
+    /// </summary>
+    [CustomEditor(typeof(WorldManager))]
+    public class WorldManagerEditor : Editor {
 
-	float vertBlend = 0f;
+        int x = 0;
+        int y = 0;
 
-	public override void OnInspectorGUI () {
+        float vertBlend = 0f;
 
-		DrawDefaultInspector();
+        public override void OnInspectorGUI() {
 
-		// Button to show debug colors
-		if (GUILayout.Button("Show constraints")) {
-			((WorldManager)target).DebugTerrain();
-		}
+            DrawDefaultInspector();
 
-		if (GUILayout.Button("Print vertex map")) {
-			((WorldManager)target).PrintVertexMap();
-		}
+            // Button to show debug colors
+            if (GUILayout.Button("Show constraints")) {
+                ((WorldManager)target).DebugTerrain();
+            }
 
-		x = EditorGUILayout.IntField ("X:", x);
-		y = EditorGUILayout.IntField ("Y:", y);
+            if (GUILayout.Button("Print vertex map")) {
+                ((WorldManager)target).PrintVertexMap();
+            }
 
-		vertBlend = EditorGUILayout.FloatField ("Blend: ",vertBlend);
+            x = EditorGUILayout.IntField("X:", x);
+            y = EditorGUILayout.IntField("Y:", y);
 
-		if (GUILayout.Button("Show coordinates")) {
-			WorldManager wm = target as WorldManager;
-			Vertex vert = wm.terrain.vertexmap.VertexAt(x, y);
-			wm.vertexIndicator.transform.position = vert.WorldPos();
-			vertBlend = vert.color.a;
-		}
+            vertBlend = EditorGUILayout.FloatField("Blend: ", vertBlend);
 
-	}
+            if (GUILayout.Button("Show coordinates")) {
+                WorldManager wm = target as WorldManager;
+                Vertex vert = wm.terrain.vertexmap.VertexAt(x, y);
+                wm.vertexIndicator.transform.position = vert.WorldPos();
+                vertBlend = vert.color.a;
+            }
+
+        }
+    }
 }

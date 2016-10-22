@@ -1,4 +1,5 @@
-﻿using Route95.Music;
+﻿using Route95.Core;
+using Route95.Music;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -71,8 +72,8 @@ namespace Route95.UI {
                 editRiffButton.Button().interactable = true;
                 playRiffButton.Button().interactable = true;
                 previewSongButton.Button().interactable = true;
-                if (RiffEditor.currentRiff == null)
-                    RiffEditor.currentRiff = MusicManager.Instance.CurrentSong.Riffs[0];
+                if (RiffEditor.CurrentRiff == null)
+                    RiffEditor.CurrentRiff = MusicManager.Instance.CurrentSong.Riffs[0];
             }
 
             dropdown.value = selectedRiffIndex;
@@ -94,7 +95,7 @@ namespace Route95.UI {
         /// </summary>
         public void UpdateValue() {
             selectedRiffIndex = dropdown.value;
-            RiffEditor.currentRiff = MusicManager.Instance.CurrentSong.Riffs[selectedRiffIndex];
+            RiffEditor.CurrentRiff = MusicManager.Instance.CurrentSong.Riffs[selectedRiffIndex];
         }
 
         /// <summary>

@@ -1,46 +1,50 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-/// <summary>
-/// Class to handle the live mode song progress bar.
-/// </summary>
-public class SongProgressBar : MenuBase<SongProgressBar> {
+namespace Route95.UI {
 
-	#region SongProgressBar Vars
+    /// <summary>
+    /// Class to handle the live mode song progress bar.
+    /// </summary>
+    public class SongProgressBar : MenuBase<SongProgressBar> {
 
-	[Tooltip("Reference to background image.")]
-	public Image background;
+        #region SongProgressBar Vars
 
-	[Tooltip("Reference to bar image.")]
-	public Image bar;
+        [Tooltip("Reference to background image.")]
+        public Image background;
 
-	float value;                            // Current song progress value
+        [Tooltip("Reference to bar image.")]
+        public Image bar;
 
-	#endregion
-	#region Unity Callbacks
+        float value;                            // Current song progress value
 
-	void Update () {
-		RectTransform bgtr = background.gameObject.RectTransform();
-		RectTransform batr = bar.gameObject.RectTransform();
-		batr.sizeDelta = new Vector2 (value*bgtr.rect.width, bgtr.rect.height);
-		batr.anchoredPosition3D = new Vector3 (
-				batr.sizeDelta.x/2f,
-				0f,
-				0f
-		);
-	}
+        #endregion
+        #region Unity Callbacks
 
-	#endregion
-	#region SongProgressBar Methods
+        void Update() {
+            RectTransform bgtr = background.gameObject.RectTransform();
+            RectTransform batr = bar.gameObject.RectTransform();
+            batr.sizeDelta = new Vector2(value * bgtr.rect.width, bgtr.rect.height);
+            batr.anchoredPosition3D = new Vector3(
+                    batr.sizeDelta.x / 2f,
+                    0f,
+                    0f
+            );
+        }
 
-	/// <summary>
-	/// Set the song progress bar value.
-	/// </summary>
-	/// <param name="v">New value.</param>
-	public void SetValue (float v) {
-		value = Mathf.Clamp01(v);
-	}
+        #endregion
+        #region SongProgressBar Methods
 
-	#endregion
+        /// <summary>
+        /// Set the song progress bar value.
+        /// </summary>
+        /// <param name="v">New value.</param>
+        public void SetValue(float v) {
+            value = Mathf.Clamp01(v);
+        }
+
+        #endregion
+    }
 }

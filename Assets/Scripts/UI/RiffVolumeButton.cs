@@ -1,4 +1,5 @@
-﻿using Route95.Music;
+﻿using Route95.Core;
+using Route95.Music;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -33,7 +34,7 @@ namespace Route95.UI {
         #region DraggableButton Overrides
 
         public override void OnMouseDown() {
-            targetRiff = RiffEditor.currentRiff;
+            targetRiff = RiffEditor.CurrentRiff;
             oldVolume = targetRiff.volume;
         }
 

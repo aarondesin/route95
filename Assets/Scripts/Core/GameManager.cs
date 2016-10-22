@@ -3,6 +3,7 @@
 
 using Route95.Music;
 using Route95.UI;
+using Route95.World;
 
 using System.IO;
 
@@ -118,14 +119,6 @@ namespace Route95.Core {
         [Tooltip("Reference to loading bar message object.")]
         [SerializeField]
         GameObject _loadingMessageObj;
-
-        //----------------------------------------------------------------------
-        [Header("UI Settings")]
-
-        /// <summary>
-        /// Position of mouse during last frame.
-        /// </summary>
-	    Vector3 _prevMouse = Vector3.zero;
 
         //----------------------------------------------------------------------
         [Header("IO Settings")]
@@ -250,6 +243,11 @@ namespace Route95.Core {
             get { return _currentState; }
             set { _currentState = value; }
         }
+
+        /// <summary>
+        /// Returns true if the game is loaded (read-only).
+        /// </summary>
+        public bool IsLoaded { get { return _isLoaded; } }
 
         /// <summary>
         /// Returns the folder to which to save songs (read-only).

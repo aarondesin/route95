@@ -84,6 +84,13 @@ namespace Route95.Music {
         }
 
         /// <summary>
+        /// Returns the list of song piece indices in this song (read-only).
+        /// </summary>
+        public List<int> SongPieceIndices {
+            get { return _songPieceIndices; }
+        }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public Song() {

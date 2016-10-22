@@ -1,55 +1,58 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Class to handle moon movement and lighting.
-/// </summary>
-public class Moon : GlobalLightSource {
+namespace Route95.World {
 
-	#region Moon Vars
+    /// <summary>
+    /// Class to handle moon movement and lighting.
+    /// </summary>
+    public class Moon : GlobalLightSource {
 
-	public static Moon Instance;  // Quick reference to this Instance
-	Light _light;                 // Reference to this light component
+        #region Moon Vars
 
-	public Light shadowCaster;
+        public static Moon Instance;  // Quick reference to this Instance
+        Light _light;                 // Reference to this light component
 
-	public float radius;
-	public float scale;
+        public Light shadowCaster;
 
-	private Vector3 target; // target for the sun to point at: the car or the origin
+        public float radius;
+        public float scale;
 
-	#endregion
-	#region Unity Callbacks
+        private Vector3 target; // target for the sun to point at: the car or the origin
 
-	void Awake () {
-		Instance = this;
-		GetComponent<Light>().cullingMask = 
-			(1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
-	}
+        #endregion
+        #region Unity Callbacks
 
-	void Start () {
-		transform.SetParent (PlayerMovement.Instance.transform);
-		transform.localScale = new Vector3 (scale, scale, scale);
-	}
+        void Awake() {
+            Instance = this;
+            GetComponent<Light>().cullingMask =
+                (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
+        }
 
-	void Update() {
-		UpdateTransform();
-	}
+        void Start() {
+            transform.SetParent(PlayerMovement.Instance.transform);
+            transform.localScale = new Vector3(scale, scale, scale);
+        }
 
-	#endregion
-	#region Moon Callbacks
-		
-	private void UpdateTransform(){
-		target = PlayerMovement.Instance.transform.position;
+        void Update() {
+            UpdateTransform();
+        }
 
-		float newX = -radius * Mathf.Cos(WorldManager.Instance.timeOfDay);
-		float newY = -radius * Mathf.Sin(WorldManager.Instance.timeOfDay);
-		float newZ = -radius * Mathf.Cos(WorldManager.Instance.timeOfDay + Mathf.PI/5);
-		this.transform.position = new Vector3(newX, newY, newZ);
+        #endregion
+        #region Moon Callbacks
 
-		this.transform.LookAt (target);
-	}
+        private void UpdateTransform() {
+            target = PlayerMovement.Instance.transform.position;
 
-	#endregion
+            float newX = -radius * Mathf.Cos(WorldManager.Instance.timeOfDay);
+            float newY = -radius * Mathf.Sin(WorldManager.Instance.timeOfDay);
+            float newZ = -radius * Mathf.Cos(WorldManager.Instance.timeOfDay + Mathf.PI / 5);
+            this.transform.position = new Vector3(newX, newY, newZ);
 
+            this.transform.LookAt(target);
+        }
+
+        #endregion
+
+    }
 }

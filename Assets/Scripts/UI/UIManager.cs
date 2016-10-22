@@ -6,6 +6,7 @@ using System.Collections;
 
 using Route95.Core;
 using Route95.Music;
+using Route95.World;
 
 namespace Route95.UI {
 
@@ -298,6 +299,14 @@ namespace Route95.UI {
         /// </summary>
         public Sprite ArrowIcon { get { return _arrowIcon; } }
 
+        /// <summary>
+        /// Returns the circle sprite (read-only).
+        /// </summary>
+        public Sprite CircleIcon { get { return _circleIcon; } }
+
+        /// <summary>
+        /// Returns the scribble sprite (read-only).
+        /// </summary>
         public Sprite ScribbleIcon { get { return _scribbleCircle; } }
 
         /// <summary>

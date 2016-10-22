@@ -1,4 +1,5 @@
-﻿using Route95.Music;
+﻿using Route95.Core;
+using Route95.Music;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -55,8 +56,8 @@ namespace Route95.UI {
         /// Inits all song piece columns on the timeline.
         /// </summary>
         public void MakeColumns() {
-            Song song = MusicManager.Instance.currentSong;
-            int numSongPieces = MusicManager.Instance.currentSong.songPieceIndices.Count;
+            Song song = MusicManager.Instance.CurrentSong;
+            int numSongPieces = MusicManager.Instance.CurrentSong.SongPieceIndices.Count;
 
             // Clear current columns
             columns.Clear();
@@ -87,12 +88,12 @@ namespace Route95.UI {
                 // Setup column button properties
                 column.Button().onClick.AddListener(() => {
                     SongArrangeMenu.Instance.UpdateValue();
-                    Riff riff = MusicManager.Instance.currentSong.riffs[SongArrangeMenu.Instance.selectedRiffIndex];
+                    Riff riff = MusicManager.Instance.CurrentSong.Riffs[SongArrangeMenu.Instance.selectedRiffIndex];
                     song.ToggleRiff(riff, num);
-                    RefreshColumn(column, song.songPieces[song.songPieceIndices[num]]);
+                    RefreshColumn(column, song.SongPieces[song.SongPieceIndices[num]]);
                 });
 
-                column.Image().sprite = GameManager.Instance.fillSprite;
+                column.Image().sprite = UIManager.Instance.FillSprite;
                 Color color = Color.white;
                 color.a = (i % 2 == 1) ? 0.2f : 0.4f;
                 column.Image().color = color;
@@ -101,7 +102,7 @@ namespace Route95.UI {
 
             // Refresh all columns
             for (int i = 0; i < columns.Count; i++)
-                RefreshColumn(columns[i], song.songPieces[song.songPieceIndices[i]]);
+                RefreshColumn(columns[i], song.SongPieces[song.SongPieceIndices[i]]);
 
             // Create add columns button
             GameObject addColumnButton = new GameObject("AddColumnButton",
@@ -120,11 +121,11 @@ namespace Route95.UI {
             atr.ResetScaleRot();
 
             addColumnButton.Button().onClick.AddListener(() => {
-                MusicManager.Instance.currentSong.NewSongPiece();
+                MusicManager.Instance.CurrentSong.NewSongPiece();
                 RefreshTimeline();
             });
 
-            addColumnButton.Image().sprite = GameManager.Instance.addIcon;
+            addColumnButton.Image().sprite = UIManager.Instance.AddIcon;
             columns.Add(addColumnButton);
         }
 
@@ -146,7 +147,7 @@ namespace Route95.UI {
         /// <param name="column">Column to refresh.</param>
         /// <param name="songpiece">Song piece to use for column.</param>
         void RefreshColumn(GameObject column, SongPiece songpiece) {
-            Song song = MusicManager.Instance.currentSong;
+            Song song = MusicManager.Instance.CurrentSong;
             RectTransform column_tr = column.RectTransform();
 
             // Clear all chuldren from column
@@ -155,10 +156,10 @@ namespace Route95.UI {
 
             int i = 0;
             float height = columnHeight / Instrument.AllInstruments.Count;
-            Measure measure = song.measures[songpiece.measureIndices[0]];
+            Measure measure = song.Measures[songpiece.measureIndices[0]];
 
             foreach (int r in measure.riffIndices) {
-                Riff riff = song.riffs[r];
+                Riff riff = song.Riffs[r];
 
                 float y = (float)(Instrument.AllInstruments.Count - 1 - i);
 
@@ -185,7 +186,7 @@ namespace Route95.UI {
                 label_text.color = Color.white;
                 label_text.fontStyle = FontStyle.Normal;
                 label_text.fontSize = 4;
-                label_text.font = GameManager.Instance.font;
+                label_text.font = UIManager.Instance.Font;
                 label_text.alignment = TextAnchor.MiddleCenter;
 
                 i++;

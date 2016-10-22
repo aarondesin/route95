@@ -1,5 +1,6 @@
 using Route95.Core;
 using Route95.UI;
+using Route95.World;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -608,6 +609,10 @@ namespace Route95.Music {
         /// <param name="inst">Instrument.</param>
         public AudioSource GetAudioSource(Instrument inst) {
             return _instrumentAudioSources[inst];
+        }
+
+        public AudioSource[] GetAllAudioSources () {
+            return _instrumentAudioSources.Values.ToArray<AudioSource>();
         }
 
         void Loop() {

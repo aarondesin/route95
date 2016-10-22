@@ -1,29 +1,33 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
 
-public class InheritAlpha : MonoBehaviour {
+namespace Route95.UI {
 
-	RectTransform parent;
-	MaskableGraphic parentGraphic;
-	MaskableGraphic graphic;
+    public class InheritAlpha : MonoBehaviour {
 
-	void Awake () {
-		if (parent == null)
-			parent = gameObject.RectTransform().parent as RectTransform;
+        RectTransform parent;
+        MaskableGraphic parentGraphic;
+        MaskableGraphic graphic;
 
-		graphic = GetComponent<MaskableGraphic>();
-		if (graphic == null)
-			throw new ArgumentException("No MaskableGraphic found on this object!");
+        void Awake() {
+            if (parent == null)
+                parent = gameObject.RectTransform().parent as RectTransform;
 
-		parentGraphic = parent.GetComponent<MaskableGraphic>();
-		if (parentGraphic == null)
-			throw new ArgumentException ("No MaskableGraphic found on parent!");
-	}
+            graphic = GetComponent<MaskableGraphic>();
+            if (graphic == null)
+                throw new ArgumentException("No MaskableGraphic found on this object!");
 
-	void Update () {
-		if (parentGraphic.color.a != graphic.color.a)
-			graphic.SetAlpha(parentGraphic.color.a);
-	}
+            parentGraphic = parent.GetComponent<MaskableGraphic>();
+            if (parentGraphic == null)
+                throw new ArgumentException("No MaskableGraphic found on parent!");
+        }
+
+        void Update() {
+            if (parentGraphic.color.a != graphic.color.a)
+                graphic.SetAlpha(parentGraphic.color.a);
+        }
+    }
 }

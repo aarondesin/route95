@@ -3,8 +3,8 @@
 
 using Route95.Music;
 using Route95.UI;
+using Route95.World;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -335,7 +335,18 @@ namespace Route95.Core {
         }
 
         #endregion
-        #region InputManager Methods
+        #region InputManager Properties
+
+        /// <summary>
+        /// Returns the currently selected GameObject (read-only).
+        /// </summary>
+        public GameObject Selected { get { return _selected; } }
+
+        /// <summary>
+        /// Returns the change in mouse position since the last frame 
+        /// (read-only).
+        /// </summary>
+        public Vector2 MouseDelta { get { return _mouseDelta; } }
 
         /// <summary>
         /// Returns whether or not the user is dragging (read-only).
@@ -343,6 +354,11 @@ namespace Route95.Core {
         public bool IsDragging { get {
             return _framesDragged >= _dragThreshold;
         } }
+
+        #endregion
+        #region InputManager Methods
+
+        
 
         void MakeNoteAudioSources () {
             for (int i = 0; i < 26; i++) {

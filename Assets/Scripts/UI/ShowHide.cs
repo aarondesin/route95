@@ -1,105 +1,109 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class that handles transition effects of UI objects.
-/// </summary>
-public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+namespace Route95.UI {
 
-	#region ShowHide Enums
+    /// <summary>
+    /// Class that handles transition effects of UI objects.
+    /// </summary>
+    public class ShowHide : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
-	/// <summary>
-	/// Type of transition.
-	/// </summary>
-	public enum TransitionType {
-		Instant,
-		Fade
-	}
+        #region ShowHide Enums
 
-	#endregion
-	#region ShowHide Vars
+        /// <summary>
+        /// Type of transition.
+        /// </summary>
+        public enum TransitionType {
+            Instant,
+            Fade
+        }
 
-	public List<GameObject> objects;       // Objects to show/hide
-	public TransitionType transitionType = // Type of transition
-		TransitionType.Instant;
+        #endregion
+        #region ShowHide Vars
 
-	public float fadeSpeed;                // Speed of fade effect
-	List<IEnumerator> activeFades;         // All active fade operations
+        public List<GameObject> objects;       // Objects to show/hide
+        public TransitionType transitionType = // Type of transition
+            TransitionType.Instant;
 
-	#endregion
-	#region ShowHide Methods
+        public float fadeSpeed;                // Speed of fade effect
+        List<IEnumerator> activeFades;         // All active fade operations
 
-	/// <summary>
-	/// Shows the object based on the transition type.
-	/// </summary>
-	public void Show() {
-		foreach (GameObject obj in objects) {
-			switch (transitionType) {
-			case TransitionType.Instant:
-				obj.SetActive(true);
-				break;
-			case TransitionType.Fade:
-				if (activeFades == null) activeFades = new List<IEnumerator>();
-				IEnumerator temp = Fade(obj);
-				activeFades.Add(temp);
-				StartCoroutine (temp);
-				break;
-			}
-		}
-	}
+        #endregion
+        #region ShowHide Methods
 
-	/// <summary>
-	/// Hides the object based on the transition type.
-	/// </summary>
-	public void Hide () {
-		foreach (GameObject obj in objects) {
-			switch (transitionType) {
-			case TransitionType.Instant:
-				obj.SetActive(false);
-				break;
-			case TransitionType.Fade:
-				foreach (IEnumerator fade in activeFades)
-					StopCoroutine (fade);
-				activeFades.Clear();
-				break;
-			}
-		}
-	}
+        /// <summary>
+        /// Shows the object based on the transition type.
+        /// </summary>
+        public void Show() {
+            foreach (GameObject obj in objects) {
+                switch (transitionType) {
+                    case TransitionType.Instant:
+                        obj.SetActive(true);
+                        break;
+                    case TransitionType.Fade:
+                        if (activeFades == null) activeFades = new List<IEnumerator>();
+                        IEnumerator temp = Fade(obj);
+                        activeFades.Add(temp);
+                        StartCoroutine(temp);
+                        break;
+                }
+            }
+        }
 
-	/// <summary>
-	/// Called when pointer first is over object.
-	/// </summary>
-	/// <param name="eventData"></param>
-	public void OnPointerEnter (PointerEventData eventData) {
-		if (objects != null && InputManager.Instance.selected == null) {
-			Show();
-		}
-	}
+        /// <summary>
+        /// Hides the object based on the transition type.
+        /// </summary>
+        public void Hide() {
+            foreach (GameObject obj in objects) {
+                switch (transitionType) {
+                    case TransitionType.Instant:
+                        obj.SetActive(false);
+                        break;
+                    case TransitionType.Fade:
+                        foreach (IEnumerator fade in activeFades)
+                            StopCoroutine(fade);
+                        activeFades.Clear();
+                        break;
+                }
+            }
+        }
 
-	/// <summary>
-	/// Called when pointer leaves object.
-	/// </summary>
-	/// <param name="eventData"></param>
-	public void OnPointerExit (PointerEventData eventData) {
-		if (objects != null && InputManager.Instance.selected == null) {
-			Hide();
-		}
-	}
+        /// <summary>
+        /// Called when pointer first is over object.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerEnter(PointerEventData eventData) {
+            if (objects != null && InputManager.Instance.Selected == null) {
+                Show();
+            }
+        }
 
-	/// <summary>
-	/// Fades target image.
-	/// </summary>
-	/// <param name="target"></param>
-	/// <returns></returns>
-	public IEnumerator Fade (GameObject target) {
-		for (float a = 0f; a < 1.0f; a += fadeSpeed) {
-			target.GetComponent<Image>().color = new Color (1, 1, 1f, a);
-			yield return null;
-		}
-	}
+        /// <summary>
+        /// Called when pointer leaves object.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerExit(PointerEventData eventData) {
+            if (objects != null && InputManager.Instance.Selected == null) {
+                Hide();
+            }
+        }
 
-	#endregion
+        /// <summary>
+        /// Fades target image.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public IEnumerator Fade(GameObject target) {
+            for (float a = 0f; a < 1.0f; a += fadeSpeed) {
+                target.GetComponent<Image>().color = new Color(1, 1, 1f, a);
+                yield return null;
+            }
+        }
+
+        #endregion
+    }
 }

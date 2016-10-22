@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using Route95.Core;
+using UnityEngine;
 using System.Collections;
+
+namespace Route95.World {
 
 /// <summary>
 /// Class to handle fading of lightning.
@@ -39,4 +42,5 @@ public class LightningFader : MonoBehaviour {
 	}
 
 	#endregion
+}
 }
