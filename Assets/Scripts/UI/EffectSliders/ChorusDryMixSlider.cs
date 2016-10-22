@@ -1,15 +1,25 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// ChorusDryMixSlider.cs
+// ©2016 Team 95
 
-public class ChorusDryMixSlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.chorusDryMix);
-	}
+    /// <summary>
+    /// Class to handle the riff editor chorus effect dry mix slider.
+    /// </summary>
+    public class ChorusDryMixSlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.chorusDryMix = slider.value;
-	}
+        /// <summary>
+        /// Initializes the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.chorusDryMix);
+        }
 
+        /// <summary>
+        /// Changes the current riff's chorus effect dry mix.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.chorusDryMix = slider.value;
+        }
+    }
 }

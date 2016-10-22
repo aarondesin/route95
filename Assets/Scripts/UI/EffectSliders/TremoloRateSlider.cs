@@ -1,15 +1,27 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// TremoloRateSlider.cs
+// ©2016 Team 95
 
-public class TremoloRateSlider : EffectSlider {
+using UnityEngine;
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.tremoloRate - (Mathf.PI/32f) / (Mathf.PI/32f));
-	}
+namespace Route95.UI {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.tremoloRate = (Mathf.PI/32f) + slider.value * (Mathf.PI/32f);
-	}
+    /// <summary>
+    /// Class to handle the riff editor tremolo effect rate slider.
+    /// </summary>
+    public class TremoloRateSlider : EffectSlider {
 
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.tremoloRate - (Mathf.PI / 32f) / (Mathf.PI / 32f));
+        }
+
+        /// <summary>
+        /// Changes the current riff's tremolo effect rate.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.tremoloRate = (Mathf.PI / 32f) + slider.value * (Mathf.PI / 32f);
+        }
+    }
 }

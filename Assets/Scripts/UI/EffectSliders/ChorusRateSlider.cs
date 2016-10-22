@@ -1,15 +1,25 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// ChorusRateSlider.cs
+// ©2016 Team 95
 
-public class ChorusRateSlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.chorusRate);
-	}
+    /// <summary>
+    /// Class to handle the riff editor chorus effect rate slider.
+    /// </summary>
+    public class ChorusRateSlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.chorusRate = slider.value;
-	}
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.chorusRate);
+        }
 
+        /// <summary>
+        /// Changes the current riff's chorus effect rate.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.chorusRate = slider.value;
+        }
+    }
 }

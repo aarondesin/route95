@@ -86,7 +86,7 @@ namespace Route95.UI {
             MusicManager.Instance.CurrentSong.RegisterRiff(temp);
 
             // Go to riff editor
-            RiffEditor.currentRiff = temp;
+            RiffEditor.CurrentRiff = temp;
             SongArrangeMenu.Instance.selectedRiffIndex = temp.index;
             SongArrangeMenu.Instance.SetValue(temp.index);
             SongArrangeMenu.Instance.Refresh();

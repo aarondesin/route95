@@ -1,5 +1,5 @@
 ﻿// SingletonMonoBehaviour.cs
-// ©2016 Aaron Desin 
+// ©2016 Team 95 
 
 using UnityEngine;
 using System;

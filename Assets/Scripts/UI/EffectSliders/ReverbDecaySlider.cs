@@ -1,15 +1,25 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// ReverbDecaySlider.cs
+// ©2016 Team 95
 
-public class ReverbDecaySlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.reverbDecayTime / 20f);
-	}
+    /// <summary>
+    /// Class to handle the riff editor reverb effect decay slider.
+    /// </summary>
+    public class ReverbDecaySlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.reverbDecayTime = slider.value * 20f;
-	}
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.reverbDecayTime / 20f);
+        }
 
+        /// <summary>
+        /// Changes the current riff's reverb effect decay time.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.reverbDecayTime = slider.value * 20f;
+        }
+    }
 }

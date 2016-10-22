@@ -1,203 +1,228 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿// RadialKeyMenu.cs
+// ©2016 Team 95
+
+using Route95.Core;
+using Route95.Music;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to handle the radial key selection menu.
-/// </summary>
-public class RadialKeyMenu : MonoBehaviour {
+using UnityEngine;
+using UnityEngine.UI;
 
-	#region RadialKeyMenu Vars
+namespace Route95.UI {
 
-	public static RadialKeyMenu Instance; // Quick reference to this Instance
+    /// <summary>
+    /// Class to handle the radial key selection menu.
+    /// </summary>
+    public class RadialKeyMenu : MenuBase<RadialKeyMenu> {
 
-	List<GameObject> objects;             // All buttons currently instantiated
+        #region RadialKeyMenu Vars
 
-	private float radius;                 // Current button placement radius
-	private float scale;                  // Current button scale
+        /// <summary>
+        /// All active buttons.
+        /// </summary>
+        List<GameObject> _objects;
 
-	[Tooltip("Base button scale.")]
-	public float baseScale;
+        [Tooltip("Base button scale.")]
+        [SerializeField]
+        float _baseScale;
 
-	[Tooltip("Base button scale factor.")]
-	public float scaleFactor;
+        [Tooltip("Base button scale factor.")]
+        [SerializeField]
+        float _scaleFactor;
 
-	[Tooltip("Confirm button.")]
-	public GameObject confirmButton;
+        /// <summary>
+        /// Current button placement radius.
+        /// </summary>
+        float _radius;
+        /// <summary>
+        /// Current button scale.
+        /// </summary>
+        float _scale;
 
-	Color gray = new Color (0.8f, 0.8f, 0.8f, 0.8f);
+        /// <summary>
+        /// Gray color constant.
+        /// </summary>
+        Color _GRAY = new Color(0.8f, 0.8f, 0.8f, 0.8f);
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Parent RectTransform;
+        /// </summary>
+        RectTransform _tr;
 
-	void Awake () {
-		Instance = this;
-		objects = new List<GameObject>();
-	}
+        #endregion
+        #region Unity Callbacks
 
-	void Start () {
-		Refresh();
-	}
+        new void Awake() {
+            // Init vars
+            _tr = transform as RectTransform();
+            _objects = new List<GameObject>();
+        }
 
-	#endregion
-	#region RadialKeyMenu Vars
+        void Start() {
+            Refresh();
+        }
 
-	/// <summary>
-	/// Refreshes the radial key menu.
-	/// </summary>
-	public void Refresh () {
+        #endregion
+        #region RadialKeyMenu Vars
 
-		// Clear old buttons
-		foreach (GameObject obj in objects) Destroy (obj);
-		objects.Clear();
+        /// <summary>
+        /// Refreshes the radial key menu.
+        /// </summary>
+        public void Refresh() {
 
-		// Init radius and scale
-		radius = (gameObject.RectTransform().rect.width - baseScale) / 2f;
-		scale = baseScale;
+            // Clear old buttons
+            foreach (GameObject obj in _objects) Destroy(obj);
+            _objects.Clear();
 
-		// Layer one -- keys
-		int numKeys = Enum.GetValues(typeof(Key)).Length;
-		for (int i=1; i < numKeys; i++) { // i=1 so that it skips Key.None
-			Key key = (Key)i;
-			float angle = (float)i / (float)(numKeys-1) * 2f * Mathf.PI;
+            // Init radius and scale
+            _radius = (_tr.rect.width - _baseScale) / 2f;
+            _scale = _baseScale;
 
-			// Create button
-			GameObject button = UIHelpers.MakeTextButton(key.ToString());
-			RectTransform tr = button.RectTransform();
-			tr.SetParent (gameObject.RectTransform());
-			tr.SetSideWidth (scale);
-			tr.AnchorAtPoint(0.5f, 0.5f);
-			tr.anchoredPosition3D = new Vector3 ( radius * Mathf.Cos (angle), radius * Mathf.Sin (angle), 0f);
-			tr.ResetScaleRot();
+            // Layer one -- keys
+            int numKeys = Enum.GetValues(typeof(Key)).Length;
+            for (int i = 1; i < numKeys; i++) { // i=1 so that it skips Key.None
+                Key key = (Key)i;
+                float angle = (float)i / (float)(numKeys - 1) * 2f * Mathf.PI;
 
-			// Set button text
-			Text text = button.GetComponentInChildren<Text>();
-			if (key.ToString().Contains("Sharp")) text.text = key.ToString()[0] + "#";
-			text.font = GameManager.Instance.font;
-			text.fontSize = (int)(scale/2f);
-			text.color = gray;
+                // Create button
+                GameObject button = UIHelpers.MakeTextButton(key.ToString());
+                RectTransform tr = button.RectTransform();
+                tr.SetParent(gameObject.RectTransform());
+                tr.SetSideWidth(scale);
+                tr.AnchorAtPoint(0.5f, 0.5f);
+                tr.anchoredPosition3D = new Vector3(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle), 0f);
+                tr.ResetScaleRot();
 
-			// Set button image
-			Image img = button.Image();
-			img.sprite = GameManager.Instance.circleIcon;
-			img.color =  gray;
+                // Set button text
+                Text text = button.GetComponentInChildren<Text>();
+                if (key.ToString().Contains("Sharp")) text.text = key.ToString()[0] + "#";
+                text.font = GameManager.Instance.font;
+                text.fontSize = (int)(scale / 2f);
+                text.color = gray;
 
-			// Highlight if selected key
-			if (key == MusicManager.Instance.currentSong.key) {
-				text.color = Color.white;
-				img.color = Color.white;
+                // Set button image
+                Image img = button.Image();
+                img.sprite = GameManager.Instance.circleIcon;
+                img.color = gray;
 
-				GameObject hl = UIHelpers.MakeImage (key.ToString() +"_SelectedHighlight");
-				tr = hl.RectTransform();
-				tr.SetParent (button.RectTransform());
-				tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
-				tr.AnchorAtPoint(0.5f, 0.5f);
-				tr.anchoredPosition3D = Vector3.zero;
-				tr.ResetScaleRot();
+                // Highlight if selected key
+                if (key == MusicManager.Instance.CurrentSong.Key) {
+                    text.color = Color.white;
+                    img.color = Color.white;
 
-				img = hl.Image();
-				img.sprite = GameManager.Instance.circleIcon;
-				img.color = Color.white;
-			}
+                    GameObject hl = UIHelpers.MakeImage(key.ToString() + "_SelectedHighlight");
+                    tr = hl.RectTransform();
+                    tr.SetParent(button.RectTransform());
+                    tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+                    tr.AnchorAtPoint(0.5f, 0.5f);
+                    tr.anchoredPosition3D = Vector3.zero;
+                    tr.ResetScaleRot();
 
-			// Set button functionality
-			button.Button().onClick.AddListener (delegate {
-				GameManager.Instance.MenuClick();
-				MusicManager.Instance.currentSong.key = key;
-				Refresh();
-			});
+                    img = hl.Image();
+                    img.sprite = GameManager.Instance.circleIcon;
+                    img.color = Color.white;
+                }
 
-			// Set button show/hide
-			ShowHide sh = button.AddComponent<ShowHide>();
-			GameObject highlight = UIHelpers.MakeImage (key.ToString() + "_Highlight");
-			tr = highlight.RectTransform();
-			tr.SetParent (button.RectTransform());
-			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
-			tr.AnchorAtPoint(0.5f, 0.5f);
-			tr.ResetScaleRot();
-			tr.anchoredPosition3D = Vector3.zero;
-			highlight.Image().sprite = GameManager.Instance.volumeIcon;
-			highlight.Image().color = Color.white;
+                // Set button functionality
+                button.Button().onClick.AddListener(delegate {
+                    UIManager.Instance.PlayMenuClickSound();
+                    MusicManager.Instance.CurrentSong.key = key;
+                    Refresh();
+                });
 
-			sh.objects = new List<GameObject>();
-			sh.objects.Add (highlight);
+                // Set button show/hide
+                ShowHide sh = button.AddComponent<ShowHide>();
+                GameObject highlight = UIHelpers.MakeImage(key.ToString() + "_Highlight");
+                tr = highlight.RectTransform();
+                tr.SetParent(button.RectTransform());
+                tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+                tr.AnchorAtPoint(0.5f, 0.5f);
+                tr.ResetScaleRot();
+                tr.anchoredPosition3D = Vector3.zero;
+                highlight.Image().sprite = GameManager.Instance.volumeIcon;
+                highlight.Image().color = Color.white;
 
-			highlight.SetActive(false);
+                sh.objects = new List<GameObject>();
+                sh.objects.Add(highlight);
 
-			objects.Add (button);
-		}
+                highlight.SetActive(false);
 
-		// Layer two -- scales
-		radius *= scaleFactor;
-		scale *= scaleFactor;
-		int numScales = ScaleInfo.AllScales.Count;
-		for (int i=0; i < numScales; i++) {
-			ScaleInfo scalei = ScaleInfo.AllScales[i];
-			float angle = (float)i / (float)numScales * 2f * Mathf.PI;
+                objects.Add(button);
+            }
 
-			// Make scale button
-			GameObject button = UIHelpers.MakeTextButton(scalei.name);
-			RectTransform tr = button.RectTransform();
-			tr.SetParent (gameObject.RectTransform());
-			tr.SetSideWidth(scale);
-			tr.AnchorAtPoint(0.5f, 0.5f);
-			tr.ResetScaleRot();
-			tr.anchoredPosition3D = new Vector3 (radius * Mathf.Cos (angle), radius * Mathf.Sin (angle), 0f);
+            // Layer two -- scales
+            radius *= scaleFactor;
+            scale *= scaleFactor;
+            int numScales = ScaleInfo.AllScales.Count;
+            for (int i = 0; i < numScales; i++) {
+                ScaleInfo scalei = ScaleInfo.AllScales[i];
+                float angle = (float)i / (float)numScales * 2f * Mathf.PI;
 
-			// Set button text
-			Text text = button.GetComponentInChildren<Text>();
-			text.font = GameManager.Instance.font;
-			text.fontSize = (int)(baseScale/6f);
-			text.color = gray;
+                // Make scale button
+                GameObject button = UIHelpers.MakeTextButton(scalei.name);
+                RectTransform tr = button.RectTransform();
+                tr.SetParent(gameObject.RectTransform());
+                tr.SetSideWidth(scale);
+                tr.AnchorAtPoint(0.5f, 0.5f);
+                tr.ResetScaleRot();
+                tr.anchoredPosition3D = new Vector3(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle), 0f);
 
-			// Set button image
-			Image img = button.Image();
-			img.sprite = GameManager.Instance.circleIcon;
-			img.color = gray;
+                // Set button text
+                Text text = button.GetComponentInChildren<Text>();
+                text.font = GameManager.Instance.font;
+                text.fontSize = (int)(baseScale / 6f);
+                text.color = gray;
 
-			// Set highlighted button
-			if (i == MusicManager.Instance.currentSong.scale) {
-				text.color = Color.white;
-				img.color = Color.white;
-			}
+                // Set button image
+                Image img = button.Image();
+                img.sprite = GameManager.Instance.circleIcon;
+                img.color = gray;
 
-			// Set button functionality
-			button.Button().onClick.AddListener (delegate {
-				GameManager.Instance.MenuClick();
-				MusicManager.Instance.currentSong.scale = scalei.scaleIndex;
-				Refresh();
-			});
+                // Set highlighted button
+                if (i == MusicManager.Instance.currentSong.scale) {
+                    text.color = Color.white;
+                    img.color = Color.white;
+                }
 
-			// Set show/hide
-			ShowHide sh = button.AddComponent<ShowHide>();
-			GameObject highlight = UIHelpers.MakeImage (scalei.name + "_Highlight");
-			tr = highlight.RectTransform();
-			tr.SetParent (button.RectTransform());
-			tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
-			tr.AnchorAtPoint(0.5f, 0.5f);
-			tr.ResetScaleRot();
-			tr.anchoredPosition3D = Vector3.zero;
-			highlight.Image().sprite = GameManager.Instance.volumeIcon;
-			highlight.Image().color = Color.white;
+                // Set button functionality
+                button.Button().onClick.AddListener(delegate {
+                    GameManager.Instance.MenuClick();
+                    MusicManager.Instance.currentSong.scale = scalei.scaleIndex;
+                    Refresh();
+                });
 
-			sh.objects = new List<GameObject>();
-			sh.objects.Add (highlight);
+                // Set show/hide
+                ShowHide sh = button.AddComponent<ShowHide>();
+                GameObject highlight = UIHelpers.MakeImage(scalei.name + "_Highlight");
+                tr = highlight.RectTransform();
+                tr.SetParent(button.RectTransform());
+                tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
+                tr.AnchorAtPoint(0.5f, 0.5f);
+                tr.ResetScaleRot();
+                tr.anchoredPosition3D = Vector3.zero;
+                highlight.Image().sprite = GameManager.Instance.volumeIcon;
+                highlight.Image().color = Color.white;
 
-			highlight.SetActive(false);
+                sh.objects = new List<GameObject>();
+                sh.objects.Add(highlight);
 
-			objects.Add (button);
-				
-		}
+                highlight.SetActive(false);
 
-		// Confirm button
-		if (MusicManager.Instance.currentSong.key != Key.None &&
-			MusicManager.Instance.currentSong.scale != -1) {
-			confirmButton.Button().interactable = true;
-			confirmButton.SetActive (true);
-		} else confirmButton.SetActive (false);
-	}
+                objects.Add(button);
 
-	#endregion
+            }
+
+            // Confirm button
+            if (MusicManager.Instance.currentSong.key != Key.None &&
+                MusicManager.Instance.currentSong.scale != -1) {
+                confirmButton.Button().interactable = true;
+                confirmButton.SetActive(true);
+            }
+            else confirmButton.SetActive(false);
+        }
+
+        #endregion
+    }
 }

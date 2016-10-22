@@ -128,6 +128,20 @@ namespace Route95.UI {
         [SerializeField]
         AudioClip _altMenuClickSound;
 
+        /// <summary>
+        /// Sound to play when enabling an instrument effect.
+        /// </summary>
+        [Tooltip("Sound to play when enabling an instrument effect.")]
+        [SerializeField]
+        AudioClip _enableEffectSound;
+
+        /// <summary>
+        /// Sound to play when disabling an instrument effect.
+        /// </summary>
+        [Tooltip("Sound to play when disabling an instrument effect.")]
+        [SerializeField]
+        AudioClip _disableEffectSound;
+
         //--------------------------------------------------------------------------
         [Header("Menu Objects")]
 
@@ -573,6 +587,14 @@ namespace Route95.UI {
         /// </summary>
         public void PlayAltMenuClickSound() {
             MusicManager.PlayMenuSound(_altMenuClickSound);
+        }
+
+        public void PlayEnableEffectSound () {
+            MusicManager.PlayMenuSound(_enableEffectSound);
+        }
+
+        public void PlayDisableEffectSound () {
+            MusicManager.PlayMenuSound(_disableEffectSound);
         }
 
         #endregion

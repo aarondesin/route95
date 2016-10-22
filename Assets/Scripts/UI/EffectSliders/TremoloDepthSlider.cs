@@ -1,15 +1,25 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// TremoloDepthSlider.cs
+// ©2016 Team 95
 
-public class TremoloDepthSlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.tremoloDepth);
-	}
+    /// <summary>
+    /// Class to handle the riff editor tremolo effect depth slider.
+    /// </summary>
+    public class TremoloDepthSlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.tremoloDepth = slider.value;
-	}
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.tremoloDepth);
+        }
 
+        /// <summary>
+        /// Changes the current riff's tremolo effect depth.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.tremoloDepth = slider.value;
+        }
+    }
 }

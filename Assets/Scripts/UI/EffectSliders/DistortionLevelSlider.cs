@@ -1,15 +1,25 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// DistortionLevelSlider.cs
+// ©2016 Team 95
 
-public class DistortionLevelSlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.distortionLevel);
-	}
+    /// <summary>
+    /// Class to handle the riff editor distortion effect level slider.
+    /// </summary>
+    public class DistortionLevelSlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.distortionLevel = slider.value;
-	}
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+        public override void Initialize() {
+            UpdateSlider(RiffEditor.CurrentRiff.distortionLevel);
+        }
 
+        /// <summary>
+        /// Changes the current riff's distortion effect level.
+        /// </summary>
+        public override void ChangeValue() {
+            RiffEditor.CurrentRiff.distortionLevel = slider.value;
+        }
+    }
 }

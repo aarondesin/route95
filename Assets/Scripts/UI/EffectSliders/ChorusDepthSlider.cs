@@ -1,15 +1,26 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// ChorusDepthSlider.cs
+// ©2016 Team 95
 
-public class ChorusDepthSlider : EffectSlider {
+namespace Route95.UI {
 
-	public override void Initialize () {
-		UpdateSlider (RiffEditor.currentRiff.chorusDepth);
-	}
+    /// <summary>
+    /// Class to handle the chorus effect depth slider.
+    /// </summary>
+    public class ChorusDepthSlider : EffectSlider {
 
-	public override void ChangeValue () {
-		RiffEditor.currentRiff.chorusDepth = slider.value;
-	}
+        /// <summary>
+        /// Inits the slider.
+        /// </summary>
+	    public override void Initialize () {
+		    UpdateSlider (RiffEditor.CurrentRiff.chorusDepth);
+	    }
 
+        /// <summary>
+        /// Changes the current riff's chorus effect depth.
+        /// </summary>
+	    public override void ChangeValue () {
+		    RiffEditor.CurrentRiff.chorusDepth = slider.value;
+	    }
+
+    }
 }

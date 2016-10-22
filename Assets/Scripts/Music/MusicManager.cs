@@ -216,7 +216,7 @@ namespace Route95.Music {
                         if (riffMode) {
 
                             // Play riff note
-                            RiffEditor.currentRiff.PlayRiff(beat++);
+                            RiffEditor.CurrentRiff.PlayRiff(beat++);
 
                             // Wrap payback
                             if (beat >= Riff.MAX_BEATS && loop) beat = 0;
@@ -618,7 +618,7 @@ namespace Route95.Music {
                 StopLooping();
 
                 // Stop AudioSource
-                Instrument instrument = Instrument.AllInstruments[RiffEditor.currentRiff.instrumentIndex];
+                Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.instrumentIndex];
                 _instrumentAudioSources[instrument].Stop();
 
                 // If not looping, then start
@@ -636,7 +636,7 @@ namespace Route95.Music {
             playing = false;
             loop = false;
             beat = 0;
-            Instrument instrument = Instrument.AllInstruments[RiffEditor.currentRiff.instrumentIndex];
+            Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.instrumentIndex];
             _instrumentAudioSources[instrument].Stop();
         }
 
@@ -682,7 +682,7 @@ namespace Route95.Music {
             _currentSong.RegisterRiff(temp);
 
             // Update riff editor
-            RiffEditor.currentRiff = temp;
+            RiffEditor.CurrentRiff = temp;
 
             // Update song arrange
             SongArrangeMenu.Instance.selectedRiffIndex = temp.index;

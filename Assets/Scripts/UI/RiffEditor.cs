@@ -31,7 +31,7 @@ namespace Route95.UI {
         AudioClip _disableEffectSound;
 
         public bool initialized = false;
-        public static Riff currentRiff;         // Current riff being edited
+        public static Riff CurrentRiff;         // Current riff being edited
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("UI Settings")]
@@ -121,7 +121,7 @@ namespace Route95.UI {
 
             // Set up riff name input field
             nameInputField.onEndEdit.AddListener(delegate {
-                currentRiff.name = nameInputField.text;
+                CurrentRiff.name = nameInputField.text;
             });
         }
 
@@ -135,7 +135,7 @@ namespace Route95.UI {
             initialized = false;
 
             // Check if riff is valid
-            if (currentRiff == null) {
+            if (CurrentRiff == null) {
                 Debug.LogError("RiffEditor.Initialize(): no riff selected!");
                 return;
             }
@@ -147,7 +147,7 @@ namespace Route95.UI {
             }
 
             // Initialize effect status sprites
-            AudioSource source = MusicManager.Instance.GetAudioSource(currentRiff.instrument);
+            AudioSource source = MusicManager.Instance.GetAudioSource(CurrentRiff.instrument);
 
             // Initialize effect toggle sprites
             distortionButton.sprite =
@@ -169,7 +169,7 @@ namespace Route95.UI {
             Cleanup();
 
             // Set up riff editor properties
-            nameInputField.text = currentRiff.name;
+            nameInputField.text = CurrentRiff.name;
             playRiffButton.sprite = UIManager.Instance.PlayIcon;
             UpdateTempoText();
 
@@ -183,14 +183,14 @@ namespace Route95.UI {
             for (int n = 0; n < numButtons; n++) buttonGrid.Add(new List<GameObject>());
 
             // Create note buttons
-            if (currentRiff.instrument.type == Instrument.Type.Percussion)
-                InitializePercussionSetup((PercussionInstrument)currentRiff.instrument);
-            else if (currentRiff.instrument.type == Instrument.Type.Melodic)
-                InitializeMelodicSetup((MelodicInstrument)currentRiff.instrument);
-            else Debug.LogError(currentRiff.instrument.name + " unable to initialize.");
+            if (CurrentRiff.instrument.type == Instrument.Type.Percussion)
+                InitializePercussionSetup((PercussionInstrument)CurrentRiff.instrument);
+            else if (CurrentRiff.instrument.type == Instrument.Type.Melodic)
+                InitializeMelodicSetup((MelodicInstrument)CurrentRiff.instrument);
+            else Debug.LogError(CurrentRiff.instrument.name + " unable to initialize.");
 
             // Update riff volume slider
-            riffVolumeSlider.value = currentRiff.volume;
+            riffVolumeSlider.value = CurrentRiff.volume;
 
             initialized = true;
         }
@@ -330,11 +330,11 @@ namespace Route95.UI {
                 );
 
                 // Check if note is already in riff
-                bool noteExists = currentRiff.Lookup(fileName, num);
+                bool noteExists = CurrentRiff.Lookup(fileName, num);
 
                 // Get or create note
                 Note note = noteExists ?
-                    currentRiff.GetNote(fileName, num) :
+                    CurrentRiff.GetNote(fileName, num) :
                     new Note(fileName);
 
                 // Create note button
@@ -376,7 +376,7 @@ namespace Route95.UI {
                 // Create show/hide toggle
                 ShowHide bt_sh = button.AddComponent<ShowHide>();
                 bt_sh.objects = new List<GameObject>() { volume };
-                bt_sh.enabled = currentRiff.Lookup(note, num);
+                bt_sh.enabled = CurrentRiff.Lookup(note, num);
 
                 // Initially hide volume slider
                 volume.SetActive(false);
@@ -384,7 +384,7 @@ namespace Route95.UI {
                 // Add button functionality
                 button.Button().onClick.AddListener(() => {
                     if (!InputManager.Instance.IsDragging) {
-                        bool n = currentRiff.Toggle(note, num);
+                        bool n = CurrentRiff.Toggle(note, num);
                         if (!n) bt_sh.Hide();
                         bt_sh.enabled = n;
                         button.Image().sprite = (n ? percussionFilled : percussionEmpty);
@@ -407,7 +407,7 @@ namespace Route95.UI {
             octaveParent.SetActive(true);
 
             Song song = MusicManager.Instance.CurrentSong;
-            Instrument instrument = currentRiff.instrument;
+            Instrument instrument = CurrentRiff.instrument;
 
             // Calculate available octaves
             List<string> sounds = Sounds.soundsToLoad[instrument.codeName];
@@ -462,7 +462,7 @@ namespace Route95.UI {
 
             // Make rows of note buttons
             for (int i = 0; i < numNotes && i < totalNotes; i++) {
-                string note = Sounds.soundsToLoad[currentRiff.instrument.codeName][i + startIndex];
+                string note = Sounds.soundsToLoad[CurrentRiff.instrument.codeName][i + startIndex];
                 bool inScale = KeyManager.Instance.GetScale(key, scale, meloInst).HasNote(note);
                 MakeMelodicButtons(note.Split('_')[1], i, note, inScale);
             }
@@ -517,15 +517,15 @@ namespace Route95.UI {
                 );
 
                 // Check if note is already in riff
-                bool noteExists = currentRiff.Lookup(fileName, num);
+                bool noteExists = CurrentRiff.Lookup(fileName, num);
 
                 // Get or create note
                 Note note = noteExists ?
-                    currentRiff.GetNote(fileName, num) :
+                    CurrentRiff.GetNote(fileName, num) :
                     new Note(fileName);
 
                 // Make note button
-                Sprite graphic = (currentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty);
+                Sprite graphic = (CurrentRiff.Lookup(fileName, num) ? melodicFilled : melodicEmpty);
                 GameObject button = UIHelpers.MakeButton(title + "_" + i, graphic);
                 button.SetParent(notePanel);
                 button.SetSize2D(buttonSize.x, buttonSize.y);
@@ -568,7 +568,7 @@ namespace Route95.UI {
                 // Create show/hide toggle
                 ShowHide bt_sh = button.AddComponent<ShowHide>();
                 bt_sh.objects = new List<GameObject>() { volume };
-                bt_sh.enabled = currentRiff.Lookup(note, num);
+                bt_sh.enabled = CurrentRiff.Lookup(note, num);
 
                 // Initially hide volume slider
                 volume.SetActive(false);
@@ -576,7 +576,7 @@ namespace Route95.UI {
                 // Setup button
                 button.Button().onClick.AddListener(() => {
                     if (!InputManager.Instance.IsDragging) {
-                        bool n = currentRiff.Toggle(note, num);
+                        bool n = CurrentRiff.Toggle(note, num);
                         if (n) {
                             SuggestChords(num, row);
                             bt_sh.Show();
@@ -632,7 +632,7 @@ namespace Route95.UI {
         /// </summary>
         /// <param name="slider">Slider to use.</param>
         public void SetRiffVolume(Slider slider) {
-            currentRiff.volume = slider.value;
+            CurrentRiff.volume = slider.value;
         }
 
         /// <summary>
@@ -641,7 +641,7 @@ namespace Route95.UI {
         /// </summary>
         /// <param name="slider">Slider to use.</param>
         public void SetRiffPanning(Slider slider) {
-            currentRiff.panning = slider.value;
+            CurrentRiff.panning = slider.value;
         }
 
         public void SyncScrollbars() {
@@ -716,14 +716,14 @@ namespace Route95.UI {
         }
 
         /*void Suggest () {
-            int posX = riffai.FindHintXPosition (currentRiff, subdivsShown);
+            int posX = riffai.FindHintXPosition (CurrentRiff, subdivsShown);
             Debug.Log ("posX = " + posX);
-            //Debug.Log ("curr inst " + currentRiff.instrument);
+            //Debug.Log ("curr inst " + CurrentRiff.instrument);
 
             Key key = MusicManager.Instance.currentSong.key;
             ScaleInfo scale = ScaleInfo.AllScales[MusicManager.Instance.currentSong.scale];
 
-            int posY = riffai.FindHintYPosition (currentRiff, KeyManager.Instance.scales [key][scale][(MelodicInstrument)currentRiff.instrument], subdivsShown);
+            int posY = riffai.FindHintYPosition (CurrentRiff, KeyManager.Instance.scales [key][scale][(MelodicInstrument)CurrentRiff.instrument], subdivsShown);
             Debug.Log ("posY = " + posY);
             if (posX >= buttonGrid.Count || posX < 0) {
                 Debug.Log ("Suggestion X out of bounds!");
@@ -740,7 +740,7 @@ namespace Route95.UI {
                 //int processedX = (posX * (2)) -1;
                 Debug.Log("Suggesting "+posX+" " + posY);
                 //Debug.Log ("curr key " + MusicManager.Instance.currentKey);
-                //Debug.Log (" curr inst " +RiffEditor.currentRiff.instrument);
+                //Debug.Log (" curr inst " +RiffEditor.CurrentRiff.instrument);
                 //Debug.Log (" guitar " + Instrument.ElectricGuitar);
                 Debug.Log("buttongrid x length: " + buttonGrid.Count);
                 Debug.Log("buttongrid Y length: " + buttonGrid[posX].Count);
@@ -753,7 +753,7 @@ namespace Route95.UI {
         void Suggest(GameObject button) {
             Debug.Log("in Suggest");
             Sprite img = button.GetComponent<Image>().sprite;
-            if (currentRiff.instrument.type == Instrument.Type.Percussion && img != percussionFilled) {
+            if (CurrentRiff.instrument.type == Instrument.Type.Percussion && img != percussionFilled) {
                 button.GetComponent<Image>().sprite = percussionSuggested;
             }
             else if (img != melodicFilled) {
