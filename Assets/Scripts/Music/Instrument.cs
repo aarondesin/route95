@@ -111,6 +111,11 @@ namespace Route95.Music {
         public string CodeName { get { return _codeName; } }
 
         /// <summary>
+        /// Returns the icon for this instrument (read-only).
+        /// </summary>
+        public Sprite Icon { get { return _icon; } }
+
+        /// <summary>
         /// Returns the index of this instrument (read-only).
         /// </summary>
         public int Index { get { return _index; } }

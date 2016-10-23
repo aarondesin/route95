@@ -1,39 +1,74 @@
-﻿using UnityEngine;
+﻿// Blinking.cs
+// ©2016 Team 95
+
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
-/// <summary>
-/// Class to blink a sprite.
-/// </summary>
-public class Blinking : MonoBehaviour {
+namespace Route95.UI {
 
-	#region Blinking Vars
+    /// <summary>
+    /// Class to blink a sprite.
+    /// </summary>
+    public class Blinking : MonoBehaviour {
 
-	[Tooltip("The color of the image at the peak of its blink cycle.")]
-	public Color peakColor;
+        #region Blinking Vars
 
-	[Tooltip("The rate at which the image blinks.")]
-	[Range(0.01f, 0.5f)]
-	public float blinkInterval;
+        /// <summary>
+        /// The color of the image at the peak of its blink cycle.
+        /// </summary>
+        [Tooltip("The color of the image at the peak of its blink cycle.")]
+        [SerializeField]
+        Color _peakColor;
 
-	[Tooltip("The depth of the alpha dip.")]
-	[Range(0f, 1f)]
-	public float blinkDepth = 0.5f;
+        /// <summary>
+        /// The rate at which the image blinks.
+        /// </summary>
+        [Tooltip("The rate at which the image blinks.")]
+        [Range(0.01f, 0.5f)]
+        [SerializeField]
+        float _blinkInterval;
 
-	[SerializeField]
-	[Range(0f, 2f*Mathf.PI)]
-	float progress = 0f;
+        /// <summary>
+        /// The depth of the alpha dip.
+        /// </summary>
+        [Tooltip("The depth of the alpha dip.")]
+        [Range(0f, 1f)]
+        [SerializeField]
+        float _blinkDepth = 0.5f;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Current progress of the blinking.
+        /// </summary>
+        [Range(0f, 2f * Mathf.PI)]
+        float _progress = 0f;
 
-	void Update () {
-		if (progress >= 2f * Mathf.PI) progress = 0;
-		Color color = peakColor;
-		color.a = 1f - blinkDepth + blinkDepth * Mathf.Sin(progress);
-		GetComponent<Image>().color = color;
-		progress += blinkInterval;
-	}
+        /// <summary>
+        /// Two times pi.
+        /// </summary>
+        float _TWOPI;
 
-	#endregion
+        /// <summary>
+        /// Reference to this object's graphic.
+        /// </summary>
+        MaskableGraphic _graphic;
+
+        #endregion
+        #region Unity Callbacks
+
+        void Awake () {
+            // Init vars
+            _TWOPI = 2f * Mathf.PI;
+            _graphic = GetComponent<MaskableGraphic>();
+        }
+
+        void Update() {
+            if (_progress >= _TWOPI) _progress -= _TWOPI;
+            Color color = _peakColor;
+            color.a = 1f - _blinkDepth + _blinkDepth * Mathf.Sin(_progress);
+            _graphic.color = color;
+            _progress += _blinkInterval;
+        }
+
+        #endregion
+    }
 }

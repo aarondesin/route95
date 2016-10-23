@@ -1,8 +1,12 @@
-﻿using Route95.Music;
+﻿// AddRiffPrompt.cs
+// ©2016 Team 95
+
+using Route95.Music;
+
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Route95.UI {
 
@@ -13,22 +17,33 @@ namespace Route95.UI {
 
         #region AddRiffPrompt Vars
 
-        [Tooltip("Riff name input field.")]
-        public InputField inputField;
+        /// <summary>
+        /// Riff name input field.
+        /// </summary>
+        InputField _inputField;
 
-        [Tooltip("Instrument select dropdown.")]
-        public Dropdown dropdown;
+        /// <summary>
+        /// Instrument select dropdown.
+        /// </summary>
+        Dropdown _dropdown;
 
-        [Tooltip("Confirm button.")]
-        public Button confirmButton;
+        /// <summary>
+        /// Confirm button.
+        /// </summary>
+        Button _confirmButton;
 
         #endregion
         #region Unity Callbacks
 
         new void Awake() {
+            // Init vars
+            _inputField = GetComponentInChildren<InputField>();
+            _dropdown = GetComponentInChildren<Dropdown>();
+            _confirmButton = GetComponentInChildren<Button>();
+
             // Reset listeners
-            inputField.onEndEdit.AddListener(delegate {
-                confirmButton.interactable = true;
+            _inputField.onEndEdit.AddListener(delegate {
+                _confirmButton.interactable = true;
             });
         }
 
@@ -45,13 +60,13 @@ namespace Route95.UI {
         public void Refresh() {
 
             // Set riff name input field to be blank
-            inputField.text = "";
+            _inputField.text = "";
 
             // Refresh dropdown
             SetupDropdown();
 
             // Set confirm button to be non-interactable
-            confirmButton.interactable = false;
+            _confirmButton.interactable = false;
         }
 
         /// <summary>
@@ -60,15 +75,15 @@ namespace Route95.UI {
         void SetupDropdown() {
 
             // Clear old options
-            dropdown.ClearOptions();
+            _dropdown.ClearOptions();
 
             // Reset options
             List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
             foreach (Instrument inst in Instrument.AllInstruments)
-                options.Add(new Dropdown.OptionData(inst.name, inst.icon));
+                options.Add(new Dropdown.OptionData(inst.Name, inst.Icon));
 
-            dropdown.AddOptions(options);
-            dropdown.value = 0;
+            _dropdown.AddOptions(options);
+            _dropdown.value = 0;
         }
 
         /// <summary>
@@ -77,22 +92,21 @@ namespace Route95.UI {
         public void AddRiff() {
 
             // Create riff
-            Riff temp = new Riff(dropdown.value);
+            Riff temp = new Riff(_dropdown.value);
 
             // Name riff
-            temp.name = inputField.text;
+            temp.Name = _inputField.text;
 
             // Register riff with song
             MusicManager.Instance.CurrentSong.RegisterRiff(temp);
 
             // Go to riff editor
             RiffEditor.CurrentRiff = temp;
-            SongArrangeMenu.Instance.selectedRiffIndex = temp.index;
-            SongArrangeMenu.Instance.SetValue(temp.index);
+            SongArrangeMenu.Instance.selectedRiffIndex = temp.Index;
+            SongArrangeMenu.Instance.SetValue(temp.Index);
             SongArrangeMenu.Instance.Refresh();
         }
 
         #endregion
-
     }
 }

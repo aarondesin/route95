@@ -1,15 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// ConfirmExitPrompt.cs
+// ©2016 Team 95
+ 
+namespace Route95.UI {
 
-public class ConfirmExitPrompt : MenuBase<ConfirmExitPrompt> {
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    /// <summary>
+    /// Singleton class to handle the confirm exit prompt.
+    /// </summary>
+    public class ConfirmExitPrompt : MenuBase<ConfirmExitPrompt> {}
 }

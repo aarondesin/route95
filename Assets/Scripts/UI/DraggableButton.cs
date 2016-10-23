@@ -1,45 +1,93 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// DraggableButton.cs
+// ©2016 Team 95
 
-/// <summary>
-/// Enables a button to be draggable.
-/// </summary>
-public class DraggableButton : MonoBehaviour {
+using UnityEngine;
 
-	#region DraggableButton Vars
+namespace Route95.UI {
 
-	public float maxDragDistanceUp;    // Maxmimum drag distance upwards
-	public float maxDragDistanceDown;  // Maxmimum drag distance downwards
-	public float maxDragDistanceLeft;  // Maxmimum drag distance to the left
-	public float maxDragDistanceRight; // Maxmimum drag distance to the right
+    /// <summary>
+    /// Enables a button to be draggable.
+    /// </summary>
+    public abstract class DraggableButton : MonoBehaviour {
 
-	const float dragBias = 1.25f;      // Threshold for drag to recognize one direction over another
+        #region DraggableButton Vars
 
-	#endregion
-	#region DraggableButton Methods
+        /// <summary>
+        /// Maximum drag distance upwards.
+        /// </summary>
+        [SerializeField]
+        protected float _maxDragDistanceUp;
 
-	/// <summary>
-	/// Calls the appropriate function based on drag direction.
-	/// </summary>
-	/// <param name="dragVector">Vector of mouse dragging.</param>
-	public void Drag (Vector3 dragVector) {
-		float hDrag = Mathf.Abs(dragVector.x);
-		float yDrag = Mathf.Abs(dragVector.y);
+        /// <summary>
+        /// Maximum drag distance downwards.
+        /// </summary>
+        [SerializeField]
+        protected float _maxDragDistanceDown;
 
-		if (dragVector.x < 0f) DragLeft (Mathf.Clamp01(hDrag/maxDragDistanceLeft));
-		else DragRight (Mathf.Clamp01(hDrag/maxDragDistanceRight));
-		if (dragVector.y < 0f) DragDown (Mathf.Clamp01(yDrag/maxDragDistanceDown));
-		else DragUp (Mathf.Clamp01(yDrag/maxDragDistanceUp));
+        /// <summary>
+        /// Maximum drag distance to the left.
+        /// </summary>
+        [SerializeField]
+        protected float _maxDragDistanceLeft;
 
-	}
+        /// <summary>
+        /// Maximum drag distance to the right.
+        /// </summary>
+        [SerializeField]
+        protected float _maxDragDistanceRight;
 
-	public virtual void OnMouseDown () {}
-	public virtual void OnMouseUp () {}
+        /// <summary>
+        /// Threshold for drag to recognize one direction over another.
+        /// </summary>
+        const float _DRAG_BIAS = 1.25f;
 
-	public virtual void DragLeft (float actionRatio) {}
-	public virtual void DragRight (float actionRatio) {}
-	public virtual void DragDown (float actionRatio) {}
-	public virtual void DragUp (float actionRation) {}
+        #endregion
+        #region DraggableButton Methods
 
-	#endregion
+        /// <summary>
+        /// Calls the appropriate function based on drag direction.
+        /// </summary>
+        /// <param name="dragVector">Vector of mouse dragging.</param>
+        public void Drag(Vector3 dragVector) {
+            float hDrag = Mathf.Abs(dragVector.x);
+            float yDrag = Mathf.Abs(dragVector.y);
+
+            if (dragVector.x < 0f) DragLeft(Mathf.Clamp01(hDrag / _maxDragDistanceLeft));
+            else DragRight(Mathf.Clamp01(hDrag / _maxDragDistanceRight));
+            if (dragVector.y < 0f) DragDown(Mathf.Clamp01(yDrag / _maxDragDistanceDown));
+            else DragUp(Mathf.Clamp01(yDrag / _maxDragDistanceUp));
+        }
+
+        /// <summary>
+        /// Called when the mouse button is pressed on this object.
+        /// </summary>
+        public abstract void OnMouseDown();
+
+        /// <summary>
+        /// Called when the mouse button is released on this object.
+        /// </summary>
+        public abstract void OnMouseUp();
+
+        /// <summary>
+        /// Called when dragged left.
+        /// </summary>
+        public abstract void DragLeft(float actionRatio);
+
+        /// <summary>
+        /// Called when dragged right.
+        /// </summary>
+        public abstract void DragRight(float actionRatio);
+
+        /// <summary>
+        /// Called when dragged down.
+        /// </summary>
+        public abstract void DragDown(float actionRatio);
+
+        /// <summary>
+        /// Called when dragged up.
+        /// </summary>
+        public abstract void DragUp(float actionRation);
+
+        #endregion
+    }
 }

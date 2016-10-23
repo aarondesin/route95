@@ -247,6 +247,14 @@ namespace Route95.Music {
         #region Properties
 
         /// <summary>
+        /// Gets/sets the name of this riff.
+        /// </summary>
+        public string Name { 
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        /// <summary>
         /// Returns the index of this riff.
         /// </summary>
         public int Index {
@@ -273,6 +281,54 @@ namespace Route95.Music {
         /// Returns the list of beat indices used in this riff.
         /// </summary>
         public List<int> BeatIndices { get { return _beatIndices; } }
+
+        /// <summary>
+        /// Gets/sets whether or not distortion is enabled.
+        /// </summary>
+        public bool DistortionEnabled {
+            get { return _distortionEnabled; }
+            set { _distortionEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets whether or not tremolo is enabled.
+        /// </summary>
+        public bool TremoloEnabled {
+            get { return _tremoloEnabled; }
+            set { _tremoloEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets whether or not chorus is enabled.
+        /// </summary>
+        public bool ChorusEnabled {
+            get { return _chorusEnabled; }
+            set { _chorusEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets whether or not echo is enabled.
+        /// </summary>
+        public bool EchoEnabled {
+            get { return _echoEnabled; }
+            set { _echoEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets whether or not reverb is enabled.
+        /// </summary>
+        public bool ReverbEnabled {
+            get { return _reverbEnabled; }
+            set { _reverbEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets whether or not flanger is enabled.
+        /// </summary>
+        public bool FlangerEnabled {
+            get { return _flangerEnabled; }
+            set { _flangerEnabled = value; }
+        }
 
         #endregion
         #region Methods

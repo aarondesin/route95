@@ -1,10 +1,13 @@
-﻿using Route95.Core;
+﻿// EffectButton.cs
+// ©2016 Team 95
+
 using Route95.Music;
+
+using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using UnityEngine.Audio;
 
 namespace Route95.UI {
 
@@ -13,140 +16,70 @@ namespace Route95.UI {
     /// </summary>
     public class EffectButton : MonoBehaviour {
 
-        public Image image;
+        #region Vars
 
         /// <summary>
-        /// Toggles the active status of the distortion filter.
+        /// This effect button's sprite.
         /// </summary>
-        public void ToggleDistortion() {
-            Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
+        Image _image;
 
-            // Toggle distortion
-            AudioDistortionFilter distortion = source.GetComponent<AudioDistortionFilter>();
-            distortion.enabled = !distortion.enabled;
-            riff.distortionEnabled = distortion.enabled;
+        #endregion
+        #region Unity Callbacks
+
+        void Awake () {
+            // Init vars
+            _image = GetComponent<Image>();
+        }
+
+        #endregion
+        #region Methods
+
+        /// <summary>
+        /// Toggles an effect on or off.
+        /// </summary>
+        /// <typeparam name="TEffect">Type of effect to toggle.</typeparam>
+        public void Toggle<TEffect> () where TEffect : Behaviour {
+            Riff riff = RiffEditor.CurrentRiff;
+            Instrument inst = riff.Instrument;
+            AudioSource source = MusicManager.Instance.GetAudioSource(inst);
+
+            // Toggle effect
+            TEffect effect = source.GetComponent<TEffect>();
+            effect.enabled = !effect.enabled;
+
+            // Update riff
+            Type effectType = typeof(TEffect);
+            if      (effectType == typeof(AudioDistortionFilter))    riff.DistortionEnabled = effect.enabled;
+            else if (effectType == typeof(AudioEchoFilter))          riff.EchoEnabled       = effect.enabled;
+            else if (effectType == typeof(AudioReverbFilter))        riff.ReverbEnabled     = effect.enabled;
+            else if (effectType == typeof(AudioTremoloFilter))       riff.TremoloEnabled    = effect.enabled;
+            else if (effectType == typeof(AudioChorusFilter))        riff.ChorusEnabled     = effect.enabled;
+            else if (effectType == typeof(AudioFlangerFilter))       riff.FlangerEnabled    = effect.enabled;
 
             // Update button art
-            if (image == null) Debug.Log("shit");
-            image.sprite = (distortion.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
+            _image.sprite = (effect.enabled ? RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
 
             // Play sound
-            if (distortion.enabled) UIManager.Instance.PlayEnableEffectSound();
+            if (effect.enabled) UIManager.Instance.PlayEnableEffectSound();
             else UIManager.Instance.PlayDisableEffectSound();
         }
 
-        /// <summary>
-        ///  Toggles the active status of the echo filter.
-        /// </summary>
-        public void ToggleEcho() {
+        public void UpdateSetting<TEffect> (ref float effectSetting, ref float riffSetting, Slider slider) 
+            where TEffect : Behaviour
+        {
             Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
+            Instrument inst = riff.Instrument;
+            AudioSource source = MusicManager.Instance.GetAudioSource (inst);
 
-            // Toggle echo
-            AudioEchoFilter echo = source.GetComponent<AudioEchoFilter>();
-            echo.enabled = !echo.enabled;
-            riff.echoEnabled = echo.enabled;
-
-            // Update button art
-            image.sprite = (echo.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
-
-            // Play sound
-            if (echo.enabled) UIManager.Instance.PlayEnableEffectSound();
-            else UIManager.Instance.PlayDisableEffectSound();
+            // Update setting on both effect and riff
+            riffSetting = effectSetting = slider.value;
+            
+            // Turn on effect if not already
+            TEffect effect = source.GetComponent<TEffect>();
+            if (!effect.enabled) Toggle<TEffect>();
         }
 
-        /// <summary>
-        /// Toggles the active status of the reverb filter.
-        /// </summary>
-        public void ToggleReverb() {
-            Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
-
-            // Toggle reverb
-            AudioReverbFilter reverb = source.GetComponent<AudioReverbFilter>();
-            reverb.enabled = !reverb.enabled;
-            riff.reverbEnabled = reverb.enabled;
-
-            // Update button art
-            image.sprite = (reverb.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
-
-            // Play sound
-            if (reverb.enabled) UIManager.Instance.PlayEnableEffectSound();
-            else UIManager.Instance.PlayDisableEffectSound();
-        }
-
-        /// <summary>
-        /// Toggles the active status of the tremolo filter.
-        /// </summary>
-        public void ToggleTremolo() {
-            Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
-
-            // Toggle tremolo
-            AudioTremoloFilter tremolo = source.GetComponent<AudioTremoloFilter>();
-            tremolo.enabled = !tremolo.enabled;
-            riff.tremoloEnabled = tremolo.enabled;
-
-            // Update button art
-            image.sprite = (tremolo.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
-
-            // Play sound
-            if (tremolo.enabled) UIManager.Instance.PlayEnableEffectSound();
-            else UIManager.Instance.PlayDisableEffectSound();
-        }
-
-        /// <summary>
-        /// Toggles the active status of the chorus filter.
-        /// </summary>
-        public void ToggleChorus() {
-            Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
-
-            // Toggle chorus
-            AudioChorusFilter chorus = source.GetComponent<AudioChorusFilter>();
-            chorus.enabled = !chorus.enabled;
-            riff.chorusEnabled = chorus.enabled;
-
-            // Update button art
-            image.sprite = (chorus.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
-
-            // Play sound
-            if (chorus.enabled) UIManager.Instance.PlayEnableEffectSound();
-            else UIManager.Instance.PlayDisableEffectSound();
-        }
-
-        /// <summary>
-        /// Toggles the active status of the flanger filter.
-        /// </summary>
-        public void ToggleFlanger() {
-            Riff riff = RiffEditor.CurrentRiff;
-            Instrument inst = riff.instrument;
-            GameObject source = MusicManager.Instance.GetAudioSource(inst).gameObject;
-
-            // Toggle flanger
-            AudioFlangerFilter flanger = source.GetComponent<AudioFlangerFilter>();
-            flanger.enabled = !flanger.enabled;
-            riff.flangerEnabled = flanger.enabled;
-
-            // Update button art
-            image.sprite = (flanger.enabled ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
-
-            // Play sound
-            if (flanger.enabled) UIManager.Instance.PlayEnableEffectSound();
-            else UIManager.Instance.PlayDisableEffectSound();
-        }
+        public void UpdateDistortionLevel 
 
         public void UpdateDistortionLevel(Slider slider) {
             AudioSource source = MusicManager.Instance.GetAudioSource(RiffEditor.CurrentRiff.instrument);
@@ -269,5 +202,7 @@ namespace Route95.UI {
             if (!riff.flangerEnabled && RiffEditor.Instance.initialized) ToggleFlanger();
         }
     }
+
+    #endregion
 }
 
