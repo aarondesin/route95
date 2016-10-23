@@ -198,7 +198,7 @@ namespace Route95.Core {
                                 KeyManager keyManager = KeyManager.Instance;
 
                                 // If percussion is selected
-                                if (inst.type == Instrument.Type.Percussion) {
+                                if (inst.InstrumentType == Instrument.Type.Percussion) {
                                     var percNotes = keyManager.GetNoteSet((PercussionInstrument)inst);
                                     noteIndex = percNotes.Count - 1 - keyToNote[keyPress];
                                     if (noteIndex >= 0) {
@@ -218,14 +218,14 @@ namespace Route95.Core {
                                     Scale scale = KeyManager.Instance.GetScale(key, scaleType, meloInst);
 
 
-                                    noteIndex = scale.Count - 1 - keyToNote[keyPress];
+                                    noteIndex = scale.NoteCount - 1 - keyToNote[keyPress];
                                     if (noteIndex >= 0) {
                                         Note note = new Note(scale.NoteAt(noteIndex));
                                         if (note != null) note.PlayNote(source, 1f, true);
                                     }
 
                                     // If electric bass
-                                    if (inst.codeName == "ElectricBass") {
+                                    if (inst.CodeName == "ElectricBass") {
 
                                         // Cause terrain deformation
                                         WorldManager.Instance.DeformRandom();
@@ -233,15 +233,15 @@ namespace Route95.Core {
                                         // All other melodic instruments
                                     }
                                     else {
-                                        switch (inst.family) {
+                                        switch (inst.InstrumentFamily) {
                                             case Instrument.Family.Guitar:
-                                                MusicManager.Instance.guitarNotes++;
+                                                MusicManager.Instance.RegisterGuitarNote();
                                                 break;
                                             case Instrument.Family.Keyboard:
-                                                MusicManager.Instance.keyboardNotes++;
+                                                MusicManager.Instance.RegisterKeyboardNote();
                                                 break;
                                             case Instrument.Family.Brass:
-                                                MusicManager.Instance.brassNotes++;
+                                                MusicManager.Instance.RegisterBrassNote();
                                                 break;
                                         }
                                     }
@@ -249,7 +249,7 @@ namespace Route95.Core {
 
                                 // If key released, stop note
                             }
-                            else if (Input.GetKeyUp(keyPress) && inst.type != Instrument.Type.Percussion)
+                            else if (Input.GetKeyUp(keyPress) && inst.InstrumentType != Instrument.Type.Percussion)
                                 _audioSources[keyToNote[keyPress]].Stop();
                         }
                     }
@@ -404,10 +404,10 @@ namespace Route95.Core {
         void SwitchInstrument(Instrument instrument) {
             Instrument inst = MusicManager.Instance.CurrentInstrument;
             if (instrument != inst) {
-                InstrumentDisplay.Instance.FadeGlow(inst.index);
+                InstrumentDisplay.Instance.FadeGlow(inst.Index);
                 MusicManager.Instance.CurrentInstrument = instrument;
-                InstrumentDisplay.Instance.WakeGlow(instrument.index);
-                MusicManager.PlayMenuSound(instrument.switchSound);
+                InstrumentDisplay.Instance.WakeGlow(instrument.Index);
+                MusicManager.PlayMenuSound(instrument.SwitchSound);
                 InstrumentDisplay.Instance.Refresh();
             }
         }

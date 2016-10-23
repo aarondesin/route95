@@ -280,7 +280,7 @@ namespace Route95.Music {
             Instrument.LoadInstruments();
 
             // Calculate number of objects to load
-            _loadOpsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
+            _loadOpsToDo = Sounds.SoundsToLoad.Count + Instrument.AllInstruments.Count +
                 Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length - 1) * ScaleInfo.AllScales.Count;
         }
 
@@ -466,7 +466,7 @@ namespace Route95.Music {
             int numLoaded = 0;
 
             // For each sound path
-            foreach (KeyValuePair<string, List<string>> list in Sounds.soundsToLoad) {
+            foreach (KeyValuePair<string, List<string>> list in Sounds.SoundsToLoad) {
                 foreach (string path in list.Value) {
 
                     // Load sound

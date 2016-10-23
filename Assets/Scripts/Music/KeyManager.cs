@@ -52,8 +52,8 @@ namespace Route95.Music {
 
             // Build percussion sets
             _percussionSets = new Dictionary<Instrument, List<string>>() {
-            { PercussionInstrument.RockDrums, Sounds.soundsToLoad["RockDrums"] },
-            { PercussionInstrument.ExoticPercussion, Sounds.soundsToLoad["ExoticPercussion"] }
+            { PercussionInstrument.RockDrums, Sounds.SoundsToLoad["RockDrums"] },
+            { PercussionInstrument.ExoticPercussion, Sounds.SoundsToLoad["ExoticPercussion"] }
         };
 
             // Init scales dict
@@ -82,8 +82,8 @@ namespace Route95.Music {
 
                         // Add instrument to sscale mapping
                         _scales[key][scale].Add(
-                            (MelodicInstrument)instrument, BuildScale(Sounds.soundsToLoad[instrument.CodeName],
-                                scale, ((MelodicInstrument)instrument).startingNote[key])
+                            (MelodicInstrument)instrument, BuildScale(Sounds.SoundsToLoad[instrument.CodeName],
+                                scale, ((MelodicInstrument)instrument).StartingNote(key))
                         );
 
                         numLoaded++;
@@ -122,31 +122,31 @@ namespace Route95.Music {
                     result.AddRoot(soundFiles[i]);
 
                     // Add second
-                    i += scale.secondIndex;
+                    i += scale.SecondInterval;
                     result.AddSecond(soundFiles[i]);
 
                     // Add third
-                    i += scale.thirdIndex;
+                    i += scale.ThirdInterval;
                     result.AddThird(soundFiles[i]);
 
                     // Add fourth
-                    i += scale.fourthIndex;
+                    i += scale.FourthInterval;
                     result.AddFourth(soundFiles[i]);
 
                     // Add fifth
-                    i += scale.fifthIndex;
+                    i += scale.FifthInterval;
                     result.AddFifth(soundFiles[i]);
 
                     // Add sixth
-                    i += scale.sixthIndex;
+                    i += scale.SixthInterval;
                     result.AddSixth(soundFiles[i]);
 
                     // Add seventh
-                    i += scale.seventhIndex;
+                    i += scale.SeventhInterval;
                     result.AddSeventh(soundFiles[i]);
 
                     // Go to next octave
-                    i += scale.rootIndex;
+                    i += scale.RootInterval;
                 }
                 return result;
             }

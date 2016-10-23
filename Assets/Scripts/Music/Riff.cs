@@ -249,7 +249,10 @@ namespace Route95.Music {
         /// <summary>
         /// Returns the index of this riff.
         /// </summary>
-        public int Index { get { return _index; } }
+        public int Index {
+            get { return _index; }
+            set { _index = value; }
+        }
 
         /// <summary>
         /// Returns the index of the instrument used in this riff (read-only).
@@ -257,9 +260,19 @@ namespace Route95.Music {
         public int InstrumentIndex { get { return _instrumentIndex; } }
 
         /// <summary>
+        /// Returns the instrument used in this riff (read-only).
+        /// </summary>
+        public Instrument Instrument { get { return _instrument; } }
+
+        /// <summary>
         /// Returns the length of the riff, in number of beats (read-only).
         /// </summary>
         public int Length { get { return _beatIndices.Count; } }
+
+        /// <summary>
+        /// Returns the list of beat indices used in this riff.
+        /// </summary>
+        public List<int> BeatIndices { get { return _beatIndices; } }
 
         #endregion
         #region Methods

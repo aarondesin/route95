@@ -28,6 +28,22 @@ namespace Route95.Music {
         List<int> _riffIndices;
 
         #endregion
+        #region Properties
+
+        /// <summary>
+        /// Returns the index of this measure.
+        /// </summary>
+        public int Index {
+            get { return _index; }
+            set { _index = value; }
+        }
+
+        /// <summary>
+        /// Returns a list of indices of riffs used in this song.
+        /// </summary>
+        public List<int> RiffIndices { get { return _riffIndices; } }
+
+        #endregion
         #region Constructor
 
         /// <summary>

@@ -17,9 +17,6 @@ namespace Route95.Music {
         /// </summary>
         Dictionary<Key, int> _startingNote;
 
-        #endregion
-        #region MelodicInstrument Methods
-
         /// <summary>
         /// Electric guitar.
         /// </summary>
@@ -33,19 +30,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_ElectricGuitar_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 8 },
-            { Key.CSharp, 9 },
-            { Key.D, 10 },
-            { Key.DSharp, 11 },
-            { Key.E, 0 },
-            { Key.F, 1 },
-            { Key.FSharp, 2 },
-            { Key.G, 3 },
-            { Key.GSharp, 4 },
-            { Key.A, 5 },
-            { Key.ASharp, 6 },
-            { Key.B, 7 }
-        }
+                { Key.C, 8 },
+                { Key.CSharp, 9 },
+                { Key.D, 10 },
+                { Key.DSharp, 11 },
+                { Key.E, 0 },
+                { Key.F, 1 },
+                { Key.FSharp, 2 },
+                { Key.G, 3 },
+                { Key.GSharp, 4 },
+                { Key.A, 5 },
+                { Key.ASharp, 6 },
+                { Key.B, 7 }
+            }
         };
 
         /// <summary>
@@ -61,19 +58,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_ElectricBass_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricBass",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 8 },
-            { Key.CSharp, 9 },
-            { Key.D, 10 },
-            { Key.DSharp, 11 },
-            { Key.E, 0 },
-            { Key.F, 1 },
-            { Key.FSharp, 2 },
-            { Key.G, 3 },
-            { Key.GSharp, 4 },
-            { Key.A, 5 },
-            { Key.ASharp, 6 },
-            { Key.B, 7 }
-        }
+                { Key.C, 8 },
+                { Key.CSharp, 9 },
+                { Key.D, 10 },
+                { Key.DSharp, 11 },
+                { Key.E, 0 },
+                { Key.F, 1 },
+                { Key.FSharp, 2 },
+                { Key.G, 3 },
+                { Key.GSharp, 4 },
+                { Key.A, 5 },
+                { Key.ASharp, 6 },
+                { Key.B, 7 }
+            }
         };
 
         /// <summary>
@@ -89,19 +86,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_AcousticGuitar_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 8 },
-            { Key.CSharp, 9 },
-            { Key.D, 10 },
-            { Key.DSharp, 11 },
-            { Key.E, 0 },
-            { Key.F, 1 },
-            { Key.FSharp, 2 },
-            { Key.G, 3 },
-            { Key.GSharp, 4 },
-            { Key.A, 5 },
-            { Key.ASharp, 6 },
-            { Key.B, 7 }
-        }
+                { Key.C, 8 },
+                { Key.CSharp, 9 },
+                { Key.D, 10 },
+                { Key.DSharp, 11 },
+                { Key.E, 0 },
+                { Key.F, 1 },
+                { Key.FSharp, 2 },
+                { Key.G, 3 },
+                { Key.GSharp, 4 },
+                { Key.A, 5 },
+                { Key.ASharp, 6 },
+                { Key.B, 7 }
+            }
         };
 
         /// <summary>
@@ -117,19 +114,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_ClassicalGuitar_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 8 },
-            { Key.CSharp, 9 },
-            { Key.D, 10 },
-            { Key.DSharp, 11 },
-            { Key.E, 0 },
-            { Key.F, 1 },
-            { Key.FSharp, 2 },
-            { Key.G, 3 },
-            { Key.GSharp, 4 },
-            { Key.A, 5 },
-            { Key.ASharp, 6 },
-            { Key.B, 7 }
-        }
+                { Key.C, 8 },
+                { Key.CSharp, 9 },
+                { Key.D, 10 },
+                { Key.DSharp, 11 },
+                { Key.E, 0 },
+                { Key.F, 1 },
+                { Key.FSharp, 2 },
+                { Key.G, 3 },
+                { Key.GSharp, 4 },
+                { Key.A, 5 },
+                { Key.ASharp, 6 },
+                { Key.B, 7 }
+            }
         };
 
         /// <summary>
@@ -145,19 +142,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_PipeOrgan_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 3 },
-            { Key.CSharp, 4 },
-            { Key.D, 5 },
-            { Key.DSharp, 6 },
-            { Key.E, 7 },
-            { Key.F, 8 },
-            { Key.FSharp, 9 },
-            { Key.G, 10 },
-            { Key.GSharp, 11 },
-            { Key.A, 0 },
-            { Key.ASharp, 1 },
-            { Key.B, 2 }
-        }
+                { Key.C, 3 },
+                { Key.CSharp, 4 },
+                { Key.D, 5 },
+                { Key.DSharp, 6 },
+                { Key.E, 7 },
+                { Key.F, 8 },
+                { Key.FSharp, 9 },
+                { Key.G, 10 },
+                { Key.GSharp, 11 },
+                { Key.A, 0 },
+                { Key.ASharp, 1 },
+                { Key.B, 2 }
+            }
         };
 
         /// <summary>
@@ -173,19 +170,19 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_Keyboard_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 3 },
-            { Key.CSharp, 4 },
-            { Key.D, 5 },
-            { Key.DSharp, 6 },
-            { Key.E, 7 },
-            { Key.F, 8 },
-            { Key.FSharp, 9 },
-            { Key.G, 10 },
-            { Key.GSharp, 11 },
-            { Key.A, 0 },
-            { Key.ASharp, 1 },
-            { Key.B, 2 }
-        }
+                { Key.C, 3 },
+                { Key.CSharp, 4 },
+                { Key.D, 5 },
+                { Key.DSharp, 6 },
+                { Key.E, 7 },
+                { Key.F, 8 },
+                { Key.FSharp, 9 },
+                { Key.G, 10 },
+                { Key.GSharp, 11 },
+                { Key.A, 0 },
+                { Key.ASharp, 1 },
+                { Key.B, 2 }
+            }
         };
 
         /// <summary>
@@ -201,20 +198,30 @@ namespace Route95.Music {
             _glowPath = "UI/Instrument_Trumpet_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
             _startingNote = new Dictionary<Key, int>() {
-            { Key.C, 3 },
-            { Key.CSharp, 4 },
-            { Key.D, 5 },
-            { Key.DSharp, 6 },
-            { Key.E, 7 },
-            { Key.F, 8 },
-            { Key.FSharp, 9 },
-            { Key.G, 10 },
-            { Key.GSharp, 11 },
-            { Key.A, 0 },
-            { Key.ASharp, 1 },
-            { Key.B, 2 }
-        }
+                { Key.C, 3 },
+                { Key.CSharp, 4 },
+                { Key.D, 5 },
+                { Key.DSharp, 6 },
+                { Key.E, 7 },
+                { Key.F, 8 },
+                { Key.FSharp, 9 },
+                { Key.G, 10 },
+                { Key.GSharp, 11 },
+                { Key.A, 0 },
+                { Key.ASharp, 1 },
+                { Key.B, 2 }
+            }
         };
+
+        #endregion
+        #region Methods
+
+        /// <summary>
+        /// Returns the index of the starting note for the given key.
+        /// </summary>
+        public int StartingNote (Key key) {
+            return _startingNote[key];
+        }
 
         #endregion
     }

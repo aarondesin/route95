@@ -125,6 +125,11 @@ namespace Route95.Music {
         /// </summary>
         public Family InstrumentFamily { get { return _family; } }
 
+        /// <summary>
+        /// Returns the switch sound for this instrument (read-only).
+        /// </summary>
+        public AudioClip SwitchSound { get { return _switchSound; } }
+
         #endregion
         #region IComparable Implementation
 

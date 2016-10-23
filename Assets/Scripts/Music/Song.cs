@@ -1,6 +1,8 @@
 ﻿// Song.cs
 // ©2016 Team 95
 
+using Route95.Core;
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -65,6 +67,48 @@ namespace Route95.Music {
         [SerializeField]
         List<int> _songPieceIndices;
 
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Get: Returns the name of the song.
+        /// Set: Sets the name of the song.
+        /// </summary>
+        public string Name {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        /// <summary>
+        /// Returns a list of all beats in the song (read-only).
+        /// </summary>
+        public List<Beat> Beats { get { return _beats; } }
+
+        /// <summary>
+        /// Returns a list of all riffs in the song (read-only).
+        /// </summary>
+        public List<Riff> Riffs { get { return _riffs; } }
+
+        /// <summary>
+        /// Returns a list of all measures in the song (read-only).
+        /// </summary>
+        public List<Measure> Measures { get { return _measures; } }
+
+        /// <summary>
+        /// Returns the number of beats in the song.
+        /// </summary>
+        public int BeatsCount { get { return _songPieceIndices.Count * 16; } }
+
+        /// <summary>
+        /// Returns the number of measures in the song.
+        /// </summary>
+        public int MeasuresCount { get { return _songPieceIndices.Count; } }
+
+        /// <summary>
+        /// Returns a list of song pieces used in the song.
+        /// </summary>
+        public List<SongPiece> SongPieces { get { return _songPieces; } }
+
         /// <summary>
         /// Get: Returns the key of this song.
         /// Set: Sets the key of this song.
@@ -89,6 +133,9 @@ namespace Route95.Music {
         public List<int> SongPieceIndices {
             get { return _songPieceIndices; }
         }
+
+        #endregion
+        #region Constructors
 
         /// <summary>
         /// Default constructor.
@@ -125,41 +172,6 @@ namespace Route95.Music {
         }
 
         /// <summary>
-        /// Get: Returns the name of the song.
-        /// Set: Sets the name of the song.
-        /// </summary>
-        public string Name {
-            get { return _name; }
-            set { _name = value; }
-        }
-
-        public List<Beat> Beats { get { return _beats; } }
-
-        public List<Riff> Riffs { get { return _riffs; } }
-
-        public List<Measure> Measures { get { return _measures; } }
-
-        /// <summary>
-        /// Returns the number of beats in the song.
-        /// </summary>
-        public int BeatsCount {
-            get {
-                return _songPieceIndices.Count * 16;
-            }
-        }
-
-        /// <summary>
-        /// Returns the number of measures in the song.
-        /// </summary>
-        public int MeasuresCount {
-            get {
-                return _songPieceIndices.Count;
-            }
-        }
-
-        public List<SongPiece> SongPieces { get { return _songPieces; } }
-
-        /// <summary>
         /// Checks if a song has the same name as another.
         /// </summary>
         /// <param name="other">Song to compare to.</param>
@@ -177,7 +189,7 @@ namespace Route95.Music {
 
             // Init measures
             Measure measure = NewMeasure();
-            songPiece.measureIndices.Add(measure.index);
+            songPiece.MeasureIndices.Add(measure.Index);
 
             // Register song piece
             RegisterSongPiece(songPiece);
@@ -190,9 +202,9 @@ namespace Route95.Music {
         /// </summary>
         /// <param name="songPiece">Song piece to register.</param>
         public void RegisterSongPiece(SongPiece songPiece) {
-            songPiece.index = _songPieces.Count;
+            songPiece.Index = _songPieces.Count;
             _songPieces.Add(songPiece);
-            _songPieceIndices.Add(songPiece.index);
+            _songPieceIndices.Add(songPiece.Index);
         }
 
         /// <summary>
@@ -201,12 +213,12 @@ namespace Route95.Music {
         /// </summary>
         /// <param name="riff">Riff to register.</param>
         public void RegisterRiff(Riff riff) {
-            riff.index = _riffs.Count;
+            riff.Index = _riffs.Count;
             _riffs.Add(riff);
             for (int i = 0; i < 16; i++) {
                 Beat beat = new Beat();
                 beat.Index = _beats.Count;
-                riff.beatIndices.Add(beat.Index);
+                riff.BeatIndices.Add(beat.Index);
                 _beats.Add(beat);
             }
         }
@@ -216,7 +228,7 @@ namespace Route95.Music {
         /// </summary>
         public Measure NewMeasure() {
             Measure measure = new Measure();
-            measure.index = _measures.Count;
+            measure.Index = _measures.Count;
             _measures.Add(measure);
             return measure;
         }
@@ -228,10 +240,10 @@ namespace Route95.Music {
         public void PlaySong(int pos) {
             try {
                 SongPiece songPiece = _songPieces[_songPieceIndices[pos / Riff.MAX_BEATS]];
-                Measure measure = _measures[songPiece.measureIndices[0]];
+                Measure measure = _measures[songPiece.MeasureIndices[0]];
 
                 // Play all notes
-                foreach (int i in measure.riffIndices) _riffs[i].PlayRiff(pos % Riff.MAX_BEATS);
+                foreach (int i in measure.RiffIndices) _riffs[i].PlayRiff(pos % Riff.MAX_BEATS);
 
             }
             catch (ArgumentOutOfRangeException) {
@@ -246,29 +258,29 @@ namespace Route95.Music {
         /// <param name="pos">Measure to toggle.</param>
         public void ToggleRiff(Riff newRiff, int pos) {
             SongPiece songPiece = _songPieces[_songPieceIndices[pos]];
-            Measure measure = _measures[songPiece.measureIndices[0]];
+            Measure measure = _measures[songPiece.MeasureIndices[0]];
 
             // For each riff in measure
-            foreach (int r in measure.riffIndices) {
+            foreach (int r in measure.RiffIndices) {
                 Riff riff = _riffs[r];
 
                 // Skip if riff not the same instrument
-                if (riff.instrument != newRiff.instrument) continue;
+                if (riff.Instrument != newRiff.Instrument) continue;
 
                 // Remove riff if it exists
-                if (newRiff == riff) measure.riffIndices.Remove(newRiff.index);
+                if (newRiff == riff) measure.RiffIndices.Remove(newRiff.Index);
 
                 // Replace riff with new one
                 else {
-                    measure.riffIndices.Remove(riff.index);
-                    measure.riffIndices.InsertSorted<int>(newRiff.index, false);
+                    measure.RiffIndices.Remove(riff.Index);
+                    measure.RiffIndices.InsertSorted<int>(newRiff.Index, false);
                 }
 
                 return;
             }
 
             // Riff not already there
-            measure.riffIndices.InsertSorted<int>(newRiff.index, false);
+            measure.RiffIndices.InsertSorted<int>(newRiff.Index, false);
         }
 
         #endregion

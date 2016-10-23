@@ -1,6 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// SongPiece.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace Route95.Music {
 
@@ -12,19 +15,47 @@ namespace Route95.Music {
 
         #region NonSerialized Song Piece Vars
 
+        /// <summary>
+        /// Default number of measures per song piece.
+        /// </summary>
         const int DEFAULT_MEASURES = 1;
 
         #endregion
         #region Serialized Song Piece Vars
 
+        /// <summary>
+        /// Name of song piece.
+        /// </summary>
         [SerializeField]
-        public string name;              // Name of song piece
+        string _name;
 
+        /// <summary>
+        /// Project-assigned index.
+        /// </summary>
         [SerializeField]
-        public int index;                // Project-assigned index
+        int _index;
 
+        /// <summary>
+        /// List of indices of measures used.
+        /// </summary>
         [SerializeField]
-        public List<int> measureIndices; // List of indices of measures used
+        List<int> _measureIndices;
+
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets the index of this song piece.
+        /// </summary>
+        public int Index {
+            get { return _index; }
+            set { _index = value; }
+        }
+
+        /// <summary>
+        /// Returns a list of the indices of the measures used in this song piece (read-only).
+        /// </summary>
+        public List<int> MeasureIndices { get { return _measureIndices; } }
 
         #endregion
         #region Song Piece Methods
@@ -33,7 +64,7 @@ namespace Route95.Music {
         /// Default constructor.
         /// </summary>
         public SongPiece() {
-            measureIndices = new List<int>();
+            _measureIndices = new List<int>();
         }
 
         /// <summary>
@@ -46,13 +77,12 @@ namespace Route95.Music {
             Measure measure = song.Measures[measureNum];
 
             // Play all riffs
-            foreach (int r in measure.riffIndices) {
+            foreach (int r in measure.RiffIndices) {
                 Riff riff = song.Riffs[r];
                 riff.PlayRiff(pos % 4);
             }
         }
 
         #endregion
-
     }
 }
