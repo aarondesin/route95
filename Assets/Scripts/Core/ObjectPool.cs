@@ -1,64 +1,79 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// ObjectPool.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Data storage class to handle poolable
-/// GameObjects.
-/// </summary>
-public class ObjectPool<T> where T: MonoBehaviour, IPoolable {
+using UnityEngine;
 
-	List<T> pool; // List of inactive GameObjects
+namespace Route95.Core {
 
-	/// <summary>
-	/// Init this Instance.
-	/// </summary>
-	public ObjectPool () {
-		pool = new List<T>();
-	}
+    /// <summary>
+    /// Data storage class to handle poolable
+    /// GameObjects.
+    /// </summary>
+    public class ObjectPool<T> where T : MonoBehaviour, IPoolable {
 
-	/// <summary>
-	/// Adds an item to the pool, and deactivates it.
-	/// </summary>
-	/// <param name="item">Item to add to the pool.</param>
-	public void Add (T item) {
-		pool.Add(item);
-		item.OnPool();
-	}
+        #region Vars
 
-	/// <summary>
-	/// Returns a reference to the object at the top
-	/// of the pool.
-	/// </summary>
-	/// <returns>Reference to the top GameObject.</returns>
-	public T Peek () {
-		if (Empty) return default(T);
-		return pool[0];
-	}
+        /// <summary>
+        /// List of inactive GameObjects.
+        /// </summary>
+        List<T> _pool;
 
-	/// <summary>
-	/// Removes and returns an item from the pool
-	/// and activates it.
-	/// </summary>
-	/// <returns>GameObject at the top of the pool.</returns>
-	public T Get () {
+        #endregion
+        #region Constructor
 
-		// Return null if empty
-		if (Empty) return default(T);
+        /// <summary>
+        /// Init this Instance.
+        /// </summary>
+        public ObjectPool() {
+            _pool = new List<T>();
+        }
 
-		T result = pool[0];
-		pool.RemoveAt(0);
-		result.OnDepool();
-		return result;
-	}
+        #endregion
+        #region Properties
 
-	/// <summary>
-	/// Returns whether or not the pool is empty.
-	/// </summary>
-	public bool Empty {
-		get {
-			return pool.Count == 0;
-		}
-	}
+        /// <summary>
+        /// Returns whether or not the pool is empty.
+        /// </summary>
+        public bool Empty { get { return _pool.Count == 0; } }
 
+        #endregion
+        #region Methods
+
+        /// <summary>
+        /// Adds an item to the pool, and deactivates it.
+        /// </summary>
+        /// <param name="item">Item to add to the pool.</param>
+        public void Add(T item) {
+            _pool.Add(item);
+            item.OnPool();
+        }
+
+        /// <summary>
+        /// Returns a reference to the object at the top
+        /// of the pool.
+        /// </summary>
+        public T Peek() {
+            if (Empty) return default(T);
+            return _pool[0];
+        }
+
+        /// <summary>
+        /// Removes and returns an item from the pool
+        /// and activates it.
+        /// </summary>
+        public T Get() {
+
+            // Return null if empty
+            if (Empty) return default(T);
+
+            T result = _pool[0];
+            _pool.RemoveAt(0);
+            result.OnDepool();
+            return result;
+        }
+
+        #endregion
+    }
 }

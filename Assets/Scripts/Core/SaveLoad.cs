@@ -1,22 +1,20 @@
-﻿using Route95.Music;
+﻿// SaveLoad.cs
+// ©2016 Team 95
+
+using Route95.Music;
 using Route95.UI;
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+
 using System;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using System.Linq;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
 
 namespace Route95.Core {
 
     /// <summary>
-    /// Non-MonoBehaviour class to handle IO.
+    /// Class to handle I/O operations.
     /// </summary>
     public static class SaveLoad {
 
@@ -45,8 +43,15 @@ namespace Route95.Core {
         #endregion
         #region SaveLoad Vars
 
-        public static string projectSaveExtension = ".r95p"; // File extension for projects
-        public static string songSaveExtension = ".r95s";    // File extension for songs
+        /// <summary>
+        /// File extension for projects.
+        /// </summary>
+        public const string PROJECT_SAVE_EXT = ".r95p";
+
+        /// <summary>
+        /// File extension for songs.
+        /// </summary>
+        public const string SONG_SAVE_EXT = ".r95s";
 
         #endregion
         #region Save Methods
@@ -62,7 +67,8 @@ namespace Route95.Core {
 
             // Check if type is serializable
             if (!typeof(T).IsSerializable)
-                throw new FailedToSaveException("SaveLoad.Save(): type " + toSave.GetType().ToString() + " is not serializable!");
+                throw new FailedToSaveException("SaveLoad.Save(): type " + 
+                    toSave.GetType().ToString() + " is not serializable!");
 
             // Init BinaryFormatter
             BinaryFormatter bf = new BinaryFormatter();
@@ -87,7 +93,8 @@ namespace Route95.Core {
 
             // Build paths
             string directoryPath = GameManager.Instance.ProjectSavePath;
-            string filePath = directoryPath + MusicManager.Instance.CurrentProject.Name + projectSaveExtension;
+            string filePath = directoryPath + MusicManager.Instance.CurrentProject.Name + 
+                PROJECT_SAVE_EXT;
 
             try {
 
@@ -113,7 +120,7 @@ namespace Route95.Core {
 
             // Build paths
             string directoryPath = Application.dataPath + "/Songs/";
-            string filePath = directoryPath + song.Name + songSaveExtension;
+            string filePath = directoryPath + song.Name + SONG_SAVE_EXT;
 
             // Save song
             Save<Song>(song, directoryPath, filePath);
@@ -245,7 +252,6 @@ namespace Route95.Core {
         /// Loads a song.
         /// </summary>
         /// <param name="path"></param>
-        /// <returns>Song path.</returns>
         public static Song LoadSong(string path) {
 
             try {
@@ -274,6 +280,5 @@ namespace Route95.Core {
         }
 
         #endregion
-
     }
 }

@@ -163,7 +163,6 @@ namespace Route95.Music {
         /// Checks if a song has the same name as another.
         /// </summary>
         /// <param name="other">Song to compare to.</param>
-        /// <returns>True if the other song has the same name.</returns>
         public bool Equals(Song other) {
             return _name == other.Name;
         }
@@ -171,7 +170,6 @@ namespace Route95.Music {
         /// <summary>
         /// Creates a new song piece and registers it.
         /// </summary>
-        /// <returns></returns>
         public SongPiece NewSongPiece() {
 
             // Create new song piece
@@ -216,7 +214,6 @@ namespace Route95.Music {
         /// <summary>
         /// Adds a new measure and registers it.
         /// </summary>
-        /// <returns></returns>
         public Measure NewMeasure() {
             Measure measure = new Measure();
             measure.index = _measures.Count;

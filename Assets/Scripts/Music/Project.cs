@@ -1,47 +1,74 @@
-﻿using Route95.Core;
+﻿// Project.cs
+// ©2016 Team 95
 
-using UnityEngine;
+using Route95.Core;
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
+using UnityEngine;
 
 namespace Route95.Music {
 
     /// <summary>
     /// Class to store all project data.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class Project {
 
         #region Vars
 
+        /// <summary>
+        /// Name of the project.
+        /// </summary>
         [Tooltip("Name of the project.")]
         [SerializeField]
         string _name;
 
+        /// <summary>
+        /// File paths of all songs in the project.
+        /// </summary>
         [Tooltip("File paths of all songs in the project.")]
         [SerializeField]
         List<string> _songPaths;
 
+        /// <summary>
+        /// All songs used in the project.
+        /// </summary>
         [SerializeField]
-        List<Song> _songs;            // All songs used in the project
+        List<Song> _songs;
 
+        /// <summary>
+        /// All songpieces used in the project.
+        /// </summary>
         [NonSerialized]
-        private List<SongPiece> songPieces; // All songpieces used in the project
+        List<SongPiece> _songPieces;
 
+        /// <summary>
+        /// All measures used in the project.
+        /// </summary>
         [NonSerialized]
-        private List<Measure> measures;     // All measures used in the project
+        List<Measure> _measures;
 
+        /// <summary>
+        /// All riffs used in the project.
+        /// </summary>
         [NonSerialized]
-        private List<Riff> riffs;           // All riffs used in the project
+        List<Riff> _riffs;
 
+        /// <summary>
+        /// All beats used in the project.
+        /// </summary>
         [NonSerialized]
-        private List<Beat> beats;           // All beats used in the project
+        List<Beat> _beats;
 
         #endregion
         #region Properties
 
+        /// <summary>
+        /// Returns the name of this project (read-only).
+        /// </summary>
         public string Name { get { return _name; } }
 
         /// <summary>
@@ -67,10 +94,10 @@ namespace Route95.Music {
             // Init lists
             _songPaths = new List<string>();
             _songs = new List<Song>();
-            songPieces = new List<SongPiece>();
-            measures = new List<Measure>();
-            riffs = new List<Riff>();
-            beats = new List<Beat>();
+            _songPieces = new List<SongPiece>();
+            _measures = new List<Measure>();
+            _riffs = new List<Riff>();
+            _beats = new List<Beat>();
         }
 
         /// <summary>
@@ -84,10 +111,10 @@ namespace Route95.Music {
             // Init any null lists
             if (_songPaths == null) _songPaths = new List<string>();
             if (_songs == null) _songs = new List<Song>();
-            if (songPieces == null) songPieces = new List<SongPiece>();
-            if (measures == null) measures = new List<Measure>();
-            if (riffs == null) riffs = new List<Riff>();
-            if (beats == null) beats = new List<Beat>();
+            if (_songPieces == null) _songPieces = new List<SongPiece>();
+            if (_measures == null) _measures = new List<Measure>();
+            if (_riffs == null) _riffs = new List<Riff>();
+            if (_beats == null) _beats = new List<Beat>();
 
             // Load all listed songs
             foreach (string path in _songPaths) AddSong(SaveLoad.LoadSong(path));
@@ -112,7 +139,7 @@ namespace Route95.Music {
 
                 // Generate and add path
                 string path = Application.dataPath + GameManager.Instance.SongSaveFolder +
-                    song.Name + SaveLoad.songSaveExtension;
+                    song.Name + SaveLoad.SONG_SAVE_EXT;
                 _songPaths.Add(path);
             }
         }
@@ -154,17 +181,17 @@ namespace Route95.Music {
                 if (_songs == null) _songs = new List<Song>();
                 _songs.Add(song);
 
-                if (songPieces == null) songPieces = new List<SongPiece>();
-                if (song.SongPieces != null) songPieces.AddRange(song.SongPieces);
+                if (_songPieces == null) _songPieces = new List<SongPiece>();
+                if (song.SongPieces != null) _songPieces.AddRange(song.SongPieces);
 
-                if (measures == null) measures = new List<Measure>();
-                if (song.Measures != null) measures.AddRange(song.Measures);
+                if (_measures == null) _measures = new List<Measure>();
+                if (song.Measures != null) _measures.AddRange(song.Measures);
 
-                if (riffs == null) riffs = new List<Riff>();
-                if (song.Riffs != null) riffs.AddRange(song.Riffs);
+                if (_riffs == null) _riffs = new List<Riff>();
+                if (song.Riffs != null) _riffs.AddRange(song.Riffs);
 
-                if (beats == null) beats = new List<Beat>();
-                if (song.Beats != null) beats.AddRange(song.Beats);
+                if (_beats == null) _beats = new List<Beat>();
+                if (song.Beats != null) _beats.AddRange(song.Beats);
             }
         }
 

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// PercussionInstrument.cs
+// ©2016 Team 95
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,8 +14,15 @@ namespace Route95.Music {
 
         #region Percussioninstrument Vars
 
-        public Dictionary<string, Sprite> icons; // Dictionary of individual drums to icons
-        Dictionary<string, string> iconPaths;    // Paths from which to load icons
+        /// <summary>
+        /// Dictionary of individual drums to icons.
+        /// </summary>
+        Dictionary<string, Sprite> _icons;
+
+        /// <summary>
+        /// Paths from which to load icons.
+        /// </summary>
+        Dictionary<string, string> _iconPaths;
 
         #endregion
         #region PercussionInstrument Methods
@@ -26,16 +36,16 @@ namespace Route95.Music {
             base.Load();
 
             // Load drum icons
-            icons = new Dictionary<string, Sprite>();
-            foreach (string path in iconPaths.Keys) {
-                Sprite sprite = Resources.Load<Sprite>(iconPaths[path]);
+            _icons = new Dictionary<string, Sprite>();
+            foreach (string path in _iconPaths.Keys) {
+                Sprite sprite = Resources.Load<Sprite>(_iconPaths[path]);
 
                 if (sprite == null) {
-                    Debug.LogError("PercussionInstrument.Load(): failed to load icon " + iconPaths[path]);
+                    Debug.LogError("PercussionInstrument.Load(): failed to load icon " + _iconPaths[path]);
                     continue;
                 }
 
-                icons.Add(path, sprite);
+                _icons.Add(path, sprite);
             }
         }
 
@@ -46,15 +56,15 @@ namespace Route95.Music {
         /// Rock drums.
         /// </summary>
         public static PercussionInstrument RockDrums = new PercussionInstrument {
-            name = "Rock Drums",
-            codeName = "RockDrums",
-            index = 0,
-            type = Type.Percussion,
-            family = Family.Percussion,
-            iconPath = "UI/Instrument_RockDrums",
-            glowPath = "UI/Instrument_RockDrums_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
-            iconPaths = new Dictionary<string, string>() {
+            _name = "Rock Drums",
+            _codeName = "RockDrums",
+            _index = 0,
+            _type = Type.Percussion,
+            _family = Family.Percussion,
+            _iconPath = "UI/Instrument_RockDrums",
+            _glowPath = "UI/Instrument_RockDrums_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+            _iconPaths = new Dictionary<string, string>() {
             { "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
             { "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
             { "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "UI/Percussion_Tom" },
@@ -69,15 +79,15 @@ namespace Route95.Music {
         /// Exotic percussion.
         /// </summary>
         public static PercussionInstrument ExoticPercussion = new PercussionInstrument {
-            name = "Exotic Percussion",
-            codeName = "ExoticPercussion",
-            index = 1,
-            type = Type.Percussion,
-            family = Family.Percussion,
-            iconPath = "UI/Instrument_ExoticPercussion",
-            glowPath = "UI/Instrument_ExoticPercussion",
-            switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
-            iconPaths = new Dictionary<string, string>() {
+            _name = "Exotic Percussion",
+            _codeName = "ExoticPercussion",
+            _index = 1,
+            _type = Type.Percussion,
+            _family = Family.Percussion,
+            _iconPath = "UI/Instrument_ExoticPercussion",
+            _glowPath = "UI/Instrument_ExoticPercussion",
+            _switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
+            _iconPaths = new Dictionary<string, string>() {
             { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","UI/Percussion_Castinets" },
             { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "UI/Percussion_Claves" },
             { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "UI/Percussion_Cowbell" },

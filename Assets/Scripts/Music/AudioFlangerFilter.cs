@@ -1,124 +1,159 @@
-﻿using UnityEngine;
+﻿// AudioFlangerFilter.cs
+// ©2016 Team 95
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Custom audio flanger filter.
-/// </summary>
-public class AudioFlangerFilter : MonoBehaviour {
+using UnityEngine;
 
-	#region AudioFlangerFilter Vars
+namespace Route95.Music {
 
-	[Tooltip("Rate at which to oscillate flanger.")]
-	[Range(Mathf.PI/32f, Mathf.PI/16f)]
-	public float rate = Mathf.PI/32f;
+    /// <summary>
+    /// Custom audio flanger filter.
+    /// </summary>
+    public class AudioFlangerFilter : MonoBehaviour {
 
-	[Tooltip("Ratio of dry/wet signal.")]
-	[Range(0f,1f)]
-	public float dryMix = 0.5f;
+        #region AudioFlangerFilter Vars
 
-	[SerializeField]
-	[Tooltip("Current signal delay.")]
-	[Range(0.005f, 0.025f)]
-	float delay = 0.005f;
+        /// <summary>
+        /// Rate at which to oscillate flanger.
+        /// </summary>
+        [Tooltip("Rate at which to oscillate flanger.")]
+        [Range(Mathf.PI / 32f, Mathf.PI / 16f)]
+        public float rate = Mathf.PI / 32f;
 
-	float r = 0f;           // Current oscillation theta
-	float time;             // Time between frames
-	List<float[]> oldDatas; // Old audio data arrays
-	float[] mixed;          // Array of mixed old audio inputs
-	int len;                // Length of data arrays
+        /// <summary>
+        /// Ratio of dry/wet signal.
+        /// </summary>
+        [Tooltip("Ratio of dry/wet signal.")]
+        [Range(0f, 1f)]
+        public float dryMix = 0.5f;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Current signal delay.
+        /// </summary>
+        [Tooltip("Current signal delay.")]
+        [Range(0.005f, 0.025f)]
+        [SerializeField]
+        float _delay = 0.005f;
 
-	void FixedUpdate () {
+        /// <summary>
+        /// Current oscillation theta.
+        /// </summary>
+        float _r = 0f;
 
-		// Add rate
-		r += rate;
+        /// <summary>
+        /// Time between frames.
+        /// </summary>
+        float _time;
 
-		// Wrap r if above 2PI
-		if (r > Mathf.PI * 2f) r -= (Mathf.PI * 2f);
+        /// <summary>
+        /// Old audio data arrays.
+        /// </summary>
+        List<float[]> _oldDatas;
 
-		// Oscillate delay
-		delay = 0.015f + 0.01f * Mathf.Sin(r);
+        /// <summary>
+        /// Array of mixed old audio inputs.
+        /// </summary>
+        float[] _mixed;
 
-	}
+        /// <summary>
+        /// Length of old data arrays.
+        /// </summary>
+        int _len;
 
-	void OnEnable () {
-		r = 0f;
-		time = 0.02f * Application.targetFrameRate;
-	}
+        #endregion
+        #region Unity Callbacks
 
-	public void OnAudioFilterRead (float[] data, int channels) {
+        void FixedUpdate() {
 
-		// Initllist of old data if necessary
-		if (oldDatas == null) oldDatas = new List<float[]>();
+            // Add rate
+            _r += rate;
 
-		// Add up to 5 old audio inputs
-		while (oldDatas.Count < 5) oldDatas.Add (data);
-	
-		// Mix old signals
-		MixSignals ();
+            // Wrap r if above 2PI
+            if (_r > Mathf.PI * 2f) _r -= (Mathf.PI * 2f);
 
-		// Copy raw audio data
-		float[] copy = new float[len];
+            // Oscillate delay
+            _delay = 0.015f + 0.01f * Mathf.Sin(_r);
 
-		// Mix old and new signals
-		float oneMinusMix = 1f - dryMix;
-		for (int i=0; i<data.Length; i++) {
-			copy[i] = data[i] * dryMix + mixed[i] * oneMinusMix * 0.95f;
-			data[i] = copy[i];
-		}
+        }
 
-		// Remove oldest data
-		oldDatas.RemoveAt(0);
+        void OnEnable() {
+            _r = 0f;
+            _time = 0.02f * Application.targetFrameRate;
+        }
 
-		// Add current data
-		oldDatas.Add(copy);
-	}
+        public void OnAudioFilterRead(float[] data, int channels) {
 
-	#endregion
-	#region AudioFlangerFilter Methods
+            // Initllist of old data if necessary
+            if (_oldDatas == null) _oldDatas = new List<float[]>();
 
-	/// <summary>
-	/// Mixes current audio signal with past signals.
-	/// </summary>
-	void MixSignals () {
+            // Add up to 5 old audio inputs
+            while (_oldDatas.Count < 5) _oldDatas.Add(data);
 
-		// Get length of audio signal
-		len = oldDatas[0].Length;
+            // Mix old signals
+            MixSignals();
 
-		// Init mixed array if necessary
-		if (mixed == null) mixed = new float[len];
+            // Copy raw audio data
+            float[] copy = new float[_len];
 
-		// Calculate mixing value between old inputs
-		float val = delay / time;
+            // Mix old and new signals
+            float oneMinusMix = 1f - dryMix;
+            for (int i = 0; i < data.Length; i++) {
+                copy[i] = data[i] * dryMix + _mixed[i] * oneMinusMix * 0.95f;
+                data[i] = copy[i];
+            }
 
-		// Get indices of old inputs to use
-		int hi = Mathf.CeilToInt(val);
-		int lo = Mathf.FloorToInt(val);
+            // Remove oldest data
+            _oldDatas.RemoveAt(0);
 
-		// Stop if indices are invalid
-		if (hi < 0 || lo < 0 || hi >= 5 || lo >= 5) return;
+            // Add current data
+            _oldDatas.Add(copy);
+        }
 
-		// Mix old inputs
-		float mix = (val - (float)lo);
-		float oneMinusMix = 1f - mix;
+        #endregion
+        #region AudioFlangerFilter Methods
 
-		// Populate mixed array
-		for (int i=0; i<len; i++) {
-			float high = oldDatas[hi][i];
-			float low = oldDatas[lo][i];
+        /// <summary>
+        /// Mixes current audio signal with past signals.
+        /// </summary>
+        void MixSignals() {
 
-			try {
-				mixed[i] = (high * mix) + (low * oneMinusMix);
-			} catch (IndexOutOfRangeException e) {
-				Debug.LogError("i: " + i + " len: " + len + e.Message);
-			}
-		}
-		
-	}
+            // Get length of audio signal
+            _len = _oldDatas[0].Length;
 
-	#endregion
+            // Init mixed array if necessary
+            if (_mixed == null) _mixed = new float[_len];
+
+            // Calculate mixing value between old inputs
+            float val = _delay / _time;
+
+            // Get indices of old inputs to use
+            int hi = Mathf.CeilToInt(val);
+            int lo = Mathf.FloorToInt(val);
+
+            // Stop if indices are invalid
+            if (hi < 0 || lo < 0 || hi >= 5 || lo >= 5) return;
+
+            // Mix old inputs
+            float mix = (val - (float)lo);
+            float oneMinusMix = 1f - mix;
+
+            // Populate mixed array
+            for (int i = 0; i < _len; i++) {
+                float high = _oldDatas[hi][i];
+                float low = _oldDatas[lo][i];
+
+                try {
+                    _mixed[i] = (high * mix) + (low * oneMinusMix);
+                }
+                catch (IndexOutOfRangeException e) {
+                    Debug.LogError("i: " + i + " len: " + _len + e.Message);
+                }
+            }
+
+        }
+
+        #endregion
+    }
 }

@@ -21,8 +21,8 @@ namespace Route95.Music {
         #region KeyManager Vars
 
         // Mappings of keys to scales to instruments
-        public Dictionary<Key, 
-            Dictionary<ScaleInfo, 
+        public Dictionary<Key,
+            Dictionary<ScaleInfo,
                 Dictionary<MelodicInstrument, Scale>>> _scales;
 
         // Mapping of percussion instruments to notes
@@ -41,7 +41,6 @@ namespace Route95.Music {
         /// <summary>
         /// Coroutine to build scales.
         /// </summary>
-        /// <returns></returns>
         IEnumerator BuildScales() {
 
             // Update loading message
@@ -79,11 +78,11 @@ namespace Route95.Music {
                     foreach (Instrument instrument in Instrument.AllInstruments) {
 
                         // Skip percussion instruments
-                        if (instrument.type == Instrument.Type.Percussion) continue;
+                        if (instrument.InstrumentType == Instrument.Type.Percussion) continue;
 
                         // Add instrument to sscale mapping
                         _scales[key][scale].Add(
-                            (MelodicInstrument)instrument, BuildScale(Sounds.soundsToLoad[instrument.codeName],
+                            (MelodicInstrument)instrument, BuildScale(Sounds.soundsToLoad[instrument.CodeName],
                                 scale, ((MelodicInstrument)instrument).startingNote[key])
                         );
 
@@ -114,7 +113,6 @@ namespace Route95.Music {
         /// <param name="soundFiles">List of sounds to draw from.</param>
         /// <param name="scale">Scale type.</param>
         /// <param name="startIndex">Index of sound to start with.</param>
-        /// <returns>A scale.</returns>
         public static Scale BuildScale(List<string> soundFiles, ScaleInfo scale, int startIndex) {
             Scale result = new Scale();
             int i = startIndex;
@@ -167,12 +165,15 @@ namespace Route95.Music {
         /// <param name="key">Musical key.</param>
         /// <param name="scale">Musical scale.</param>
         /// <param name="inst">Melodic instrument.</param>
-        public Scale GetScale (Key key, ScaleInfo scale, 
-            MelodicInstrument inst) 
-        {
+        public Scale GetScale(Key key, ScaleInfo scale,
+            MelodicInstrument inst) {
             return _scales[key][scale][inst];
         }
 
+        /// <summary>
+        /// Returns the note set for a percussion instrument.
+        /// </summary>
+        /// <param name="inst"></param>
         public List<string> GetNoteSet(PercussionInstrument inst) {
             return _percussionSets[inst];
         }

@@ -1,14 +1,17 @@
-﻿using UnityEngine;
+﻿// Instrument.cs
+// ©2016 Team 95
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace Route95.Music {
 
     /// <summary>
     /// Class to store all relevant instrument data and references.
     /// </summary>
-    public class Instrument : IComparable {
+    public abstract class Instrument : IComparable {
 
         #region Instrument Enums
 
@@ -34,22 +37,105 @@ namespace Route95.Music {
         #endregion
         #region Instrument Vars
 
-        public string name;                            // User-friendly name
-        public string codeName;                        // Name in code
-        public int index;                              // Game index
-        public Type type;                              // Instrument type
-        public Family family;                          // Instrument family
+        /// <summary>
+        /// User-friendly name.
+        /// </summary>
+        protected string _name;
 
-        public Sprite icon;                            // Icon sprite
-        protected string iconPath;                     // Path from which to load icon
+        /// <summary>
+        /// Name in code.
+        /// </summary>
+        protected string _codeName;
 
-        public Sprite glow;                            // Glow sprite
-        protected string glowPath;                     // Path from which to load glow sprite
+        /// <summary>
+        /// Game index.
+        /// </summary>
+        protected int _index;
 
-        public AudioClip switchSound;                  // Sound to play when switched to in live mode
-        protected string switchSoundPath;              // Path from which to load switch sound
+        /// <summary>
+        /// Instrument type.
+        /// </summary>
+        protected Type _type;
 
-        public static List<Instrument> AllInstruments; // List of all instruments available in the game
+        /// <summary>
+        /// Instrument family.
+        /// </summary>
+        protected Family _family;
+
+        /// <summary>
+        /// Icon sprite.
+        /// </summary>
+        protected Sprite _icon;
+
+        /// <summary>
+        /// Path from which to load icon.
+        /// </summary>
+        protected string _iconPath;
+
+        /// <summary>
+        /// Glow sprite.
+        /// </summary>
+        protected Sprite _glow;
+
+        /// <summary>
+        /// Path from which to load glow sprite.
+        /// </summary>
+        protected string _glowPath;
+
+        /// <summary>
+        /// Sound to play when instrument is switched to.
+        /// </summary>
+        protected AudioClip _switchSound;
+
+        /// <summary>
+        /// Path from which to load switch sound.
+        /// </summary>
+        protected string _switchSoundPath;
+
+        /// <summary>
+        /// List of all instruments available.
+        /// </summary>
+        public static List<Instrument> AllInstruments;
+
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Returns the user-friendly name of this instrument (read-only).
+        /// </summary>
+        public string Name { get { return _name; } }
+
+        /// <summary>
+        /// Returns the in-code name of this instrument (read-only).
+        /// </summary>
+        public string CodeName { get { return _codeName; } }
+
+        /// <summary>
+        /// Returns the index of this instrument (read-only).
+        /// </summary>
+        public int Index { get { return _index; } }
+
+        /// <summary>
+        /// Returns the type of this instrument (read-only).
+        /// </summary>
+        public Instrument.Type InstrumentType { get { return _type; } }
+
+        /// <summary>
+        /// Returns the family of this instrument (read-only).
+        /// </summary>
+        public Family InstrumentFamily { get { return _family; } }
+
+        #endregion
+        #region IComparable Implementation
+
+        public int CompareTo(object obj) {
+            if (obj == null) return 1;
+
+            Instrument other = obj as Instrument;
+            if (other != null) return this._index.CompareTo(other.Index);
+            else throw new ArgumentException("Argument is not an instrument.");
+
+        }
 
         #endregion
         #region Instrument Methods
@@ -58,9 +144,9 @@ namespace Route95.Music {
         /// Loads all resources associated with an instrument.
         /// </summary>
         public virtual void Load() {
-            icon = Resources.Load<Sprite>(iconPath);
-            glow = Resources.Load<Sprite>(glowPath);
-            switchSound = Resources.Load<AudioClip>(switchSoundPath);
+            _icon = Resources.Load<Sprite>(_iconPath);
+            _glow = Resources.Load<Sprite>(_glowPath);
+            _switchSound = Resources.Load<AudioClip>(_switchSoundPath);
         }
 
         /// <summary>
@@ -84,15 +170,6 @@ namespace Route95.Music {
             // Load all instruments
             foreach (Instrument instrument in AllInstruments)
                 instrument.Load();
-        }
-
-        public int CompareTo(object obj) {
-            if (obj == null) return 1;
-
-            Instrument other = obj as Instrument;
-            if (other != null) return this.index.CompareTo(other.index);
-            else throw new ArgumentException("Argument is not an instrument.");
-
         }
 
         #endregion

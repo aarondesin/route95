@@ -56,7 +56,6 @@ namespace Route95.Core {
             /// <summary>
             /// String conversion.
             /// </summary>
-            /// <returns>String representation of this PerfTracker.Info.</returns>
             public override string ToString() {
                 return
                     "Seconds: " + seconds.ToString("##.0000") + "\n" +
@@ -71,22 +70,22 @@ namespace Route95.Core {
         /// <summary>
         /// Dictionary to map game states to Info structs.
         /// </summary>
-        Dictionary<GameManager.State, Info> perfTracker;
+        Dictionary<GameManager.State, Info> _perfTracker;
 
         #endregion
         #region UnityCallbacks
 
         void Awake() {
             // Init dictionary
-            perfTracker = new Dictionary<GameManager.State, Info>();
+            _perfTracker = new Dictionary<GameManager.State, Info>();
             int numStates = System.Enum.GetValues(typeof(GameManager.State)).Length;
             for (int i=0; i<numStates; i++) {
-                perfTracker.Add ((GameManager.State)i, new Info());
+                _perfTracker.Add ((GameManager.State)i, new Info());
             }
         }
 
         void Update() {
-            Info perf = perfTracker[GameManager.Instance.CurrentState];
+            Info perf = _perfTracker[GameManager.Instance.CurrentState];
             perf.seconds += Time.deltaTime;
             perf.frames += 1;
             perf.avgFPS += ((1f / Time.deltaTime) - perf.avgFPS) / perf.frames;
@@ -103,8 +102,8 @@ namespace Route95.Core {
 
                 // Print info for each state
                 foreach (GameManager.State state in Enum.GetValues(typeof(GameManager.State))) {
-                    if (perfTracker.ContainsKey(state))
-                        log += state.ToString() + "\n-----\n" + perfTracker[state].ToString();
+                    if (_perfTracker.ContainsKey(state))
+                        log += state.ToString() + "\n-----\n" + _perfTracker[state].ToString();
                 }
 
                 // Create PerfInfo directory if possible
@@ -121,7 +120,7 @@ namespace Route95.Core {
         }
 
         #endregion
-        #region PerfTracker Callbacks
+        #region PerfTracker Methods
 
         /// <summary>
         /// Returns a path for the PerfInfo file based on the

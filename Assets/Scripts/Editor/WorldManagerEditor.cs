@@ -1,6 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// WorldManagerEditor.cs
+// ©2016 Team 95
+
 using UnityEditor;
+
+using UnityEngine;
 
 namespace Route95.World {
 
@@ -10,10 +13,22 @@ namespace Route95.World {
     [CustomEditor(typeof(WorldManager))]
     public class WorldManagerEditor : Editor {
 
-        int x = 0;
-        int y = 0;
+        #region Vars
 
-        float vertBlend = 0f;
+        /// <summary>
+        /// Current shown x.
+        /// </summary>
+        int _x = 0;
+
+        /// <summary>
+        /// Current shown y.
+        /// </summary>
+        int _y = 0;
+
+        float _vertBlend = 0f;
+
+        #endregion
+        #region Unity Overrides
 
         public override void OnInspectorGUI() {
 
@@ -28,18 +43,19 @@ namespace Route95.World {
                 ((WorldManager)target).PrintVertexMap();
             }
 
-            x = EditorGUILayout.IntField("X:", x);
-            y = EditorGUILayout.IntField("Y:", y);
+            _x = EditorGUILayout.IntField("X:", _x);
+            _y = EditorGUILayout.IntField("Y:", _y);
 
-            vertBlend = EditorGUILayout.FloatField("Blend: ", vertBlend);
+            _vertBlend = EditorGUILayout.FloatField("Blend: ", _vertBlend);
 
             if (GUILayout.Button("Show coordinates")) {
                 WorldManager wm = target as WorldManager;
-                Vertex vert = wm.terrain.vertexmap.VertexAt(x, y);
+                Vertex vert = wm.terrain.vertexmap.VertexAt(_x, _y);
                 wm.vertexIndicator.transform.position = vert.WorldPos();
-                vertBlend = vert.color.a;
+                _vertBlend = vert.color.a;
             }
-
         }
+
+        #endregion
     }
 }

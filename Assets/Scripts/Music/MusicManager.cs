@@ -1,19 +1,17 @@
+// MusicManager.cs
+// ©2016 Team 95
+
 using Route95.Core;
 using Route95.UI;
 using Route95.World;
 
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Audio;
 using System;
 using System.Collections;
-using System.Collections.Generic;// need for using lists
-using System.IO; // need for path operations
+using System.Collections.Generic;
 using System.Linq;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Route95.Music {
 
@@ -55,16 +53,27 @@ namespace Route95.Music {
     /// </summary>
     public class MusicManager : SingletonMonoBehaviour<MusicManager> {
 
-        #region Sound Struct
+        #region Nested Struct
 
         /// <summary>
         /// Struct to hold all relevant sound and playback data.
         /// </summary>
         public struct Sound {
-            public AudioClip clip;     // AudioClip to play
-            public AudioSource source; // AudioSource to use for playback
-            public float volume;       // Note volume
-            public float delay;        // Note delay
+
+            /// <summary>
+            /// AudioClip to play.
+            /// </summary>
+            public AudioClip clip;
+
+            /// <summary>
+            /// AudioSource to use for playback.
+            /// </summary>
+            public AudioSource source;
+
+            /// <summary>
+            /// Note volume.
+            /// </summary>
+            public float volume;
         }
 
         #endregion
@@ -73,28 +82,60 @@ namespace Route95.Music {
         //-----------------------------------------------------------------------------------------------------------------
         [Header("MusicManager Status")]
 
-        AudioSource source;                                                // Global MM audio source
+        /// <summary>
+        /// Global MusicManager audio source.
+        /// </summary>
+        AudioSource _source;
 
-        float startLoadTime;                                               // Time at which loading started
-        int loadProgress;                                                  // Number of load tasks
-        public int loadsToDo;                                              // Number of tasks to load
+        /// <summary>
+        /// Time at which loading started.
+        /// </summary>
+        float _loadStartTime;
 
+        /// <summary>
+        /// Number of load tasks completed.
+        /// </summary>
+        int _loadOpsCompleted;
+
+        /// <summary>
+        /// Number of tasks to load.
+        /// </summary>
+        int _loadOpsToDo;
+
+        /// <summary>
+        /// Playing right now?
+        /// </summary>
         [Tooltip("Is this playing right now?")]
-        public bool playing = false;
+        bool _isPlaying = false;
 
-        [Tooltip("Loop riff?")]
-        public bool loop = false;
+        /// <summary>
+        /// Loop riffs?
+        /// </summary>
+        [Tooltip("Loop riffs?")]
+        bool _loopRiffs = false;
 
-        [Tooltip("Loop playlist?")]
-        public bool loopPlaylist = false;
+        /// <summary>
+        /// Loop playlists?
+        /// </summary>
+        [Tooltip("Loop playlists?")]
+        bool _loopPlaylist = false;
 
+        /// <summary>
+        /// Current instrument in live mode.
+        /// </summary>
         Instrument _currentInstrument =
-            MelodicInstrument.ElectricGuitar;                              // Current instrument in live mode
+            MelodicInstrument.ElectricGuitar;
 
+        /// <summary>
+        /// Current tempo.
+        /// </summary>
         [Tooltip("Current tempo.")]
-        public Tempo tempo = Tempo.Medium;
+        Tempo _tempo = Tempo.Medium;
 
-        public static Dictionary<Tempo, float> tempoToFloat =              // Mappings of tempos to values
+        /// <summary>
+        /// Mappings of tempos to values.
+        /// </summary>
+        public static Dictionary<Tempo, float> TempoToFloat =
             new Dictionary<Tempo, float>() {
         { Tempo.Slowest, 50f },
         { Tempo.Slower, 70f },
@@ -110,53 +151,89 @@ namespace Route95.Music {
         /// </summary>
         int _currentPlayingSong;
 
+        /// <summary>
+        /// Current beat number.
+        /// </summary>
         [Tooltip("Current beat.")]
-        [SerializeField]
-        private int beat;
+        int _beat;
 
-        private float BeatTimer;                                           // Countdown to next beat
+        /// <summary>
+        /// Countdown to next beat (steps).
+        /// </summary>
+        float _beatTimer;
 
+        /// <summary>
+        /// Number of beats elapsed in current song.
+        /// </summary>
         [Tooltip("Number of beats elapsed in current song.")]
-        public int beatsElapsedInCurrentSong = 0;
+        int _beatsElapsedInCurrentSong = 0;
 
+        /// <summary>
+        /// Number of beats elapsed in playlist.
+        /// </summary>
         [Tooltip("Number of beats elapsed in current playlist.")]
-        public int beatsElapsedInPlaylist = 0;
+        int _beatsElapsedInPlaylist = 0;
 
+        /// <summary>
+        /// Number of elapsed guitar notes in current song.
+        /// </summary>
         [Tooltip("Number of elapsed guitar notes in current song.")]
-        public int guitarNotes = 0;
+        int _guitarNotes = 0;
 
+        /// <summary>
+        /// Current density of guitar notes.
+        /// </summary>
         [Tooltip("Current density of guitar notes.")]
         [SerializeField]
-        float guitarDensity = 0f;
+        float _guitarDensity = 0f;
 
+        /// <summary>
+        /// Number of elapsed keyboard notes in current song.
+        /// </summary>
         [Tooltip("Number of elapsed keyboard notes in current song.")]
-        public int keyboardNotes = 0;
+        int _keyboardNotes = 0;
 
+        /// <summary>
+        /// Current density of keyboard notes.
+        /// </summary>
         [Tooltip("Current density of keyboard notes.")]
-        [SerializeField]
-        float keyboardDensity = 0f;
+        float _keyboardDensity = 0f;
 
+        /// <summary>
+        /// Number of elapsed brass notes in current song.
+        /// </summary>
         [Tooltip("Number of elapsed brass notes in current song.")]
-        public int brassNotes = 0;
+        public int _brassNotes = 0;
 
+        /// <summary>
+        /// Current density of brass notes.
+        /// </summary>
         [Tooltip("Current density of brass notes.")]
-        [SerializeField]
-        float brassDensity = 0f;
+        float _brassDensity = 0f;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Object References")]
 
+        /// <summary>
+        /// Mixer to use.
+        /// </summary>
         [Tooltip("Mixer to use for MusicManager.Instance.")]
-        public AudioMixer mixer;
+        [SerializeField]
+        AudioMixer _mixer;
 
+        /// <summary>
+        /// AudioSource to use for UI sounds.
+        /// </summary>
         [Tooltip("AudioSource to use for UI sounds.")]
-        public AudioSource OneShot;
+        [SerializeField]
+        AudioSource _oneShotSource;
 
+        /// <summary>
+        /// AudioSource to use for UI riff playback.
+        /// </summary>
         [Tooltip("AudioSource to use for UI riff playback.")]
-        public AudioSource LoopRiff;
-
-        [Tooltip("Loop playlist button sprite.")]
-        public Image loopPlaylistButton;
+        [SerializeField]
+        AudioSource _loopRiffSource;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Project References")]
@@ -174,16 +251,21 @@ namespace Route95.Music {
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Sounds")]
 
+        /// <summary>
+        /// Holds all loaded sounds.
+        /// </summary>
         public static Dictionary<string, AudioClip> SoundClips =
-            new Dictionary<string, AudioClip>();                           // Holds all loaded sounds
+            new Dictionary<string, AudioClip>();
 
         /// <summary>
         /// Mapping of instruments to AudioSources.
         /// </summary>
-        [NonSerialized]
         Dictionary<Instrument, AudioSource> _instrumentAudioSources;
 
-        public bool riffMode = true;
+        /// <summary>
+        /// If true, plays back riffs and not songs.
+        /// </summary>
+        bool _riffMode = true;
 
         #endregion
         #region Unity Callbacks
@@ -191,36 +273,37 @@ namespace Route95.Music {
         new void Awake() {
             base.Awake();
 
-            source = GetComponent<AudioSource>();
+            // Init vars
+            _source = GetComponent<AudioSource>();
 
             // Load instrument lists
             Instrument.LoadInstruments();
 
             // Calculate number of objects to load
-            loadsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
+            _loadOpsToDo = Sounds.soundsToLoad.Count + Instrument.AllInstruments.Count +
                 Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length - 1) * ScaleInfo.AllScales.Count;
         }
 
         void FixedUpdate() {
 
             // Return if not playing or game is paused
-            if (!playing) return;
+            if (!_isPlaying) return;
             if (GameManager.Instance.Paused) return;
 
             // If new beat
-            if (BeatTimer <= 0f) {
+            if (_beatTimer <= 0f) {
                 switch (GameManager.Instance.CurrentState) {
 
                     // Setup mode (riff editor)
                     case GameManager.State.Setup:
 
-                        if (riffMode) {
-
+                        if (_riffMode) {
+                            
                             // Play riff note
-                            RiffEditor.CurrentRiff.PlayRiff(beat++);
+                            RiffEditor.CurrentRiff.PlayRiff(_beat++);
 
                             // Wrap payback
-                            if (beat >= Riff.MAX_BEATS && loop) beat = 0;
+                            if (_beat >= Riff.MAX_BEATS && _loopRiffs) _beat = 0;
 
                             // Decrement shaker density
                             WorldManager.Instance.shakers -= 2;
@@ -231,11 +314,11 @@ namespace Route95.Music {
                             if (_currentSong.BeatsCount == 0) return;
 
                             // If song is finished
-                            if (beat >= _currentSong.BeatsCount && loop)
-                                beat = 0;
+                            if (_beat >= _currentSong.BeatsCount && _loopRiffs)
+                                _beat = 0;
 
                             // Play notes
-                            _currentSong.PlaySong(beat++);
+                            _currentSong.PlaySong(_beat++);
 
 
                         }
@@ -247,14 +330,14 @@ namespace Route95.Music {
                         if (!_currentProject.Empty) {
 
                             // If song is finished
-                            if (beat >= _currentSong.BeatsCount || _currentSong.BeatsCount == 0) {
-                                beat = 0;
+                            if (_beat >= _currentSong.BeatsCount || _currentSong.BeatsCount == 0) {
+                                _beat = 0;
 
                                 // Reset vars
-                                beatsElapsedInCurrentSong = 0;
-                                guitarNotes = 0;
-                                keyboardNotes = 0;
-                                brassNotes = 0;
+                                _beatsElapsedInCurrentSong = 0;
+                                _guitarNotes = 0;
+                                _keyboardNotes = 0;
+                                _brassNotes = 0;
 
                                 // Reset shaker density
                                 WorldManager.Instance.shakers = 0;
@@ -270,9 +353,9 @@ namespace Route95.Music {
                                 else {
 
                                     // Loop playlist if possible
-                                    if (loopPlaylist) {
+                                    if (_loopPlaylist) {
                                         _currentPlayingSong = 0;
-                                        beatsElapsedInPlaylist = 0;
+                                        _beatsElapsedInPlaylist = 0;
 
                                         // Otherwise go to postplay menu
                                     }
@@ -283,40 +366,45 @@ namespace Route95.Music {
                             if (_currentSong.BeatsCount == 0) return;
 
                             // Play notes
-                            _currentSong.PlaySong(beat);
+                            _currentSong.PlaySong(_beat);
 
                             // Calculate song progress
-                            float songTotalTime = _currentSong.BeatsCount * 7200f / tempoToFloat[tempo] / 4f;
-                            float songCurrentTime = (beat * 7200f / tempoToFloat[tempo] / 4f) + (7200f / tempoToFloat[tempo] / 4f) - BeatTimer;
+                            float songTotalTime = _currentSong.BeatsCount * 7200f / TempoToFloat[_tempo] / 4f;
+                            float songCurrentTime = (_beat * 7200f / TempoToFloat[_tempo] / 4f) + (7200f / TempoToFloat[_tempo] / 4f) - _beatTimer;
                             SongProgressBar.Instance.SetValue(songCurrentTime / songTotalTime);
 
                             // Increment vars
-                            beat++;
-                            beatsElapsedInCurrentSong++;
-                            beatsElapsedInPlaylist++;
+                            _beat++;
+                            _beatsElapsedInCurrentSong++;
+                            _beatsElapsedInPlaylist++;
 
                             // Update instrument densities
-                            guitarDensity = (float)guitarNotes / (float)beatsElapsedInCurrentSong;
-                            keyboardDensity = (float)keyboardNotes / (float)beatsElapsedInCurrentSong;
-                            brassDensity = (float)brassNotes / (float)beatsElapsedInCurrentSong;
+                            _guitarDensity = (float)_guitarNotes / (float)_beatsElapsedInCurrentSong;
+                            _keyboardDensity = (float)_keyboardNotes / (float)_beatsElapsedInCurrentSong;
+                            _brassDensity = (float)_brassNotes / (float)_beatsElapsedInCurrentSong;
                             if (WorldManager.Instance.shakers > 2) WorldManager.Instance.shakers -= 2;
-                            WorldManager.Instance.roadVariance = Mathf.Clamp(guitarDensity * 0.6f, 0.2f, 0.6f);
-                            WorldManager.Instance.roadMaxSlope = Mathf.Clamp(keyboardDensity * 0.002f, 0.002f, 0.001f);
-                            WorldManager.Instance.decorationDensity = Mathf.Clamp(brassDensity * 2f, 1f, 2f);
+                            WorldManager.Instance.roadVariance = Mathf.Clamp(_guitarDensity * 0.6f, 0.2f, 0.6f);
+                            WorldManager.Instance.roadMaxSlope = Mathf.Clamp(_keyboardDensity * 0.002f, 0.002f, 0.001f);
+                            WorldManager.Instance.decorationDensity = Mathf.Clamp(_brassDensity * 2f, 1f, 2f);
                         }
                         break;
                 }
 
                 // Reset beat timer
-                BeatTimer = 7200f / tempoToFloat[tempo] / 4f; // 3600f = 60 fps * 60 seconds
+                _beatTimer = 7200f / TempoToFloat[_tempo] / 4f; // 3600f = 60 fps * 60 seconds
 
                 // Decrement beat timer
             }
-            else BeatTimer -= 1.667f;
+            else _beatTimer -= 1.667f;
         }
 
         #endregion
         #region Properties
+
+        /// <summary>
+        /// Returns the number of load operations to perform (read-only).
+        /// </summary>
+        public int LoadOps { get { return _loadOpsToDo; } }
 
         /// <summary>
         /// Current selected instrument.
@@ -359,7 +447,7 @@ namespace Route95.Music {
         public void Load() {
 
             // Save loading start time
-            startLoadTime = Time.realtimeSinceStartup;
+            _loadStartTime = Time.realtimeSinceStartup;
 
             // Begin by loading sounds
             StartCoroutine("LoadSounds");
@@ -368,7 +456,6 @@ namespace Route95.Music {
         /// <summary>
         /// Coroutine to load all instrument sounds.
         /// </summary>
-        /// <returns></returns>
         IEnumerator LoadSounds() {
 
             // Update loading message
@@ -414,7 +501,6 @@ namespace Route95.Music {
         /// <summary>
         /// Coroutine to load instruments.
         /// </summary>
-        /// <returns></returns>
         IEnumerator LoadInstruments() {
 
             List<string> loadMessages = new List<string>() {
@@ -440,14 +526,14 @@ namespace Route95.Music {
                 Instrument.AllInstruments[i].Load();
 
                 // Create instrument AudioSource GameObject
-                GameObject obj = new GameObject(Instrument.AllInstruments[i].name);
+                GameObject obj = new GameObject(Instrument.AllInstruments[i].Name);
                 AudioSource source = obj.AddComponent<AudioSource>();
 
                 // Group instrument under MusicManager
                 obj.transform.parent = transform.parent;
 
                 // Connect AudioSource to mixer
-                source.outputAudioMixerGroup = mixer.FindMatchingGroups(obj.name)[0];
+                source.outputAudioMixerGroup = _mixer.FindMatchingGroups(obj.name)[0];
 
                 // Connect instrument to AudioSource
                 _instrumentAudioSources.Add(Instrument.AllInstruments[i], source);
@@ -513,14 +599,14 @@ namespace Route95.Music {
         public void FinishLoading() {
 
             // Report loading time
-            Debug.Log("MusicManager.Load(): finished in " + (Time.realtimeSinceStartup - startLoadTime).ToString("0.0000") + " seconds.");
+            Debug.Log("MusicManager.Load(): finished in " + (Time.realtimeSinceStartup - _loadStartTime).ToString("0.0000") + " seconds.");
 
             // Start loading WorldManager
             WorldManager.Instance.Load();
         }
 
         #endregion
-        #region MusicManager Callbacks
+        #region MusicManager Methods
 
         /// <summary>
         /// Plays a one-shot AudioClip.
@@ -528,7 +614,7 @@ namespace Route95.Music {
         /// <param name="sound">Sound to play.</param>
         /// <param name="volume">Volume scaler.</param>
         public static void PlayMenuSound(AudioClip sound, float volume = 1f) {
-            Instance.source.PlayOneShot(sound, volume);
+            Instance._source.PlayOneShot(sound, volume);
         }
 
         /// <summary>
@@ -581,12 +667,7 @@ namespace Route95.Music {
         /// Toggles whether to loop playlist.
         /// </summary>
         public void ToggleLoopPlaylist() {
-            loopPlaylist = !loopPlaylist;
-
-            // Update sprite
-            if (RiffEditor.Instance == null) Debug.Log("shit");
-            loopPlaylistButton.sprite = loopPlaylist ?
-                RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty;
+            _loopPlaylist = !_loopPlaylist;
         }
 
         /// <summary>
@@ -594,12 +675,12 @@ namespace Route95.Music {
         /// </summary>
         public void PlayRiffLoop() {
             SongArrangeMenu.Instance.UpdateValue();
-            riffMode = true;
+            _riffMode = true;
             Loop();
         }
 
         public void PlaySongLoop() {
-            riffMode = false;
+            _riffMode = false;
             Loop();
         }
 
@@ -617,20 +698,20 @@ namespace Route95.Music {
 
         void Loop() {
             // If looping
-            if (loop) {
+            if (_loopRiffs) {
 
                 // Stop doing so
                 StopLooping();
 
                 // Stop AudioSource
-                Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.instrumentIndex];
+                Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.InstrumentIndex];
                 _instrumentAudioSources[instrument].Stop();
 
                 // If not looping, then start
             }
             else {
-                playing = true;
-                loop = true;
+                _isPlaying = true;
+                _loopRiffs = true;
             }
         }
 
@@ -638,10 +719,10 @@ namespace Route95.Music {
         /// Stops looping the current riff.
         /// </summary>
         public void StopLooping() {
-            playing = false;
-            loop = false;
-            beat = 0;
-            Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.instrumentIndex];
+            _isPlaying = false;
+            _loopRiffs = false;
+            _beat = 0;
+            Instrument instrument = Instrument.AllInstruments[RiffEditor.CurrentRiff.InstrumentIndex];
             _instrumentAudioSources[instrument].Stop();
         }
 
@@ -656,8 +737,8 @@ namespace Route95.Music {
         /// Increases the tempo.
         /// </summary>
         public void IncreaseTempo() {
-            if ((int)tempo < (int)Tempo.NUM_TEMPOS - 1) {
-                tempo = (Tempo)((int)tempo + 1);
+            if ((int)_tempo < (int)Tempo.NUM_TEMPOS - 1) {
+                _tempo = (Tempo)((int)_tempo + 1);
                 if (RiffEditor.Instance != null)
                     RiffEditor.Instance.UpdateTempoText();
             }
@@ -667,17 +748,37 @@ namespace Route95.Music {
         /// Decreases the tempo.
         /// </summary>
         public void DecreaseTempo() {
-            if ((int)tempo > 0) {
-                tempo = (Tempo)((int)tempo - 1);
+            if ((int)_tempo > 0) {
+                _tempo = (Tempo)((int)_tempo - 1);
                 if (RiffEditor.Instance != null)
                     RiffEditor.Instance.UpdateTempoText();
             }
         }
 
         /// <summary>
+        /// Registers that a guitar note was played.
+        /// </summary>
+        public void RegisterGuitarNote() {
+            _guitarNotes++;
+        }
+
+        /// <summary>
+        /// Registers that a keyboard note was played.
+        /// </summary>
+        public void RegisterKeyboardNote() {
+            _keyboardNotes++;
+        }
+
+        /// <summary>
+        /// Registers that a brass note was played.
+        /// </summary>
+        public void RegisterBrassNote() {
+            _brassNotes++;
+        }
+
+        /// <summary>
         /// Adds a riff to the current song.
         /// </summary>
-        /// <returns></returns>
         public Riff AddRiff() {
 
             // Create a new riff
@@ -690,7 +791,7 @@ namespace Route95.Music {
             RiffEditor.CurrentRiff = temp;
 
             // Update song arrange
-            SongArrangeMenu.Instance.selectedRiffIndex = temp.index;
+            SongArrangeMenu.Instance.selectedRiffIndex = temp.Index;
             SongArrangeMenu.Instance.Refresh();
 
             return temp;
@@ -700,22 +801,22 @@ namespace Route95.Music {
         /// Starts playing a song.
         /// </summary>
         public void StartSong() {
-            playing = true;
+            _isPlaying = true;
         }
 
         /// <summary>
         /// Starts playing a playlist.
         /// </summary>
         public void StartPlaylist() {
-            beatsElapsedInPlaylist = 0;
+            _beatsElapsedInPlaylist = 0;
         }
 
         /// <summary>
         /// Stops playing a song.
         /// </summary>
         public void StopPlaying() {
-            playing = false;
-            beat = 0;
+            _isPlaying = false;
+            _beat = 0;
         }
 
         #endregion

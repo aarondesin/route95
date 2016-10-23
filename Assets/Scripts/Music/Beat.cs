@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿// Beat.cs
+// ©2016 Team 95
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace Route95.Music {
 
@@ -42,6 +45,11 @@ namespace Route95.Music {
             set { _index = value; }
         }
 
+        /// <summary>
+        /// Returns the number of notes in the beat (read-only).
+        /// </summary>
+        public int NoteCount { get { return _notes.Count; }  }
+
         #endregion
         #region Beat Methods
 
@@ -74,11 +82,6 @@ namespace Route95.Music {
         public void Clear() {
             _notes.Clear();
         }
-
-        /// <summary>
-        /// Returns the number of notes in the beat (read-only).
-        /// </summary>
-        public int NoteCount { get { return _notes.Count; }  }
 
         #endregion
     }

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// MelodicInstrument.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
 namespace Route95.Music {
@@ -11,7 +12,10 @@ namespace Route95.Music {
 
         #region MelodicInstrument Vars
 
-        public Dictionary<Key, int> startingNote; // Mapping of musical key to index of starting note
+        /// <summary>
+        /// Mapping of musical key to index of starting note.
+        /// </summary>
+        Dictionary<Key, int> _startingNote;
 
         #endregion
         #region MelodicInstrument Methods
@@ -20,15 +24,15 @@ namespace Route95.Music {
         /// Electric guitar.
         /// </summary>
         public static MelodicInstrument ElectricGuitar = new MelodicInstrument {
-            name = "Electric Guitar",
-            codeName = "ElectricGuitar",
-            index = 2,
-            type = Type.Melodic,
-            family = Family.Guitar,
-            iconPath = "UI/Instrument_ElectricGuitar",
-            glowPath = "UI/Instrument_ElectricGuitar_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Electric Guitar",
+            _codeName = "ElectricGuitar",
+            _index = 2,
+            _type = Type.Melodic,
+            _family = Family.Guitar,
+            _iconPath = "UI/Instrument_ElectricGuitar",
+            _glowPath = "UI/Instrument_ElectricGuitar_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 8 },
             { Key.CSharp, 9 },
             { Key.D, 10 },
@@ -48,15 +52,15 @@ namespace Route95.Music {
         /// Electric bass.
         /// </summary>
         public static MelodicInstrument ElectricBass = new MelodicInstrument {
-            name = "Electric Bass",
-            codeName = "ElectricBass",
-            index = 3,
-            type = Type.Melodic,
-            family = Family.Bass,
-            iconPath = "UI/Instrument_ElectricBass",
-            glowPath = "UI/Instrument_ElectricBass_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricBass",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Electric Bass",
+            _codeName = "ElectricBass",
+            _index = 3,
+            _type = Type.Melodic,
+            _family = Family.Bass,
+            _iconPath = "UI/Instrument_ElectricBass",
+            _glowPath = "UI/Instrument_ElectricBass_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricBass",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 8 },
             { Key.CSharp, 9 },
             { Key.D, 10 },
@@ -76,15 +80,15 @@ namespace Route95.Music {
         /// Acoustic guitar.
         /// </summary>
         public static MelodicInstrument AcousticGuitar = new MelodicInstrument {
-            name = "Acoustic Guitar",
-            codeName = "AcousticGuitar",
-            index = 4,
-            type = Type.Melodic,
-            family = Family.Guitar,
-            iconPath = "UI/Instrument_AcousticGuitar",
-            glowPath = "UI/Instrument_AcousticGuitar_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Acoustic Guitar",
+            _codeName = "AcousticGuitar",
+            _index = 4,
+            _type = Type.Melodic,
+            _family = Family.Guitar,
+            _iconPath = "UI/Instrument_AcousticGuitar",
+            _glowPath = "UI/Instrument_AcousticGuitar_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 8 },
             { Key.CSharp, 9 },
             { Key.D, 10 },
@@ -104,15 +108,15 @@ namespace Route95.Music {
         /// Classical guitar.
         /// </summary>
         public static MelodicInstrument ClassicalGuitar = new MelodicInstrument {
-            name = "Classical Guitar",
-            codeName = "ClassicalGuitar",
-            index = 5,
-            type = Type.Melodic,
-            family = Family.Guitar,
-            iconPath = "UI/Instrument_ClassicalGuitar",
-            glowPath = "UI/Instrument_ClassicalGuitar_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Classical Guitar",
+            _codeName = "ClassicalGuitar",
+            _index = 5,
+            _type = Type.Melodic,
+            _family = Family.Guitar,
+            _iconPath = "UI/Instrument_ClassicalGuitar",
+            _glowPath = "UI/Instrument_ClassicalGuitar_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 8 },
             { Key.CSharp, 9 },
             { Key.D, 10 },
@@ -132,15 +136,15 @@ namespace Route95.Music {
         /// Pipe organ.
         /// </summary>
         public static MelodicInstrument PipeOrgan = new MelodicInstrument {
-            name = "Pipe Organ",
-            codeName = "PipeOrgan",
-            index = 6,
-            type = Type.Melodic,
-            family = Family.Keyboard,
-            iconPath = "UI/Instrument_PipeOrgan",
-            glowPath = "UI/Instrument_PipeOrgan_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Pipe Organ",
+            _codeName = "PipeOrgan",
+            _index = 6,
+            _type = Type.Melodic,
+            _family = Family.Keyboard,
+            _iconPath = "UI/Instrument_PipeOrgan",
+            _glowPath = "UI/Instrument_PipeOrgan_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 3 },
             { Key.CSharp, 4 },
             { Key.D, 5 },
@@ -160,15 +164,15 @@ namespace Route95.Music {
         /// Keyboard.
         /// </summary>
         public static MelodicInstrument Keyboard = new MelodicInstrument {
-            name = "Keyboard",
-            codeName = "Keyboard",
-            index = 7,
-            type = Type.Melodic,
-            family = Family.Keyboard,
-            iconPath = "UI/Instrument_Keyboard",
-            glowPath = "UI/Instrument_Keyboard_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Keyboard",
+            _codeName = "Keyboard",
+            _index = 7,
+            _type = Type.Melodic,
+            _family = Family.Keyboard,
+            _iconPath = "UI/Instrument_Keyboard",
+            _glowPath = "UI/Instrument_Keyboard_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 3 },
             { Key.CSharp, 4 },
             { Key.D, 5 },
@@ -188,15 +192,15 @@ namespace Route95.Music {
         /// Trumpet.
         /// </summary>
         public static MelodicInstrument Trumpet = new MelodicInstrument {
-            name = "Trumpet",
-            codeName = "Trumpet",
-            index = 8,
-            type = Type.Melodic,
-            family = Family.Brass,
-            iconPath = "UI/Instrument_Trumpet",
-            glowPath = "UI/Instrument_Trumpet_Glow",
-            switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
-            startingNote = new Dictionary<Key, int>() {
+            _name = "Trumpet",
+            _codeName = "Trumpet",
+            _index = 8,
+            _type = Type.Melodic,
+            _family = Family.Brass,
+            _iconPath = "UI/Instrument_Trumpet",
+            _glowPath = "UI/Instrument_Trumpet_Glow",
+            _switchSoundPath = "Audio/Gameplay/Instruments/ElectricGuitar",
+            _startingNote = new Dictionary<Key, int>() {
             { Key.C, 3 },
             { Key.CSharp, 4 },
             { Key.D, 5 },
@@ -213,6 +217,5 @@ namespace Route95.Music {
         };
 
         #endregion
-
     }
 }

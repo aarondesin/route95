@@ -1,23 +1,42 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// Measure.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to store riffs.
-/// </summary>
-[System.Serializable]
-public class Measure {
+using UnityEngine;
 
-	[SerializeField]
-	public int index;             // Project-specific index
+namespace Route95.Music {
 
-	[SerializeField]
-	public List<int> riffIndices; // List of indices of riffs used
+    /// <summary>
+    /// Class to store riffs.
+    /// </summary>
+    [System.Serializable]
+    public class Measure {
 
-	/// <summary>
-	/// Default constructor.
-	/// </summary>
-	public Measure () {
-		riffIndices = new List<int>();
-	}
+        #region Vars
+
+        /// <summary>
+        /// Project-specific index.
+        /// </summary>
+        [SerializeField]
+        int _index;
+
+        /// <summary>
+        /// List of indices of riffs used.
+        /// </summary>
+        [SerializeField]
+        List<int> _riffIndices;
+
+        #endregion
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Measure() {
+            _riffIndices = new List<int>();
+        }
+
+        #endregion
+    }
 }

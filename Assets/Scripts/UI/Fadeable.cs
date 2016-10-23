@@ -103,7 +103,6 @@ public class Fadeable : MonoBehaviour {
 	/// <summary>
 	/// Fades an object.
 	/// </summary>
-	/// <returns></returns>
 	IEnumerator DoFade () {
 		while (true) {
 			if (alpha >= fadeSpeed) {
@@ -125,7 +124,6 @@ public class Fadeable : MonoBehaviour {
 	/// <summary>
 	/// Unfades an object.
 	/// </summary>
-	/// <returns></returns>
 	IEnumerator DoUnFade () {
 		while (alpha <= 1f-fadeSpeed) {
 

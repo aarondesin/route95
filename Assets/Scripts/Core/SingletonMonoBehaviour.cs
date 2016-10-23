@@ -1,9 +1,10 @@
 ﻿// SingletonMonoBehaviour.cs
 // ©2016 Team 95 
 
-using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
+
+using UnityEngine;
 
 /// <summary>
 /// Class to ensure singleton system in a MonoBehaviour
@@ -25,6 +26,9 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour
 	#endregion
 	#region Static Vars
 
+    /// <summary>
+    /// Instance of this class.
+    /// </summary>
 	static SingletonMonoBehaviour<T> _Instance;
 
 	#endregion
@@ -39,7 +43,7 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour
 	}
 
 	#endregion
-	#region Methods
+	#region Properties
 
 	/// <summary>
 	/// Returns the Instance of this class.

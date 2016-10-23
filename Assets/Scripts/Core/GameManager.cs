@@ -278,7 +278,7 @@ namespace Route95.Core {
             UIManager.Instance.ShowMenu(LoadingScreen.Instance);
 
             // Calculate operations to do
-            _loadOpsToDo = MusicManager.Instance.loadsToDo +
+            _loadOpsToDo = MusicManager.Instance.LoadOps +
                     WorldManager.Instance.loadsToDo;
 
             // Init vars
