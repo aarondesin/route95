@@ -539,7 +539,7 @@ namespace Route95.UI {
             // Show live menus
             ShowMenu(LiveInstrumentIcons.Instance);
             ShowMenu(SongProgressBar.Instance);
-            if (MusicManager.Instance.loopPlaylist) ShowMenu(LoopIcon.Instance);
+            if (MusicManager.Instance.LoopPlaylist) ShowMenu(LoopIcon.Instance);
             else HideMenu(LoopIcon.Instance);
 
             // Init music

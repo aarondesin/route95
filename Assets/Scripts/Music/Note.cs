@@ -109,9 +109,25 @@ namespace Route95.Music {
         public string Filename { get { return _filename; } }
 
         /// <summary>
-        /// Returns the volume of this note (read-only).
+        /// Gets/sets the volume of this note.
         /// </summary>
-        public float Volume { get { return _volume; } }
+        public float Volume {
+            get { return _volume; }
+            set { _volume = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets the duration of this note.
+        /// </summary>
+        public float Duration {
+            get { return _duration; }
+            set { _duration = value; }
+        }
+
+        /// <summary>
+        /// Returns the type of percussion of this note (read-only).
+        /// </summary>
+        public PercType PercussionType { get { return _percType; } }
 
         #endregion
         #region Methods

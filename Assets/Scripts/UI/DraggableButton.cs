@@ -61,32 +61,32 @@ namespace Route95.UI {
         /// <summary>
         /// Called when the mouse button is pressed on this object.
         /// </summary>
-        public abstract void OnMouseDown();
+        public virtual void OnMouseDown() { }
 
         /// <summary>
         /// Called when the mouse button is released on this object.
         /// </summary>
-        public abstract void OnMouseUp();
+        public virtual void OnMouseUp() { }
 
         /// <summary>
         /// Called when dragged left.
         /// </summary>
-        public abstract void DragLeft(float actionRatio);
+        public virtual void DragLeft(float actionRatio) { }
 
         /// <summary>
         /// Called when dragged right.
         /// </summary>
-        public abstract void DragRight(float actionRatio);
+        public virtual void DragRight(float actionRatio) { }
 
         /// <summary>
         /// Called when dragged down.
         /// </summary>
-        public abstract void DragDown(float actionRatio);
+        public virtual void DragDown(float actionRatio) { }
 
         /// <summary>
         /// Called when dragged up.
         /// </summary>
-        public abstract void DragUp(float actionRation);
+        public virtual void DragUp(float actionRatio) { }
 
         #endregion
     }

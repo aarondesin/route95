@@ -1,66 +1,81 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
+﻿// InstrumentDisplay.cs
+// ©2016 Team 95
 
 using Route95.Core;
 using Route95.Music;
 
+using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Route95.UI {
 
-/// <summary>
-/// Class to handle instrument display on the back of the car.
-/// </summary>
-public class InstrumentDisplay : SingletonMonoBehaviour<InstrumentDisplay> {
+    /// <summary>
+    /// Class to handle instrument display on the back of the car.
+    /// </summary>
+    public class InstrumentDisplay : SingletonMonoBehaviour<InstrumentDisplay> {
 
-	#region InstrumentDisplay Vars
+        #region InstrumentDisplay Vars
 
-	public Image glow;                        // Sprite to change for glow
-	public float fadeSpeed;                   // Speed of fade
-	public List<Fadeable> glows;                 // Instrument icons glows
+        /// <summary>
+        /// Sprite to change for glow.
+        /// </summary>
+        Image _glow;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Speed of fade.
+        /// </summary>
+        [SerializeField]
+        float _fadeSpeed;
 
-	void FixedUpdate () {
+        /// <summary>
+        /// Instrument icons glows.
+        /// </summary>
+        List<Fadeable> _glows;
 
-		if (GameManager.Instance.CurrentState != GameManager.State.Live) return;
-		if (GameManager.Instance.Paused) return;
+        #endregion
+        #region Unity Callbacks
 
-		Color color = glow.color;
-		color.a -= fadeSpeed;
-		glow.color = color;
+        void FixedUpdate() {
 
-	}
+            if (GameManager.Instance.CurrentState != GameManager.State.Live) return;
+            if (GameManager.Instance.Paused) return;
 
-	#endregion
-	#region InstrumentDisplay Methods
+            Color color = _glow.color;
+            color.a -= _fadeSpeed;
+            _glow.color = color;
 
-	/// <summary>
-	/// Refreshes the display, changing art if necessary.
-	/// </summary>
-	public void Refresh () {
-		gameObject.Image().sprite = MusicManager.Instance.CurrentInstrument.icon;
-		glow.sprite = MusicManager.Instance.CurrentInstrument.glow;
-	}
+        }
 
-	/// <summary>
-	/// Sets glow to full.
-	/// </summary>
-	public void WakeGlow () {
-		Color color = glow.color;
-		color.a = 1f;
-		glow.color = color;
-	}
+        #endregion
+        #region InstrumentDisplay Methods
 
-	public void WakeGlow (int index) {
-		glows[index].UnFade();
-	}
+        /// <summary>
+        /// Refreshes the display, changing art if necessary.
+        /// </summary>
+        public void Refresh() {
+            gameObject.Image().sprite = MusicManager.Instance.CurrentInstrument.Icon;
+            _glow.sprite = MusicManager.Instance.CurrentInstrument.Glow;
+        }
 
-	public void FadeGlow (int index) {
-		glows[index].Fade();
-	}
+        /// <summary>
+        /// Sets glow to full.
+        /// </summary>
+        public void WakeGlow() {
+            Color color = _glow.color;
+            color.a = 1f;
+            _glow.color = color;
+        }
 
-	#endregion
-}
+        public void WakeGlow(int index) {
+            _glows[index].UnFade();
+        }
+
+        public void FadeGlow(int index) {
+            _glows[index].Fade();
+        }
+
+        #endregion
+    }
 }

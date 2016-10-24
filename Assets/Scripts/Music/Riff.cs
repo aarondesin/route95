@@ -273,6 +273,22 @@ namespace Route95.Music {
         public Instrument Instrument { get { return _instrument; } }
 
         /// <summary>
+        /// Gets/sets the volume of this riff.
+        /// </summary>
+        public float Volume {
+            get { return _volume; }
+            set { _volume = value; }
+        }
+
+        /// <summary>
+        /// Gets/sets the panning of this riff.
+        /// </summary>
+        public float Panning {
+            get { return _panning; }
+            set { _panning = value; }
+        }
+
+        /// <summary>
         /// Returns the length of the riff, in number of beats (read-only).
         /// </summary>
         public int Length { get { return _beatIndices.Count; } }
@@ -290,12 +306,27 @@ namespace Route95.Music {
             set { _distortionEnabled = value; }
         }
 
+        public float DistortionLevel {
+            get { return _distortionLevel; }
+            set { _distortionLevel = value; }
+        }
+
         /// <summary>
         /// Gets/sets whether or not tremolo is enabled.
         /// </summary>
         public bool TremoloEnabled {
             get { return _tremoloEnabled; }
             set { _tremoloEnabled = value; }
+        }
+
+        public float TremoloRate {
+            get { return _tremoloRate; }
+            set { _tremoloRate = value; }
+        }
+
+        public float TremoloDepth {
+            get { return _tremoloDepth; }
+            set { _tremoloDepth = value; }
         }
 
         /// <summary>
@@ -306,12 +337,42 @@ namespace Route95.Music {
             set { _chorusEnabled = value; }
         }
 
+        public float ChorusDryMix {
+            get { return _chorusDryMix; }
+            set { _chorusDryMix = value; }
+        }
+
+        public float ChorusRate {
+            get { return _chorusRate; }
+            set { _chorusRate = value; }
+        }
+
+        public float ChorusDepth {
+            get { return _chorusDepth; }
+            set { _chorusDepth = value; }
+        }
+
         /// <summary>
         /// Gets/sets whether or not echo is enabled.
         /// </summary>
         public bool EchoEnabled {
             get { return _echoEnabled; }
             set { _echoEnabled = value; }
+        }
+
+        public float EchoDecay {
+            get { return _echoDecayRatio; }
+            set { _echoDecayRatio = value; }
+        }
+
+        public float EchoDelay {
+            get { return _echoDelay; }
+            set { _echoDelay = value; }
+        }
+
+        public float EchoDryMix {
+            get { return _echoDryMix; }
+            set { _echoDryMix = value; }
         }
 
         /// <summary>
@@ -322,12 +383,32 @@ namespace Route95.Music {
             set { _reverbEnabled = value; }
         }
 
+        public float ReverbDecay {
+            get { return _reverbDecayTime; }
+            set { _reverbDecayTime = value; }
+        }
+
+        public float ReverbLevel {
+            get { return _reverbLevel; }
+            set { _reverbLevel = value; }
+        }
+
         /// <summary>
         /// Gets/sets whether or not flanger is enabled.
         /// </summary>
         public bool FlangerEnabled {
             get { return _flangerEnabled; }
             set { _flangerEnabled = value; }
+        }
+
+        public float FlangerRate {
+            get { return _flangerRate; }
+            set { _flangerRate = value; }
+        }
+
+        public float FlangerDryMix {
+            get { return _flangerDryMix; }
+            set { _flangerDryMix = value; }
         }
 
         #endregion

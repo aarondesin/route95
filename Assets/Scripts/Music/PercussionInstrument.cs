@@ -100,6 +100,15 @@ namespace Route95.Music {
         };
 
         #endregion
+        #region Methods
 
+        /// <summary>
+        /// Returns the note icon for a note.
+        /// </summary>
+        public Sprite GetNoteIcon (string note) {
+            return _icons[note];
+        }
+
+        #endregion
     }
 }

@@ -18,9 +18,9 @@ namespace Route95.Music {
         string _name;
 
         /// <summary>
-        /// Interval in list of all scales.
+        /// Index in list of all scales.
         /// </summary>
-        int _scaleInterval;
+        int _scaleIndex;
 
         /// <summary>
         /// Interval to root.
@@ -62,7 +62,7 @@ namespace Route95.Music {
         /// </summary>
         public static ScaleInfo Major = new ScaleInfo() {
             _name = "Major",
-            _scaleInterval = 0,
+            _scaleIndex = 0,
             _secondInterval = 2,
             _thirdInterval = 2,
             _fourthInterval = 1,
@@ -77,7 +77,7 @@ namespace Route95.Music {
         /// </summary>
         public static ScaleInfo Minor = new ScaleInfo() {
             _name = "Minor",
-            _scaleInterval = 1,
+            _scaleIndex = 1,
             _secondInterval = 2,
             _thirdInterval = 1,
             _fourthInterval = 2,
@@ -99,39 +99,49 @@ namespace Route95.Music {
         #region Properties
 
         /// <summary>
-        /// Returns the root interval.
+        /// Returns the name of this scale (read-only).
+        /// </summary>
+        public string Name { get { return _name; } }
+
+        /// <summary>
+        /// Returns the root interval (read-only).
         /// </summary>
         public int RootInterval { get { return _rootInterval; } }
 
         /// <summary>
-        /// Returns the second interval.
+        /// Returns the second interval (read-only).
         /// </summary>
         public int SecondInterval { get { return _secondInterval; } }
 
         /// <summary>
-        /// Returns the third interval.
+        /// Returns the third interval (read-only).
         /// </summary>
         public int ThirdInterval { get { return _thirdInterval; } }
 
         /// <summary>
-        /// Returns the fourth interval.
+        /// Returns the fourth interval (read-only).
         /// </summary>
         public int FourthInterval { get { return _fourthInterval; } }
 
         /// <summary>
-        /// Returns the fifth interval.
+        /// Returns the fifth interval (read-only).
         /// </summary>
         public int FifthInterval { get { return _fifthInterval; } }
 
         /// <summary>
-        /// Returns the sixth interval.
+        /// Returns the sixth interval (read-only).
         /// </summary>
         public int SixthInterval { get { return _sixthInterval; } }
 
         /// <summary>
-        /// Returns the seventh interval.
+        /// Returns the seventh interval (read-only).
         /// </summary>
         public int SeventhInterval { get { return _seventhInterval; } }
+
+        /// <summary>
+        /// Returns the index of this scale (read-only).
+        /// </summary>
+        public int ScaleIndex { get { return _scaleIndex; } }
 
         #endregion
     }

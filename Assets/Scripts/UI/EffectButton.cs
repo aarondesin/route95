@@ -26,7 +26,7 @@ namespace Route95.UI {
         #endregion
         #region Unity Callbacks
 
-        void Awake () {
+        void Awake() {
             // Init vars
             _image = GetComponent<Image>();
         }
@@ -38,7 +38,7 @@ namespace Route95.UI {
         /// Toggles an effect on or off.
         /// </summary>
         /// <typeparam name="TEffect">Type of effect to toggle.</typeparam>
-        public void Toggle<TEffect> () where TEffect : Behaviour {
+        public void Toggle<TEffect>() where TEffect : Behaviour {
             Riff riff = RiffEditor.CurrentRiff;
             Instrument inst = riff.Instrument;
             AudioSource source = MusicManager.Instance.GetAudioSource(inst);
@@ -49,12 +49,12 @@ namespace Route95.UI {
 
             // Update riff
             Type effectType = typeof(TEffect);
-            if      (effectType == typeof(AudioDistortionFilter))    riff.DistortionEnabled = effect.enabled;
-            else if (effectType == typeof(AudioEchoFilter))          riff.EchoEnabled       = effect.enabled;
-            else if (effectType == typeof(AudioReverbFilter))        riff.ReverbEnabled     = effect.enabled;
-            else if (effectType == typeof(AudioTremoloFilter))       riff.TremoloEnabled    = effect.enabled;
-            else if (effectType == typeof(AudioChorusFilter))        riff.ChorusEnabled     = effect.enabled;
-            else if (effectType == typeof(AudioFlangerFilter))       riff.FlangerEnabled    = effect.enabled;
+            if (effectType == typeof(AudioDistortionFilter)) riff.DistortionEnabled = effect.enabled;
+            else if (effectType == typeof(AudioEchoFilter)) riff.EchoEnabled = effect.enabled;
+            else if (effectType == typeof(AudioReverbFilter)) riff.ReverbEnabled = effect.enabled;
+            else if (effectType == typeof(AudioTremoloFilter)) riff.TremoloEnabled = effect.enabled;
+            else if (effectType == typeof(AudioChorusFilter)) riff.ChorusEnabled = effect.enabled;
+            else if (effectType == typeof(AudioFlangerFilter)) riff.FlangerEnabled = effect.enabled;
 
             // Update button art
             _image.sprite = (effect.enabled ? RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
@@ -64,23 +64,22 @@ namespace Route95.UI {
             else UIManager.Instance.PlayDisableEffectSound();
         }
 
-        public void UpdateSetting<TEffect> (ref float effectSetting, ref float riffSetting, Slider slider) 
-            where TEffect : Behaviour
-        {
+        public void UpdateSetting<TEffect>(ref float effectSetting, ref float riffSetting, Slider slider)
+            where TEffect : Behaviour {
             Riff riff = RiffEditor.CurrentRiff;
             Instrument inst = riff.Instrument;
-            AudioSource source = MusicManager.Instance.GetAudioSource (inst);
+            AudioSource source = MusicManager.Instance.GetAudioSource(inst);
 
             // Update setting on both effect and riff
             riffSetting = effectSetting = slider.value;
-            
+
             // Turn on effect if not already
             TEffect effect = source.GetComponent<TEffect>();
             if (!effect.enabled) Toggle<TEffect>();
         }
 
-        public void UpdateDistortionLevel 
-
+        //public void UpdateDistortionLevel 
+        /*
         public void UpdateDistortionLevel(Slider slider) {
             AudioSource source = MusicManager.Instance.GetAudioSource(RiffEditor.CurrentRiff.instrument);
             RiffEditor.CurrentRiff.distortionLevel = slider.value;
@@ -201,8 +200,9 @@ namespace Route95.UI {
             Riff riff = RiffEditor.CurrentRiff;
             if (!riff.flangerEnabled && RiffEditor.Instance.initialized) ToggleFlanger();
         }
-    }
+    }*/
 
-    #endregion
+        #endregion
+    }
 }
 

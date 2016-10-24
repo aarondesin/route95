@@ -1,72 +1,75 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// NoteButton.cs
+// ©2016 Team 95
 
+using System;
 using Route95.Music;
 
-/// <summary>
-/// A special use of DraggableButton for the riff editor not buttons.
-/// </summary>
-public class NoteButton : DraggableButton {
+using UnityEngine;
+using UnityEngine.UI;
 
-	#region NoteButton Vars
+namespace Route95.UI {
 
-	const int notesVisible = 10;
-	const float vDragDistance = 128f;
-	const float hDragDistance = 128f;
+    /// <summary>
+    /// A special use of DraggableButton for the riff editor not buttons.
+    /// </summary>
+    public class NoteButton : DraggableButton {
 
-	public Note targetNote;
-	public Image volumeImage;
+        #region NoteButton Vars
 
-	float oldVolume;
-	#endregion
-	#region Unity Callbacks
+        const int VISIBLE_NOTES = 10;
+        const float V_DRAG_DISTANCE = 128f;
+        const float H_DRAG_DISTANCE = 128f;
 
-	void Awake () {
-		maxDragDistanceUp = vDragDistance;
-		maxDragDistanceDown = vDragDistance;
-		maxDragDistanceLeft = hDragDistance;
-		maxDragDistanceRight = hDragDistance;
+        public Note targetNote;
+        public Image volumeImage;
 
-		//dragThreshold = 25f;
-	}
+        float oldVolume;
+        #endregion
+        #region Unity Callbacks
 
-	#endregion
-	#region DraggableButton Overrides
+        void Awake() {
+            _maxDragDistanceUp = V_DRAG_DISTANCE;
+            _maxDragDistanceDown = V_DRAG_DISTANCE;
+            _maxDragDistanceLeft = H_DRAG_DISTANCE;
+            _maxDragDistanceRight = H_DRAG_DISTANCE;
+        }
 
-	public override void OnMouseDown() {
-		oldVolume = targetNote.volume;
-	}
+        #endregion
+        #region DraggableButton Overrides
 
+        public override void OnMouseDown() {
+            oldVolume = targetNote.Volume;
+        }
 
-	public override void DragDown (float actionRatio) {
-		targetNote.volume = Mathf.Clamp01 (oldVolume - actionRatio);
-		UpdateButtonArt();
-	}
+        public override void DragDown(float actionRatio) {
+            targetNote.Volume = Mathf.Clamp01(oldVolume - actionRatio);
+            UpdateButtonArt();
+        }
 
-	public override void DragUp (float actionRatio) {
-		targetNote.volume = Mathf.Clamp01 (oldVolume + actionRatio);
-		UpdateButtonArt();
-	}
+        public override void DragUp(float actionRatio) {
+            targetNote.Volume = Mathf.Clamp01(oldVolume + actionRatio);
+            UpdateButtonArt();
+        }
 
-	public override void DragLeft (float actionRatio) {
-		targetNote.duration = 1f;
-	}
+        public override void DragLeft(float actionRatio) {
+            targetNote.Duration = 1f;
+        }
 
-	public override void DragRight (float actionRatio) {
-		targetNote.duration = 1 + (float)(notesVisible-1) * actionRatio;
-	}
+        public override void DragRight(float actionRatio) {
+            targetNote.Duration = 1 + (float)(VISIBLE_NOTES - 1) * actionRatio;
+        }
 
-	#endregion
-	#region DraggableButton Methods
+        #endregion
+        #region Methods
 
-	/// <summary>
-	/// Updates the button's fill amount and color.
-	/// </summary>
-	public void UpdateButtonArt() {
-		volumeImage.fillAmount = targetNote.volume;
-		volumeImage.color = new Color (0.75f*targetNote.volume + 0.25f, 0.25f, 0.25f, 1f);
-	}
+        /// <summary>
+        /// Updates the button's fill amount and color.
+        /// </summary>
+        public void UpdateButtonArt() {
+            volumeImage.fillAmount = targetNote.Volume;
+            volumeImage.color = new Color(0.75f * targetNote.Volume + 0.25f, 0.25f, 0.25f, 1f);
+        }
 
-	#endregion
+        #endregion
+    }
 }

@@ -307,18 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 090e7ddbb58495e4a997704a8b689084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glow: {fileID: 1643627759}
-  fadeSpeed: 0.05
-  glows:
-  - {fileID: 654892847}
-  - {fileID: 1839266322}
-  - {fileID: 439461348}
-  - {fileID: 1990447072}
-  - {fileID: 417697722}
-  - {fileID: 902385623}
-  - {fileID: 1594625725}
-  - {fileID: 1947633910}
-  - {fileID: 1578024941}
+  _fadeSpeed: 0
 --- !u!1 &8459537
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,7 +412,7 @@ GameObject:
   - 114: {fileID: 12625954}
   - 114: {fileID: 12625953}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Echo Decay Ratio Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -458,10 +447,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 12625951}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 835b058319dce224a8943301e5099230, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 916065925}
 --- !u!114 &12625954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,18 +495,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 12625953}
-        m_MethodName: updateechoDecayRatio
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 12625954}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &17118842
@@ -1493,7 +1470,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 58759266}
   m_Layer: 5
-  m_Name: Distortion (Parent)
+  m_Name: Distortion Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1600,7 +1577,7 @@ GameObject:
   - 114: {fileID: 62250221}
   - 114: {fileID: 62250222}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Distortion Level Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1672,18 +1649,7 @@ MonoBehaviour:
   m_Value: 0.3
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 62250222}
-        m_MethodName: updatedistortionLevel
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 62250221}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &62250222
@@ -1694,10 +1660,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 62250219}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: daa02295fbc6eba44982aee809d77a49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 924589067}
 --- !u!1 &62362753
 GameObject:
   m_ObjectHideFlags: 0
@@ -2341,7 +2306,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 99086118}
 --- !u!1 &101698808
 GameObject:
   m_ObjectHideFlags: 0
@@ -5536,9 +5500,8 @@ GameObject:
   - 224: {fileID: 187982208}
   - 222: {fileID: 187982210}
   - 114: {fileID: 187982209}
-  - 114: {fileID: 187982211}
   m_Layer: 5
-  m_Name: Echo Dry Mix Slider
+  m_Name: Echo Dry Mix Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5597,18 +5560,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 187982207}
---- !u!114 &187982211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 187982207}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 649e73d7f4e24534d8cad0c2c1546139, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 2103933683}
 --- !u!1 &190642046
 GameObject:
   m_ObjectHideFlags: 0
@@ -7871,7 +7822,7 @@ GameObject:
   - 114: {fileID: 223172984}
   - 114: {fileID: 223172983}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Tremolo Depth Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7906,10 +7857,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 223172981}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 3cad094def6dcda4da5761ce5155bad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 826674090}
 --- !u!114 &223172984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7955,18 +7905,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 223172983}
-        m_MethodName: updatetremoloDepth
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 223172984}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &232752658
@@ -8872,9 +8811,8 @@ GameObject:
   - 224: {fileID: 271153206}
   - 222: {fileID: 271153208}
   - 114: {fileID: 271153207}
-  - 114: {fileID: 271153209}
   m_Layer: 5
-  m_Name: Tremolo Rate Slider
+  m_Name: Tremolo Rate Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8933,18 +8871,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 271153205}
---- !u!114 &271153209
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 271153205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7940d364d35cb4d4b85f5c2e15f4cf23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 416740425}
 --- !u!1 &276638840
 GameObject:
   m_ObjectHideFlags: 0
@@ -9906,7 +9832,7 @@ GameObject:
   - 114: {fileID: 320499908}
   - 114: {fileID: 320499907}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Chorus Rate Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9941,10 +9867,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 320499905}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f4b6365e6480d841b8c5088617aa3dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1293270342}
 --- !u!114 &320499908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9990,18 +9915,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 320499907}
-        m_MethodName: updatechorusRate
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 320499908}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &328028403
@@ -10015,7 +9929,7 @@ GameObject:
   - 114: {fileID: 328028406}
   - 114: {fileID: 328028405}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Reverb Level Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10050,10 +9964,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 328028403}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 5ff4dff24a197c14d869ad9b3e6eb89c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1199481447}
 --- !u!114 &328028406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10099,18 +10012,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 328028405}
-        m_MethodName: updatereverbLevel
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 328028406}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &340966186
@@ -10376,9 +10278,8 @@ GameObject:
   - 224: {fileID: 348167964}
   - 222: {fileID: 348167966}
   - 114: {fileID: 348167965}
-  - 114: {fileID: 348167967}
   m_Layer: 5
-  m_Name: Chorus Dry Mix Slider
+  m_Name: Chorus Dry Mix Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10437,18 +10338,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 348167963}
---- !u!114 &348167967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 348167963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eafba6347b99d444c8e847ae6f36c201, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 1011039798}
 --- !u!1001 &348255996
 Prefab:
   m_ObjectHideFlags: 0
@@ -11141,10 +11030,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57d09f40271ec794d98c58f8f7a46120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  peakColor: {r: 1, g: 1, b: 1, a: 0.7529412}
-  blinkInterval: 0.04
-  blinkDepth: 0.6
-  progress: 0
+  _peakColor: {r: 0, g: 0, b: 0, a: 0}
+  _blinkInterval: 0
+  _blinkDepth: 0.5
 --- !u!114 &383313057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11392,9 +11280,8 @@ GameObject:
   - 224: {fileID: 389887105}
   - 222: {fileID: 389887107}
   - 114: {fileID: 389887106}
-  - 114: {fileID: 389887108}
   m_Layer: 5
-  m_Name: Chorus Rate Slider
+  m_Name: Chorus Rate Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11453,18 +11340,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 389887104}
---- !u!114 &389887108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 389887104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d662253c01054846881ffd2d55ce242, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 320499908}
 --- !u!1 &398724494
 GameObject:
   m_ObjectHideFlags: 0
@@ -11907,7 +11782,7 @@ GameObject:
   - 114: {fileID: 416740425}
   - 114: {fileID: 416740424}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Tremolo Rate Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11942,10 +11817,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 416740422}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 106857d1fd51a8844b3b8032ff6f92ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 826674090}
 --- !u!114 &416740425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11991,18 +11865,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 416740424}
-        m_MethodName: updatetremoloRate
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 416740425}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &417697720
@@ -12052,12 +11915,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &417697723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12102,7 +11962,7 @@ GameObject:
   - 114: {fileID: 419642530}
   - 114: {fileID: 419642529}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Flanger Rate Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12137,10 +11997,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 419642527}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 732d1c4e76a1a614faa5301a6e7d07c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 99086118}
 --- !u!114 &419642530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12186,18 +12045,7 @@ MonoBehaviour:
   m_Value: 0.0982
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 419642529}
-        m_MethodName: updateflangerRate
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 419642530}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &419966872
@@ -14605,12 +14453,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &438675747
 GameObject:
   m_ObjectHideFlags: 0
@@ -14752,12 +14597,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &439461349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15051,9 +14893,8 @@ GameObject:
   - 224: {fileID: 460252491}
   - 222: {fileID: 460252493}
   - 114: {fileID: 460252492}
-  - 114: {fileID: 460252494}
   m_Layer: 5
-  m_Name: Chorus Depth Slider
+  m_Name: Chorus Depth Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15112,18 +14953,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 460252490}
---- !u!114 &460252494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 460252490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b265015f816da5849bd331b6aa5d35d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 2048495029}
 --- !u!1 &465334183
 GameObject:
   m_ObjectHideFlags: 0
@@ -15561,12 +15390,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &484484987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16226,12 +16052,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.2
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 0
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &529178215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16325,6 +16148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35f7687a9c61bd9488e60b9601c964c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _scribbleSounds: []
   projectNameInputField: {fileID: 1798203143}
   playlist: {fileID: 1095947005}
   buttonHeight: 6
@@ -16343,12 +16167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &543921768
 GameObject:
   m_ObjectHideFlags: 0
@@ -17328,12 +17149,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 0
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &589967493
 GameObject:
   m_ObjectHideFlags: 0
@@ -17821,65 +17639,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3125fb541aaab3d48a0daafa855440e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paused: 0
-  currentState: 0
-  loaded: 0
-  loading: 0
-  loadingScreen: {fileID: 796519848}
-  loadingBar: {fileID: 1576480158}
-  loadingMessage: {fileID: 152282597}
-  casette: {fileID: 1730378343}
-  casetteMoveSpeed: 0.4
-  casetteFront: {fileID: 42670265}
-  casetteBack: {fileID: 402827720}
-  progress: 0
-  fadeWaitTime: 180
-  fadeSpeed: 0.02
-  projectSaveFolder: /Projects/
-  songSaveFolder: /Songs/
-  font: {fileID: 12800000, guid: 8db80b3f7b8ad7e488136bc8b3fd6400, type: 3}
-  handwrittenFont: {fileID: 12800000, guid: 3bea0085604b27041adad22cce073323, type: 3}
-  arrowIcon: {fileID: 21300000, guid: d609bb3db92815b4f84c54def93896d6, type: 3}
-  addIcon: {fileID: 21300000, guid: ed614671d2e9fca49a149b99abdc6eb1, type: 3}
-  editIcon: {fileID: 21300000, guid: 73753c5230f1f76498ba0d937217a3f7, type: 3}
-  playIcon: {fileID: 21300000, guid: 5a63a9880030c94469da624501f0a408, type: 3}
-  pauseIcon: {fileID: 21300000, guid: 3e1b272746313e8488b9d2cdcd6d6b7f, type: 3}
-  loadIcon: {fileID: 21300000, guid: 771e46b24b8c2b242b1fca076d792aa0, type: 3}
-  removeIcon: {fileID: 21300000, guid: c81de28483fdac243b3e2645e4b6c1ee, type: 3}
-  circleIcon: {fileID: 21300000, guid: 55668880aa7d80b4d81f57ab6043769e, type: 3}
-  volumeIcon: {fileID: 21300000, guid: a01c201d16be7a94ebf40dec47d5dc41, type: 3}
-  melodicVolumeIcon: {fileID: 21300000, guid: 2fe6be0cc43c77f40a3c2aa792bf4142, type: 3}
-  fillSprite: {fileID: 21300000, guid: c3ae2674f12f0aa488976272c26cc2f3, type: 3}
-  scribbleCircle: {fileID: 21300000, guid: f999250d3dafe3b4c83ff7d35b3c6239, type: 3}
-  menuClick: {fileID: 8300000, guid: 5f28d112f6413e44baa2ced59af01738, type: 3}
-  menuClick2: {fileID: 8300000, guid: 23a9282a58f1e0d48bb19a538bd4ac0f, type: 3}
-  effectsOn: {fileID: 8300000, guid: 2dd05a1a3e787e64285b6e6c25f23e14, type: 3}
-  effectsOff: {fileID: 8300000, guid: 18ef0a7e36c93d14c87485c57e46a1fc, type: 3}
-  scribbles:
-  - {fileID: 8300000, guid: c24a776c5999d334582805c13cad9718, type: 3}
-  - {fileID: 8300000, guid: 784811721b38a2e4096ec8a1d44b3a8c, type: 3}
-  - {fileID: 8300000, guid: 8395dfe84b45ebc459e6959e367df76b, type: 3}
-  mainMenu: {fileID: 863281884}
-  playlistMenu: {fileID: 537561988}
-  keySelectMenu: {fileID: 699958033}
-  songArrangeMenu: {fileID: 1585738784}
-  riffEditMenu: {fileID: 1803614117}
-  postPlayMenu: {fileID: 909404789}
-  pauseMenu: {fileID: 433132273}
-  addRiffPrompt: {fileID: 1415144758}
-  loadPrompt: {fileID: 2011310440}
-  prompt: {fileID: 484484982}
-  confirmExitPrompt: {fileID: 2076667125}
-  keySelectConfirmButton: {fileID: 177463291}
-  systemButtons: {fileID: 1469761352}
-  livePlayQuitPrompt: {fileID: 589210704}
-  liveIcons: {fileID: 1690160809}
-  songProgressBar: {fileID: 1170065699}
-  loopIcon: {fileID: 906108765}
-  cameraBlocker: {fileID: 1989535857}
-  exitButton: {fileID: 589210701}
-  tooltip: {fileID: 529178210}
-  tooltipDistance: 32
+  _paused: 0
+  _currentState: 0
+  _isLoaded: 0
+  _isLoading: 0
+  _loadingScreenObj: {fileID: 0}
+  _loadProgressBarObj: {fileID: 0}
+  _loadingMessageObj: {fileID: 0}
+  _projectSaveFolder: Projects/
+  _songSaveFolder: Songs/
 --- !u!4 &622006810
 Transform:
   m_ObjectHideFlags: 0
@@ -18309,7 +18077,7 @@ GameObject:
   - 114: {fileID: 643414904}
   - 114: {fileID: 643414903}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Flanger Dry Mix Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18344,10 +18112,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 643414901}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d3550c5f926a0647a86ef6ca05e6adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 99086118}
 --- !u!114 &643414904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18393,18 +18160,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 643414903}
-        m_MethodName: updateflangerDryMix
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 643414904}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &644428088
@@ -18417,9 +18173,8 @@ GameObject:
   - 224: {fileID: 644428089}
   - 222: {fileID: 644428091}
   - 114: {fileID: 644428090}
-  - 114: {fileID: 644428092}
   m_Layer: 5
-  m_Name: Reverb Level Slider
+  m_Name: Reverb Level Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18478,18 +18233,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 644428088}
---- !u!114 &644428092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 644428088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14024e0c68f4b904a9636547cd453204, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 328028406}
 --- !u!1 &645894581
 GameObject:
   m_ObjectHideFlags: 0
@@ -20373,12 +20116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &656372252
 GameObject:
   m_ObjectHideFlags: 0
@@ -20526,7 +20266,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 673837095}
   m_Layer: 5
-  m_Name: Echo
+  m_Name: Echo Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20698,12 +20438,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &699958036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20817,12 +20554,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.1
-  fadeAllChildren: 0
-  blockParents: 0
-  disableAfterFading: 0
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &704082807
 GameObject:
   m_ObjectHideFlags: 0
@@ -22069,12 +21803,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 0
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &800897370
 GameObject:
   m_ObjectHideFlags: 0
@@ -22455,7 +22186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 826674090}
 --- !u!1 &826986818
 GameObject:
   m_ObjectHideFlags: 0
@@ -23002,12 +22732,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 0
-  fadeSpeed: 0.1
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &863666239
 GameObject:
   m_ObjectHideFlags: 0
@@ -23440,7 +23167,7 @@ MonoBehaviour:
   vertexIndicator: {fileID: 70034783}
   loadsToDo: 0
   chunkSize: 100
-  chunkResolution: 12
+  _chunkResolution: 8
   chunkLoadRadius: 8
   chunkGenerationMode: 1
   heightScale: 800
@@ -23697,12 +23424,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &902385624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23816,10 +23540,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57d09f40271ec794d98c58f8f7a46120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  peakColor: {r: 1, g: 1, b: 1, a: 0.809}
-  blinkInterval: 0.06
-  blinkDepth: 0.5
-  progress: 0
+  _peakColor: {r: 0, g: 0, b: 0, a: 0}
+  _blinkInterval: 0
+  _blinkDepth: 0.5
 --- !u!1 &909404789
 GameObject:
   m_ObjectHideFlags: 0
@@ -23869,12 +23592,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &909404792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24217,7 +23937,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 916065925}
 --- !u!1 &916150257
 GameObject:
   m_ObjectHideFlags: 0
@@ -24602,7 +24321,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 924589067}
 --- !u!1 &928416504
 GameObject:
   m_ObjectHideFlags: 0
@@ -25065,9 +24783,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aa344ec6000d6243a52f7bed65922a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseScale: 128
-  scaleFactor: 0.7
-  confirmButton: {fileID: 177463291}
+  _baseScale: 0
+  _scaleFactor: 0
 --- !u!1 &950487567
 GameObject:
   m_ObjectHideFlags: 0
@@ -25671,9 +25388,8 @@ GameObject:
   - 224: {fileID: 985053403}
   - 222: {fileID: 985053405}
   - 114: {fileID: 985053404}
-  - 114: {fileID: 985053406}
   m_Layer: 5
-  m_Name: Reverb Decay Ratio Slider
+  m_Name: Reverb Decay Ratio Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25732,18 +25448,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 985053402}
---- !u!114 &985053406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 985053402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18f1cbd1e79623b4db2f3989cf183b7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 1109841005}
 --- !u!1 &985390718
 GameObject:
   m_ObjectHideFlags: 0
@@ -25791,12 +25495,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 0
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &985390721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25907,7 +25608,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 989367807}
   m_Layer: 5
-  m_Name: Flanger
+  m_Name: Flanger Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26353,7 +26054,7 @@ GameObject:
   - 114: {fileID: 1011039798}
   - 114: {fileID: 1011039797}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Chorus Dry Mix Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26388,10 +26089,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1011039795}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: a79c6867908f55842a821c063f4f5328, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1293270342}
 --- !u!114 &1011039798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26437,18 +26137,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1011039797}
-        m_MethodName: updatechorusDryMix
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1011039798}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &1014398054
@@ -27586,7 +27275,7 @@ GameObject:
   - 114: {fileID: 1109841005}
   - 114: {fileID: 1109841004}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Reverb Decay Ratio Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27621,10 +27310,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1109841002}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: b8e01bb1989b5b44f940c8ce3d2e09ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1199481447}
 --- !u!114 &1109841005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27670,18 +27358,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1109841004}
-        m_MethodName: updatereverbDecayTime
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1109841005}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &1112486928
@@ -27857,10 +27534,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a300714b61ccf4f90fce550713f5f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selected: {fileID: 0}
-  scrollviews:
-  - {fileID: 181759422}
-  dragThreshold: 30
+  _volumeChangeAmount: 0
+  _selected: {fileID: 0}
+  _scrollviews: []
+  _dragThreshold: 30
 --- !u!4 &1118047755
 Transform:
   m_ObjectHideFlags: 0
@@ -30439,12 +30116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &1175178861
 GameObject:
   m_ObjectHideFlags: 0
@@ -31033,7 +30707,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1199481447}
 --- !u!1 &1201765328
 GameObject:
   m_ObjectHideFlags: 0
@@ -32221,6 +31894,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca45f7a19e20eb04d940db2404ae8d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enableEffectSound: {fileID: 0}
+  _disableEffectSound: {fileID: 0}
   initialized: 0
   buttonSpacing: 4
   halfNoteScale: 0.85
@@ -32248,20 +31923,6 @@ MonoBehaviour:
   beatsBar_tr: {fileID: 1015468147}
   riffVolumeSlider: {fileID: 704082809}
   octaveParent: {fileID: 304970115}
-  effectSliders:
-  - {fileID: 1324439758}
-  - {fileID: 271153209}
-  - {fileID: 1722352174}
-  - {fileID: 348167967}
-  - {fileID: 389887108}
-  - {fileID: 460252494}
-  - {fileID: 1969535749}
-  - {fileID: 2105029684}
-  - {fileID: 1351271471}
-  - {fileID: 2100768788}
-  - {fileID: 187982211}
-  - {fileID: 985053406}
-  - {fileID: 644428092}
   distortionButton: {fileID: 924589067}
   tremoloButton: {fileID: 826674090}
   chorusButton: {fileID: 1293270342}
@@ -32909,7 +32570,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1293270342}
 --- !u!1 &1294310294
 GameObject:
   m_ObjectHideFlags: 0
@@ -33527,9 +33187,8 @@ GameObject:
   - 224: {fileID: 1324439755}
   - 222: {fileID: 1324439757}
   - 114: {fileID: 1324439756}
-  - 114: {fileID: 1324439758}
   m_Layer: 5
-  m_Name: Distortion Level Slider
+  m_Name: Distortion Level Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33588,18 +33247,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1324439754}
---- !u!114 &1324439758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1324439754}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f6b5992573d86643b1b4f5c3d5bd54a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 62250221}
 --- !u!1 &1334809314
 GameObject:
   m_ObjectHideFlags: 0
@@ -33713,7 +33360,6 @@ MonoBehaviour:
   swaySpeed: 0.5
   baseSway: 0.01
   doSway: 1
-  CameraBlocker: {fileID: 1989535857}
   progress: 0
   transitionTimer: 0
   ViewOutsideCar: {fileID: 2107393831}
@@ -34322,9 +33968,8 @@ GameObject:
   - 224: {fileID: 1351271468}
   - 222: {fileID: 1351271470}
   - 114: {fileID: 1351271469}
-  - 114: {fileID: 1351271471}
   m_Layer: 5
-  m_Name: Echo Decay Ratio Slider
+  m_Name: Echo Decay Ratio Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34383,18 +34028,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1351271467}
---- !u!114 &1351271471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1351271467}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26b7f82890d57a0428d44484348a8f94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 12625954}
 --- !u!1 &1356348915
 GameObject:
   m_ObjectHideFlags: 0
@@ -36392,7 +36025,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 1378722470}
   m_Layer: 5
-  m_Name: Reverb
+  m_Name: Reverb Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37333,12 +36966,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!222 &1415144761
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -37356,9 +36986,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55874738a6604554d973c3351c747459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputField: {fileID: 1344395452}
-  dropdown: {fileID: 399985235}
-  confirmButton: {fileID: 1478047998}
 --- !u!114 &1415144763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40291,12 +39918,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1578024942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40404,12 +40028,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &1586078767
 GameObject:
   m_ObjectHideFlags: 0
@@ -42453,12 +42074,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1594625726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42967,7 +42585,7 @@ GameObject:
   - 114: {fileID: 1604756821}
   - 114: {fileID: 1604756820}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Echo Delay Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43002,10 +42620,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1604756818}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 879c51779d8df584aa81402357c08e85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 916065925}
 --- !u!114 &1604756821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43051,18 +42668,7 @@ MonoBehaviour:
   m_Value: 500
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1604756820}
-        m_MethodName: updateechoDelay
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1604756821}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &1609619178
@@ -43838,38 +43444,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65bdab0f780371d4c8315c6b1c7d5e4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadsToDo: 0
-  playing: 0
-  loop: 0
-  loopPlaylist: 0
-  tempo: 0
-  currentPlayingSong: 0
-  beat: 0
-  beatsElapsedInCurrentSong: 0
-  beatsElapsedInPlaylist: 0
-  guitarNotes: 0
-  guitarDensity: 0
-  keyboardNotes: 0
-  keyboardDensity: 0
-  brassNotes: 0
-  brassDensity: 0
-  mixer: {fileID: 24100000, guid: f67c1c84114f8a843bf10b57f49b6c12, type: 2}
-  OneShot: {fileID: 0}
-  LoopRiff: {fileID: 0}
-  loopPlaylistButton: {fileID: 1420294032}
-  currentProject:
-    name: New Project
-    songPaths: []
-  currentSong:
-    name: New Song
-    key: 0
-    scale: -1
-    songPieces: []
-    measures: []
-    riffs: []
-    beats: []
-    songPieceIndices: 
-  riffMode: 1
+  _guitarDensity: 0
+  _brassNotes: 0
+  _mixer: {fileID: 0}
+  _oneShotSource: {fileID: 0}
+  _loopRiffSource: {fileID: 0}
 --- !u!164 &1664068198
 AudioReverbFilter:
   m_ObjectHideFlags: 0
@@ -48137,6 +47716,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3156d2e15d742044794a17b7b8e97d9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fadeWaitTime: 0
+  _fadeSpeed: 0
 --- !u!1 &1692154283
 GameObject:
   m_ObjectHideFlags: 0
@@ -48463,9 +48044,8 @@ GameObject:
   - 224: {fileID: 1722352171}
   - 222: {fileID: 1722352173}
   - 114: {fileID: 1722352172}
-  - 114: {fileID: 1722352174}
   m_Layer: 5
-  m_Name: Tremolo Depth Slider
+  m_Name: Tremolo Depth Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48524,18 +48104,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1722352170}
---- !u!114 &1722352174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1722352170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 189bfa18edb818248ad7123dede027fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 223172984}
 --- !u!1 &1725949544
 GameObject:
   m_ObjectHideFlags: 0
@@ -48786,6 +48354,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2225313df93b5a243b7b4e6856704517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _moveSpeed: 1
+  _frontTransform: {fileID: 0}
+  _backTransform: {fileID: 0}
+  _lerpProgress: 0
 --- !u!1 &1741350055
 GameObject:
   m_ObjectHideFlags: 0
@@ -49885,12 +49457,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.03
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1803614120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50233,12 +49802,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1839266323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51100,12 +50666,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1947633911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51217,9 +50780,8 @@ GameObject:
   - 224: {fileID: 1969535746}
   - 222: {fileID: 1969535748}
   - 114: {fileID: 1969535747}
-  - 114: {fileID: 1969535749}
   m_Layer: 5
-  m_Name: Flanger Rate Slider
+  m_Name: Flanger Rate Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51278,18 +50840,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1969535745}
---- !u!114 &1969535749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1969535745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5222a4e715cfba849bb34ffa5b3db59e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 419642530}
 --- !u!1 &1972760256
 GameObject:
   m_ObjectHideFlags: 0
@@ -51682,12 +51232,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.02
-  fadeAllChildren: 0
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &1990447070
 GameObject:
   m_ObjectHideFlags: 0
@@ -51735,12 +51282,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &1990447073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52290,12 +51834,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &2036810856
 GameObject:
   m_ObjectHideFlags: 0
@@ -52534,7 +52075,7 @@ GameObject:
   - 114: {fileID: 2048495029}
   - 114: {fileID: 2048495028}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Chorus Depth Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52569,10 +52110,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2048495026}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: f041c9c2f11a75b47b3a1515792d2ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 1293270342}
 --- !u!114 &2048495029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52618,18 +52158,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2048495028}
-        m_MethodName: updatechorusDepth
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 2048495029}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &2051209325
@@ -52749,7 +52278,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 2065741080}
   m_Layer: 5
-  m_Name: Chorus
+  m_Name: Chorus Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52858,12 +52387,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 1
-  blockParents: 0
-  disableAfterFading: 1
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!1 &2079469087
 GameObject:
   m_ObjectHideFlags: 0
@@ -52911,12 +52437,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startFaded: 1
-  fadeSpeed: 0.05
-  fadeAllChildren: 0
-  blockParents: 1
-  disableAfterFading: 0
-  busy: 0
+  _startFaded: 1
+  _fadeSpeed: 0.05
+  _blockRaycastsWhileFaded: 1
 --- !u!114 &2079469090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53358,7 +52881,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 2098875926}
   m_Layer: 5
-  m_Name: Tremolo
+  m_Name: Tremolo Effect (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53396,9 +52919,8 @@ GameObject:
   - 224: {fileID: 2100768785}
   - 222: {fileID: 2100768787}
   - 114: {fileID: 2100768786}
-  - 114: {fileID: 2100768788}
   m_Layer: 5
-  m_Name: Echo Delay Slider
+  m_Name: Echo Delay Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53457,18 +52979,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2100768784}
---- !u!114 &2100768788
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2100768784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a33192e32899f8438d2950cda73d748, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 1604756821}
 --- !u!1 &2103828393
 GameObject:
   m_ObjectHideFlags: 0
@@ -53554,7 +53064,7 @@ GameObject:
   - 114: {fileID: 2103933683}
   - 114: {fileID: 2103933682}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: Echo Dry Mix Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53589,10 +53099,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2103933680}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a06a871aa3711db41a269f92b358c0a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 23dc8fc02b13dab43b7c70dc0ad47877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  image: {fileID: 916065925}
 --- !u!114 &2103933683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53638,18 +53147,7 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2103933682}
-        m_MethodName: updateechoDryMix
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 2103933683}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &2104321021
@@ -53798,9 +53296,8 @@ GameObject:
   - 224: {fileID: 2105029681}
   - 222: {fileID: 2105029683}
   - 114: {fileID: 2105029682}
-  - 114: {fileID: 2105029684}
   m_Layer: 5
-  m_Name: Flanger Dry Mix Slider
+  m_Name: Flanger Dry Mix Slider (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53859,18 +53356,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2105029680}
---- !u!114 &2105029684
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2105029680}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f28c21bd52355864c8aca8ec57ac25a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 643414904}
 --- !u!1 &2107393830
 GameObject:
   m_ObjectHideFlags: 0

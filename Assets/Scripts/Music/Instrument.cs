@@ -116,6 +116,11 @@ namespace Route95.Music {
         public Sprite Icon { get { return _icon; } }
 
         /// <summary>
+        /// Returns the glow sprite for this instrument (read-only).
+        /// </summary>
+        public Sprite Glow { get { return _glow; } }
+
+        /// <summary>
         /// Returns the index of this instrument (read-only).
         /// </summary>
         public int Index { get { return _index; } }

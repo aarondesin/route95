@@ -985,46 +985,61 @@ namespace Route95.World {
 
         public void ShowWeatherEffect(Note note) {
 
+            switch (note.PercussionType) {
 
+                // If cymbal, create shooting star
+                case Note.PercType.Cymbal:
+                    ShootingStar();
+                    break;
+                
+                // If hat, create stars
+                case Note.PercType.Hat:
+                    StarBurst();
+                    break;
+                
+                // If kick or tom, cause lightning flash
+                case Note.PercType.Kick:
+                    LightningFlash(note.Volume);
+                    break;
+                case Note.PercType.Tom:
+                    LightningFlash(0.75f * note.Volume);
+                    break;
+                
+                // If shaker, increase rain density
+                case Note.PercType.Shaker:
+                    shakers++;
+                    break;
 
-            // If snare, cause lightning strike
-            if (note.IsSnare()) WorldManager.Instance.LightningStrike(note.volume);
+                // If snare, cause lightning strike
+                case Note.PercType.Snare:
+                    LightningStrike(note.Volume);
+                    break;
 
-            // If kick or tom, cause lightning flash
-            else if (note.IsKick()) WorldManager.Instance.LightningFlash(note.volume);
-            else if (note.IsTom()) WorldManager.Instance.LightningFlash(0.75f * note.volume);
-
-            // If shaker, increase rain density
-            else if (note.IsShaker()) WorldManager.Instance.shakers++;
-
-            // If hat, create stars
-            else if (note.IsHat()) WorldManager.Instance.StarBurst();
-
-            // If cymbal, create shooting star
-            else if (note.IsCymbal()) WorldManager.Instance.ShootingStar();
-
-            // If wood, create exhaust puff
-            else if (note.IsWood()) WorldManager.Instance.ExhaustPuff();
+                // If wood, create exhaust puff
+                case Note.PercType.Wood:
+                    ExhaustPuff();
+                    break;
         }
-
-        public void DebugTerrain() {
-            terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
-        }
-
-        public void PrintVertexMap() {
-            VertexMap vmap = terrain.vertexmap;
-            string log = "";
-            for (int i = vmap.xMin; i <= vmap.xMax; i++) {
-                for (int j = vmap.yMin; j <= vmap.yMax; j++) {
-                    Vertex vert = vmap.VertexAt(i, j);
-                    log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
-                }
-                log += "\n";
-            }
-            System.IO.File.WriteAllText(Application.persistentDataPath + "/vmap.txt", log);
-        }
-
-        #endregion
-
     }
+
+    public void DebugTerrain() {
+        terrain.SetDebugColors(DynamicTerrain.DebugColors.Constrained);
+    }
+
+    public void PrintVertexMap() {
+        VertexMap vmap = terrain.vertexmap;
+        string log = "";
+        for (int i = vmap.xMin; i <= vmap.xMax; i++) {
+            for (int j = vmap.yMin; j <= vmap.yMax; j++) {
+                Vertex vert = vmap.VertexAt(i, j);
+                log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
+            }
+            log += "\n";
+        }
+        System.IO.File.WriteAllText(Application.persistentDataPath + "/vmap.txt", log);
+    }
+
+    #endregion
+
+}
 }

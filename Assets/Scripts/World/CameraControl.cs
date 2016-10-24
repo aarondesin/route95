@@ -354,7 +354,7 @@ namespace Route95.World {
 
                         // Check if camera is out of range
                         float distToPlayer = Vector3.Distance(transform.position, PlayerMovement.Instance.transform.position);
-                        if (distToPlayer > resetDistance && !CameraBlocker.Instance.GetComponent<Fadeable>().busy)
+                        if (distToPlayer > resetDistance && !CameraBlocker.Instance.GetComponent<Fadeable>().Busy)
                             StartFade();
                     }
                     break;

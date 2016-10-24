@@ -24,10 +24,10 @@ namespace Route95.UI {
         #region Unity Callbacks
 
         void Awake() {
-            maxDragDistanceUp = vDragDistance;
-            maxDragDistanceDown = vDragDistance;
-            maxDragDistanceLeft = hDragDistance;
-            maxDragDistanceRight = hDragDistance;
+            _maxDragDistanceUp = vDragDistance;
+            _maxDragDistanceDown = vDragDistance;
+            _maxDragDistanceLeft = hDragDistance;
+            _maxDragDistanceRight = hDragDistance;
         }
 
         #endregion
@@ -35,17 +35,17 @@ namespace Route95.UI {
 
         public override void OnMouseDown() {
             targetRiff = RiffEditor.CurrentRiff;
-            oldVolume = targetRiff.volume;
+            oldVolume = targetRiff.Volume;
         }
 
         public override void DragDown(float actionRatio) {
-            targetRiff.volume = Mathf.Clamp01(oldVolume - actionRatio);
-            gameObject.Image().fillAmount = targetRiff.volume;
+            targetRiff.Volume = Mathf.Clamp01(oldVolume - actionRatio);
+            gameObject.Image().fillAmount = targetRiff.Volume;
         }
 
         public override void DragUp(float actionRatio) {
-            targetRiff.volume = Mathf.Clamp01(oldVolume + actionRatio);
-            gameObject.Image().fillAmount = targetRiff.volume;
+            targetRiff.Volume = Mathf.Clamp01(oldVolume + actionRatio);
+            gameObject.Image().fillAmount = targetRiff.Volume;
         }
 
         #endregion

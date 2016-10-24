@@ -60,8 +60,8 @@ namespace Route95.World {
             progress = 0f;
             StopMoving();
 
-            minVelocity = MusicManager.tempoToFloat[Tempo.Slowest] * distPerBeat;
-            maxVelocity = MusicManager.tempoToFloat[Tempo.Fastest] * distPerBeat;
+            minVelocity = MusicManager.TempoToFloat[Tempo.Slowest] * distPerBeat;
+            maxVelocity = MusicManager.TempoToFloat[Tempo.Fastest] * distPerBeat;
 
             GetComponent<AudioSource>().volume = 0.0f;
 
@@ -121,7 +121,7 @@ namespace Route95.World {
                     dOffset += (Mathf.PerlinNoise(Random.Range(0f, 1f), 0f) - 0.5f);
                     velocityOffset = Mathf.Clamp(velocityOffset + dOffset, minVelocity, maxVelocity);
 
-                    velocity = MusicManager.tempoToFloat[MusicManager.Instance.tempo] * distPerBeat + velocityOffset;
+                    velocity = MusicManager.TempoToFloat[MusicManager.Instance.Tempo] * distPerBeat + velocityOffset;
 
                     progress += velocity * Time.fixedDeltaTime / road.CurveCount;
                     if (progress >= 1f)

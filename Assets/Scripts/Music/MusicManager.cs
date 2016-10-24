@@ -423,6 +423,11 @@ namespace Route95.Music {
         }
 
         /// <summary>
+        /// Returns true if MM is playing (read-only).
+        /// </summary>
+        public bool IsPlaying { get { return _isPlaying; } }
+
+        /// <summary>
         /// Returns the index of the current playing sound (read-only).
         /// </summary>
         public int CurrentPlayingSong {
@@ -437,6 +442,21 @@ namespace Route95.Music {
             get { return _currentSong; }
             set { _currentSong = value; }
         }
+
+        /// <summary>
+        /// Returns the current tempo (read-only).
+        /// </summary>
+        public Tempo Tempo { get { return _tempo; } }
+
+        /// <summary>
+        /// Returns true if MM is playing riffs (read-only).
+        /// </summary>
+        public bool RiffMode { get { return _riffMode; } }
+
+        /// <summary>
+        /// Returns true if MM is looping the playlist (read-only).
+        /// </summary>
+        public bool LoopPlaylist { get { return _loopPlaylist; } }
 
         #endregion
         #region Load Methods
