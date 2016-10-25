@@ -319,6 +319,7 @@ GameObject:
   - 223: {fileID: 8459541}
   - 114: {fileID: 8459540}
   - 114: {fileID: 8459539}
+  - 114: {fileID: 8459542}
   m_Layer: 0
   m_Name: 3D Canvas (Playlist Menu)
   m_TagString: Untagged
@@ -401,6 +402,17 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &8459542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 8459537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf511ee0223a8b14b81e200e79d5aa5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &12625951
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,7 +988,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 45111279}
   - 114: {fileID: 45111278}
-  - 114: {fileID: 45111280}
   m_Layer: 0
   m_Name: PerfTracker
   m_TagString: Untagged
@@ -1008,17 +1019,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 10
---- !u!114 &45111280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 45111277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e1d8b8013ef84040b611b33e3f2b844, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &45660307
 GameObject:
   m_ObjectHideFlags: 0
@@ -8325,7 +8325,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 985390720}
+        - m_Target: {fileID: 0}
           m_MethodName: UnFade
           m_Mode: 1
           m_Arguments:
@@ -8342,7 +8342,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 985390720}
+        - m_Target: {fileID: 0}
           m_MethodName: Fade
           m_Mode: 1
           m_Arguments:
@@ -10783,6 +10783,7 @@ GameObject:
   - 65: {fileID: 371512242}
   - 65: {fileID: 371512243}
   - 54: {fileID: 371512244}
+  - 114: {fileID: 371512245}
   m_Layer: 9
   m_Name: Player Avatar
   m_TagString: Untagged
@@ -10983,6 +10984,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &371512245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371512236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf511ee0223a8b14b81e200e79d5aa5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &383313053
 GameObject:
   m_ObjectHideFlags: 0
@@ -15644,6 +15656,51 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 497647094}
+--- !u!1 &500793668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 500793670}
+  - 114: {fileID: 500793669}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &500793669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 500793668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eacd482a0b831946a57495e8aab6b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _menuClickSound: {fileID: 8300000, guid: 8a04811f2ad08eb42906a01b30346d1f, type: 3}
+  _altMenuClickSound: {fileID: 8300000, guid: 23a9282a58f1e0d48bb19a538bd4ac0f, type: 3}
+  _enableEffectSound: {fileID: 8300000, guid: 2dd05a1a3e787e64285b6e6c25f23e14, type: 3}
+  _disableEffectSound: {fileID: 8300000, guid: 18ef0a7e36c93d14c87485c57e46a1fc, type: 3}
+  _tooltipDistance: 0
+--- !u!4 &500793670
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 500793668}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
 --- !u!1 &506969549
 GameObject:
   m_ObjectHideFlags: 0
@@ -15974,6 +16031,7 @@ GameObject:
   - 224: {fileID: 529178211}
   - 222: {fileID: 529178213}
   - 114: {fileID: 529178212}
+  - 225: {fileID: 529178216}
   - 114: {fileID: 529178214}
   - 114: {fileID: 529178215}
   m_Layer: 5
@@ -16066,6 +16124,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79306f6a35bd3ae49b5cea0bf7a6faf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &529178216
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 529178210}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &530240446
 GameObject:
   m_ObjectHideFlags: 0
@@ -16104,6 +16173,7 @@ GameObject:
   - 224: {fileID: 537561989}
   - 114: {fileID: 537561990}
   - 114: {fileID: 537561991}
+  - 225: {fileID: 537561992}
   m_Layer: 5
   m_Name: Playlist Menu (Parent)
   m_TagString: Untagged
@@ -16170,6 +16240,17 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!225 &537561992
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 537561988}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &543921768
 GameObject:
   m_ObjectHideFlags: 0
@@ -16957,6 +17038,7 @@ GameObject:
   - 114: {fileID: 589210706}
   - 114: {fileID: 589210707}
   - 114: {fileID: 589210708}
+  - 225: {fileID: 589210709}
   m_Layer: 5
   m_Name: Exit Button
   m_TagString: Untagged
@@ -17095,7 +17177,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 700084314}
+        - m_Target: {fileID: 0}
           m_MethodName: UnFade
           m_Mode: 1
           m_Arguments:
@@ -17112,7 +17194,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 700084314}
+        - m_Target: {fileID: 0}
           m_MethodName: Fade
           m_Mode: 1
           m_Arguments:
@@ -17152,6 +17234,17 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!225 &589210709
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 589210701}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &589967493
 GameObject:
   m_ObjectHideFlags: 0
@@ -17643,9 +17736,6 @@ MonoBehaviour:
   _currentState: 0
   _isLoaded: 0
   _isLoading: 0
-  _loadingScreenObj: {fileID: 0}
-  _loadProgressBarObj: {fileID: 0}
-  _loadingMessageObj: {fileID: 0}
   _projectSaveFolder: Projects/
   _songSaveFolder: Songs/
 --- !u!4 &622006810
@@ -20398,6 +20488,8 @@ GameObject:
   - 114: {fileID: 699958035}
   - 222: {fileID: 699958037}
   - 114: {fileID: 699958036}
+  - 225: {fileID: 699958038}
+  - 114: {fileID: 699958039}
   m_Layer: 5
   m_Name: Key Selection Menu (Parent)
   m_TagString: Untagged
@@ -20474,6 +20566,28 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 699958033}
+--- !u!225 &699958038
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 699958033}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &699958039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 699958033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d0ff7a610194b64ca03881a7910a88f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &700084310
 GameObject:
   m_ObjectHideFlags: 0
@@ -20484,7 +20598,6 @@ GameObject:
   - 224: {fileID: 700084311}
   - 222: {fileID: 700084313}
   - 114: {fileID: 700084312}
-  - 114: {fileID: 700084314}
   m_Layer: 5
   m_Name: Highlight
   m_TagString: Untagged
@@ -20543,20 +20656,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 700084310}
---- !u!114 &700084314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 700084310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _startFaded: 1
-  _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
 --- !u!1 &704082807
 GameObject:
   m_ObjectHideFlags: 0
@@ -21731,6 +21830,8 @@ GameObject:
   - 222: {fileID: 796519851}
   - 114: {fileID: 796519850}
   - 114: {fileID: 796519852}
+  - 225: {fileID: 796519854}
+  - 114: {fileID: 796519853}
   m_Layer: 5
   m_Name: Loading Screen
   m_TagString: Untagged
@@ -21806,6 +21907,28 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!114 &796519853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 796519848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d6ff2b86b5c07344a9d890e5b62a81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &796519854
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 796519848}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &800897370
 GameObject:
   m_ObjectHideFlags: 0
@@ -22692,6 +22815,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 863281885}
   - 114: {fileID: 863281886}
+  - 225: {fileID: 863281888}
+  - 114: {fileID: 863281887}
   m_Layer: 5
   m_Name: Main Menu (Parent)
   m_TagString: Untagged
@@ -22735,6 +22860,28 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!114 &863281887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 863281884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abc2ca7e14cbd5e46a1e863ab98bfaf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &863281888
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 863281884}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &863666239
 GameObject:
   m_ObjectHideFlags: 0
@@ -23554,8 +23701,10 @@ GameObject:
   - 114: {fileID: 909404791}
   - 222: {fileID: 909404793}
   - 114: {fileID: 909404792}
+  - 225: {fileID: 909404794}
+  - 114: {fileID: 909404795}
   m_Layer: 5
-  m_Name: PostplayMenu_Parent
+  m_Name: PostplayMenu (Parent)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23628,6 +23777,28 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 909404789}
+--- !u!225 &909404794
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 909404789}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &909404795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 909404789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7853ef604888dd04e86621bd2f95f596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &910201240
 GameObject:
   m_ObjectHideFlags: 0
@@ -25458,7 +25629,6 @@ GameObject:
   - 224: {fileID: 985390719}
   - 222: {fileID: 985390722}
   - 114: {fileID: 985390721}
-  - 114: {fileID: 985390720}
   m_Layer: 5
   m_Name: Highlight
   m_TagString: Untagged
@@ -25484,20 +25654,6 @@ RectTransform:
   m_AnchoredPosition: {x: -64, y: 0}
   m_SizeDelta: {x: 128, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &985390720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 985390718}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _startFaded: 1
-  _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
 --- !u!114 &985390721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27188,7 +27344,6 @@ GameObject:
   - 224: {fileID: 1103795636}
   - 222: {fileID: 1103795638}
   - 114: {fileID: 1103795637}
-  - 114: {fileID: 1103795639}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -27253,17 +27408,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1103795635}
---- !u!114 &1103795639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1103795635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 481dee3b57bb4c748927fcfd46719951, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1109841002
 GameObject:
   m_ObjectHideFlags: 0
@@ -31631,6 +31775,7 @@ GameObject:
   - 223: {fileID: 1272661860}
   - 114: {fileID: 1272661859}
   - 114: {fileID: 1272661858}
+  - 114: {fileID: 1272661862}
   m_Layer: 5
   m_Name: 2DCanvas
   m_TagString: Untagged
@@ -31722,6 +31867,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1272661862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1272661857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf511ee0223a8b14b81e200e79d5aa5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1272737139
 GameObject:
   m_ObjectHideFlags: 0
@@ -32293,7 +32449,6 @@ GameObject:
   - 224: {fileID: 1286945163}
   - 222: {fileID: 1286945165}
   - 114: {fileID: 1286945164}
-  - 114: {fileID: 1286945166}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -32358,17 +32513,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1286945162}
---- !u!114 &1286945166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1286945162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 481dee3b57bb4c748927fcfd46719951, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1288508729
 GameObject:
   m_ObjectHideFlags: 0
@@ -39964,6 +40108,7 @@ GameObject:
   - 224: {fileID: 1585738785}
   - 114: {fileID: 1585738786}
   - 114: {fileID: 1585738787}
+  - 225: {fileID: 1585738788}
   m_Layer: 9
   m_Name: Song Arrange Menu (Parent)
   m_TagString: Untagged
@@ -40031,6 +40176,17 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!225 &1585738788
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1585738784}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1586078767
 GameObject:
   m_ObjectHideFlags: 0
@@ -40041,7 +40197,6 @@ GameObject:
   - 224: {fileID: 1586078768}
   - 222: {fileID: 1586078770}
   - 114: {fileID: 1586078769}
-  - 114: {fileID: 1586078771}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -40106,17 +40261,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1586078767}
---- !u!114 &1586078771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1586078767}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 481dee3b57bb4c748927fcfd46719951, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1589577488
 GameObject:
   m_ObjectHideFlags: 0
@@ -48704,7 +48848,7 @@ GameObject:
   - 222: {fileID: 1758016747}
   - 114: {fileID: 1758016746}
   - 114: {fileID: 1758016745}
-  - 114: {fileID: 1758016748}
+  - 225: {fileID: 1758016748}
   m_Layer: 5
   m_Name: Confirm Exit Button (Confirm Exit Panel)
   m_TagString: Untagged
@@ -48816,17 +48960,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1758016743}
---- !u!114 &1758016748
-MonoBehaviour:
+--- !u!225 &1758016748
+CanvasGroup:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1758016743}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf4d1c2291e4c2141ad6790ec3ffd230, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1760786349
 GameObject:
   m_ObjectHideFlags: 0
@@ -49413,6 +49557,7 @@ GameObject:
   - 114: {fileID: 1803614119}
   - 222: {fileID: 1803614121}
   - 114: {fileID: 1803614120}
+  - 225: {fileID: 1803614122}
   m_Layer: 5
   m_Name: Riff Editor (Parent)
   m_TagString: Untagged
@@ -49493,6 +49638,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1803614117}
+--- !u!225 &1803614122
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1803614117}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1805006400 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
@@ -49734,27 +49890,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eda0687c194a2794da6672de4ce5d242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  images:
-  - {fileID: 1014398055}
-  - {fileID: 632290646}
-  - {fileID: 1286048863}
-  - {fileID: 1288508730}
-  - {fileID: 1419350474}
-  - {fileID: 425917629}
-  - {fileID: 959528979}
-  - {fileID: 1282566463}
-  - {fileID: 1337133343}
-  - {fileID: 134986164}
-  - {fileID: 551304908}
-  - {fileID: 3314317}
-  - {fileID: 1621251595}
-  - {fileID: 570545097}
-  - {fileID: 1531876700}
-  - {fileID: 252514804}
-  - {fileID: 1642587823}
-  - {fileID: 1312758744}
-  spinRadius: 256
-  spinRate: 0.8
+  _images: []
+  _spinRadius: 0
+  _spinRate: 0
 --- !u!1 &1839266320
 GameObject:
   m_ObjectHideFlags: 0
@@ -51163,6 +51301,7 @@ GameObject:
   - 222: {fileID: 1989535860}
   - 114: {fileID: 1989535859}
   - 114: {fileID: 1989535861}
+  - 225: {fileID: 1989535862}
   m_Layer: 5
   m_Name: CameraBlocker
   m_TagString: Untagged
@@ -51235,6 +51374,17 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!225 &1989535862
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1989535857}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1990447070
 GameObject:
   m_ObjectHideFlags: 0
@@ -51706,7 +51856,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2079469089}
+        - m_Target: {fileID: 0}
           m_MethodName: UnFade
           m_Mode: 1
           m_Arguments:
@@ -51723,7 +51873,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2079469089}
+        - m_Target: {fileID: 0}
           m_MethodName: Fade
           m_Mode: 1
           m_Arguments:
@@ -52317,6 +52467,8 @@ GameObject:
   - 222: {fileID: 2076667128}
   - 114: {fileID: 2076667127}
   - 114: {fileID: 2076667129}
+  - 225: {fileID: 2076667131}
+  - 114: {fileID: 2076667130}
   m_Layer: 5
   m_Name: Exit Confirm Panel (Parent)
   m_TagString: Untagged
@@ -52390,6 +52542,28 @@ MonoBehaviour:
   _startFaded: 1
   _fadeSpeed: 0.05
   _blockRaycastsWhileFaded: 1
+--- !u!114 &2076667130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2076667125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 602064712f75e924db69802b435f849e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &2076667131
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2076667125}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2079469087
 GameObject:
   m_ObjectHideFlags: 0
@@ -52400,7 +52574,6 @@ GameObject:
   - 224: {fileID: 2079469088}
   - 222: {fileID: 2079469091}
   - 114: {fileID: 2079469090}
-  - 114: {fileID: 2079469089}
   m_Layer: 5
   m_Name: Highlight
   m_TagString: Untagged
@@ -52426,20 +52599,6 @@ RectTransform:
   m_AnchoredPosition: {x: -64, y: 0}
   m_SizeDelta: {x: 128, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2079469089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2079469087}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b90ad4122b3484942b19355b8aef27ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _startFaded: 1
-  _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
 --- !u!114 &2079469090
 MonoBehaviour:
   m_ObjectHideFlags: 0

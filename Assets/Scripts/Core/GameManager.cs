@@ -99,27 +99,6 @@ namespace Route95.Core {
         /// </summary>
 	    float _loadStartTime;
 
-        /// <summary>
-        /// Parent loading screen object.
-        /// </summary>
-        [Tooltip("Parent loading screen object.")]
-        [SerializeField]
-        GameObject _loadingScreenObj;
-
-        /// <summary>
-        /// Reference to loading bar GameObject.
-        /// </summary>
-        [Tooltip("Loading bar reference.")]
-        [SerializeField]
-        GameObject _loadProgressBarObj;
-
-        /// <summary>
-        /// Reference to loading bar message object.
-        /// </summary>
-        [Tooltip("Reference to loading bar message object.")]
-        [SerializeField]
-        GameObject _loadingMessageObj;
-
         //----------------------------------------------------------------------
         [Header("IO Settings")]
 

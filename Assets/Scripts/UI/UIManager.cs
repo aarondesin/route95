@@ -21,98 +21,84 @@ namespace Route95.UI {
         /// Font to use for UI.
         /// </summary>
         [Tooltip("Font to use for UI.")]
-        [SerializeField]
         Font _font;
 
         /// <summary>
         /// Handwritten-style font to use for UI.
         /// </summary>
         [Tooltip("Handwritten-style font to use for UI.")]
-        [SerializeField]
         Font _handwrittenFont;
 
         /// <summary>
         /// Arrow icon.
         /// </summary>
         [Tooltip("Arrow icon.")]
-        [SerializeField]
         Sprite _arrowIcon;
 
         /// <summary>
         /// Add icon.
         /// </summary>
         [Tooltip("Add icon.")]
-        [SerializeField]
         Sprite _addIcon;
 
         /// <summary>
         /// Edit icon.
         /// </summary>
         [Tooltip("Edit icon.")]
-        [SerializeField]
         Sprite _editIcon;
 
         /// <summary>
         /// Play icon.
         /// </summary>
         [Tooltip("Play icon.")]
-        [SerializeField]
         Sprite _playIcon;
 
         /// <summary>
         /// Pause icon.
         /// </summary>
         [Tooltip("Pause icon.")]
-        [SerializeField]
         Sprite _pauseIcon;
 
         /// <summary>
         /// Load file icon.
         /// </summary>
         [Tooltip("Load file icon.")]
-        [SerializeField]
         Sprite _loadIcon;
 
         /// <summary>
         /// Remove icon.
         /// </summary>
         [Tooltip("Remove icon.")]
-        [SerializeField]
         Sprite _removeIcon;
 
         /// <summary>
         /// Circle icon.
         /// </summary>
         [Tooltip("Circle icon.")]
-        [SerializeField]
         Sprite _circleIcon;
 
         /// <summary>
         /// Percussion note volume icon.
         /// </summary>
         [Tooltip("Percussion note volume icon.")]
-        [SerializeField]
         Sprite _percussionVolumeIcon;
 
         /// <summary>
         /// Melodic note volume icon.
         /// </summary>
         [Tooltip("Melodic note volume icon.")]
-        [SerializeField]
         Sprite _melodicVolumeIcon;
 
         /// <summary>
         /// Fill sprite.
         /// </summary>
         [Tooltip("Fill sprite.")]
-        [SerializeField]
         Sprite _fillSprite;
 
         /// <summary>
         /// Scribble circle sprite.
         /// </summary>
         [Tooltip("Scribble circle sprite.")]
-        [SerializeField]
         Sprite _scribbleCircle;
 
         /// <summary>
@@ -165,13 +151,6 @@ namespace Route95.UI {
         [Header("Tooltip Settings")]
 
         /// <summary>
-        /// GameObject to use for tooltip.
-        /// </summary>
-        [Tooltip("GameObject to use for tooltip.")]
-        [SerializeField]
-        GameObject _tooltipObj;
-
-        /// <summary>
         /// Distance to show tooltip.
         /// </summary>
         [Tooltip("Distance to show tooltip.")]
@@ -186,9 +165,30 @@ namespace Route95.UI {
         #endregion
         #region Unity Callbacks
 
+        new void Awake () {
+            base.Awake();
+
+            // Load UI resources
+            _font = Resources.Load<Font>("Fonts/LemonMilk");
+            _handwrittenFont = Resources.Load<Font>("Fonts/Handwritten");
+
+            _arrowIcon = Resources.Load<Sprite>("Sprites/Arrow");
+            _addIcon = Resources.Load<Sprite>("Sprites/PlusRiff");
+            _editIcon = Resources.Load<Sprite>("Sprites/EditRiff");
+            _playIcon = Resources.Load<Sprite>("Sprites/StartProject");
+            _pauseIcon = Resources.Load<Sprite>("Sprites/Pause");
+            _loadIcon = Resources.Load<Sprite>("Sprites/LoadProject");
+            _removeIcon = Resources.Load<Sprite>("Sprites/X");
+            _circleIcon = Resources.Load<Sprite>("Sprites/Circle");
+            _percussionVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar");
+            _melodicVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar_Melodic");
+            _fillSprite = Resources.Load<Sprite>("Sprites/FillSprite");
+            _scribbleCircle = Resources.Load<Sprite>("Sprites/ScribbleHighlight");
+        }
+
         void Start() {
             // Init vars
-            _tooltipTR = _tooltipObj.RectTransform();
+            _tooltipTR = Tooltip.Instance.GetComponent<RectTransform>();
             _canvasTR = _tooltipTR.parent as RectTransform;
 
             // Get 2D canvas dimensions
@@ -222,7 +222,7 @@ namespace Route95.UI {
                 case GameManager.State.Setup:
 
                     // Check for tooltip
-                    if (_tooltipObj.activeSelf) {
+                    if (Tooltip.Instance.gameObject.activeSelf) {
 
                         Vector2 realPosition = new Vector2(
                             Input.mousePosition.x / Screen.width * _canvasDimensions.x,

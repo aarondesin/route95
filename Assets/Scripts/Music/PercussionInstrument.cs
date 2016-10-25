@@ -61,17 +61,17 @@ namespace Route95.Music {
             _index = 0,
             _type = Type.Percussion,
             _family = Family.Percussion,
-            _iconPath = "UI/Instrument_RockDrums",
-            _glowPath = "UI/Instrument_RockDrums_Glow",
+            _iconPath = "Sprites/Instrument_RockDrums",
+            _glowPath = "Sprites/Instrument_RockDrums_Glow",
             _switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
             _iconPaths = new Dictionary<string, string>() {
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "UI/Percussion_Kick" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "UI/Percussion_Snare" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "UI/Percussion_Tom" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom", "UI/Percussion_Tom" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom", "UI/Percussion_Tom" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "UI/Percussion_Hat" },
-            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "UI/Percussion_Hat" }
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick", "Sprites/Percussion_Kick" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare", "Sprites/Percussion_Snare" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom", "Sprites/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom", "Sprites/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom", "Sprites/Percussion_Tom" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat", "Sprites/Percussion_Hat" },
+            { "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash", "Sprites/Percussion_Hat" }
         }
         };
 
@@ -84,18 +84,18 @@ namespace Route95.Music {
             _index = 1,
             _type = Type.Percussion,
             _family = Family.Percussion,
-            _iconPath = "UI/Instrument_ExoticPercussion",
-            _glowPath = "UI/Instrument_ExoticPercussion",
+            _iconPath = "Sprites/Instrument_ExoticPercussion",
+            _glowPath = "Sprites/Instrument_ExoticPercussion",
             _switchSoundPath = "Audio/Gameplay/Instruments/RockDrums",
             _iconPaths = new Dictionary<string, string>() {
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","UI/Percussion_Castinets" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "UI/Percussion_Claves" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "UI/Percussion_Cowbell" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", "UI/Percussion_Cowbell" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", "UI/Percussion_JamBlock" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1", "UI/Percussion_Maracas" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", "UI/Percussion_Maracas" },
-            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "UI/Percussion_Tambourine" }
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets","Sprites/Percussion_Castinets" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves", "Sprites/Percussion_Claves" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell", "Sprites/Percussion_Cowbell" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2", "Sprites/Percussion_Cowbell" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock", "Sprites/Percussion_JamBlock" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1", "Sprites/Percussion_Maracas" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2", "Sprites/Percussion_Maracas" },
+            { "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine", "Sprites/Percussion_Tambourine" }
         }
         };
 

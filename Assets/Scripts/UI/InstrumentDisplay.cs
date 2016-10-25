@@ -19,6 +19,11 @@ namespace Route95.UI {
         #region InstrumentDisplay Vars
 
         /// <summary>
+        /// Reference to icon.
+        /// </summary>
+        Image _icon;
+
+        /// <summary>
         /// Sprite to change for glow.
         /// </summary>
         Image _glow;
@@ -36,6 +41,13 @@ namespace Route95.UI {
 
         #endregion
         #region Unity Callbacks
+
+        new void Awake () {
+            base.Awake();
+
+            // Init vars
+            _icon = GetComponent<Image>();
+        }
 
         void FixedUpdate() {
 
@@ -55,7 +67,7 @@ namespace Route95.UI {
         /// Refreshes the display, changing art if necessary.
         /// </summary>
         public void Refresh() {
-            gameObject.Image().sprite = MusicManager.Instance.CurrentInstrument.Icon;
+            _icon.sprite = MusicManager.Instance.CurrentInstrument.Icon;
             _glow.sprite = MusicManager.Instance.CurrentInstrument.Glow;
         }
 
@@ -68,10 +80,16 @@ namespace Route95.UI {
             _glow.color = color;
         }
 
+        /// <summary>
+        /// Wakes a particular glow.
+        /// </summary>
         public void WakeGlow(int index) {
             _glows[index].UnFade();
         }
 
+        /// <summary>
+        /// Fades a particular glow.
+        /// </summary>
         public void FadeGlow(int index) {
             _glows[index].Fade();
         }

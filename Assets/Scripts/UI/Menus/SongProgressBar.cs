@@ -24,8 +24,8 @@ namespace Route95.UI {
         #region Unity Callbacks
 
         void Update() {
-            RectTransform bgtr = background.gameObject.RectTransform();
-            RectTransform batr = bar.gameObject.RectTransform();
+            RectTransform bgtr = background.gameObject.GetComponent<RectTransform>();
+            RectTransform batr = bar.gameObject.GetComponent<RectTransform>();
             batr.sizeDelta = new Vector2(value * bgtr.rect.width, bgtr.rect.height);
             batr.anchoredPosition3D = new Vector3(
                     batr.sizeDelta.x / 2f,

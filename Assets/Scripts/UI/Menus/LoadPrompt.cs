@@ -82,7 +82,7 @@ namespace Route95.UI {
 
                 GameObject button = UIHelpers.MakeButton(filename);
 
-                RectTransform button_tr = button.RectTransform();
+                RectTransform button_tr = button.GetComponent<RectTransform>();
                 button_tr.SetParent(fileList);
                 float width = ((RectTransform)button_tr.parent.parent).rect.width;
                 button_tr.sizeDelta = new Vector2(width, buttonSize.y);
@@ -94,19 +94,19 @@ namespace Route95.UI {
                 );
                 button_tr.ResetScaleRot();
 
-                Image button_img = button.Image();
+                Image button_img = button.GetComponent<Image>();
                 button_img.sprite = UIManager.Instance.FillSprite;
                 button_img.color = new Color(1f, 1f, 1f, 0f);
 
                 GameObject text = UIHelpers.MakeText(filename + "_Text");
-                RectTransform text_tr = text.RectTransform();
+                RectTransform text_tr = text.GetComponent<RectTransform>();
                 text_tr.SetParent(button.transform);
                 text_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
                 text_tr.AnchorAtPoint(0.5f, 0.5f);
                 text_tr.anchoredPosition3D = Vector3.zero;
                 text_tr.ResetScaleRot();
 
-                Text text_text = text.Text();
+                Text text_text = text.GetComponent<Text>();
                 text_text.text = filename;
                 text_text.fontSize = 36;
                 text_text.color = Color.white;
@@ -116,32 +116,32 @@ namespace Route95.UI {
                 Fadeable text_fade = text.AddComponent<Fadeable>();
                 text_fade.StartFaded = false;
 
-                button.Button().onClick.AddListener(() => {
+                button.GetComponent<Button>().onClick.AddListener(() => {
                     UIManager.Instance.PlayMenuClickSound();
                     ResetButtons();
                     selectedPath = path;
-                    loadButton.Button().interactable = true;
-                    loadButtonText.color = loadButton.Button().colors.normalColor;
-                    button.Image().color = new Color(1f, 1f, 1f, 0.5f);
+                    loadButton.GetComponent<Button>().interactable = true;
+                    loadButtonText.color = loadButton.GetComponent<Button>().colors.normalColor;
+                    button.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.5f);
                 });
 
                 fileButtons.Add(button);
 
-                GameObject highlight = UIHelpers.MakeImage(filename + "_Highlight");
-                RectTransform highlight_tr = highlight.RectTransform();
+                /*GameObject highlight = UIHelpers.MakeImage(filename + "_Highlight");
+                RectTransform highlight_tr = highlight.GetComponent<RectTransform>();
                 highlight_tr.SetParent(button_tr);
                 highlight_tr.sizeDelta = ((RectTransform)text_tr.parent).sizeDelta;
                 highlight_tr.AnchorAtPoint(0.5f, 0.5f);
                 highlight_tr.anchoredPosition3D = Vector3.zero;
                 highlight_tr.ResetScaleRot();
-                highlight.Image().color = new Color(1f, 1f, 1f, 0.5f);
+                highlight.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.5f);
 
                 ShowHide sh = button.ShowHide();
                 sh.objects = new List<GameObject>();
                 sh.objects.Add(highlight);
 
                 fileButtons.Add(highlight);
-                highlight.SetActive(false);
+                highlight.SetActive(false);*/
             }
 
             // Update size of panel to fit all files
@@ -194,7 +194,7 @@ namespace Route95.UI {
 
         // Resets highlighting of all buttons
         void ResetButtons() {
-            foreach (GameObject button in fileButtons) button.Image().color = new Color(1f, 1f, 1f, 0f);
+            foreach (GameObject button in fileButtons) button.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
         }
 
         #endregion

@@ -15,6 +15,8 @@ public class Tooltip : MenuBase<Tooltip> {
 	#region Unity Callbacks
 
 	new void Awake () {
+        base.Awake();
+
 		// Init vars
 		textObj = GetComponentInChildren<Text>();
 	}
@@ -22,6 +24,9 @@ public class Tooltip : MenuBase<Tooltip> {
 	#endregion
 	#region Tooltip Methods
 
+    /// <summary>
+    /// Sets the text of the tooltip.
+    /// </summary>
 	public void SetText (string text) {
 		textObj.text = text;
 	}

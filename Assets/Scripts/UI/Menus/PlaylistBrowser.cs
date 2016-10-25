@@ -108,7 +108,7 @@ namespace Route95.UI {
                 GameObject listing = UIHelpers.MakeButton(song.Name);
                 listings.Add(listing);
 
-                RectTransform listing_tr = listing.RectTransform();
+                RectTransform listing_tr = listing.GetComponent<RectTransform>();
                 listing_tr.SetParent(playlist);
                 listing_tr.sizeDelta = new Vector2(playlist.rect.width, buttonHeight);
                 listing_tr.AnchorAtPoint(0f, 1f);
@@ -119,15 +119,15 @@ namespace Route95.UI {
                 );
                 listing_tr.ResetScaleRot();
 
-                Image listing_img = listing.Image();
+                Image listing_img = listing.GetComponent<Image>();
                 listing_img.sprite = UIManager.Instance.FillSprite;
                 listing_img.color = new Color(0f, 0f, 1f, 0f);
 
-                ShowHide listing_sh = listing.ShowHide();
+                /*ShowHide listing_sh = listing.ShowHide();
 
                 // Create background for listing
                 GameObject listing_bg = UIHelpers.MakeImage(song.Name + "_bg");
-                RectTransform listing_bg_tr = listing_bg.RectTransform();
+                RectTransform listing_bg_tr = listing_bg.GetComponent<RectTransform>();
                 listing_bg_tr.SetParent(playlist);
                 listing_bg_tr.sizeDelta = new Vector2(listing_tr.sizeDelta.x - 2f * horizontalPadding, listing_tr.sizeDelta.y);
                 listing_bg_tr.AnchorAtPoint(0f, 1f);
@@ -139,24 +139,24 @@ namespace Route95.UI {
                 listing_bg_tr.SetSiblingIndex(-1);
                 listing_bg_tr.ResetScaleRot();
 
-                Image listing_bg_img = listing_bg.Image();
+                Image listing_bg_img = listing_bg.GetComponent<Image>();
                 listing_bg_img.raycastTarget = false;
                 listing_bg_img.sprite = UIManager.Instance.FillSprite;
                 listing_bg_img.color = new Color(1f, 1f, 1f, 0.0f);
 
-                listings.Add(listing_bg);
+                listings.Add(listing_bg);*/
 
                 // Create song text
                 GameObject listing_text = UIHelpers.MakeText(song.Name + "_text");
 
-                RectTransform listing_text_tr = listing_text.RectTransform();
+                RectTransform listing_text_tr = listing_text.GetComponent<RectTransform>();
                 listing_text_tr.SetParent(listing_tr);
                 listing_text_tr.sizeDelta = listing_tr.sizeDelta;
                 listing_text_tr.AnchorAtPoint(0.5f, 0.5f);
                 listing_text_tr.anchoredPosition3D = new Vector3(horizontalPadding * 1.5f + listing_tr.sizeDelta.y, 0f, 0f);
                 listing_text_tr.ResetScaleRot();
 
-                Text listing_text_txt = listing_text.Text();
+                Text listing_text_txt = listing_text.GetComponent<Text>();
                 listing_text_txt.text = (i + 1).ToString() + ". " + song.Name;
                 listing_text_txt.fontSize = fontSize;
                 listing_text_txt.color = Color.black;
@@ -167,18 +167,18 @@ namespace Route95.UI {
                 // Create remove song button
                 GameObject listing_remove = UIHelpers.MakeButton(song.Name + "_remove");
 
-                RectTransform listing_remove_tr = listing_remove.RectTransform();
+                RectTransform listing_remove_tr = listing_remove.GetComponent<RectTransform>();
                 listing_remove_tr.SetParent(listing_tr);
                 listing_remove_tr.sizeDelta = new Vector2(iconScale * listing_tr.sizeDelta.y, iconScale * listing_tr.sizeDelta.y);
                 listing_remove_tr.AnchorAtPoint(1f, 0.5f);
                 listing_remove_tr.anchoredPosition3D = new Vector3(-horizontalPadding - listing_remove_tr.sizeDelta.x, 0f, 0f);
                 listing_remove_tr.ResetScaleRot();
 
-                Image listing_remove_img = listing_remove.Image();
+                Image listing_remove_img = listing_remove.GetComponent<Image>();
                 listing_remove_img.color = Color.black;
                 listing_remove_img.sprite = UIManager.Instance.RemoveIcon;
 
-                Button listing_remove_button = listing_remove.Button();
+                Button listing_remove_button = listing_remove.GetComponent<Button>();
                 listing_remove_button.onClick.AddListener(() => {
                     UIManager.Instance.PlayMenuClickSound();
                     MusicManager.Instance.CurrentProject.RemoveSong(num);
@@ -190,7 +190,7 @@ namespace Route95.UI {
                 // Create edit song button
                 GameObject listing_edit = UIHelpers.MakeButton(song.Name + "_edit");
 
-                RectTransform listing_edit_tr = listing_edit.RectTransform();
+                RectTransform listing_edit_tr = listing_edit.GetComponent<RectTransform>();
                 listing_edit_tr.SetParent(listing_tr);
                 listing_edit_tr.sizeDelta = new Vector2(iconScale * listing_tr.sizeDelta.y, iconScale * listing_tr.sizeDelta.y);
                 listing_edit_tr.AnchorAtPoint(1f, 0.5f);
@@ -201,11 +201,11 @@ namespace Route95.UI {
                 );
                 listing_edit_tr.ResetScaleRot();
 
-                Image listing_edit_img = listing_edit.Image();
+                Image listing_edit_img = listing_edit.GetComponent<Image>();
                 listing_edit_img.color = Color.black;
                 listing_edit_img.sprite = UIManager.Instance.EditIcon;
 
-                Button listing_edit_button = listing_edit.Button();
+                Button listing_edit_button = listing_edit.GetComponent<Button>();
                 listing_edit_button.onClick.AddListener(() => {
                     UIManager.Instance.PlayMenuClickSound();
                     MusicManager.Instance.CurrentSong = song;
@@ -214,11 +214,11 @@ namespace Route95.UI {
                     else UIManager.Instance.GoToSongArrangeMenu();
                 });
 
-                listing_sh.objects = new List<GameObject>() {
+                /*listing_sh.objects = new List<GameObject>() {
                 listing_edit,
                 listing_remove,
                 listing_bg
-            };
+            };*/
 
                 listing_edit.AddComponent<Tooltippable>().message = "Edit \"" + song.Name + "\".";
 
@@ -227,7 +227,7 @@ namespace Route95.UI {
                     Song prevSong = MusicManager.Instance.CurrentProject.Songs[i - 1];
                     GameObject listing_up = UIHelpers.MakeButton(song.Name + "_up");
 
-                    RectTransform listing_up_tr = listing_up.RectTransform();
+                    RectTransform listing_up_tr = listing_up.GetComponent<RectTransform>();
                     listing_up_tr.SetParent(listing_tr);
                     listing_up_tr.sizeDelta = new Vector2(listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
                     listing_up_tr.ResetScaleRot();
@@ -239,11 +239,11 @@ namespace Route95.UI {
                         0f
                     );
 
-                    Image listing_up_img = listing_up.Image();
+                    Image listing_up_img = listing_up.GetComponent<Image>();
                     listing_up_img.color = Color.black;
                     listing_up_img.sprite = UIManager.Instance.ArrowIcon;
 
-                    Button listing_up_button = listing_up.Button();
+                    Button listing_up_button = listing_up.GetComponent<Button>();
                     listing_up_button.onClick.AddListener(() => {
                         UIManager.Instance.PlayMenuClickSound();
                         Song temp = song;
@@ -252,7 +252,7 @@ namespace Route95.UI {
                         Refresh();
                     });
 
-                    listing_sh.objects.Add(listing_up);
+                    //listing_sh.objects.Add(listing_up);
                 }
 
                 // Create move song down button if not at bottom
@@ -260,7 +260,7 @@ namespace Route95.UI {
                     Song nextSong = MusicManager.Instance.CurrentProject.Songs[i + 1];
                     GameObject listing_down = UIHelpers.MakeButton(song.Name + "_down");
 
-                    RectTransform listing_down_tr = listing_down.RectTransform();
+                    RectTransform listing_down_tr = listing_down.GetComponent<RectTransform>();
                     listing_down_tr.SetParent(listing_tr);
                     listing_down_tr.sizeDelta = new Vector2(listing_tr.sizeDelta.y * iconScale / 2f, listing_tr.sizeDelta.y * iconScale / 2f);
                     listing_down_tr.ResetScaleRot();
@@ -272,11 +272,11 @@ namespace Route95.UI {
                         0f
                     );
 
-                    Image listing_down_img = listing_down.Image();
+                    Image listing_down_img = listing_down.GetComponent<Image>();
                     listing_down_img.color = Color.black;
                     listing_down_img.sprite = UIManager.Instance.ArrowIcon;
 
-                    Button listing_down_button = listing_down.Button();
+                    Button listing_down_button = listing_down.GetComponent<Button>();
                     listing_down_button.onClick.AddListener(() => {
                         UIManager.Instance.PlayMenuClickSound();
                         Song temp = song;
@@ -285,17 +285,17 @@ namespace Route95.UI {
                         Refresh();
                     });
 
-                    listing_sh.objects.Add(listing_down);
+                    //listing_sh.objects.Add(listing_down);
                 }
 
-                foreach (GameObject obj in listing_sh.objects) obj.SetActive(false);
+               // foreach (GameObject obj in listing_sh.objects) obj.SetActive(false);
             }
 
             // Create new song button
             GameObject newSongButton = UIHelpers.MakeButton("New Song");
             listings.Add(newSongButton);
 
-            RectTransform newSongButton_tr = newSongButton.RectTransform();
+            RectTransform newSongButton_tr = newSongButton.GetComponent<RectTransform>();
             newSongButton_tr.SetParent(playlist);
             newSongButton_tr.sizeDelta = new Vector2(buttonHeight * iconScale, buttonHeight * iconScale);
             newSongButton_tr.AnchorAtPoint(0.15f, 1f);
@@ -307,11 +307,11 @@ namespace Route95.UI {
             );
             newSongButton_tr.ResetScaleRot();
 
-            Image newSong_img = newSongButton.Image();
+            Image newSong_img = newSongButton.GetComponent<Image>();
             newSong_img.sprite = UIManager.Instance.AddIcon;
             newSong_img.color = Color.black;
 
-            newSongButton.Button().onClick.AddListener(delegate {
+            newSongButton.GetComponent<Button>().onClick.AddListener(delegate {
                 UIManager.Instance.PlayMenuClickSound();
                 MusicManager.Instance.NewSong();
                 UIManager.Instance.GoToKeySelectMenu();
@@ -319,7 +319,7 @@ namespace Route95.UI {
 
             GameObject newSong_text = UIHelpers.MakeText("New Song_text");
 
-            RectTransform newSong_text_tr = newSong_text.RectTransform();
+            RectTransform newSong_text_tr = newSong_text.GetComponent<RectTransform>();
             newSong_text_tr.SetParent(newSongButton_tr);
             newSong_text_tr.sizeDelta = new Vector2(playlist.rect.width / 2f - 2f * horizontalPadding, newSongButton_tr.sizeDelta.y);
             newSong_text_tr.AnchorAtPoint(0f, 0.5f);
@@ -330,7 +330,7 @@ namespace Route95.UI {
             );
             newSong_text_tr.ResetScaleRot();
 
-            Text newSong_text_txt = newSong_text.Text();
+            Text newSong_text_txt = newSong_text.GetComponent<Text>();
             newSong_text_txt.text = "New Song...";
             newSong_text_txt.fontSize = (int)(fontSize * iconScale);
             newSong_text_txt.color = Color.black;
@@ -340,7 +340,7 @@ namespace Route95.UI {
             GameObject newSongButton_highlight = UIHelpers.MakeImage("Highlight (New Song Button)");
             listings.Add(newSongButton_highlight);
 
-            RectTransform newSongButton_highlight_tr = newSongButton_highlight.RectTransform();
+            RectTransform newSongButton_highlight_tr = newSongButton_highlight.GetComponent<RectTransform>();
             newSongButton_highlight_tr.SetParent(newSongButton_tr);
             newSongButton_highlight_tr.sizeDelta = new Vector2(playlist.rect.width * 0.5f - 2f * horizontalPadding, newSongButton_tr.sizeDelta.y * 1.5f);
             newSongButton_highlight_tr.AnchorAtPoint(0f, 0.5f);
@@ -349,20 +349,20 @@ namespace Route95.UI {
 
             newSongButton_highlight_tr.SetSiblingIndex(-1);
 
-            Image newSongButton_highlight_img = newSongButton_highlight.Image();
+            Image newSongButton_highlight_img = newSongButton_highlight.GetComponent<Image>();
             newSongButton_highlight_img.raycastTarget = false;
             newSongButton_highlight_img.sprite = UIManager.Instance.ScribbleIcon;
             newSongButton_highlight_img.color = new Color(1f, 1f, 1f, 1f);
 
-            ShowHide newSongButton_sh = newSongButton.ShowHide();
-            newSongButton_sh.objects = new List<GameObject>() { newSongButton_highlight };
-            newSongButton_sh.Hide();
+            //ShowHide newSongButton_sh = newSongButton.ShowHide();
+            //newSongButton_sh.objects = new List<GameObject>() { newSongButton_highlight };
+            //newSongButton_sh.Hide();
 
             // Create load song button
             GameObject loadSongButton = UIHelpers.MakeButton("Load Song Button (Playlist Browser)");
             listings.Add(loadSongButton);
 
-            RectTransform loadSongButton_tr = loadSongButton.RectTransform();
+            RectTransform loadSongButton_tr = loadSongButton.GetComponent<RectTransform>();
             loadSongButton_tr.SetParent(playlist);
             loadSongButton_tr.sizeDelta = new Vector2(buttonHeight * iconScale, buttonHeight * iconScale);
             loadSongButton_tr.AnchorAtPoint(0.6f, 1f);
@@ -374,18 +374,18 @@ namespace Route95.UI {
             );
             loadSongButton_tr.ResetScaleRot();
 
-            Image loadSongButton_img = loadSongButton.Image();
+            Image loadSongButton_img = loadSongButton.GetComponent<Image>();
             loadSongButton_img.sprite = UIManager.Instance.LoadIcon;
             loadSongButton_img.color = Color.black;
 
-            loadSongButton.Button().onClick.AddListener(delegate {
+            loadSongButton.GetComponent<Button>().onClick.AddListener(delegate {
                 UIManager.Instance.PlayMenuClickSound();
                 GameManager.Instance.ShowLoadPromptForSongs();
             });
 
             GameObject loadSongButton_text = UIHelpers.MakeText("Load New Song_text");
 
-            RectTransform loadSongButton_text_tr = loadSongButton_text.RectTransform();
+            RectTransform loadSongButton_text_tr = loadSongButton_text.GetComponent<RectTransform>();
             loadSongButton_text_tr.SetParent(loadSongButton_tr);
             loadSongButton_text_tr.sizeDelta = new Vector2(playlist.rect.width / 2f - 2f * horizontalPadding, loadSongButton_tr.sizeDelta.y);
             loadSongButton_text_tr.AnchorAtPoint(0f, 0.5f);
@@ -396,7 +396,7 @@ namespace Route95.UI {
             );
             loadSongButton_text_tr.ResetScaleRot();
 
-            Text loadSongButton_text_txt = loadSongButton_text.Text();
+            Text loadSongButton_text_txt = loadSongButton_text.GetComponent<Text>();
             loadSongButton_text_txt.text = "Load Song...";
             loadSongButton_text_txt.fontSize = (int)(fontSize * iconScale);
             loadSongButton_text_txt.color = Color.black;
@@ -406,7 +406,7 @@ namespace Route95.UI {
             GameObject loadSongButton_highlight = UIHelpers.MakeImage("Load New Song Highlight");
             listings.Add(loadSongButton_highlight);
 
-            RectTransform loadSongButton_highlight_tr = loadSongButton_highlight.RectTransform();
+            RectTransform loadSongButton_highlight_tr = loadSongButton_highlight.GetComponent<RectTransform>();
             loadSongButton_highlight_tr.SetParent(loadSongButton_tr);
             loadSongButton_highlight_tr.sizeDelta = new Vector2(playlist.rect.width * 0.5f, loadSongButton_tr.sizeDelta.y * 1.5f);
             loadSongButton_highlight_tr.AnchorAtPoint(0f, 0.5f);
@@ -415,15 +415,14 @@ namespace Route95.UI {
 
             loadSongButton_highlight_tr.SetSiblingIndex(-1);
 
-            Image loadSongButton_highlight_img = loadSongButton_highlight.Image();
+            Image loadSongButton_highlight_img = loadSongButton_highlight.GetComponent<Image>();
             loadSongButton_highlight_img.raycastTarget = false;
             loadSongButton_highlight_img.sprite = UIManager.Instance.ScribbleIcon;
             loadSongButton_highlight_img.color = new Color(1f, 1f, 1f, 1f);
 
-            ShowHide loadSongButton_sh = loadSongButton.ShowHide();
-            loadSongButton_sh.objects = new List<GameObject>() { loadSongButton_highlight };
-            loadSongButton_sh.Hide();
-
+            //ShowHide loadSongButton_sh = loadSongButton.ShowHide();
+            //loadSongButton_sh.objects = new List<GameObject>() { loadSongButton_highlight };
+            //loadSongButton_sh.Hide();
         }
 
         #endregion

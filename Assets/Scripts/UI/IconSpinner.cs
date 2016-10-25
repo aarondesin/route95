@@ -1,48 +1,81 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// IconSpinner.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to handle an animated icon spinner effect.
-/// </summary>
-public class IconSpinner : MonoBehaviour {
+using UnityEngine;
 
-	#region IconSpinner Vars
+namespace Route95.UI {
 
-	[Tooltip("List of images to move.")]
-	public List<RectTransform> images;
+    /// <summary>
+    /// Class to handle an animated icon spinner effect.
+    /// </summary>
+    public class IconSpinner : MonoBehaviour {
 
-	[Tooltip("Radius of spinning area.")]
-	public float spinRadius;
+        #region IconSpinner Vars
 
-	[Tooltip("Spinning speed.")]
-	public float spinRate;
+        /// <summary>
+        /// List of images to move.
+        /// </summary>
+        [Tooltip("List of images to move.")]
+        [SerializeField]
+        List<RectTransform> _images;
 
-	int imageCount; // Number of images
-	float r = 0f;   // Current theta
+        /// <summary>
+        /// Radius of spinning area.
+        /// </summary>
+        [Tooltip("Radius of spinning area.")]
+        [SerializeField]
+        float _spinRadius;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Spinning speed.
+        /// </summary>
+        [Tooltip("Spinning speed.")]
+        [SerializeField]
+        float _spinRate;
 
-	void Awake () {
-		// Get number of images
-		imageCount = images.Count;
-	}
+        /// <summary>
+        /// Number of images.
+        /// </summary>
+        int _imageCount;
 
-	void Update () {
+        /// <summary>
+        /// Current theta.
+        /// </summary>
+        float _r = 0f;
 
-		// Update theta
-		r += spinRate * Time.deltaTime;
+        /// <summary>
+        /// Two times pi.
+        /// </summary>
+        float _TWOPI = Mathf.PI * 2f;
 
-		// Move all images
-		for (int i=0; i<imageCount; i++) {
-			float angleOffset = (float)i / (float)images.Count * Mathf.PI * 2f;
-			images[i].anchoredPosition3D = 
-				new Vector3 (Mathf.Cos (r + angleOffset), Mathf.Sin (r + angleOffset), 0f) * spinRadius;
-		}
-	}
+        /// <summary>
+        /// Angle per icon;
+        /// </summary>
+        float _c;
 
-	#endregion
+        #endregion
+        #region Unity Callbacks
 
+        void Awake() {
+            // Get number of images
+            _imageCount = _images.Count;
+            _c = (float)_imageCount * _TWOPI;
+        }
+
+        void Update() {
+            // Update theta
+            _r += _spinRate * Time.deltaTime;
+
+            // Move all images
+            for (int i = 0; i < _imageCount; i++) {
+                float newAngle = _r + (float)i / _c;
+                _images[i].anchoredPosition3D =
+                    new Vector3(Mathf.Cos(newAngle), Mathf.Sin(newAngle), 0f) * _spinRadius;
+            }
+        }
+
+        #endregion
+    }
 }

@@ -2,11 +2,8 @@
 // ©2016 Team 95
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Route95.UI {
 
@@ -31,9 +28,6 @@ namespace Route95.UI {
         [Tooltip("Rate of fade/unfade in percent per cycle.")]
         [SerializeField]
         float _fadeSpeed = 0.05f;
-
-        //[Tooltip("Disable GameObject after fading?")]
-        //bool _disableAfterFading = false;
 
         /// <summary>
         /// Block raycasts while faded?
@@ -71,8 +65,14 @@ namespace Route95.UI {
         #endregion
         #region Properties
 
+        /// <summary>
+        /// Returns true if this fader is busy (read-only).
+        /// </summary>
         public bool Busy { get { return _busy; } }
 
+        /// <summary>
+        /// Gets/sets whether this object starts faded.
+        /// </summary>
         public bool StartFaded {
             get { return _startFaded; }
             set { _startFaded = value; }
@@ -92,6 +92,9 @@ namespace Route95.UI {
             return _group.alpha == 1f && !_busy;
         } }
 
+        /// <summary>
+        /// Returns true if this object is not busy (read-only).
+        /// </summary>
         public bool NotFading {
             get {
                 return DoneFading || DoneUnfading;

@@ -20,8 +20,8 @@ public class LightningFader : MonoBehaviour {
 	#region Unity Callbacks
 
 	void Awake () {
-		_light = gameObject.Light();
-		_renderer = gameObject.SpriteRenderer();
+		_light = gameObject.GetComponent<Light>();
+		_renderer = gameObject.GetComponent<SpriteRenderer>();
 	}
 
 	void Start () {

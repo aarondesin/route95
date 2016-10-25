@@ -1,8 +1,10 @@
-﻿using Route95.Core;
+﻿// RiffVolumeButton.cs
+// ©2016 Team 95
+
 using Route95.Music;
+
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 namespace Route95.UI {
 
@@ -13,39 +15,53 @@ namespace Route95.UI {
 
         #region RiffVolumeButton Vars
 
-        const float vDragDistance = 128f;
-        const float hDragDistance = 128f;
+        /// <summary>
+        /// Vertical drag distance.
+        /// </summary>
+        const float V_DRAG_DISTANCE = 128f;
 
-        float oldVolume; // copy of old note volume
+        /// <summary>
+        /// Horizontal drag distance.
+        /// </summary>
+        const float H_DRAG_DISTANCE = 128f;
 
-        Riff targetRiff; // riff to edit
+        /// <summary>
+        /// Copy of old note volume.
+        /// </summary>
+        float _oldVolume;
+
+        /// <summary>
+        /// Target riff to edit.
+        /// </summary>
+        Riff _targetRiff;
 
         #endregion
         #region Unity Callbacks
 
         void Awake() {
-            _maxDragDistanceUp = vDragDistance;
-            _maxDragDistanceDown = vDragDistance;
-            _maxDragDistanceLeft = hDragDistance;
-            _maxDragDistanceRight = hDragDistance;
+            // Init vars
+            _maxDragDistanceUp = V_DRAG_DISTANCE;
+            _maxDragDistanceDown = V_DRAG_DISTANCE;
+            _maxDragDistanceLeft = H_DRAG_DISTANCE;
+            _maxDragDistanceRight = H_DRAG_DISTANCE;
         }
 
         #endregion
         #region DraggableButton Overrides
 
         public override void OnMouseDown() {
-            targetRiff = RiffEditor.CurrentRiff;
-            oldVolume = targetRiff.Volume;
+            _targetRiff = RiffEditor.CurrentRiff;
+            _oldVolume = _targetRiff.Volume;
         }
 
         public override void DragDown(float actionRatio) {
-            targetRiff.Volume = Mathf.Clamp01(oldVolume - actionRatio);
-            gameObject.Image().fillAmount = targetRiff.Volume;
+            _targetRiff.Volume = Mathf.Clamp01(_oldVolume - actionRatio);
+            gameObject.GetComponent<Image>().fillAmount = _targetRiff.Volume;
         }
 
         public override void DragUp(float actionRatio) {
-            targetRiff.Volume = Mathf.Clamp01(oldVolume + actionRatio);
-            gameObject.Image().fillAmount = targetRiff.Volume;
+            _targetRiff.Volume = Mathf.Clamp01(_oldVolume + actionRatio);
+            gameObject.GetComponent<Image>().fillAmount = _targetRiff.Volume;
         }
 
         #endregion

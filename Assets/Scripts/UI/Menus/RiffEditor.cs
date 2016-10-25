@@ -301,14 +301,14 @@ namespace Route95.UI {
         void MakePercussionButtons(string title, int row, string fileName, Sprite iconGraphic) {
 
             // Calculate y position of buttons in this row
-            float y = rowBackgrounds[row].RectTransform().anchoredPosition3D.y;
+            float y = rowBackgrounds[row].GetComponent<RectTransform>().anchoredPosition3D.y;
 
             // Make icon for note
             GameObject drumIcon = UIHelpers.MakeImage(title, iconGraphic);
             drumIcon.SetParent(iconBar_tr);
             drumIcon.SetSideWidth(squareSize.x);
             drumIcon.AnchorAtPoint(0.5f, 1.0f);
-            drumIcon.RectTransform().ResetScaleRot();
+            drumIcon.GetComponent<RectTransform>().ResetScaleRot();
             drumIcon.SetPosition2D(0f, y);
             drumIcon.AddComponent<Tooltippable>().message = title;
             objects.Add(drumIcon);
@@ -320,7 +320,7 @@ namespace Route95.UI {
                 int num = i;
 
                 // Calculate x position of this button
-                float x = columnBackgrounds[num].RectTransform().anchoredPosition3D.x;
+                float x = columnBackgrounds[num].GetComponent<RectTransform>().anchoredPosition3D.x;
 
                 // Calculate scale
                 float scale = (
@@ -349,20 +349,20 @@ namespace Route95.UI {
                 button.tag = "StopScrolling";
 
                 // Change scale based on beat
-                RectTransform button_tr = button.RectTransform();
+                RectTransform button_tr = button.GetComponent<RectTransform>();
                 button_tr.ResetScaleRot();
                 button_tr.localScale = new Vector3(scale, scale, scale);
 
                 // Create volume slider
                 GameObject volume = UIHelpers.MakeImage(title + "_volume");
-                RectTransform volume_tr = volume.RectTransform();
+                RectTransform volume_tr = volume.GetComponent<RectTransform>();
                 volume_tr.SetParent(button_tr);
                 volume_tr.sizeDelta = buttonSize;
                 volume_tr.localScale = Vector3.one * volumeScale;
                 volume_tr.AnchorAtPoint(0.5f, 0.5f);
                 volume_tr.anchoredPosition3D = Vector3.zero;
 
-                Image volume_img = volume.Image();
+                Image volume_img = volume.GetComponent<Image>();
                 volume_img.sprite = UIManager.Instance.PercussionVolumeIcon;
                 volume_img.type = Image.Type.Filled;
                 volume_img.fillAmount = note.Volume;
@@ -374,21 +374,21 @@ namespace Route95.UI {
                 noteButton.UpdateButtonArt();
 
                 // Create show/hide toggle
-                ShowHide bt_sh = button.AddComponent<ShowHide>();
-                bt_sh.objects = new List<GameObject>() { volume };
-                bt_sh.enabled = CurrentRiff.Lookup(note, num);
+                //ShowHide bt_sh = button.AddComponent<ShowHide>();
+                //bt_sh.objects = new List<GameObject>() { volume };
+                //bt_sh.enabled = CurrentRiff.Lookup(note, num);
 
                 // Initially hide volume slider
                 volume.SetActive(false);
 
                 // Add button functionality
-                button.Button().onClick.AddListener(() => {
+                button.GetComponent<Button>().onClick.AddListener(() => {
                     if (!InputManager.Instance.IsDragging) {
                         bool n = CurrentRiff.Toggle(note, num);
-                        if (!n) bt_sh.Hide();
-                        bt_sh.enabled = n;
-                        button.Image().sprite = (n ? percussionFilled : percussionEmpty);
-                        if (n) bt_sh.Show();
+                        //if (!n) bt_sh.Hide();
+                        //bt_sh.enabled = n;
+                        button.GetComponent<Image>().sprite = (n ? percussionFilled : percussionEmpty);
+                        //if (n) bt_sh.Show();
                     }
                 });
 
@@ -480,7 +480,7 @@ namespace Route95.UI {
 
             // Calculate y position of buttons in this row
             GameObject bg = rowBackgrounds[row];
-            float y = bg.RectTransform().anchoredPosition3D.y;
+            float y = bg.GetComponent<RectTransform>().anchoredPosition3D.y;
 
             // Create note text
             GameObject noteText = UIHelpers.MakeText(title);
@@ -494,11 +494,11 @@ namespace Route95.UI {
 
             // Change text color depending on whether or not the note is in the scale
             if (inScale) {
-                noteText.Text().color = Color.white;
-                bg.Image().SetAlpha(bg.Image().color.a * 3f);
+                noteText.GetComponent<Text>().color = Color.white;
+                bg.GetComponent<Image>().SetAlpha(bg.GetComponent<Image>().color.a * 3f);
             }
             else
-                noteText.Text().color = transparentWhite;
+                noteText.GetComponent<Text>().color = transparentWhite;
 
             // Make note buttons
             for (int i = 0; i < numButtons; i++) {
@@ -507,7 +507,7 @@ namespace Route95.UI {
                 int num = i;
 
                 // Calculate x position of this button
-                float x = columnBackgrounds[num].RectTransform().anchoredPosition3D.x;
+                float x = columnBackgrounds[num].GetComponent<RectTransform>().anchoredPosition3D.x;
 
                 // Calculate scale
                 float scale = (
@@ -536,13 +536,13 @@ namespace Route95.UI {
                 button.tag = "StopScrolling";
 
                 // Change scale based on beat
-                RectTransform button_tr = button.RectTransform();
+                RectTransform button_tr = button.GetComponent<RectTransform>();
                 button_tr.ResetScaleRot();
                 button_tr.localScale = new Vector3(scale, scale, scale);
 
                 // Create volume slider
                 GameObject volume = UIHelpers.MakeImage(title + "_volume");
-                RectTransform volume_tr = volume.RectTransform();
+                RectTransform volume_tr = volume.GetComponent<RectTransform>();
                 volume_tr.SetParent(button_tr);
                 volume_tr.sizeDelta = button_tr.sizeDelta;
                 volume_tr.localScale = new Vector3(
@@ -554,7 +554,7 @@ namespace Route95.UI {
                 volume_tr.AnchorAtPoint(0.5f, 0.5f);
                 volume_tr.anchoredPosition3D = Vector3.zero;
 
-                Image volume_img = volume.Image();
+                Image volume_img = volume.GetComponent<Image>();
                 volume_img.sprite = UIManager.Instance.MelodicVolumeIcon;
                 volume_img.type = Image.Type.Filled;
                 volume_img.fillAmount = note.Volume;
@@ -562,31 +562,31 @@ namespace Route95.UI {
                 // Setup volume slider
                 NoteButton noteButton = button.AddComponent<NoteButton>();
                 noteButton.targetNote = note;
-                noteButton.volumeImage = volume.Image();
+                noteButton.volumeImage = volume.GetComponent<Image>();
                 noteButton.UpdateButtonArt();
 
                 // Create show/hide toggle
-                ShowHide bt_sh = button.AddComponent<ShowHide>();
-                bt_sh.objects = new List<GameObject>() { volume };
-                bt_sh.enabled = CurrentRiff.Lookup(note, num);
+                //ShowHide bt_sh = button.AddComponent<ShowHide>();
+                //bt_sh.objects = new List<GameObject>() { volume };
+                //bt_sh.enabled = CurrentRiff.Lookup(note, num);
 
                 // Initially hide volume slider
                 volume.SetActive(false);
 
                 // Setup button
-                button.Button().onClick.AddListener(() => {
+                button.GetComponent<Button>().onClick.AddListener(() => {
                     if (!InputManager.Instance.IsDragging) {
                         bool n = CurrentRiff.Toggle(note, num);
                         if (n) {
                             SuggestChords(num, row);
-                            bt_sh.Show();
+                            //bt_sh.Show();
                         }
                         else {
                             ClearSuggestions();
-                            bt_sh.Hide();
+                            //bt_sh.Hide();
                         }
-                        bt_sh.enabled = n;
-                        button.Image().sprite = (n ? melodicFilled : melodicEmpty);
+                        //bt_sh.enabled = n;
+                        button.GetComponent<Image>().sprite = (n ? melodicFilled : melodicEmpty);
                     }
                 });
 
@@ -601,10 +601,10 @@ namespace Route95.UI {
             for (int column = 0; column < Riff.MAX_BEATS; column++) {
                 GameObject columnBackground =
                     UIHelpers.MakeImage("ColumnBackground_" + column, UIManager.Instance.FillSprite);
-                columnBackground.Image().SetAlpha(column % 2 == 0 ? evenBackgroundAlpha : oddBackgroundAlpha);
+                columnBackground.GetComponent<Image>().SetAlpha(column % 2 == 0 ? evenBackgroundAlpha : oddBackgroundAlpha);
                 columnBackground.SetParent(notePanel);
                 columnBackground.SetSize2D(squareSize.x, notePanel.rect.height);
-                columnBackground.RectTransform().ResetScaleRot();
+                columnBackground.GetComponent<RectTransform>().ResetScaleRot();
                 columnBackground.AnchorAtPoint(0f, 0.5f);
                 columnBackground.SetPosition2D(squareSize.x * (column + 0.5f), 0f);
                 columnBackgrounds.Add(columnBackground);
@@ -615,10 +615,10 @@ namespace Route95.UI {
             for (int row = 0; row < numNotes; row++) {
                 GameObject rowBackground =
                     UIHelpers.MakeImage("RowBackground_" + row, UIManager.Instance.FillSprite);
-                rowBackground.Image().SetAlpha(row % 2 == 0 ? evenBackgroundAlpha : oddBackgroundAlpha);
+                rowBackground.GetComponent<Image>().SetAlpha(row % 2 == 0 ? evenBackgroundAlpha : oddBackgroundAlpha);
                 rowBackground.SetParent(notePanel);
                 rowBackground.SetSize2D(notePanel.rect.width, squareSize.y);
-                rowBackground.RectTransform().ResetScaleRot();
+                rowBackground.GetComponent<RectTransform>().ResetScaleRot();
                 rowBackground.AnchorAtPoint(0.5f, 1f);
                 rowBackground.SetPosition2D(0f, squareSize.y * -(row + 0.5f));
                 rowBackgrounds.Add(rowBackground);
@@ -690,7 +690,7 @@ namespace Route95.UI {
         /// <summary>
         /// Updates the text for the tempo selector.
         /// </summary>
-        public void UpdateTempoText() {
+        public void UpdateTempoText () {
             tempoText.text = MusicManager.Instance.Tempo.ToString();
         }
 
@@ -798,7 +798,7 @@ namespace Route95.UI {
         }
 
         void CreateSuggestion(GameObject button, string title, Sprite graphic, string tooltip) {
-            RectTransform tr = button.RectTransform();
+            RectTransform tr = button.GetComponent<RectTransform>();
 
             GameObject suggestion = UIHelpers.MakeButton(
                 title,
@@ -807,8 +807,8 @@ namespace Route95.UI {
                 new Vector2(tr.sizeDelta.y, tr.sizeDelta.y),
                 Vector2.zero
             );
-            suggestion.Button().onClick.AddListener(delegate { button.Button().onClick.Invoke(); });
-            suggestion.RectTransform().localScale = tr.localScale;
+            suggestion.GetComponent<Button>().onClick.AddListener(delegate { button.GetComponent<Button>().onClick.Invoke(); });
+            suggestion.GetComponent<RectTransform>().localScale = tr.localScale;
             suggestion.AddComponent<Tooltippable>().message = tooltip;
             suggestions.Add(suggestion);
         }

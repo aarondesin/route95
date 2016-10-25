@@ -104,8 +104,8 @@ namespace Route95.UI {
 
                 // Create button
                 GameObject button = UIHelpers.MakeTextButton(key.ToString());
-                RectTransform tr = button.RectTransform();
-                tr.SetParent(gameObject.RectTransform());
+                RectTransform tr = button.GetComponent<RectTransform>();
+                tr.SetParent(gameObject.GetComponent<RectTransform>());
                 tr.SetSideWidth(_scale);
                 tr.AnchorAtPoint(0.5f, 0.5f);
                 tr.anchoredPosition3D = new Vector3(
@@ -123,7 +123,7 @@ namespace Route95.UI {
                 text.color = _GRAY;
 
                 // Set button image
-                Image img = button.Image();
+                Image img = button.GetComponent<Image>();
                 img.sprite = UIManager.Instance.CircleIcon;
                 img.color = _GRAY;
 
@@ -134,41 +134,41 @@ namespace Route95.UI {
 
                     GameObject hl = UIHelpers.MakeImage(
                         key.ToString() + "_SelectedHighlight");
-                    tr = hl.RectTransform();
-                    tr.SetParent(button.RectTransform());
+                    tr = hl.GetComponent<RectTransform>();
+                    tr.SetParent(button.GetComponent<RectTransform>());
                     tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
                     tr.AnchorAtPoint(0.5f, 0.5f);
                     tr.anchoredPosition3D = Vector3.zero;
                     tr.ResetScaleRot();
 
-                    img = hl.Image();
+                    img = hl.GetComponent<Image>();
                     img.sprite = UIManager.Instance.CircleIcon;
                     img.color = Color.white;
                 }
 
                 // Set button functionality
-                button.Button().onClick.AddListener(delegate {
+                button.GetComponent<Button>().onClick.AddListener(delegate {
                     UIManager.Instance.PlayMenuClickSound();
                     MusicManager.Instance.CurrentSong.Key = key;
                     Refresh();
                 });
 
                 // Set button show/hide
-                ShowHide sh = button.AddComponent<ShowHide>();
+                //ShowHide sh = button.AddComponent<ShowHide>();
                 GameObject highlight = UIHelpers.MakeImage(
                     key.ToString() + "_Highlight");
-                tr = highlight.RectTransform();
-                tr.SetParent(button.RectTransform());
+                tr = highlight.GetComponent<RectTransform>();
+                tr.SetParent(button.GetComponent<RectTransform>());
                 tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
                 tr.AnchorAtPoint(0.5f, 0.5f);
                 tr.ResetScaleRot();
                 tr.anchoredPosition3D = Vector3.zero;
-                highlight.Image().sprite = 
+                highlight.GetComponent<Image>().sprite = 
                     UIManager.Instance.PercussionVolumeIcon;
-                highlight.Image().color = Color.white;
+                highlight.GetComponent<Image>().color = Color.white;
 
-                sh.objects = new List<GameObject>();
-                sh.objects.Add(highlight);
+                //sh.objects = new List<GameObject>();
+                //sh.objects.Add(highlight);
 
                 highlight.SetActive(false);
 
@@ -184,8 +184,8 @@ namespace Route95.UI {
 
                 // Make scale button
                 GameObject button = UIHelpers.MakeTextButton(scalei.Name);
-                RectTransform tr = button.RectTransform();
-                tr.SetParent(gameObject.RectTransform());
+                RectTransform tr = button.GetComponent<RectTransform>();
+                tr.SetParent(gameObject.GetComponent<RectTransform>());
                 tr.SetSideWidth(_scale);
                 tr.AnchorAtPoint(0.5f, 0.5f);
                 tr.ResetScaleRot();
@@ -201,7 +201,7 @@ namespace Route95.UI {
                 text.color = _GRAY;
 
                 // Set button image
-                Image img = button.Image();
+                Image img = button.GetComponent<Image>();
                 img.sprite = UIManager.Instance.CircleIcon;
                 img.color = _GRAY;
 
@@ -212,28 +212,28 @@ namespace Route95.UI {
                 }
 
                 // Set button functionality
-                button.Button().onClick.AddListener(delegate {
+                button.GetComponent<Button>().onClick.AddListener(delegate {
                     UIManager.Instance.PlayMenuClickSound();
                     MusicManager.Instance.CurrentSong.Scale = scalei.ScaleIndex;
                     Refresh();
                 });
 
                 // Set show/hide
-                ShowHide sh = button.AddComponent<ShowHide>();
+                //ShowHide sh = button.AddComponent<ShowHide>();
                 GameObject highlight = UIHelpers.MakeImage(
                     scalei.Name + "_Highlight");
-                tr = highlight.RectTransform();
-                tr.SetParent(button.RectTransform());
+                tr = highlight.GetComponent<RectTransform>();
+                tr.SetParent(button.GetComponent<RectTransform>());
                 tr.sizeDelta = ((RectTransform)(tr.parent)).sizeDelta;
                 tr.AnchorAtPoint(0.5f, 0.5f);
                 tr.ResetScaleRot();
                 tr.anchoredPosition3D = Vector3.zero;
-                highlight.Image().sprite = 
+                highlight.GetComponent<Image>().sprite = 
                     UIManager.Instance.PercussionVolumeIcon;
-                highlight.Image().color = Color.white;
+                highlight.GetComponent<Image>().color = Color.white;
 
-                sh.objects = new List<GameObject>();
-                sh.objects.Add(highlight);
+                //sh.objects = new List<GameObject>();
+                //sh.objects.Add(highlight);
 
                 highlight.SetActive(false);
 
@@ -247,7 +247,7 @@ namespace Route95.UI {
             // Confirm button
             if (MusicManager.Instance.CurrentSong.Key != Key.None &&
                 MusicManager.Instance.CurrentSong.Scale != -1) {
-                confirmButton.Button().interactable = true;
+                confirmButton.GetComponent<Button>().interactable = true;
                 confirmButton.SetActive(true);
             }
             else confirmButton.SetActive(false);

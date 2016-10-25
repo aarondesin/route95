@@ -44,7 +44,7 @@ namespace Route95.UI {
             columns = new List<GameObject>();
 
             // Init vars
-            timeline_tr = gameObject.RectTransform();
+            timeline_tr = gameObject.GetComponent<RectTransform>();
             columnWidth = timeline_tr.rect.width / (float)NUM_COLUMNS;
             columnHeight = ((RectTransform)timeline_tr.parent).rect.height;
         }
@@ -76,7 +76,7 @@ namespace Route95.UI {
                     typeof(Image)
                 );
 
-                RectTransform tr = column.RectTransform();
+                RectTransform tr = column.GetComponent<RectTransform>();
                 column.SetParent(timeline_tr);
                 tr.sizeDelta = new Vector2(columnWidth, columnHeight);
                 tr.AnchorAtPoint(0f, 0f);
@@ -86,17 +86,17 @@ namespace Route95.UI {
                 int num = i; // avoid pointer problems
 
                 // Setup column button properties
-                column.Button().onClick.AddListener(() => {
+                column.GetComponent<Button>().onClick.AddListener(() => {
                     SongArrangeMenu.Instance.UpdateValue();
                     Riff riff = MusicManager.Instance.CurrentSong.Riffs[SongArrangeMenu.Instance.selectedRiffIndex];
                     song.ToggleRiff(riff, num);
                     RefreshColumn(column, song.SongPieces[song.SongPieceIndices[num]]);
                 });
 
-                column.Image().sprite = UIManager.Instance.FillSprite;
+                column.GetComponent<Image>().sprite = UIManager.Instance.FillSprite;
                 Color color = Color.white;
                 color.a = (i % 2 == 1) ? 0.2f : 0.4f;
-                column.Image().color = color;
+                column.GetComponent<Image>().color = color;
                 columns.Add(column);
             }
 
@@ -112,20 +112,20 @@ namespace Route95.UI {
                 typeof(Image)
             );
 
-            RectTransform atr = addColumnButton.RectTransform();
-            addColumnButton.SetParent(gameObject.RectTransform());
+            RectTransform atr = addColumnButton.GetComponent<RectTransform>();
+            addColumnButton.SetParent(gameObject.GetComponent<RectTransform>());
             float width = Mathf.Min(columnWidth, columnHeight) / 3f;
             atr.SetSideWidth(width);
             atr.AnchorAtPoint(1f, 0f);
             atr.anchoredPosition3D = new Vector3(-columnWidth / 2f, columnHeight / 2f, 0f);
             atr.ResetScaleRot();
 
-            addColumnButton.Button().onClick.AddListener(() => {
+            addColumnButton.GetComponent<Button>().onClick.AddListener(() => {
                 MusicManager.Instance.CurrentSong.NewSongPiece();
                 RefreshTimeline();
             });
 
-            addColumnButton.Image().sprite = UIManager.Instance.AddIcon;
+            addColumnButton.GetComponent<Image>().sprite = UIManager.Instance.AddIcon;
             columns.Add(addColumnButton);
         }
 
@@ -148,7 +148,7 @@ namespace Route95.UI {
         /// <param name="songpiece">Song piece to use for column.</param>
         void RefreshColumn(GameObject column, SongPiece songpiece) {
             Song song = MusicManager.Instance.CurrentSong;
-            RectTransform column_tr = column.RectTransform();
+            RectTransform column_tr = column.GetComponent<RectTransform>();
 
             // Clear all chuldren from column
             foreach (RectTransform child in column_tr)
@@ -165,7 +165,7 @@ namespace Route95.UI {
 
                 // Riff name label
                 GameObject label = UIHelpers.MakeText(riff.Name);
-                RectTransform label_tr = label.RectTransform();
+                RectTransform label_tr = label.GetComponent<RectTransform>();
                 label.SetParent(column_tr);
                 label_tr.sizeDelta = new Vector2(columnWidth, height);
                 label_tr.AnchorAtPoint(0f, 0f);
@@ -174,14 +174,14 @@ namespace Route95.UI {
 
                 // Instrument icon
                 GameObject icon = UIHelpers.MakeImage(riff.Name + "Icon", riff.Instrument.Icon);
-                RectTransform icon_tr = icon.RectTransform();
+                RectTransform icon_tr = icon.GetComponent<RectTransform>();
                 icon_tr.SetParent(column_tr);
                 icon_tr.SetSideWidth(height);
                 icon_tr.AnchorAtPoint(0f, 0f);
                 icon_tr.anchoredPosition3D = new Vector3(height, height * y, 0f);
                 icon_tr.ResetScaleRot();
 
-                Text label_text = label.Text();
+                Text label_text = label.GetComponent<Text>();
                 label_text.text = riff.Name;
                 label_text.color = Color.white;
                 label_text.fontStyle = FontStyle.Normal;

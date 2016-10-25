@@ -20,7 +20,7 @@ namespace Route95.UI {
                 typeof(RectTransform),
                 typeof(CanvasRenderer),
                 typeof(Button),
-                typeof(ShowHide),
+                //typeof(ShowHide),
                 typeof(Image)
             );
             RectTransform tr = button.GetComponent<RectTransform>();
@@ -32,19 +32,19 @@ namespace Route95.UI {
 
         public static GameObject MakeButton(string buttonName, Sprite graphic) {
             GameObject button = MakeButton(buttonName);
-            button.Image().sprite = graphic;
+            button.GetComponent<Image>().sprite = graphic;
             return button;
         }
 
         public static GameObject MakeButton(string buttonName, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject button = MakeButton(buttonName);
 
-            RectTransform tr = button.RectTransform();
+            RectTransform tr = button.GetComponent<RectTransform>();
             tr.SetParent(parent);
             tr.sizeDelta = sizeD;
             tr.anchoredPosition = pos;
 
-            button.Image().sprite = image;
+            button.GetComponent<Image>().sprite = image;
 
             return button;
         }
@@ -95,7 +95,7 @@ namespace Route95.UI {
         public static GameObject MakeText(string textName, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject text = MakeText(textName);
 
-            RectTransform tr = text.RectTransform();
+            RectTransform tr = text.GetComponent<RectTransform>();
             tr.SetParent(parent);
             tr.sizeDelta = sizeD;
             tr.anchoredPosition = pos;
@@ -121,19 +121,19 @@ namespace Route95.UI {
 
         public static GameObject MakeImage(string imageName, Sprite graphic) {
             GameObject image = MakeImage(imageName);
-            image.Image().sprite = graphic;
+            image.GetComponent<Image>().sprite = graphic;
             return image;
         }
 
         public static GameObject MakeImage(string imageName, Sprite graphic, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject image = MakeImage(imageName);
 
-            RectTransform tr = image.RectTransform();
+            RectTransform tr = image.GetComponent<RectTransform>();
             tr.SetParent(parent);
             tr.sizeDelta = sizeD;
             tr.anchoredPosition = pos;
 
-            image.Image().sprite = graphic;
+            image.GetComponent<Image>().sprite = graphic;
 
             return image;
         }

@@ -63,15 +63,15 @@ namespace Route95.UI {
 
             if (MusicManager.Instance.CurrentSong.Riffs.Count == 0) {
                 dropdown.interactable = false;
-                editRiffButton.Button().interactable = false;
-                playRiffButton.Button().interactable = false;
-                previewSongButton.Button().interactable = false;
+                editRiffButton.GetComponent<Button>().interactable = false;
+                playRiffButton.GetComponent<Button>().interactable = false;
+                previewSongButton.GetComponent<Button>().interactable = false;
             }
             else {
                 dropdown.interactable = true;
-                editRiffButton.Button().interactable = true;
-                playRiffButton.Button().interactable = true;
-                previewSongButton.Button().interactable = true;
+                editRiffButton.GetComponent<Button>().interactable = true;
+                playRiffButton.GetComponent<Button>().interactable = true;
+                previewSongButton.GetComponent<Button>().interactable = true;
                 if (RiffEditor.CurrentRiff == null)
                     RiffEditor.CurrentRiff = MusicManager.Instance.CurrentSong.Riffs[0];
             }
@@ -82,7 +82,7 @@ namespace Route95.UI {
             songNameInputField.text = MusicManager.Instance.CurrentSong.Name;
 
             // Update play riff button art
-            playRiffButton.Image().sprite = UIManager.Instance.PlayIcon;
+            playRiffButton.GetComponent<Image>().sprite = UIManager.Instance.PlayIcon;
 
             bool hasRiffs = MusicManager.Instance.CurrentSong.Riffs.Count != 0;
             SongTimeline.Instance.SetInteractable(hasRiffs);
@@ -119,14 +119,14 @@ namespace Route95.UI {
         /// <summary>
         /// Updates the play riff button art.
         /// </summary>
-        public void TogglePlayRiffButton() {
-            if (MusicManager.Instance.IsPlaying && MusicManager.Instance.RiffMode) playRiffButton.Image().sprite = UIManager.Instance.PauseIcon;
-            else playRiffButton.Image().sprite = UIManager.Instance.PlayIcon;
+        public void TogglePlayRiffGetComponent<Button>() {
+            if (MusicManager.Instance.IsPlaying && MusicManager.Instance.RiffMode) playRiffButton.GetComponent<Image>().sprite = UIManager.Instance.PauseIcon;
+            else playRiffButton.GetComponent<Image>().sprite = UIManager.Instance.PlayIcon;
         }
 
-        public void TogglePlaySongButton() {
-            if (MusicManager.Instance.IsPlaying && !MusicManager.Instance.RiffMode) previewSongButton.Image().sprite = UIManager.Instance.PauseIcon;
-            else previewSongButton.Image().sprite = UIManager.Instance.PlayIcon;
+        public void TogglePlaySongGetComponent<Button>() {
+            if (MusicManager.Instance.IsPlaying && !MusicManager.Instance.RiffMode) previewSongButton.GetComponent<Image>().sprite = UIManager.Instance.PauseIcon;
+            else previewSongButton.GetComponent<Image>().sprite = UIManager.Instance.PlayIcon;
         }
 
         #endregion

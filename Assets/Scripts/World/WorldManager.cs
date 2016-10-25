@@ -400,12 +400,12 @@ namespace Route95.World {
 
             timeOfDay = UnityEngine.Random.Range(0, 2 * Mathf.PI);
             CreateSun();
-            sunLight = sun.Light();
+            sunLight = sun.GetComponent<Light>();
             sunIntensityAmplitude = (maxSunIntensity - minSunIntensity) / 2f;
             sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
 
             CreateMoon();
-            moonLight = moon.Light();
+            moonLight = moon.GetComponent<Light>();
             moonIntensityAmplitude = (maxMoonIntensity - maxMoonIntensity) / 2f;
             moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
 
@@ -650,7 +650,7 @@ namespace Route95.World {
                 typeof (LensFlare)
             );
 
-            Light light = sun.Light();
+            Light light = sun.GetComponent<Light>();
             light.shadows = LightShadows.Soft;
             light.flare = sunFlare;
 
@@ -677,7 +677,7 @@ namespace Route95.World {
                 typeof (SpriteRenderer)
             );
 
-            Light light = moon.Light();
+            Light light = moon.GetComponent<Light>();
             light.shadows = LightShadows.Soft;
 
             // Random moon phase
@@ -903,7 +903,7 @@ namespace Route95.World {
             // Enable lightning striker and move to point
             lightningStriker.SetActive(true);
             lightningStriker.transform.position = origin;
-            lightningStriker.Light().intensity = baseLightningIntensity * strength;
+            lightningStriker.GetComponent<Light>().intensity = baseLightningIntensity * strength;
         }
 
         /// <summary>
@@ -931,7 +931,7 @@ namespace Route95.World {
             // Enable lightning flash and move to point
             lightningFlash.SetActive(true);
             lightningFlash.transform.position = origin;
-            lightningFlash.Light().intensity = baseLightningIntensity * strength;
+            lightningFlash.GetComponent<Light>().intensity = baseLightningIntensity * strength;
         }
 
         public void StarBurst() {
