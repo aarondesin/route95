@@ -3,8 +3,8 @@
 
 namespace Route95.UI {
 
-    public class KeySelectMenu : MenuBase<KeySelectMenu> {
-
-        
-    }
+	/// <summary>
+	/// Class to handle the key selection menu.
+	/// </summary>
+    public class KeySelectMenu : MenuBase<KeySelectMenu> { }
 }

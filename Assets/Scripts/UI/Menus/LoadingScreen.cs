@@ -2,7 +2,6 @@
 // ©2016 Team 95
 
 using UnityEngine.UI;
-using System.Collections;
 
 namespace Route95.UI {
 

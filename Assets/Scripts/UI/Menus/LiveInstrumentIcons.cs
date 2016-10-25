@@ -2,7 +2,6 @@
 // ©2016 Team 95
 
 using UnityEngine;
-using System.Collections;
 
 namespace Route95.UI {
 
@@ -40,6 +39,8 @@ namespace Route95.UI {
         #region Unity Callbacks
 
         new void Awake () {
+			base.Awake();
+
             // Init vars
             _canvasGroup = GetComponent<CanvasGroup>();
         }

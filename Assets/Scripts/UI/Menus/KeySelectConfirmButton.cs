@@ -9,19 +9,31 @@ namespace Route95.UI {
     [RequireComponent(typeof(Button))]
     public class KeySelectConfirmButton : MenuBase<KeySelectConfirmButton> {
 
-        /// <summary>
-        /// Button component.
-        /// </summary>
-        Button _button;
+		#region Vars
 
-        new void Awake () {
+		/// <summary>
+		/// Button component.
+		/// </summary>
+		Button _button;
+
+		#endregion
+		#region Unity Callbacks
+
+		new void Awake () {
             // Init vars
             _button = GetComponent<Button>();
         }
 
-        public void SetInteractable (bool val) {
+		#endregion
+		#region Methods
+
+		/// <summary>
+		/// Sets the interactable status of this button.
+		/// </summary>
+		public void SetInteractable (bool val) {
             _button.interactable = val;
         }
-       
-    }
+
+		#endregion
+	}
 }

@@ -1,12 +1,11 @@
 ﻿// UIManager.cs
 // ©2016 Team 95
 
-using UnityEngine;
-using System.Collections;
-
 using Route95.Core;
 using Route95.Music;
 using Route95.World;
+
+using UnityEngine;
 
 namespace Route95.UI {
 
@@ -598,10 +597,16 @@ namespace Route95.UI {
             MusicManager.PlayMenuSound(_altMenuClickSound);
         }
 
+		/// <summary>
+		/// Plays a sound for enabling effects.
+		/// </summary>
         public void PlayEnableEffectSound () {
             MusicManager.PlayMenuSound(_enableEffectSound);
         }
 
+		/// <summary>
+		/// Plays a spound for disabling effects.
+		/// </summary>
         public void PlayDisableEffectSound () {
             MusicManager.PlayMenuSound(_disableEffectSound);
         }

@@ -3,8 +3,8 @@
 
 namespace Route95.UI {
 
-    public class LoopIcon : MenuBase<LoopIcon> {
-
-        
-    }
+	/// <summary>
+	/// Class to handle the looping icon.
+	/// </summary>
+    public class LoopIcon : MenuBase<LoopIcon> {}
 }

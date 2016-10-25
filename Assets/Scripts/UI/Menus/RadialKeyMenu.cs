@@ -77,10 +77,6 @@ namespace Route95.UI {
             _numScales = ScaleInfo.AllScales.Count;
         }
 
-        void Start() {
-            Refresh();
-        }
-
         #endregion
         #region RadialKeyMenu Vars
 

@@ -1,7 +1,8 @@
-﻿using Route95.Core;
+﻿// UIHelpers.cs
+// ©2016 Team 95
+
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 namespace Route95.UI {
 
@@ -14,7 +15,6 @@ namespace Route95.UI {
         /// Creates a button GameObject with default properties.
         /// </summary>
         /// <param name="buttonName"></param>
-        /// <returns></returns>
         public static GameObject MakeButton(string buttonName) {
             GameObject button = new GameObject(buttonName,
                 typeof(RectTransform),
@@ -30,12 +30,18 @@ namespace Route95.UI {
             return button;
         }
 
+		/// <summary>
+		/// Makes a button with the given graphic.
+		/// </summary>
         public static GameObject MakeButton(string buttonName, Sprite graphic) {
             GameObject button = MakeButton(buttonName);
             button.GetComponent<Image>().sprite = graphic;
             return button;
         }
 
+		/// <summary>
+		/// Makes a button with the given properties.
+		/// </summary>
         public static GameObject MakeButton(string buttonName, Sprite image, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject button = MakeButton(buttonName);
 
@@ -53,8 +59,6 @@ namespace Route95.UI {
         /// Creates a button GameObject with default properties
         /// and a child text GameObject.
         /// </summary>
-        /// <param name="buttonText">Text to show on button.</param>
-        /// <returns></returns>
         public static GameObject MakeTextButton(string buttonText) {
             GameObject button = MakeButton(buttonText);
             RectTransform button_tr = button.GetComponent<RectTransform>();
@@ -92,6 +96,9 @@ namespace Route95.UI {
             return text;
         }
 
+		/// <summary>
+		/// Makes a text object with the given properties.
+		/// </summary>
         public static GameObject MakeText(string textName, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject text = MakeText(textName);
 
@@ -106,8 +113,6 @@ namespace Route95.UI {
         /// <summary>
         /// Creates an image GameObject with default properties.
         /// </summary>
-        /// <param name="imageName"></param>
-        /// <returns></returns>
         public static GameObject MakeImage(string imageName) {
             GameObject image = new GameObject(imageName,
                 typeof(RectTransform),
@@ -119,12 +124,18 @@ namespace Route95.UI {
             return image;
         }
 
+		/// <summary>
+		/// Makes an image object with the given graphic.
+		/// </summary>
         public static GameObject MakeImage(string imageName, Sprite graphic) {
             GameObject image = MakeImage(imageName);
             image.GetComponent<Image>().sprite = graphic;
             return image;
         }
 
+		/// <summary>
+		/// Makes an image object with the given properties.
+		/// </summary>
         public static GameObject MakeImage(string imageName, Sprite graphic, RectTransform parent, Vector2 sizeD, Vector2 pos) {
             GameObject image = MakeImage(imageName);
 

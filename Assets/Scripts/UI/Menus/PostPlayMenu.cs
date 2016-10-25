@@ -3,7 +3,8 @@
 
 namespace Route95.UI {
 
-    public class PostPlayMenu : MenuBase<PostPlayMenu> {
-
-    }
+	/// <summary>
+	/// Class to handle the postplay menu.
+	/// </summary>
+    public class PostPlayMenu : MenuBase<PostPlayMenu> { }
 }

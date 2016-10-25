@@ -61,7 +61,7 @@ namespace Route95.UI {
         void Awake() {
             // Get number of images
             _imageCount = _images.Count;
-            _c = (float)_imageCount * _TWOPI;
+            _c = _TWOPI / (float)_imageCount;
         }
 
         void Update() {
@@ -70,7 +70,7 @@ namespace Route95.UI {
 
             // Move all images
             for (int i = 0; i < _imageCount; i++) {
-                float newAngle = _r + (float)i / _c;
+                float newAngle = _r + (float)i * _c;
                 _images[i].anchoredPosition3D =
                     new Vector3(Mathf.Cos(newAngle), Mathf.Sin(newAngle), 0f) * _spinRadius;
             }

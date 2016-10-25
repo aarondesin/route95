@@ -1,15 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// PauseMenu.cs
+// ©2016 Team 95
 
-public class PauseMenu : MenuBase<PauseMenu> {
+namespace Route95.UI {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+	/// <summary>
+	/// Class to handle the pause menu.
+	/// </summary>
+	public class PauseMenu : MenuBase<PauseMenu> { }
 }

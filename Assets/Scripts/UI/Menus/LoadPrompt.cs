@@ -1,11 +1,14 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// LoadPrompt.cs
+// ©2016 Team 95
+
+using Route95.Core;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Route95.Core;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Route95.UI {
 
@@ -27,22 +30,60 @@ namespace Route95.UI {
         #endregion
         #region LoadPrompt Vars
 
-        public RectTransform fileList;     // Transform of the actual panel with all of the files listed
-        static Vector2 fileListSize = new Vector2(84f, 84f);
-        public GameObject loadButton;      // Load button on propmt
-        public Text loadButtonText;        // Text on load button
+		/// <summary>
+		/// Transform of the actual panel with all of the files listed.
+		/// </summary>
+        RectTransform _fileList;
 
-        Mode loadMode;                     // Type of file to display and load
-        string selectedPath;               // Currently selected path
+		/// <summary>
+		/// Size vector of the file list.
+		/// </summary>
+		static Vector2 _FileListSize = new Vector2(84f, 84f);
 
-        List<GameObject> fileButtons;      // List of created buttons
+		/// <summary>
+		/// Load button on prompt.
+		/// </summary>
+        GameObject _loadButton;
 
+		/// <summary>
+		/// Text on load button.
+		/// </summary>
+        Text _loadButtonText;
 
-        static float horizontalPadding = 8f;
-        static float verticalPadding = 4f;
-        static Vector2 buttonSize = new Vector2(360f, 72f);
+		/// <summary>
+		/// Type of file to display and load.
+		/// </summary>
+        Mode _loadMode;
 
-        public Text header;
+		/// <summary>
+		/// Currently selected path.
+		/// </summary>
+        string _selectedPath;
+
+		/// <summary>
+		/// List of created buttons.
+		/// </summary>
+        List<GameObject> _fileButtons;
+
+		/// <summary>
+		/// Horizontal button padding.
+		/// </summary>
+        const float HORIZONTAL_PADDING = 8f;
+
+		/// <summary>
+		/// Vertical button padding.
+		/// </summary>
+        const float VERTICAL_PADDING = 4f;
+
+		/// <summary>
+		/// Size of a button.
+		/// </summary>
+        static Vector2 _ButtonSize = new Vector2(360f, 72f);
+
+		/// <summary>
+		/// Header text.
+		/// </summary>
+        Text _header;
 
         #endregion
         #region Unity Callbacks
@@ -51,20 +92,23 @@ namespace Route95.UI {
             base.Awake();
 
             // Init vars
-            fileButtons = new List<GameObject>();
+            _fileButtons = new List<GameObject>();
         }
 
         #endregion
         #region LoadPrompt Methods
 
-        // 
+        /// <summary>
+		/// Refreshes the load prompt based on the given mode.
+		/// </summary>
         public void Refresh(Mode mode) {
-            foreach (GameObject fileButton in fileButtons)
+			// Clear old buttons
+            foreach (GameObject fileButton in _fileButtons)
                 Destroy(fileButton);
 
-            fileButtons.Clear();
+            _fileButtons.Clear();
 
-            loadMode = mode;
+            _loadMode = mode;
 
             // Get list of files in save location
             List<string> files = new List<string>();
@@ -83,13 +127,13 @@ namespace Route95.UI {
                 GameObject button = UIHelpers.MakeButton(filename);
 
                 RectTransform button_tr = button.GetComponent<RectTransform>();
-                button_tr.SetParent(fileList);
+                button_tr.SetParent(_fileList);
                 float width = ((RectTransform)button_tr.parent.parent).rect.width;
-                button_tr.sizeDelta = new Vector2(width, buttonSize.y);
+                button_tr.sizeDelta = new Vector2(width, _ButtonSize.y);
                 button_tr.AnchorAtPoint(0f, 1f);
                 button_tr.anchoredPosition3D = new Vector3(
-                    horizontalPadding + button_tr.sizeDelta.x / 2f,
-                    ((i == 0 ? 0f : verticalPadding) + button_tr.sizeDelta.y) * -(float)(i + 1),
+                    HORIZONTAL_PADDING + button_tr.sizeDelta.x / 2f,
+                    ((i == 0 ? 0f : VERTICAL_PADDING) + button_tr.sizeDelta.y) * -(float)(i + 1),
                     0f
                 );
                 button_tr.ResetScaleRot();
@@ -119,13 +163,13 @@ namespace Route95.UI {
                 button.GetComponent<Button>().onClick.AddListener(() => {
                     UIManager.Instance.PlayMenuClickSound();
                     ResetButtons();
-                    selectedPath = path;
-                    loadButton.GetComponent<Button>().interactable = true;
-                    loadButtonText.color = loadButton.GetComponent<Button>().colors.normalColor;
+                    _selectedPath = path;
+                    _loadButton.GetComponent<Button>().interactable = true;
+                    _loadButtonText.color = _loadButton.GetComponent<Button>().colors.normalColor;
                     button.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.5f);
                 });
 
-                fileButtons.Add(button);
+                _fileButtons.Add(button);
 
                 /*GameObject highlight = UIHelpers.MakeImage(filename + "_Highlight");
                 RectTransform highlight_tr = highlight.GetComponent<RectTransform>();
@@ -145,10 +189,10 @@ namespace Route95.UI {
             }
 
             // Update size of panel to fit all files
-            fileList.sizeDelta = new Vector2(fileListSize.x, (float)(fileButtons.Count + 1) * (verticalPadding + buttonSize.y));
+            _fileList.sizeDelta = new Vector2(_FileListSize.x, (float)(_fileButtons.Count + 1) * (VERTICAL_PADDING + _ButtonSize.y));
 
             // Update header
-            header.text = mode == Mode.Project ? "Load Project" : "Load Song";
+            _header.text = mode == Mode.Project ? "Load Project" : "Load Song";
         }
 
 
@@ -156,12 +200,12 @@ namespace Route95.UI {
         // calls save_load to load the currently selected file
         public void LoadSelectedPath() {
             //string fullPath = GameManager.Instance.projectSavePath+"/"+selectedPath+SaveLoad.projectSaveExtension;
-            Debug.Log("LoadPrompt.LoadSelectedPath(): loading " + selectedPath);
+            Debug.Log("LoadPrompt.LoadSelectedPath(): loading " + _selectedPath);
 
-            switch (loadMode) {
+            switch (_loadMode) {
                 case LoadPrompt.Mode.Project:
                     try {
-                        SaveLoad.LoadProject(selectedPath);
+                        SaveLoad.LoadProject(_selectedPath);
                         Prompt.Instance.PromptMessage("Load Project", "Successfully loaded project!", "Nice");
 
                         // Refresh name field on playlist browser
@@ -179,7 +223,7 @@ namespace Route95.UI {
 
                 case LoadPrompt.Mode.Song:
                     try {
-                        SaveLoad.LoadSongToProject(selectedPath);
+                        SaveLoad.LoadSongToProject(_selectedPath);
                         PlaylistBrowser.Instance.Refresh();
                         Prompt.Instance.PromptMessage("Load Song", "Successfully loaded song!", "Nice");
                         break;
@@ -194,7 +238,7 @@ namespace Route95.UI {
 
         // Resets highlighting of all buttons
         void ResetButtons() {
-            foreach (GameObject button in fileButtons) button.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
+            foreach (GameObject button in _fileButtons) button.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
         }
 
         #endregion

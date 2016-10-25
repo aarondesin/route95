@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// Prompt.cs
+// ©2016 Team 95
 
-using Route95.Core;
+using UnityEngine.UI;
 
 namespace Route95.UI {
 
@@ -13,9 +12,20 @@ namespace Route95.UI {
 
         #region Prompt Vars
 
-        public Text titleText;         // Reference to title text
-        public Text messageText;       // Reference to message body text
-        public Text buttonText;        // Reference to button text
+		/// <summary>
+		/// Reference to title text.
+		/// </summary>
+        Text _titleText;
+
+		/// <summary>
+		/// Reference to message body text.
+		/// </summary>
+        Text _messageText;
+
+		/// <summary>
+		/// Reference to button text.
+		/// </summary>
+        Text _buttonText;
 
         #endregion
         #region Prompt Methods
@@ -27,9 +37,9 @@ namespace Route95.UI {
         /// <param name="message">Message.</param>
         /// <param name="button">Button text.</param>
         public void PromptMessage(string title, string message, string button) {
-            titleText.text = title;
-            messageText.text = message;
-            buttonText.text = button;
+            _titleText.text = title;
+            _messageText.text = message;
+            _buttonText.text = button;
             UIManager.Instance.ShowMenu(this);
         }
 

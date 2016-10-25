@@ -8,7 +8,7 @@ namespace Route95.UI {
     /// <summary>
     /// Class to handle the loading screen progress bar.
     /// </summary>
-    public class LoadingBar : SingletonMonoBehaviour<LoadingBar> {
+    public class LoadingBar : MenuBase<LoadingBar> {
 
         #region LoadingBar Vars
 
@@ -33,7 +33,6 @@ namespace Route95.UI {
         /// <summary>
         /// Updates the loading bar progress value.
         /// </summary>
-        /// <param name="p">Progress.</param>
         public void UpdateProgress (float p) {
             _slider.value = p;
         }

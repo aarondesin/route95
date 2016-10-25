@@ -38,6 +38,8 @@ namespace Route95.UI {
         #region Unity Callbacks
 
         new void Awake() {
+			base.Awake();
+
             // Set song name input field functionality
             songNameInputField.onEndEdit.AddListener(delegate { MusicManager.Instance.CurrentSong.Name = songNameInputField.text; });
         }

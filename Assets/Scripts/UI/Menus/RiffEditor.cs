@@ -310,7 +310,7 @@ namespace Route95.UI {
             drumIcon.AnchorAtPoint(0.5f, 1.0f);
             drumIcon.GetComponent<RectTransform>().ResetScaleRot();
             drumIcon.SetPosition2D(0f, y);
-            drumIcon.AddComponent<Tooltippable>().message = title;
+            drumIcon.AddComponent<Tooltippable>().Message = title;
             objects.Add(drumIcon);
 
             // Make note buttons
@@ -809,7 +809,7 @@ namespace Route95.UI {
             );
             suggestion.GetComponent<Button>().onClick.AddListener(delegate { button.GetComponent<Button>().onClick.Invoke(); });
             suggestion.GetComponent<RectTransform>().localScale = tr.localScale;
-            suggestion.AddComponent<Tooltippable>().message = tooltip;
+            suggestion.AddComponent<Tooltippable>().Message = tooltip;
             suggestions.Add(suggestion);
         }
 
