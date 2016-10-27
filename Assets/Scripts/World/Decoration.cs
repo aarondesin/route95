@@ -1,7 +1,11 @@
-﻿using Route95.Core;
-using UnityEngine;
+﻿// Decoration.cs
+// ©2016 Team 95
+
+using Route95.Core;
+
 using System.Collections;
-using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace Route95.World {
 
@@ -47,60 +51,125 @@ namespace Route95.World {
         #endregion
         #region Decoration Vars
 
+		/// <summary>
+		/// Decoration group.
+		/// </summary>
         [Tooltip("Decoration group.")]
-        public Group group = Group.None;
+		[SerializeField]
+        Group _group = Group.None;
 
+		/// <summary>
+		/// Is this decoration dynamic/physics-enabled?
+		/// </summary>
         [Tooltip("Is this decoration dynamic/physics-enabled?")]
-        public bool dynamic = false;
+		[SerializeField]
+        bool _dynamic = false;
 
+		/// <summary>
+		/// Average number of this decoration per chunk.
+		/// </summary>
         [Tooltip("Average number of this decoration per chunk.")]
-        public float density;
+		[SerializeField]
+        float _density;
 
+		/// <summary>
+		/// Distribution type to use for this decoration.
+		/// </summary>
         [Tooltip("Distribution type to use for this decoration.")]
-        public Distribution distribution; // Distribution type to use
+		[SerializeField]
+        Distribution _distribution;
 
+		/// <summary>
+		/// Base position offset to use when placing.
+		/// </summary>
         [Tooltip("Base position offset to use when placing.")]
-        public Vector3 positionOffset;
+		[SerializeField]
+        Vector3 _positionOffset;
 
+		/// <summary>
+		/// Base rotation offset to use when placing.
+		/// </summary>
         [Tooltip("Base rotation offset to use when placing.")]
-        public Vector3 rotationOffset;
+		[SerializeField]
+        Vector3 _rotationOffset;
 
+		/// <summary>
+		/// Range of randomization in height.
+		/// </summary>
         [Tooltip("Range of randomization in height.")]
-        public Vector2 heightRange;
+		[SerializeField]
+        Vector2 _heightRange;
 
+		/// <summary>
+		/// Range of randomization in width.
+		/// </summary>
         [Tooltip("Range of randomization in width.")]
-        public Vector2 widthRange;
+		[SerializeField]
+        Vector2 _widthRange;
 
+		/// <summary>
+		/// Range of randomization in pitch.
+		/// </summary>
         [Tooltip("Range of randomization in pitch.")]
-        public Vector2 pitchRange;
+		[SerializeField]
+        Vector2 _pitchRange;
 
+		/// <summary>
+		/// Range of randomization in yaw.
+		/// </summary>
         [Tooltip("Range of randomization in yaw.")]
-        public Vector2 yawRange;
-
+		[SerializeField]
+        Vector2 _yawRange;
+	
+		/// <summary>
+		/// Range of randomization in roll.
+		/// </summary>
         [Tooltip("Range of randomization in roll.")]
-        public Vector2 rollRange;
+		[SerializeField]
+        Vector2 _rollRange;
 
-        public AnimationCurve heightAnimation;
+		/// <summary>
+		/// Height animation curve.
+		/// </summary>
+		[Tooltip("Height animation curve.")]
+		[SerializeField]
+        AnimationCurve _heightAnimation;
 
-        public AnimationCurve widthAnimation;
+		/// <summary>
+		/// Width animation curve.
+		/// </summary>
+		[Tooltip("Width animation curve.")]
+		[SerializeField]
+        AnimationCurve _widthAnimation;
 
-        public float animationSpeed = 0.5f;
+		/// <summary>
+		/// Animation speed.
+		/// </summary>
+		[Tooltip("Animation speed.")]
+		[SerializeField]
+        float _animationSpeed = 0.5f;
 
-        Vector3 normalScale;
+		/// <summary>
+		/// Scale backup.
+		/// </summary>
+        Vector3 _normalScale;
 
-        ParticleSystem partSystem;
+		/// <summary>
+		/// Particle system.
+		/// </summary>
+        ParticleSystem _partSystem;
 
         #endregion
         #region Unity Callbacks
 
         void Awake() {
-            normalScale = transform.localScale;
-            partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
-            partSystem.gameObject.transform.parent = transform.parent;
+            _normalScale = transform.localScale;
+            _partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
+            _partSystem.gameObject.transform.parent = transform.parent;
         }
 
         void FixedUpdate() {
-            if (dynamic) {
+            if (_dynamic) {
 
                 // Remove if decoration fell below
                 if (transform.position.y < -WorldManager.Instance.heightScale)
@@ -129,26 +198,26 @@ namespace Route95.World {
 
         // Starts with base position/rotation, and adds variance
         public void Randomize() {
-            transform.localScale = normalScale;
-            transform.position += positionOffset;
-            transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
+            transform.localScale = _normalScale;
+            transform.position += _positionOffset;
+            transform.rotation = Quaternion.Euler(_rotationOffset.x, _rotationOffset.y, _rotationOffset.z);
 
             // Randomize scale (width and height)
             transform.localScale = new Vector3(
-                transform.localScale.x * Random.Range(widthRange[0], widthRange[1]),
-                transform.localScale.y * Random.Range(heightRange[0], heightRange[1]),
-                transform.localScale.z * Random.Range(widthRange[0], widthRange[1])
+                transform.localScale.x * Random.Range(_widthRange[0], _widthRange[1]),
+                transform.localScale.y * Random.Range(_heightRange[0], _heightRange[1]),
+                transform.localScale.z * Random.Range(_widthRange[0], _widthRange[1])
             );
 
             // Randomize rotation
             transform.Rotate(new Vector3(
-                Random.Range(pitchRange[0], pitchRange[1]),
-                Random.Range(yawRange[0], yawRange[1]),
-                Random.Range(rollRange[0], rollRange[1])
+                Random.Range(_pitchRange[0], _pitchRange[1]),
+                Random.Range(_yawRange[0], _yawRange[1]),
+                Random.Range(_rollRange[0], _rollRange[1])
             ), Space.World);
 
-            partSystem.transform.position = transform.position;
-            partSystem.Play();
+            _partSystem.transform.position = transform.position;
+            _partSystem.Play();
 
             StartCoroutine(Animate());
         }
@@ -158,12 +227,12 @@ namespace Route95.World {
             float progress = 0f;
             while (progress < 1f) {
                 Vector3 scale = new Vector3(
-                    baseScale.x * widthAnimation.Evaluate(progress),
-                    baseScale.y * heightAnimation.Evaluate(progress),
-                    baseScale.z * widthAnimation.Evaluate(progress)
+                    baseScale.x * _widthAnimation.Evaluate(progress),
+                    baseScale.y * _heightAnimation.Evaluate(progress),
+                    baseScale.z * _widthAnimation.Evaluate(progress)
                 );
                 transform.localScale = scale;
-                progress += animationSpeed * Time.deltaTime;
+                progress += _animationSpeed * Time.deltaTime;
                 yield return null;
             }
             yield break;

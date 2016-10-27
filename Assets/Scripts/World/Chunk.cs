@@ -1,17 +1,23 @@
-﻿using Route95.Core;
-using UnityEngine;
+﻿// Chunk.cs
+// ©2016 Team 95
+
+using Route95.Core;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using UnityEngine;
+
 namespace Route95.World {
 
+	/// <summary>
+	/// Comparer class for chunks.
+	/// </summary>
     public class ChunkComparer : IComparer<Chunk> {
-
         int IComparer<Chunk>.Compare(Chunk x, Chunk y) {
-            return x.priority.CompareTo(y.priority);
+            return x.Priority.CompareTo(y.Priority);
         }
-
     }
 
     /// <summary>
@@ -23,37 +29,100 @@ namespace Route95.World {
 
         #region Chunk Vars
 
-        public int x;                          // x position in chunk grid
-        public int y;                          // y position in chunk grid
+		/// <summary>
+		/// Coordinates in chunk grid.
+		/// </summary>
+        int _x, _y;
 
-        int numVerts;                          // number of vertices used in the mesh
-        Mesh mesh;                             // 3D mesh to use for the chunk                 
-        Vector3[] verts;                       // vertices used in the mesh
-        int[] triangles;                       // triangles used in the mesh
-        Vector3[] normals;                     // normals used for each mesh vertex
-        Vector2[] uvs;                         // UVs used for each mesh vertex
-        Color[] colors;                        // colors at each mesh vertex
+		/// <summary>
+		/// 3D mesh to use for the chunk.
+		/// </summary>
+		Mesh _mesh;
 
-        IntVector2[] coords;                   // vertex map coordinates of each mesh vertex
-        Vertex[] mapVerts;                     // references to representative vertex map vertices for each mesh vertex
+		/// <summary>
+		/// Number of vertices used in the mesh.
+		/// </summary>
+        int _numVerts;
 
-        DynamicTerrain terrain;                // reference to parent terrain
-        VertexMap vmap;                        // reference to vertex map to use
-        public List<GameObject> decorations;   // list of decorations parented to this chunk
+        /// <summary>
+		/// Vertices used in the mesh.
+		/// </summary>
+        Vector3[] _verts;
 
-        static int chunkRes;                          // chunk resolution (copied from WM)
-        static float chunkSize;                       // width of a chunk in world units (copied from WM)
+		/// <summary>
+		/// Triangles used in the mesh.
+		/// </summary>
+        int[] _triangles;
 
-        public float priority = 0f;            // this chunk's priority when considering chunks to update.
+		/// <summary>
+		/// Normals used for each mesh vertex.
+		/// </summary>
+        Vector3[] _normals;
 
-        public GameObject grassEmitter;        // this chunk's grass emitter
+		/// <summary>
+		/// UVs used for each mesh vertex.
+		/// </summary>
+        Vector2[] _uvs;
 
-        public bool hasCheckedForRoad = false; // has this chunk checked for roads?
-        public bool hasRoad = false;           // chunk has road on it
-        public bool nearRoad = false;          // chunk is within one chunk distance of a road
-        bool isUpdatingVerts = false;          // is the chunk currently updating its vertices?
-        bool needsColliderUpdate = false;      // does the chunk need a collider update?
-        bool needsColorUpdate = false;         // does the chunk need a color update?
+		/// <summary>
+		/// Colors at each mesh vertex.
+		/// </summary>
+        Color[] _colors;
+
+		/// <summary>
+		/// Vertex map coordinates of each mesh vertex
+		/// </summary>
+        IntVector2[] _coords;
+
+		/// <summary>
+		/// References to representative vertex map vertices for each mesh vertex.
+		/// </summary>
+        Vertex[] _mapVerts;
+
+		/// <summary>
+		/// List of decorations parented to this chunk.
+		/// </summary>
+        List<GameObject> _decorations;
+
+		/// <summary>
+		/// This chunk's priority when considering chunks to update.
+		/// </summary>
+        float _priority = 0f;
+
+		/// <summary>
+		/// This chunk's grass emitter.
+		/// </summary>
+        GameObject _grassEmitter;
+
+		/// <summary>
+		/// Has this chunk checked for roads?
+		/// </summary>
+        bool _hasCheckedForRoad = false;
+
+		/// <summary>
+		/// Chunk has road on it.
+		/// </summary>
+        bool _hasRoad = false;
+
+		/// <summary>
+		/// Chunk is within one chunk distance of a road.
+		/// </summary>
+        bool _nearRoad = false;
+
+		/// <summary>
+		/// Is the chunk currently updating its vertices?
+		/// </summary>
+        bool _isUpdatingVerts = false;
+
+		/// <summary>
+		/// Does the chunk need a collider update?
+		/// </summary>
+        bool _needsColliderUpdate = false;
+
+		/// <summary>
+		/// Does the chunk need a color update?
+		/// </summary>
+        bool _needsColorUpdate = false;
 
         #endregion
         #region IComparable Implementations
@@ -62,8 +131,8 @@ namespace Route95.World {
             if (other == null)
                 throw new ArgumentException("Other object not a chunk!");
 
-            if (priority > other.priority) return 1;
-            else if (priority == other.priority) return 0;
+            if (_priority > other._priority) return 1;
+            else if (_priority == other._priority) return 0;
             else return -1;
         }
 
@@ -72,58 +141,61 @@ namespace Route95.World {
 
         void IPoolable.OnPool() {
             gameObject.SetActive(false);
-            priority = 0;
+            _priority = 0;
         }
 
         void IPoolable.OnDepool() {
             gameObject.SetActive(true);
         }
 
-        #endregion
-        #region Chunk Methods
+		#endregion
+		#region Properties
 
-        /// <summary>
-        /// Initializes a brand new chunk at x and y.
-        /// </summary>
-        /// <param name="x">The x coordinate.</param>
-        /// <param name="y">The y coordinate.</param>
-        public void Initialize(int x, int y) {
+		public float Priority { get { return _priority; } }
 
-            terrain = WorldManager.Instance.terrain;
+		#endregion
+		#region Chunk Methods
+
+		/// <summary>
+		/// Initializes a brand new chunk at x and y.
+		/// </summary>
+		public void Initialize(int x, int y) {
+
+            DynamicTerrain terrain = WorldManager.Instance.terrain;
 
             // Init vars
-            this.x = x;
-            this.y = y;
+            _x = x;
+            _y = y;
 
-            vmap = terrain.vertexmap;
-            chunkRes = WorldManager.Instance.ChunkResolution;
-            chunkSize = WorldManager.Instance.chunkSize;
+            VertexMap vmap = terrain.vertexmap;
+            int chunkRes = WorldManager.Instance.ChunkResolution;
+            float chunkSize = WorldManager.Instance.ChunkSize;
 
             // Generate vertices
-            verts = CreateUniformVertexArray(chunkRes);
-            numVerts = verts.Length;
+            _verts = CreateUniformVertexArray(chunkRes);
+            _numVerts = _verts.Length;
 
             // Generate triangles
-            triangles = CreateSquareArrayTriangles(chunkRes);
+            _triangles = CreateSquareArrayTriangles(chunkRes);
 
             // Init normals
-            normals = new Vector3[numVerts];
+            _normals = new Vector3[_numVerts];
 
             // Generate UVs
-            uvs = CreateUniformUVArray(chunkRes);
+            _uvs = CreateUniformUVArray(chunkRes);
 
             // Init colors
-            colors = new Color[numVerts];
+            _colors = new Color[_numVerts];
 
             // Init coords and mapVerts
-            coords = new IntVector2[numVerts];
-            mapVerts = new Vertex[numVerts];
+            _coords = new IntVector2[_numVerts];
+            _mapVerts = new Vertex[_numVerts];
 
             // Build initial chunk mesh
-            mesh = CreateChunkMesh();
+            _mesh = CreateChunkMesh();
 
             // Assign mesh
-            GetComponent<MeshFilter>().mesh = mesh;
+            GetComponent<MeshFilter>().mesh = _mesh;
 
             // Move GameObject to appropriate position
             transform.position = new Vector3(x * chunkSize - chunkSize / 2f, 0f, y * chunkSize - chunkSize / 2f);
@@ -132,26 +204,26 @@ namespace Route95.World {
             gameObject.name = "Chunk (" + x + "," + y + ") Position:" + transform.position.ToString();
 
             // Init decorations list
-            decorations = new List<GameObject>();
+            _decorations = new List<GameObject>();
 
             // Register all vertices with vertex map
             // Move vertices, generate normals/colors
-            for (int i = 0; i < numVerts; i++) {
+            for (int i = 0; i < _numVerts; i++) {
 
                 // Init normal/color
-                normals[i] = Vector3.up;
-                colors[i] = Color.white;
+                _normals[i] = Vector3.up;
+                _colors[i] = Color.white;
 
                 // Get VMap coords
                 IntVector2 coord = IntToV2(i);
-                coords[i] = coord;
+                _coords[i] = coord;
 
                 // Get corresponding vertex
-                mapVerts[i] = vmap.VertexAt(coord, true);
+                _mapVerts[i] = vmap.VertexAt(coord, true);
 
                 // If vertex exists, get height
-                UpdateVertex(i, mapVerts[i].height);
-                UpdateColor(i, mapVerts[i].color);
+                UpdateVertex(i, _mapVerts[i].height);
+                UpdateColor(i, _mapVerts[i].color);
             }
 
             // Assign material
@@ -162,7 +234,7 @@ namespace Route95.World {
 
             // Assign collision mesh
             MeshCollider collider = GetComponent<MeshCollider>();
-            collider.sharedMesh = mesh;
+            collider.sharedMesh = _mesh;
             collider.convex = false;
 
             // Init rigidbody
@@ -173,18 +245,18 @@ namespace Route95.World {
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
             // Add grass system
-            grassEmitter = GameObject.Instantiate(WorldManager.Instance.grassEmitterTemplate);
-            grassEmitter.transform.parent = transform;
-            grassEmitter.transform.localPosition = Vector3.zero;
+            _grassEmitter = GameObject.Instantiate(WorldManager.Instance.grassEmitterTemplate);
+            _grassEmitter.transform.parent = transform;
+            _grassEmitter.transform.localPosition = Vector3.zero;
 
             // Randomize grass density
-            ParticleSystem sys = grassEmitter.GetComponent<ParticleSystem>();
+            ParticleSystem sys = _grassEmitter.GetComponent<ParticleSystem>();
             sys.maxParticles = UnityEngine.Random.Range(0, WorldManager.Instance.grassPerChunk);
             sys.playOnAwake = true;
 
             // Assign particle system emission shape
             ParticleSystem.ShapeModule shape = sys.shape;
-            shape.mesh = mesh;
+            shape.mesh = _mesh;
 
             // Assign particle system emission rate
             ParticleSystem.EmissionModule emit = sys.emission;
@@ -196,14 +268,14 @@ namespace Route95.World {
         /// <summary>
         /// Resets necessary variables after de-pooling a chunk.
         /// </summary>
-        /// <param name="x">The x coordinate.</param>
-        /// <param name="y">The y coordinate.</param>
         public void Reuse(int x, int y) {
-            terrain = WorldManager.Instance.terrain;
+            DynamicTerrain terrain = WorldManager.Instance.terrain;
+			VertexMap vmap = terrain.vertexmap;
+			float chunkSize = WorldManager.Instance.ChunkSize;
 
             // Update vars
-            this.x = x;
-            this.y = y;
+            _x = x;
+            _y = y;
 
             // Move chunk to appropriate position
             transform.position = new Vector3(x * chunkSize - chunkSize / 2f, 0f, y * chunkSize - chunkSize / 2f);
@@ -211,28 +283,28 @@ namespace Route95.World {
             // Update chunk name
             gameObject.name = "Chunk (" + x + "," + y + ") Position:" + transform.position.ToString();
 
-            priority = 0f;
+            _priority = 0f;
 
             // Clear decoration list
-            decorations.Clear();
+            _decorations.Clear();
 
             // Register all vertices with vertex map
             // Move vertices, generate normals/colors
-            for (int i = 0; i < numVerts; i++) {
+            for (int i = 0; i < _numVerts; i++) {
 
                 // Get VMap coords
                 IntVector2 coord = IntToV2(i);
-                coords[i] = coord;
+                _coords[i] = coord;
 
                 // Get corresponding vertex
-                mapVerts[i] = vmap.VertexAt(coord, true);
+                _mapVerts[i] = vmap.VertexAt(coord, true);
 
                 // Get height from vertex
-                UpdateVertex(i, mapVerts[i].height);
+                UpdateVertex(i, _mapVerts[i].height);
 
             }
 
-            hasCheckedForRoad = false;
+            _hasCheckedForRoad = false;
 
             UpdateCollider();
         }
@@ -243,7 +315,7 @@ namespace Route95.World {
         /// <returns>The uniform vertex array.</returns>
         /// <param name="vertexSize">Vertex size.</param>
         Vector3[] CreateUniformVertexArray(int vertexSize) {
-            float chunkSize = WorldManager.Instance.chunkSize;
+            float chunkSize = WorldManager.Instance.ChunkSize;
             int chunkRes = WorldManager.Instance.ChunkResolution;
             float scale = chunkSize / (chunkRes - 1);
             int numVertices = vertexSize * vertexSize;
@@ -332,11 +404,11 @@ namespace Route95.World {
             chunkMesh.MarkDynamic();
 
             // Assign vertices/normals/UVs/tris/colors
-            chunkMesh.vertices = verts;
-            chunkMesh.normals = normals;
-            chunkMesh.uv = uvs;
-            chunkMesh.triangles = triangles;
-            chunkMesh.colors = colors;
+            chunkMesh.vertices = _verts;
+            chunkMesh.normals = _normals;
+            chunkMesh.uv = _uvs;
+            chunkMesh.triangles = _triangles;
+            chunkMesh.colors = _colors;
 
             return chunkMesh;
         }
@@ -345,32 +417,32 @@ namespace Route95.World {
         /// Updates the physics collider.
         /// </summary>
         public void UpdateCollider() {
-            needsColliderUpdate = false;
+            _needsColliderUpdate = false;
 
-            ParticleSystem grass = grassEmitter.GetComponent<ParticleSystem>();
+            ParticleSystem grass = _grassEmitter.GetComponent<ParticleSystem>();
 
             // Clear current grass
             grass.Clear();
 
             // Reassign mesh vertices/normals
-            mesh.vertices = verts;
-            mesh.normals = normals; // NEEDED FOR PROPER LIGHTING
+            _mesh.vertices = _verts;
+            _mesh.normals = _normals; // NEEDED FOR PROPER LIGHTING
 
             // Recalculate bounding box
-            mesh.RecalculateBounds();
+            _mesh.RecalculateBounds();
 
             // Reassign collider mesh
-            GetComponent<MeshCollider>().sharedMesh = mesh;
+            GetComponent<MeshCollider>().sharedMesh = _mesh;
 
             // Assign particle system emission shape
             ParticleSystem.ShapeModule shape = grass.shape;
-            shape.mesh = mesh;
+            shape.mesh = _mesh;
 
             // Replace decorations
             ReplaceDecorations();
 
             // Replace grass
-            grassEmitter.GetComponent<ParticleSystem>().Play();
+            _grassEmitter.GetComponent<ParticleSystem>().Play();
 
         }
 
@@ -378,8 +450,8 @@ namespace Route95.World {
         /// Updates the verrex colors.
         /// </summary>
         public void UpdateColors() {
-            mesh.colors = colors;
-            needsColorUpdate = false;
+            _mesh.colors = _colors;
+            _needsColorUpdate = false;
         }
 
         /// <summary>
@@ -392,11 +464,11 @@ namespace Route95.World {
             try {
 
                 // Check if height update is needed
-                if (verts[index].y != height) {
-                    priority++;
-                    verts[index].y = height;
-                    if (forceUpdate) mesh.vertices = verts;
-                    needsColliderUpdate = true;
+                if (_verts[index].y != height) {
+                    _priority++;
+                    _verts[index].y = height;
+                    if (forceUpdate) _mesh.vertices = _verts;
+                    _needsColliderUpdate = true;
                 }
 
             }
@@ -414,9 +486,9 @@ namespace Route95.World {
         public void UpdateColor(int index, Color color) {
 
             // Check if color update is needed
-            if (colors[index] != color) {
-                colors[index] = color;
-                needsColorUpdate = true;
+            if (_colors[index] != color) {
+                _colors[index] = color;
+                _needsColorUpdate = true;
             }
         }
 
@@ -439,20 +511,22 @@ namespace Route95.World {
 
             if (!GameManager.Instance.IsLoaded) yield break;
 
-            isUpdatingVerts = true;
-            float margin = WorldManager.Instance.chunkSize / 2;
+            _isUpdatingVerts = true;
+            float margin = WorldManager.Instance.ChunkSize / 2;
             float startTime = Time.realtimeSinceStartup;
             Vector3 playerPos = PlayerMovement.Instance.transform.position;
             Vector3 chunkPos = transform.position;
+			DynamicTerrain terrain = WorldManager.Instance.terrain;
+			VertexMap vmap = terrain.vertexmap;
 
             int v = 0;
-            for (; v < numVerts; v++) {
+            for (; v < _numVerts; v++) {
 
                 // Get VMap coordinates
-                IntVector2 coord = coords[v];
+                IntVector2 coord = _coords[v];
 
                 // Get coresponding vertex
-                Vertex vert = mapVerts[v];
+                Vertex vert = _mapVerts[v];
 
                 // Update vertex height
                 UpdateVertex(v, vert.height);
@@ -463,7 +537,7 @@ namespace Route95.World {
                 if (!vert.locked) {
 
                     // Distance between player and vertex
-                    Vector3 vertPos = chunkPos + verts[v];
+                    Vector3 vertPos = chunkPos + _verts[v];
                     float distance = Vector3.Distance(vertPos, playerPos);
 
                     // If vertex is close enough
@@ -482,8 +556,8 @@ namespace Route95.World {
                     }
                 }
 
-                if (v == numVerts - 1) {
-                    isUpdatingVerts = false;
+                if (v == _numVerts - 1) {
+                    _isUpdatingVerts = false;
                     yield break;
                 }
                 else if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
@@ -506,19 +580,19 @@ namespace Route95.World {
         public void ChunkUpdate() {
 
             // Update collider if necessary
-            if (needsColliderUpdate) UpdateCollider();
+            if (_needsColliderUpdate) UpdateCollider();
 
             // Update vertex colors if necessary
-            if (needsColorUpdate) UpdateColors();
+            if (_needsColorUpdate) UpdateColors();
 
             // Check for road if necessary
-            if (!hasCheckedForRoad && WorldManager.Instance.road.loaded)
+            if (!_hasCheckedForRoad && WorldManager.Instance.road.loaded)
                 CheckForRoad(PlayerMovement.Instance.moving ? PlayerMovement.Instance.progress : 0f);
 
             // Update verts if possible
-            if (!isUpdatingVerts) StartCoroutine("UpdateVerts");
+            if (!_isUpdatingVerts) StartCoroutine("UpdateVerts");
 
-            priority = 0f;
+            _priority = 0f;
         }
 
         /// <summary>
@@ -526,9 +600,11 @@ namespace Route95.World {
         /// </summary>
         /// <param name="startProgress">Start progress.</param>
         public void CheckForRoad(float startProgress) {
-            hasCheckedForRoad = true;
+            _hasCheckedForRoad = true;
             Road road = WorldManager.Instance.road;
+			DynamicTerrain terrain = WorldManager.Instance.terrain;
             Vector3 chunkPos = transform.position;
+			float chunkSize = WorldManager.Instance.ChunkSize;
             float checkResolution = (1f - startProgress) * WorldManager.Instance.roadPathCheckResolution;
 
             // Set boundaries for "near road" consideration
@@ -547,11 +623,11 @@ namespace Route95.World {
                 if (sample.x >= nearMin.x && sample.x <= nearMax.x &&
                     sample.z >= nearMin.y && sample.z <= nearMax.y) {
 
-                    if (!nearRoad) {
+                    if (!_nearRoad) {
                         gameObject.name += "|nearRoad";
                         terrain.AddCloseToRoadChunk(this);
                     }
-                    nearRoad = true;
+                    _nearRoad = true;
 
                     // If near road, check if has road
                     if (sample.x >= hasMin.x && sample.x <= hasMax.x &&
@@ -559,8 +635,8 @@ namespace Route95.World {
 
                         terrain.AddRoadChunk(this);
                         gameObject.name += "|hasRoad";
-                        grassEmitter.SetActive(false);
-                        hasRoad = true;
+                        _grassEmitter.SetActive(false);
+                        _hasRoad = true;
                         return;
                     }
                 }
@@ -575,7 +651,9 @@ namespace Route95.World {
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
         public static IntVector2 ToNearestVMapCoords(float x, float y) {
-            //if (x < 0) Debug.Log(x);
+			//if (x < 0) Debug.Log(x);
+			float chunkSize = WorldManager.Instance.ChunkSize;
+			int chunkRes = WorldManager.Instance.ChunkResolution;
             IntVector2 result = new IntVector2(
                 Mathf.FloorToInt((x + chunkSize / 2f) * (chunkRes - 1) / chunkSize),
                 Mathf.FloorToInt((y + chunkSize / 2f) * (chunkRes - 1) / chunkSize)
@@ -593,8 +671,8 @@ namespace Route95.World {
         IntVector2 IntToV2(int i) {
             int chunkRes = WorldManager.Instance.ChunkResolution;
 
-            int xi = x * (chunkRes - 1) + i % chunkRes;
-            int yi = y * (chunkRes - 1) + i / chunkRes;
+            int xi = _x * (chunkRes - 1) + i % chunkRes;
+            int yi = _y * (chunkRes - 1) + i / chunkRes;
             return new IntVector2(xi, yi);
         }
 
@@ -605,7 +683,7 @@ namespace Route95.World {
             foreach (Transform tr in GetComponentsInChildren<Transform>()) {
 
                 // Skip chunk itself
-                if (tr == transform || tr == grassEmitter.transform) continue;
+                if (tr == transform || tr == _grassEmitter.transform) continue;
 
                 // Raycast down
                 RaycastHit hit;
@@ -620,7 +698,7 @@ namespace Route95.World {
         /// Removes and pools all decorations on the chunk.
         /// </summary>
         public void RemoveDecorations() {
-            foreach (GameObject decoration in decorations)
+            foreach (GameObject decoration in _decorations)
                 WorldManager.Instance.RemoveDecoration(decoration);
         }
 
@@ -631,10 +709,10 @@ namespace Route95.World {
         public void SetDebugColors(DynamicTerrain.DebugColors color) {
             switch (color) {
                 case DynamicTerrain.DebugColors.Constrained:
-                    for (int v = 0; v < numVerts; v++) {
-                        colors[v] = mapVerts[v].noDecorations ? Color.black : Color.white;
+                    for (int v = 0; v < _numVerts; v++) {
+                        _colors[v] = _mapVerts[v].noDecorations ? Color.black : Color.white;
                     }
-                    mesh.colors = colors;
+                    _mesh.colors = _colors;
                     break;
             }
         }

@@ -71,7 +71,8 @@ namespace Route95.World {
 
         [Tooltip("The length of one side of a chunk.")]
         [Range(1f, 200f)]
-        public float chunkSize = DEFAULT_CHUNK_SIZE;
+		[SerializeField]
+        float _chunkSize = DEFAULT_CHUNK_SIZE;
 
         [Tooltip("The number of vertices along one side of a chunk.")]
         [Range(2, 32)]
@@ -454,10 +455,18 @@ namespace Route95.World {
 
         }
 
-        #endregion
-        #region WorldManager Methods
+		#endregion
+		#region Properties
 
-        public void Load() {
+		public float ChunkSize {
+			get { return _chunkSize; }
+			set { _chunkSize = value; }
+		}
+
+		#endregion
+		#region WorldManager Methods
+
+		public void Load() {
 
             Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
 

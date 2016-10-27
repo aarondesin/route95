@@ -6,6 +6,16 @@ TagManager:
   tags:
   - cubes
   - StopScrolling
+  - ViewOutsideCar
+  - ViewDriving
+  - ViewRadio
+  - ViewHoodForward
+  - ViewNearChase
+  - ViewFarChase
+  - ViewFrontRightWheel
+  - ViewFrontLeftWheel
+  - ViewRearRightWheel
+  - ViewRearLeftWheel
   layers:
   - Default
   - TransparentFX

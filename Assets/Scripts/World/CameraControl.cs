@@ -1,8 +1,12 @@
-﻿using Route95.Core;
+﻿// CameraControl.cs
+// ©2016 Team 95
+
+using Route95.Core;
 using Route95.UI;
-using UnityEngine;
-using System.Collections;
+
 using System.Collections.Generic;
+
+using UnityEngine;
 
 namespace Route95.World {
 
@@ -35,92 +39,169 @@ namespace Route95.World {
 
         [Header("General camera settings")]
 
+		/// <summary>
+		/// Current camera state.
+		/// </summary>
         [Tooltip("Current camera state.")]
-        public State state = State.Setup;
+		[SerializeField]
+        State _state = State.Setup;
 
+		/// <summary>
+		/// Free camera rotate sensitivity.
+		/// </summary>
         [Tooltip("Free camera rotate sensitivity.")]
-        public float rotateSensitivity = 0.25f;
+		[SerializeField]
+        float _rotateSensitivity = 0.25f;
 
+		/// <summary>
+		/// Free camera movement sensitivity.
+		/// </summary>
         [Tooltip("Free camera movement sensitivity.")]
-        public float moveSensitivity = 0.4f;
+		[SerializeField]
+        float _moveSensitivity = 0.4f;
 
+		/// <summary>
+		/// Camera sway speed.
+		/// </summary>
         [Tooltip("Camera sway speed.")]
-        public float swaySpeed = 1f;
+		[SerializeField]
+        float _swaySpeed = 1f;
 
+		/// <summary>
+		/// Camera base sway amount.
+		/// </summary>
         [Tooltip("Camera base sway amount.")]
-        public float baseSway = 1f;
+		[SerializeField]
+        float _baseSway = 1f;
 
-        public bool doSway = true;
+		/// <summary>
+		/// Camera sway enabled.
+		/// </summary>
+        bool _doSway = true;
 
-        const float DEFAULT_SPEED = 1f;     // Default camera speed
+		/// <summary>
+		/// Default camera speed.
+		/// </summary>
+        const float DEFAULT_SPEED = 1f;
+
+		/// <summary>
+		/// Default camera FOV.
+		/// </summary>
         const float DEFAULT_FOV = 75f;
 
-        // Camera interp vars
-        CameraView initialView;
-        Transform startTransform;                      // Camera lerp start transform
-        float startFOV;
-        CameraView targetView;
+        /// <summary>
+		/// Initial camera view.
+		/// </summary>
+        CameraView _initialView;
 
-        float speed;                          // Camera speed
-        bool moving = false;                  // Is the camera currently lerping?
+		/// <summary>
+		/// Camera lerp start transform.
+		/// </summary>
+        Transform _startTransform;
 
+		/// <summary>
+		/// Camera lerp start FOV.
+		/// </summary>
+        float _startFOV;
+
+		/// <summary>
+		/// Camera lerp target view.
+		/// </summary>
+        CameraView _targetView;
+
+		/// <summary>
+		/// Current camera speed.
+		/// </summary>
+        float _speed;
+
+		/// <summary>
+		/// Is the camera currently lerping?
+		/// </summary>
+        bool _moving = false;
+
+		/// <summary>
+		/// Lerp progress.
+		/// </summary>
         [SerializeField]
-        float progress = 0f;                  // Lerp progress
+        float _progress = 0f;
 
-        // Live mode camera angle vars
-        CameraView currentAngle;              // Current live mode angle
-        List<CameraView> liveAngles;          // List of all live mode angles
+        /// <summary>
+		/// Current live mode angle.
+		/// </summary>
+        CameraView _currentAngle;
 
+		/// <summary>
+		/// List of all live mode angles.
+		/// </summary>
+        List<CameraView> _liveAngles;
+
+		/// <summary>
+		/// Timer to next angle change.
+		/// </summary>
         [SerializeField]
-        float transitionTimer;                // Timer to next angle change
-        bool paused = false;                  // Is live mode paused?
-        float resetDistance;
+        float _transitionTimer;
 
-        [Tooltip("Initial position for camera")]
-        //public Transform initialView;
+		/// <summary>
+		/// Is live mode paused?
+		/// </summary>
+        bool _paused = false;
 
-        public Transform ViewOutsideCar;
-        public Transform ViewDriving;
-        public Transform ViewRadio;
-        public Transform ViewChase;
+		/// <summary>
+		/// Distance to car for camera to reset.
+		/// </summary>
+        float _resetDistance;
 
-        public CameraView OutsideCar;
-        public CameraView Driving;
-        public CameraView Radio;
+        Transform _viewOutsideCar;
+        Transform _viewDriving;
+        Transform _viewRadio;
+        Transform _viewChase;
 
-        public Transform HoodForward;
-        public Transform HoodBackward;
-        public Transform NearChase;
-        public Transform FarChase;
-        public Transform FrontLeftWheel;
-        public Transform FrontRightWheel;
-        public Transform RearLeftWheel;
-        public Transform RearRightWheel;
-        public Transform WideRear;
-        public Transform WideFront;
+        CameraView _outsideCar;
+        CameraView _driving;
+        CameraView _radio;
 
+        Transform _hoodForward;
+        Transform _nearChase;
+        Transform _farChase;
+        Transform _frontLeftWheel;
+        Transform _frontRightWheel;
+        Transform _rearLeftWheel;
+        Transform _rearRightWheel;
+        Transform _rideRear;
+        Transform _rideFront;
+
+		/// <summary>
+		/// Frequency with which to automatically change camera angle in live mode.
+		/// </summary>
         [Tooltip("Frequency with which to automatically change camera angle in live mode.")]
         [Range(1f, 600f)]
-        public float liveModeTransitionFreq;
+		[SerializeField]
+        float _liveModeTransitionFreq;
 
+		/// <summary>
+		/// Initial control mode.
+		/// </summary>
         [Tooltip("Initial control mode.")]
-        public CameraControlMode controlMode = CameraControlMode.Random;
+        CameraControlMode _controlMode = CameraControlMode.Random;
 
-        int targetAngle = -1;
+		/// <summary>
+		/// Camera lerp target angle.
+		/// </summary>
+        int _targetAngle = -1;
 
         // Mappings of keys to camera angle indices
-        static Dictionary<KeyCode, int> keyToView = new Dictionary<KeyCode, int>() {
-        { KeyCode.F1, 0 },
-        { KeyCode.F2, 1 },
-        { KeyCode.F3, 2 },
-        { KeyCode.F4, 3 },
-        { KeyCode.F5, 4 },
-        { KeyCode.F6, 5 },
-        { KeyCode.F7, 6 },
-        { KeyCode.F8, 7 },
-        { KeyCode.F9, 8 },
-        { KeyCode.F10, 9 }
-    };
+        static Dictionary<KeyCode, int> _KeyToView = new Dictionary<KeyCode, int>() {
+			{ KeyCode.F1, 0 },
+			{ KeyCode.F2, 1 },
+			{ KeyCode.F3, 2 },
+			{ KeyCode.F4, 3 },
+			{ KeyCode.F5, 4 },
+			{ KeyCode.F6, 5 },
+			{ KeyCode.F7, 6 },
+			{ KeyCode.F8, 7 },
+			{ KeyCode.F9, 8 },
+			{ KeyCode.F10, 9 }
+		};
 
         #endregion
         #region Unity Callbacks
@@ -128,189 +209,201 @@ namespace Route95.World {
         new void Awake() {
             base.Awake();
 
-            transitionTimer = liveModeTransitionFreq;
-            speed = DEFAULT_SPEED;
+			// Init vars
+            _transitionTimer = _liveModeTransitionFreq;
+            _speed = DEFAULT_SPEED;
 
             // Outside car
-            OutsideCar = new CameraView() {
+			_viewOutsideCar = GameObject.FindGameObjectWithTag("ViewOutsideCar").transform;
+            _outsideCar = new CameraView() {
                 name = "OutsideCar",
-                transform = ViewOutsideCar,
-                targetPos = ViewOutsideCar.position,
-                targetRot = ViewOutsideCar.rotation,
+                transform = _viewOutsideCar,
+                targetPos = _viewOutsideCar.position,
+                targetRot = _viewOutsideCar.rotation,
                 fov = DEFAULT_FOV,
                 followMode = CameraView.CameraFollowMode.Static
             };
 
             // Driving
-            Driving = new CameraView() {
+			_viewDriving = GameObject.FindGameObjectWithTag("ViewDriving").transform;
+            _driving = new CameraView() {
                 name = "Driving",
-                transform = ViewDriving,
-                targetPos = ViewDriving.position,
-                targetRot = ViewDriving.rotation,
+                transform = _viewDriving,
+                targetPos = _viewDriving.position,
+                targetRot = _viewDriving.rotation,
                 fov = DEFAULT_FOV,
                 followMode = CameraView.CameraFollowMode.Static
             };
 
             // Radio
-            Radio = new CameraView() {
+			_viewRadio = GameObject.FindGameObjectWithTag("ViewRadio").transform;
+            _radio = new CameraView() {
                 name = "Radio",
-                transform = ViewRadio,
-                targetPos = ViewRadio.position,
-                targetRot = ViewRadio.rotation,
+                transform = _viewRadio,
+                targetPos = _viewRadio.position,
+                targetRot = _viewRadio.rotation,
                 fov = 20f,
                 followMode = CameraView.CameraFollowMode.Static
             };
 
-            initialView = OutsideCar;
-            SnapToView(initialView);
+            _initialView = _outsideCar;
+            SnapToView(_initialView);
+
+			_hoodForward = GameObject.FindGameObjectWithTag("ViewHoodForward").transform;
+			_nearChase = GameObject.FindGameObjectWithTag("ViewNearChase").transform;
+			_farChase = GameObject.FindGameObjectWithTag("ViewFarChase").transform;
+			_frontRightWheel = GameObject.FindGameObjectWithTag("ViewFrontRightWheel").transform;
+			_frontLeftWheel = GameObject.FindGameObjectWithTag("ViewFrontLeftWheel").transform;
+			_rearRightWheel = GameObject.FindGameObjectWithTag("ViewRearRightWheel").transform;
+			_rearLeftWheel = GameObject.FindGameObjectWithTag("ViewRearLeftWheel").transform;
 
             // Init live mode angles
-            liveAngles = new List<CameraView>() {
+            _liveAngles = new List<CameraView>() {
 
-			// On the hood, forwards
-			new CameraView () {
-                name = "HoodForward",
-                transform = HoodForward,
-                targetPos = HoodForward.position,
-                targetRot = HoodForward.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static
-            },
+				// On the hood, forwards
+				new CameraView () {
+					name = "HoodForward",
+					transform = _hoodForward,
+					targetPos = _hoodForward.position,
+					targetRot = _hoodForward.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static
+				},
 
-			// Near chase
-			new CameraView () {
-                name = "NearChase",
-                transform = NearChase,
-                targetPos = NearChase.position,
-                targetRot = NearChase.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Lead,
-                placementMode = CameraView.CameraPlacementMode.Fixed,
-                lag = 0.04f
-            },
+				// Near chase
+				new CameraView () {
+					name = "NearChase",
+					transform = _nearChase,
+					targetPos = _nearChase.position,
+					targetRot = _nearChase.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Lead,
+					placementMode = CameraView.CameraPlacementMode.Fixed,
+					lag = 0.04f
+				},
 
-			// Far chase
-			new CameraView () {
-                name = "FarChase",
-                transform = FarChase,
-                targetPos = FarChase.position,
-                targetRot = FarChase.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Lead,
-                placementMode = CameraView.CameraPlacementMode.Fixed,
-                lag = 0.2f
-            },
+				// Far chase
+				new CameraView () {
+					name = "FarChase",
+					transform = _farChase,
+					targetPos = _farChase.position,
+					targetRot = _farChase.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Lead,
+					placementMode = CameraView.CameraPlacementMode.Fixed,
+					lag = 0.2f
+				},
 
-			// Front right wheel
-			new CameraView () {
-                name = "FrontRightWheel",
-                transform = FrontRightWheel,
-                targetPos = FrontRightWheel.position,
-                targetRot = FrontRightWheel.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static,
-                placementMode = CameraView.CameraPlacementMode.Fixed
-            },
+				// Front right wheel
+				new CameraView () {
+					name = "FrontRightWheel",
+					transform = _frontRightWheel,
+					targetPos = _frontRightWheel.position,
+					targetRot = _frontRightWheel.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static,
+					placementMode = CameraView.CameraPlacementMode.Fixed
+				},
 
-			// Front left wheel
-			new CameraView () {
-                name = "FrontLeftWheel",
-                transform = FrontLeftWheel,
-                targetPos = FrontLeftWheel.position,
-                targetRot = FrontLeftWheel.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static,
-                placementMode = CameraView.CameraPlacementMode.Fixed
-            },
+				// Front left wheel
+				new CameraView () {
+					name = "FrontLeftWheel",
+					transform = _frontLeftWheel,
+					targetPos = _frontLeftWheel.position,
+					targetRot = _frontLeftWheel.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static,
+					placementMode = CameraView.CameraPlacementMode.Fixed
+				},
 
-			// Rear right wheel
-			new CameraView () {
-                name = "RearRightWheel",
-                transform = RearRightWheel,
-                targetPos = RearRightWheel.position,
-                targetRot = RearRightWheel.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static,
-                placementMode = CameraView.CameraPlacementMode.Fixed
-            },
+				// Rear right wheel
+				new CameraView () {
+					name = "RearRightWheel",
+					transform = _rearRightWheel,
+					targetPos = _rearRightWheel.position,
+					targetRot = _rearRightWheel.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static,
+					placementMode = CameraView.CameraPlacementMode.Fixed
+				},
 
-			// Rear left wheel
-			new CameraView () {
-                name = "RearLeftWheel",
-                transform = RearLeftWheel,
-                targetPos = RearLeftWheel.position,
-                targetRot = RearLeftWheel.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static,
-                placementMode = CameraView.CameraPlacementMode.Fixed
-            },
+				// Rear left wheel
+				new CameraView () {
+					name = "RearLeftWheel",
+					transform = _rearLeftWheel,
+					targetPos = _rearLeftWheel.position,
+					targetRot = _rearLeftWheel.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static,
+					placementMode = CameraView.CameraPlacementMode.Fixed
+				},
 
-			// Rear left wheel
-			new CameraView () {
-                name = "RearLeftWheel",
-                transform = RearLeftWheel,
-                targetPos = RearLeftWheel.position,
-                targetRot = RearLeftWheel.rotation,
-                fov = DEFAULT_FOV,
-                followMode = CameraView.CameraFollowMode.Static,
-                placementMode = CameraView.CameraPlacementMode.Fixed
-            },
+				// Rear left wheel
+				new CameraView () {
+					name = "RearLeftWheel",
+					transform = _rearLeftWheel,
+					targetPos = _rearLeftWheel.position,
+					targetRot = _rearLeftWheel.rotation,
+					fov = DEFAULT_FOV,
+					followMode = CameraView.CameraFollowMode.Static,
+					placementMode = CameraView.CameraPlacementMode.Fixed
+				},
 
-			// Far top
-			new CameraView () {
-                name = "FarTop",
-                targetPos = PickRandomPosition (25f, 50f),
-                fov = 60f,
-                followMode = CameraView.CameraFollowMode.Shaky,
-                placementMode = CameraView.CameraPlacementMode.RandomSky
-            },
+				// Far top
+				new CameraView () {
+					name = "FarTop",
+					targetPos = PickRandomPosition (25f, 50f),
+					fov = 60f,
+					followMode = CameraView.CameraFollowMode.Shaky,
+					placementMode = CameraView.CameraPlacementMode.RandomSky
+				},
 
-			// Distant
-			new CameraView () {
-                name = "Distant",
-                targetPos = PickRandomPosition (10f, 20f),
-                fov = 60f,
-                followMode = CameraView.CameraFollowMode.Shaky,
-                placementMode = CameraView.CameraPlacementMode.RandomGround
-            }
-        };
+				// Distant
+				new CameraView () {
+					name = "Distant",
+					targetPos = PickRandomPosition (10f, 20f),
+					fov = 60f,
+					followMode = CameraView.CameraFollowMode.Shaky,
+					placementMode = CameraView.CameraPlacementMode.RandomGround
+				}
+			};
 
-            foreach (CameraView angle in liveAngles) {
+            foreach (CameraView angle in _liveAngles) {
                 angle.pos = angle.targetPos;
                 angle.rot = angle.targetRot;
             }
         }
 
         void Start() {
-            resetDistance = WorldManager.Instance.chunkLoadRadius *
+            _resetDistance = WorldManager.Instance.chunkLoadRadius *
                 0.5f * WorldManager.Instance.chunkSize;
-            currentAngle = OutsideCar;
+            _currentAngle = _outsideCar;
         }
 
         void Update() {
 
-            switch (state) {
+            switch (_state) {
                 case State.Setup:
-                    if (moving) {
+                    if (_moving) {
 
-                        if (progress < 1f) {
+                        if (_progress < 1f) {
 
-                            progress += speed * Time.deltaTime;
+                            _progress += _speed * Time.deltaTime;
 
                             // Lerp position
-                            transform.position = Vector3.Slerp(startTransform.position, targetView.transform.position, progress);
+                            transform.position = Vector3.Slerp(_startTransform.position, _targetView.transform.position, _progress);
 
                             // Lerp Rotation
-                            transform.rotation = Quaternion.Slerp(startTransform.rotation, targetView.transform.rotation, progress);
+                            transform.rotation = Quaternion.Slerp(_startTransform.rotation, _targetView.transform.rotation, _progress);
 
-                            Camera.main.fieldOfView = Mathf.Lerp(startFOV, targetView.fov, Mathf.Sqrt(progress));
+                            Camera.main.fieldOfView = Mathf.Lerp(_startFOV, _targetView.fov, Mathf.Sqrt(_progress));
 
                         }
                         else {
-                            moving = false;
-                            startTransform = targetView.transform;
-                            transform.position = startTransform.position;
-                            transform.rotation = startTransform.rotation;
+                            _moving = false;
+                            _startTransform = _targetView.transform;
+                            transform.position = _startTransform.position;
+                            transform.rotation = _startTransform.rotation;
                             OnCompleteLerp();
                         }
                     }
@@ -318,43 +411,43 @@ namespace Route95.World {
 
 
                 case State.Live:
-                    if (!paused) {
+                    if (!_paused) {
 
                         // Check each mapped key for input
-                        foreach (KeyCode key in keyToView.Keys) {
+                        foreach (KeyCode key in _KeyToView.Keys) {
                             if (Input.GetKeyDown(key) && CameraBlocker.Instance.GetComponent<Fadeable>().NotFading) {
-                                if (controlMode != CameraControlMode.Manual)
-                                    controlMode = CameraControlMode.Manual;
+                                if (_controlMode != CameraControlMode.Manual)
+                                    _controlMode = CameraControlMode.Manual;
                                 StartFade();
-                                targetAngle = keyToView[key];
+                                _targetAngle = _KeyToView[key];
                             }
                         }
 
                         UpdateAllAngles();
 
                         // Move camera to current angle position
-                        transform.position = currentAngle.pos;
-                        transform.rotation = currentAngle.rot;
+                        transform.position = _currentAngle.pos;
+                        transform.rotation = _currentAngle.rot;
 
                         // Update transition timer
-                        if (controlMode == CameraControlMode.Random) {
-                            if (transitionTimer <= 0f) {
-                                transitionTimer = liveModeTransitionFreq;
-                                targetAngle = -1;
+                        if (_controlMode == CameraControlMode.Random) {
+                            if (_transitionTimer <= 0f) {
+                                _transitionTimer = _liveModeTransitionFreq;
+                                _targetAngle = -1;
                                 StartFade();
                             }
-                            else transitionTimer--;
+                            else _transitionTimer--;
                         }
 
                         if (CameraBlocker.Instance.GetComponent<Fadeable>().DoneUnfading) {
                             UIManager.Instance.HideMenu(CameraBlocker.Instance);
-                            if (targetAngle == -1) ChangeAngle();
-                            else ChangeAngle(targetAngle);
+                            if (_targetAngle == -1) ChangeAngle();
+                            else ChangeAngle(_targetAngle);
                         }
 
                         // Check if camera is out of range
                         float distToPlayer = Vector3.Distance(transform.position, PlayerMovement.Instance.transform.position);
-                        if (distToPlayer > resetDistance && !CameraBlocker.Instance.GetComponent<Fadeable>().Busy)
+                        if (distToPlayer > _resetDistance && !CameraBlocker.Instance.GetComponent<Fadeable>().Busy)
                             StartFade();
                     }
                     break;
@@ -366,25 +459,25 @@ namespace Route95.World {
                     Vector3 old = transform.rotation.eulerAngles;
                     bool slow = Input.GetAxisRaw("Slow") != 0f;
                     old.z = 0f;
-                    old.x += -d.y * rotateSensitivity * (slow ? 0.05f : 1f);
-                    old.y += d.x * rotateSensitivity * (slow ? 0.05f : 1f);
+                    old.x += -d.y * _rotateSensitivity * (slow ? 0.05f : 1f);
+                    old.y += d.x * _rotateSensitivity * (slow ? 0.05f : 1f);
                     transform.rotation = Quaternion.Euler(old);
 
                     // Translate camera
-                    float forward = Input.GetAxisRaw("Forward") * moveSensitivity * (slow ? 0.05f : 1f);
-                    float up = Input.GetAxisRaw("Up") * moveSensitivity * (slow ? 0.05f : 1f);
-                    float right = Input.GetAxisRaw("Right") * moveSensitivity * (slow ? 0.05f : 1f);
+                    float forward = Input.GetAxisRaw("Forward") * _moveSensitivity * (slow ? 0.05f : 1f);
+                    float up = Input.GetAxisRaw("Up") * _moveSensitivity * (slow ? 0.05f : 1f);
+                    float right = Input.GetAxisRaw("Right") * _moveSensitivity * (slow ? 0.05f : 1f);
                     transform.Translate(new Vector3(right, up, forward));
 
                     break;
 
             }
 
-            if (doSway) {
+            if (_doSway) {
 
                 // Calculate sway
-                float bx = ((Mathf.PerlinNoise(0f, Time.time * swaySpeed) - 0.5f)) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
-                float by = ((Mathf.PerlinNoise(0f, (Time.time * swaySpeed) + 100f)) - 0.5f) * baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+                float bx = ((Mathf.PerlinNoise(0f, Time.time * _swaySpeed) - 0.5f)) * _baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
+                float by = ((Mathf.PerlinNoise(0f, (Time.time * _swaySpeed) + 100f)) - 0.5f) * _baseSway * Camera.main.fieldOfView / DEFAULT_FOV;
 
                 // Do sway
                 transform.Rotate(bx, by, 0f);
@@ -398,25 +491,25 @@ namespace Route95.World {
         /// Start camera live mode.
         /// </summary>
         public void StartLiveMode() {
-            if (state == State.Free) return;
-            state = State.Live;
+            if (_state == State.Free) return;
+            _state = State.Live;
             ChangeAngle();
-            paused = false;
+            _paused = false;
         }
 
         /// <summary>
         /// Pause camera live mode.
         /// </summary>
         public void StopLiveMode() {
-            state = State.Setup;
-            paused = true;
+            _state = State.Setup;
+            _paused = true;
         }
 
         /// <summary>
         /// Start camera free mode.
         /// </summary>
         public void StartFreeMode() {
-            state = State.Free;
+            _state = State.Free;
             transform.rotation = Quaternion.identity;
             Casette.Instance.MoveToBack();
             UIManager.Instance.HideAllMenus();
@@ -430,7 +523,7 @@ namespace Route95.World {
         /// Stop camera free mode.
         /// </summary>
         public void StopFreeMode() {
-            state = State.Setup;
+            _state = State.Setup;
         }
 
         public void StartFade() {
@@ -441,21 +534,21 @@ namespace Route95.World {
         /// Pause camera movement.
         /// </summary>
         public void Pause() {
-            paused = true;
+            _paused = true;
         }
 
         /// <summary>
         /// Unpause camera movement.
         /// </summary>
         public void Unpause() {
-            paused = false;
+            _paused = false;
         }
 
         /// <summary>
         /// Pick a random live camera angle.
         /// </summary>
         public void ChangeAngle() {
-            ChangeAngle(Random.Range(0, liveAngles.Count));
+            ChangeAngle(Random.Range(0, _liveAngles.Count));
         }
 
         /// <summary>
@@ -463,21 +556,21 @@ namespace Route95.World {
         /// </summary>
         /// <param name="camView"></param>
         public void ChangeAngle(int camView) {
-            currentAngle = liveAngles[camView];
-            GetComponent<Camera>().fieldOfView = currentAngle.fov;
+            _currentAngle = _liveAngles[camView];
+            GetComponent<Camera>().fieldOfView = _currentAngle.fov;
             //if (Debug.isDebugBuild) 
             //Debug.Log("CameraControl.ChangeAngle(): switch to view \"" + currentAngle.name +".\"");
 
-            switch (currentAngle.placementMode) {
+            switch (_currentAngle.placementMode) {
 
                 case CameraView.CameraPlacementMode.Fixed:
                     break;
 
                 case CameraView.CameraPlacementMode.RandomGround:
-                    currentAngle.targetPos = PickRandomPosition(10f, 20f);
+                    _currentAngle.targetPos = PickRandomPosition(10f, 20f);
                     break;
                 case CameraView.CameraPlacementMode.RandomSky:
-                    currentAngle.targetPos = PickRandomPosition(25f, 50f);
+                    _currentAngle.targetPos = PickRandomPosition(25f, 50f);
                     break;
             }
         }
@@ -486,7 +579,7 @@ namespace Route95.World {
         /// Warms all live mode camera angles.
         /// </summary>
         void UpdateAllAngles() {
-            foreach (CameraView angle in liveAngles) {
+            foreach (CameraView angle in _liveAngles) {
                 if (angle.transform != null) {
                     angle.targetPos = angle.transform.position;
                     angle.targetRot = angle.transform.rotation;
@@ -550,7 +643,7 @@ namespace Route95.World {
         /// </summary>
         /// <param name="newSpeed"></param>
         public void SetSpeed(float newSpeed) {
-            speed = newSpeed;
+            _speed = newSpeed;
         }
 
         /// <summary>
@@ -558,27 +651,27 @@ namespace Route95.World {
         /// </summary>
         /// <param name="newPosition"></param>
         public void SnapToView(CameraView newView) {
-            targetView = newView;
-            startTransform = newView.transform;
+            _targetView = newView;
+            _startTransform = newView.transform;
             transform.position = newView.transform.position;
             transform.rotation = newView.transform.rotation;
             Camera.main.fieldOfView = newView.fov;
         }
 
         public void LerpToView(CameraView newView, float newSpeed = DEFAULT_SPEED) {
-            if (targetView == newView) {
+            if (_targetView == newView) {
                 OnCompleteLerp();
                 return;
             }
 
-            CameraView oldView = targetView;
-            startFOV = oldView.fov;
-            startTransform = oldView.transform;
+            CameraView oldView = _targetView;
+            _startFOV = oldView.fov;
+            _startTransform = oldView.transform;
 
-            targetView = newView;
-            moving = true;
-            speed = newSpeed;
-            progress = 0f;
+            _targetView = newView;
+            _moving = true;
+            _speed = newSpeed;
+            _progress = 0f;
         }
 
         void OnCompleteLerp() {
