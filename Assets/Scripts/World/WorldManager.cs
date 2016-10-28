@@ -81,7 +81,8 @@ namespace Route95.World {
 
         [Tooltip("The radius around the player within which to draw chunks.")]
         [Range(4, 32)]
-        public int chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
+		[SerializeField]
+        int _chunkLoadRadius = DEFAULT_CHUNK_LOAD_RADIUS;
 
         [Tooltip("Mode to generate chunks.")]
         public ChunkGenerationMode chunkGenerationMode = ChunkGenerationMode.Circular;
@@ -339,15 +340,18 @@ namespace Route95.World {
 
         [Tooltip("Maximum number of chunk updates per cycle.")]
         [Range(1, 16)]
-        public int chunkUpdatesPerCycle = DEFAULT_CHUNK_UPDATES_PER_CYCLE;
+		[SerializeField]
+        int _chunkUpdatesPerCycle = DEFAULT_CHUNK_UPDATES_PER_CYCLE;
 
         [Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
-        public int freqArraySize = DEFAULT_FREQ_ARRAY_SIZE;
+		[SerializeField]
+        int _frequencySampleSize = DEFAULT_FREQ_ARRAY_SIZE;
 
         LineRenderer visualizer;                                // Frequency visualizer
 
         [Tooltip("FFT window to use when sampling music frequencies.")]
-        public FFTWindow freqFFTWindow;
+		[SerializeField]
+        FFTWindow _frequencyFFTWindow;
 
         [Tooltip("Maximum number of decorations to place per update cycle.")]
         [Range(10, 200)]
@@ -391,9 +395,9 @@ namespace Route95.World {
             visualization.enabled = false;
 
             //roadPlacementDistance = chunkSize * 2f;
-            roadCleanupRadius = chunkSize * (chunkLoadRadius);
-            roadPlacementDistance = chunkSize * 0.4f;
-            roadExtendRadius = chunkSize * (chunkLoadRadius / 2);
+            roadCleanupRadius = _chunkSize * (_chunkLoadRadius);
+            roadPlacementDistance = _chunkSize * 0.4f;
+            roadExtendRadius = _chunkSize * (_chunkLoadRadius / 2);
             road = CreateRoad();
 
             numDecorations = 0;
@@ -421,9 +425,9 @@ namespace Route95.World {
         }
 
         void Start() {
-            loadsToDo = chunkLoadRadius * chunkLoadRadius +
+            loadsToDo = _chunkLoadRadius * _chunkLoadRadius +
                 (doDecorate ? maxDecorations + decorationPaths.Count : 0) +
-                terrain.loadsToDo;
+                terrain.LoadOpsToDo;
         }
 
         // Update is called once per frame
@@ -458,10 +462,18 @@ namespace Route95.World {
 		#endregion
 		#region Properties
 
-		public float ChunkSize {
-			get { return _chunkSize; }
-			set { _chunkSize = value; }
+		public float ChunkSize { get { return _chunkSize; } }
+
+		public int ChunkLoadRadius {
+			get { return _chunkLoadRadius; }
+			set { _chunkLoadRadius = value; }
 		}
+
+		public int ChunkUpdatesPerCycle { get { return _chunkUpdatesPerCycle; } }
+
+		public FFTWindow FrequencyFFTWindow { get { return _frequencyFFTWindow; } }
+
+		public int FrequencySampleSize { get { return _frequencySampleSize; } }
 
 		#endregion
 		#region WorldManager Methods
@@ -619,7 +631,7 @@ namespace Route95.World {
 
             int numActive = 0;
             int maxActive = 0;
-            switch (deco.group) {
+            switch (deco.DecoGroup) {
                 case Decoration.Group.RoadSigns:
                     numActive = roadSignGroup.numActive;
                     maxActive = roadSignGroup.maxActive;
@@ -634,7 +646,7 @@ namespace Route95.World {
                     break;
             }
             if (numActive < maxActive) {
-                switch (deco.distribution) {
+                switch (deco.DistributionType) {
                     case Decoration.Distribution.Random:
                         Chunk chunk = terrain.RandomChunk();
                         if (chunk == null) return false;
@@ -727,26 +739,26 @@ namespace Route95.World {
 
             // Pick a random coordinate
             Vector2 coordinate = new Vector2(
-                chunk.x * chunkSize + UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f),
-                chunk.y * chunkSize + UnityEngine.Random.Range(-chunkSize / 2f, chunkSize / 2f)
+                chunk.X * _chunkSize + UnityEngine.Random.Range(-_chunkSize / 2f, _chunkSize / 2f),
+                chunk.Y * _chunkSize + UnityEngine.Random.Range(-_chunkSize / 2f, _chunkSize / 2f)
             );
 
             // Find nearest vertex
             IntVector2 nearestVertex = Chunk.ToNearestVMapCoords(coordinate.x, coordinate.y);
-            Vertex vert = terrain.vertexmap.VertexAt(nearestVertex);
+            Vertex vert = terrain.VertexMap.VertexAt(nearestVertex);
             if (vert == null) {
                 Debug.LogError("WorldManager.DecorateRandom(): picked nonexistent vertex at " + nearestVertex.ToString());
                 return false;
             }
 
             // Check if constrained
-            if (terrain.vertexmap.VertexAt(nearestVertex).noDecorations) {
+            if (terrain.VertexMap.VertexAt(nearestVertex).noDecorations) {
                 //Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
                 return false;
             }
 
             // Roll based on density
-            float density = decorationPrefab.GetComponent<Decoration>().density;
+            float density = decorationPrefab.GetComponent<Decoration>().Density;
             float spawnThreshold = density / terrain.NumActiveChunks * decorationDensity;
 
             // If roll succeeded
@@ -769,16 +781,16 @@ namespace Route95.World {
                 decoration.transform.position = new Vector3(coordinate.x, y, coordinate.y);
 
                 // Parent decoration to chunk (if not dynamic)
-                if (deco.dynamic) decoration.transform.parent = terrain.transform;
+                if (deco.Dynamic) decoration.transform.parent = terrain.transform;
                 else {
                     decoration.transform.parent = chunk.gameObject.transform;
-                    chunk.decorations.Add(decoration);
+                    chunk.AddDecoration(decoration);
                 }
 
                 // Register decoration
                 numDecorations++;
-                terrain.vertexmap.RegisterDecoration(nearestVertex, decoration);
-                switch (deco.group) {
+                terrain.VertexMap.RegisterDecoration(nearestVertex, decoration);
+                switch (deco.DecoGroup) {
                     case Decoration.Group.Rocks:
                         rockGroup.numActive++;
                         break;
@@ -813,8 +825,8 @@ namespace Route95.World {
                 roadWidth * UnityEngine.Random.Range(1.5f, 1.6f) * (side == 0 ? 1 : -1);
 
             // Find nearest chunk
-            int chunkX = Mathf.RoundToInt((coordinate.x - chunkSize / 2f) / chunkSize);
-            int chunkY = Mathf.RoundToInt((coordinate.z - chunkSize / 2f) / chunkSize);
+            int chunkX = Mathf.RoundToInt((coordinate.x - _chunkSize / 2f) / _chunkSize);
+            int chunkY = Mathf.RoundToInt((coordinate.z - _chunkSize / 2f) / _chunkSize);
             Chunk chunk = terrain.ChunkAt(chunkX, chunkY);
 
             if (chunk == null) return false;
@@ -842,11 +854,11 @@ namespace Route95.World {
 
             // Parent to nearest chunk
             decoration.transform.parent = chunk.gameObject.transform;
-            chunk.decorations.Add(decoration);
+            chunk.AddDecoration(decoration);
 
             // Register
             numDecorations++;
-            if (deco.group == Decoration.Group.RoadSigns) roadSignGroup.numActive++;
+            if (deco.DecoGroup == Decoration.Group.RoadSigns) roadSignGroup.numActive++;
 
             return true;
         }
@@ -871,7 +883,7 @@ namespace Route95.World {
 
 
             // Deregister
-            switch (d.group) {
+            switch (d.DecoGroup) {
                 case Decoration.Group.RoadSigns:
                     roadSignGroup.numActive--;
                     break;
@@ -985,8 +997,8 @@ namespace Route95.World {
                 vertexUpdateDistance + offset;
 
             IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
-            Vertex v = terrain.vertexmap.VertexAt(coords);
-            if (v == null) v = terrain.vertexmap.AddVertex(coords);
+            Vertex v = terrain.VertexMap.VertexAt(coords);
+            if (v == null) v = terrain.VertexMap.AddVertex(coords);
             if (!v.locked && !v.nearRoad) v.SmoothHeight(v.height + heightScale / 32f, 0.95f);
 
             //Debug.Log(v.ToString());
@@ -1036,7 +1048,7 @@ namespace Route95.World {
     }
 
     public void PrintVertexMap() {
-        VertexMap vmap = terrain.vertexmap;
+        VertexMap vmap = terrain.VertexMap;
         string log = "";
         for (int i = vmap.xMin; i <= vmap.xMax; i++) {
             for (int j = vmap.yMin; j <= vmap.yMax; j++) {

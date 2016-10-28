@@ -311,10 +311,10 @@ namespace Route95.Core {
             // Show main menu
             UIManager.Instance.ShowMenu(MainMenu.Instance);
 
-            CameraControl.Instance.SnapToView(CameraControl.Instance.OutsideCar);
-
             // Begin 3D rendering again
             StartRendering();
+
+			onFinishLoading.Invoke();
         }
 
         #endregion

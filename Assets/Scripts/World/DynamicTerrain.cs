@@ -1,22 +1,22 @@
+// DynamicTerrain.cs
+// ©2016 Team 95
+
 using Route95.Core;
 using Route95.Music;
 using Route95.UI;
-using UnityEngine;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
 
 namespace Route95.World {
 
     /// <summary>
     /// Class to manage chunks. 
     /// </summary>
-    public class DynamicTerrain : MonoBehaviour {
+    public class DynamicTerrain : SingletonMonoBehaviour<DynamicTerrain> {
 
         #region DynamicTerrain Enums
 
@@ -30,92 +30,144 @@ namespace Route95.World {
         #endregion
         #region DynamicTerrain Vars
 
-        bool loaded = false;                 // is the terrain loaded?
-        bool randomized = false;             // Has the terrain been randomized?
-        public int loadsToDo;
+		/// <summary>
+		/// Is the terrain loaded?
+		/// </summary>
+        bool _loaded = false;
 
-        ObjectPool<Chunk> chunkPool;         // pool of chunk GameObjects
-        List<Chunk> chunksToUpdate;          // list of chunks to be updated
-        int chunkUpdatesPerCycle;            // number of chunks to update each cycle (copied from WM)
+		/// <summary>
+		/// Has the terrain been randomized?
+		/// </summary>
+        bool _randomized = false;
 
-        List<Chunk> activeChunks;            // list of active chunks
-        List<Chunk> activeCloseToRoadChunks; // list of active chunks that are within one chunk width of the road
-        List<Chunk> activeRoadChunks;        // list of active chunks with road on them
-        List<Chunk> deletions;               // list of chunks that will be deleted
+		/// <summary>
+		/// Number of load operations to perform.
+		/// </summary>
+        int _loadOpsToDo;
 
-        public VertexMap vertexmap;          // map of vertices
-        Map<Chunk> chunkmap;                 // map of chunks
+		/// <summary>
+		/// Pool of chunk GameObjects.
+		/// </summary>
+        ObjectPool<Chunk> _chunkPool;
 
-        float chunkSize;                     // size of chunks in world units (copied from WM)
-        int chunkRes;                        // resolution of chunks (copied from WM)
-        int chunkLoadRadius;                 // radius around player to load chunks, in number of chunks (copied from WM)
+		/// <summary>
+		/// _list of chunks to be updated
+		/// </summary>
+        List<Chunk> _chunksToUpdate;
 
-        Vector3 playerPos;                   // world position of player avatar (copied from PlayerMovement)
-        IntVector2 playerChunkPos;           // 2D position of player avatar in terms of chunk
+		/// <summary>
+		/// List of active chunks.
+		/// </summary>
+        List<Chunk> _activeChunks;
+
+		/// <summary>
+		/// List of active chunks that are within one chunk width of the road.
+		/// </summary>
+        List<Chunk> _activeCloseToRoadChunks;
+
+		/// <summary>
+		/// List of active chunks with road on them.
+		/// </summary>
+        List<Chunk> _activeRoadChunks;
+
+		/// <summary>
+		/// List of chunks that will be deleted.
+		/// </summary>
+        List<Chunk> _deletions;
+
+		/// <summary>
+		/// Map of vertices.
+		/// </summary>
+        VertexMap _vertexMap;
+
+		/// <summary>
+		/// Map of chunks.
+		/// </summary>
+        Map<Chunk> _chunkMap;
+
+		/// <summary>
+		/// 2D position of player avatar in terms of chunk.
+		/// </summary>
+        IntVector2 _playerChunkPos;
 
         #endregion
         #region Frequency Sampling Vars
 
-        public LinInt freqData;              // pointer to stored music frequency data
-        int freqSampleSize;                  // sample size to use when reading frequency data (copied from WM)
-        float[] data;                        // raw frequency data
-        FFTWindow fftWindow;                 // FFT window to use when reading frequency data (copied from WM)
-        AudioSource[] sources;
-        int numSources;
+		/// <summary>
+		/// Pointer to stored music frequency data.
+		/// </summary>
+        LinInt _freqData;
+
+		/// <summary>
+		/// Raw frequency data.
+		/// </summary>
+        float[] _data;
+
+		/// <summary>
+		/// AudioSources from which to collect frequency data.
+		/// </summary>
+        AudioSource[] _sources;
+
+		/// <summary>
+		/// Number of AudioSources from which to collect frequency data.
+		/// </summary>
+        int _numSources;
 
         #endregion
         #region Unity Callbacks
 
-        void Awake() {
+        new void Awake() {
+			base.Awake();
 
-            // Copy vars from WM
-            chunkUpdatesPerCycle = WorldManager.Instance.chunkUpdatesPerCycle;
-            chunkSize = WorldManager.Instance.chunkSize;
-            chunkRes = WorldManager.Instance.ChunkResolution;
-            chunkLoadRadius = WorldManager.Instance.chunkLoadRadius;
+			int chunkLoadRadius = WorldManager.Instance.ChunkLoadRadius;
+			int chunkRes = WorldManager.Instance.ChunkResolution;
 
+			// Init verts
             int verts = 2 * chunkLoadRadius * (chunkRes - 1);
-            loadsToDo = verts * verts;
+            _loadOpsToDo = verts * verts;
 
             // Init chunk pool
-            chunkPool = new ObjectPool<Chunk>();
+            _chunkPool = new ObjectPool<Chunk>();
 
             // Init chunk lists
-            chunksToUpdate = new List<Chunk>();
-            activeChunks = new List<Chunk>();
-            activeRoadChunks = new List<Chunk>();
-            activeCloseToRoadChunks = new List<Chunk>();
-            deletions = new List<Chunk>();
+            _chunksToUpdate = new List<Chunk>();
+            _activeChunks = new List<Chunk>();
+            _activeRoadChunks = new List<Chunk>();
+            _activeCloseToRoadChunks = new List<Chunk>();
+            _deletions = new List<Chunk>();
 
             // Init vertex map
-            vertexmap = new VertexMap();
-            vertexmap.terrain = this;
+            _vertexMap = new VertexMap();
 
             // Init chunk map
-            chunkmap = new Map<Chunk>(chunkLoadRadius * 2);
+            _chunkMap = new Map<Chunk>(chunkLoadRadius * 2);
 
             // Init player chunk position
-            playerChunkPos = new IntVector2(0, 0);
+            _playerChunkPos = new IntVector2(0, 0);
 
             // Init frequency data vars
-            freqSampleSize = WorldManager.Instance.freqArraySize;
-            data = new float[freqSampleSize];
-            fftWindow = WorldManager.Instance.freqFFTWindow;
+            int freqSampleSize = WorldManager.Instance.freqArraySize;
+            _data = new float[freqSampleSize];
         }
 
-        #endregion
-        #region DynamicTerrain Load Callbacks
+		#endregion
+		#region Properties
 
-        /// <summary>
-        /// Starts the chunk update coroutine.
-        /// </summary>
-        public void DoLoadChunks() {
+		public int LoadOpsToDo { get { return _loadOpsToDo; } }
+
+		public VertexMap VertexMap { get { return _vertexMap; } }
+
+		public LinInt FreqData { get { return _freqData; } }
+
+		#endregion
+		#region DynamicTerrain Methods
+
+		/// <summary>
+		/// Starts the chunk update coroutine.
+		/// </summary>
+		public void DoLoadChunks() {
             WorldManager.Instance.StartCoroutine(UpdateChunks());
         }
-
-
-        #endregion
-        #region DynamicTerrain Callbacks
 
         /// <summary>
         /// Adds a new chunk at the specified coordinates,
@@ -130,7 +182,7 @@ namespace Route95.World {
             Chunk c;
 
             // If no chunks available to reuse
-            if (chunkPool.Empty) {
+            if (_chunkPool.Empty) {
 
                 // Create new chunk
                 chunk = new GameObject("",
@@ -146,12 +198,11 @@ namespace Route95.World {
                 // Initialize chunk
                 c.Initialize(x, y);
 
-                // If a chunk is available to reuse
-            }
-            else {
+            // If a chunk is available to reuse
+            } else {
 
                 // Take a chunk from the pool
-                chunk = chunkPool.Get().gameObject;
+                chunk = _chunkPool.Get().gameObject;
 
                 c = chunk.GetComponent<Chunk>();
 
@@ -163,7 +214,7 @@ namespace Route95.World {
             chunk.transform.parent = transform;
 
             // Register chunk as active
-            activeChunks.Add(c);
+            _activeChunks.Add(c);
 
             return chunk;
         }
@@ -183,40 +234,43 @@ namespace Route95.World {
         };
 
             // Change loading screen message
-            if (!loaded) LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
+            if (!_loaded) LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
+
+			float chunkSize = WorldManager.Instance.ChunkSize;
+			int chunkLoadRadius = WorldManager.Instance.ChunkLoadRadius;
 
             // Main loop
             while (true) {
 
                 // If updating terrain
-                if (loaded) {
+                if (_loaded) {
                     DeleteChunks();
                     UpdateFreqData();
                 }
 
                 // Update player world and chunk positions
-                playerPos = PlayerMovement.Instance.transform.position;
-                playerChunkPos = new IntVector2(
+                Vector3 playerPos = PlayerMovement.Instance.transform.position;
+                _playerChunkPos = new IntVector2(
                     (int)Mathf.RoundToInt((playerPos.x - chunkSize / 2f) / chunkSize),
                     (int)Mathf.RoundToInt((playerPos.z - chunkSize / 2f) / chunkSize)
                 );
 
                 // For each space where there should be a chunk
-                for (int x = playerChunkPos.x - chunkLoadRadius; x <= playerChunkPos.x + chunkLoadRadius; x++) {
-                    for (int y = playerChunkPos.y - chunkLoadRadius; y <= playerChunkPos.y + chunkLoadRadius; y++) {
+                for (int x = _playerChunkPos.x - chunkLoadRadius; x <= _playerChunkPos.x + chunkLoadRadius; x++) {
+                    for (int y = _playerChunkPos.y - chunkLoadRadius; y <= _playerChunkPos.y + chunkLoadRadius; y++) {
 
                         // Skip if chunk exists
-                        if (chunkmap.At(x, y) != null) continue;
+                        if (_chunkMap.At(x, y) != null) continue;
 
                         // Skip if chunk too far (circular generation)
                         if (WorldManager.Instance.chunkGenerationMode == WorldManager.ChunkGenerationMode.Circular)
-                            if (IntVector2.Distance(new IntVector2(x, y), playerChunkPos) > (float)chunkLoadRadius)
+                            if (IntVector2.Distance(new IntVector2(x, y), _playerChunkPos) > (float)chunkLoadRadius)
                                 continue;
 
                         // Create chunk
-                        chunkmap.Set(x, y, CreateChunk(x, y).GetComponent<Chunk>());
+                        _chunkMap.Set(x, y, CreateChunk(x, y).GetComponent<Chunk>());
 
-                        if (!loaded) {
+                        if (!_loaded) {
                             GameManager.Instance.ReportLoaded(1);
                             startTime = Time.realtimeSinceStartup;
                         }
@@ -232,49 +286,50 @@ namespace Route95.World {
                 }
 
                 // If finished loading terrain
-                if (!loaded) {
-                    loaded = true;
+                if (!_loaded) {
+                    _loaded = true;
 
                     // Update all colliders
-                    foreach (Chunk chunk in activeChunks) chunk.UpdateCollider();
+                    foreach (Chunk chunk in _activeChunks) chunk.UpdateCollider();
 
                     // Deform initial terrain
-                    int res = vertexmap.vertices.Width;
+                    int res = _vertexMap.vertices.Width;
                     StartCoroutine(CreateMountain(0, 0, res, res, 5f, 20f, -0.03f, 0.03f));
 
                     // If updating terrain
                 }
-                else if (randomized) {
+                else if (_randomized) {
 
                     // Reset list of chunks to update
-                    chunksToUpdate.Clear();
+                    _chunksToUpdate.Clear();
                     int listCount = 0;
 
                     // For each active chunk
-                    foreach (Chunk chunk in activeChunks) {
+                    foreach (Chunk chunk in _activeChunks) {
 
                         // Increase priority
-                        chunk.priority++;
+                        chunk.Priority++;
 
                         // Insert chunk into list based on priority
                         if (listCount == 0) {
-                            chunksToUpdate.Add(chunk);
+                            _chunksToUpdate.Add(chunk);
                             listCount++;
                         }
                         else for (int i = 0; i < listCount; i++)
-                                if (chunk.priority > chunksToUpdate[i].priority) {
-                                    chunksToUpdate.Insert(i, chunk);
+                                if (chunk.Priority > _chunksToUpdate[i].Priority) {
+                                    _chunksToUpdate.Insert(i, chunk);
                                     listCount++;
                                     break;
                                 }
                     }
 
-                    // Update highest priority chunks
-                    for (int i = 0; i < chunkUpdatesPerCycle && i < activeChunks.Count && i < listCount; i++) {
-                        chunksToUpdate[i].ChunkUpdate();
-                        chunksToUpdate[i].priority = 0;
-                    }
+					int chunkUpdatesPerCycle = WorldManager.Instance.ChunkUpdatesPerCycle;
 
+                    // Update highest priority chunks
+                    for (int i = 0; i < chunkUpdatesPerCycle && i < _activeChunks.Count && i < listCount; i++) {
+                        _chunksToUpdate[i].ChunkUpdate();
+                        _chunksToUpdate[i].Priority = 0;
+                    }
 
                     // Take a break if target frame rate missed
                     if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
@@ -292,27 +347,29 @@ namespace Route95.World {
         /// </summary>
         void DeleteChunks() {
 
+			int chunkLoadRadius = WorldManager.Instance.ChunkLoadRadius;
+
             // Init list of chunks to delete
-            deletions.Clear();
+            _deletions.Clear();
 
             // Check if each active chunk is within chunk load radius
-            foreach (Chunk chunk in activeChunks) {
+            foreach (Chunk chunk in _activeChunks) {
                 switch (WorldManager.Instance.chunkGenerationMode) {
                     case WorldManager.ChunkGenerationMode.Circular:
-                        if (IntVector2.Distance(new IntVector2(chunk.x, chunk.y), playerChunkPos) > chunkLoadRadius)
-                            deletions.Add(chunk);
+                        if (IntVector2.Distance(new IntVector2(chunk.X, chunk.Y), _playerChunkPos) > chunkLoadRadius)
+                            _deletions.Add(chunk);
                         break;
 
                     case WorldManager.ChunkGenerationMode.Square:
-                        if (chunk.x < playerChunkPos.x - chunkLoadRadius || chunk.x > playerChunkPos.x + chunkLoadRadius ||
-                            chunk.y < playerChunkPos.y - chunkLoadRadius || chunk.y > playerChunkPos.y + chunkLoadRadius)
-                            deletions.Add(chunk);
+                        if (chunk.X < _playerChunkPos.x - chunkLoadRadius || chunk.X > _playerChunkPos.x + chunkLoadRadius ||
+                            chunk.Y < _playerChunkPos.y - chunkLoadRadius || chunk.Y > _playerChunkPos.y + chunkLoadRadius)
+                            _deletions.Add(chunk);
                         break;
                 }
             }
 
             // Delete all marked chunks
-            foreach (Chunk chunk in deletions) DeleteChunk(chunk);
+            foreach (Chunk chunk in _deletions) DeleteChunk(chunk);
         }
 
         /// <summary>
@@ -331,44 +388,38 @@ namespace Route95.World {
             // Deregister from lists/map
             DeregisterChunk(chunk);
 
-            chunksToUpdate.Remove(chunk);
+            _chunksToUpdate.Remove(chunk);
 
             // Pool chunk
-            chunkPool.Add(chunk);
-
-
+            _chunkPool.Add(chunk);
         }
 
         /// <summary>
         /// Chunks at x and y.
         /// </summary>
-        /// <returns>The <see cref="Chunk"/>.</returns>
-        /// <param name="x">The x coordinate.</param>
-        /// <param name="y">The y coordinate.</param>
         public Chunk ChunkAt(int x, int y) {
-            return chunkmap.At(x, y);
+            return _chunkMap.At(x, y);
         }
 
         /// <summary>
         /// Removes a chunk from the appropriate lists.
         /// </summary>
-        /// <param name="chunk">Chunk.</param>
         public void DeregisterChunk(Chunk chunk) {
 
             // Remove chunk from active list
-            activeChunks.Remove(chunk);
+            _activeChunks.Remove(chunk);
 
             // Remove chunk from road and close to road lists
-            if (chunk.nearRoad) {
-                activeCloseToRoadChunks.Remove(chunk);
-                if (chunk.hasRoad) activeRoadChunks.Remove(chunk);
+            if (chunk.NearRoad) {
+                _activeCloseToRoadChunks.Remove(chunk);
+                if (chunk.HasRoad) _activeRoadChunks.Remove(chunk);
             }
 
             // Deparent chunk
             chunk.transform.parent = null;
 
             // Remove entry from chunkmap
-            chunkmap.Set(chunk.x, chunk.y, null);
+            _chunkMap.Set(chunk.X, chunk.Y, null);
         }
 
         /// <summary>
@@ -377,8 +428,8 @@ namespace Route95.World {
         public void OnExtendRoad() {
 
             // Mark any chunk that is not near a road to be checked for road
-            foreach (Chunk chunk in activeChunks) {
-                if (!chunk.nearRoad) chunk.hasCheckedForRoad = false;
+            foreach (Chunk chunk in _activeChunks) {
+                if (!chunk.NearRoad) chunk.HasCheckedForRoad = false;
             }
         }
 
@@ -386,33 +437,36 @@ namespace Route95.World {
         /// Reads the frequency data put out from instruments.
         /// </summary>
         void UpdateFreqData() {
-            if (sources == null) {
-                sources = MusicManager.Instance.GetAllAudioSources();
-                numSources = sources.Length;
+            if (_sources == null) {
+                _sources = MusicManager.Instance.GetAllAudioSources();
+                _numSources = _sources.Length;
             }
 
+			FFTWindow fftWindow = WorldManager.Instance.FrequencyFFTWindow;
+			int freqSampleSize = WorldManager.Instance.FrequencySampleSize;
+
             // For each instrument audio source
-            for (int s = 0; s < numSources; s++) {
+            for (int s = 0; s < _numSources; s++) {
 
                 // Skip if disabled
-                if (!sources[s].enabled) continue;
+                if (!_sources[s].enabled) continue;
 
                 // Sample audio source
                 float[] sample = new float[freqSampleSize];
-                sources[s].GetSpectrumData(sample, 0, fftWindow);
+                _sources[s].GetSpectrumData(sample, 0, fftWindow);
 
                 // Add audio source data into final array
                 for (int i = 0; i < freqSampleSize; i++) {
                     if (sample[i] != float.NaN && sample[i] != 0f) {
-                        if (s == 0) data[i] = sample[i];
-                        else data[i] += sample[i];
+                        if (s == 0) _data[i] = sample[i];
+                        else _data[i] += sample[i];
                     }
                 }
             }
 
             // Convert audio data into LinInt
-            if (freqData == null && GameManager.Instance.IsLoaded) freqData = new LinInt();
-            if (GameManager.Instance.IsLoaded) freqData.Update(data);
+            if (_freqData == null && GameManager.Instance.IsLoaded) _freqData = new LinInt();
+            if (GameManager.Instance.IsLoaded) _freqData.Update(_data);
         }
 
         /// <summary>
@@ -422,11 +476,11 @@ namespace Route95.World {
         public Chunk RandomChunk() {
 
             // Check if no active chunks
-            if (activeChunks.Count == 0)
+            if (_activeChunks.Count == 0)
                 return null;
 
             // Pick a random active chunk
-            Chunk chunk = activeChunks[UnityEngine.Random.Range(0, activeChunks.Count)];
+            Chunk chunk = _activeChunks[UnityEngine.Random.Range(0, _activeChunks.Count)];
 
             // Check if chunk is null
             if (chunk == null) {
@@ -439,7 +493,7 @@ namespace Route95.World {
 
         public int NumActiveChunks {
             get {
-                return activeChunks.Count;
+                return _activeChunks.Count;
             }
         }
 
@@ -448,7 +502,7 @@ namespace Route95.World {
         /// </summary>
         /// <param name="chunk">Chunk.</param>
         public void AddRoadChunk(Chunk chunk) {
-            activeRoadChunks.Add(chunk);
+            _activeRoadChunks.Add(chunk);
         }
 
         /// <summary>
@@ -458,11 +512,11 @@ namespace Route95.World {
         public Chunk RandomRoadChunk() {
 
             // Check if no active chunks with road
-            if (activeRoadChunks.Count == 0)
+            if (_activeRoadChunks.Count == 0)
                 return null;
 
             // Pick a random road chunk
-            Chunk chunk = activeRoadChunks[UnityEngine.Random.Range(0, activeRoadChunks.Count)];
+            Chunk chunk = _activeRoadChunks[UnityEngine.Random.Range(0, _activeRoadChunks.Count)];
 
             // Check if chunk is null
             if (chunk == null) {
@@ -478,7 +532,7 @@ namespace Route95.World {
         /// </summary>
         /// <param name="chunk">Chunk.</param>
         public void AddCloseToRoadChunk(Chunk chunk) {
-            activeCloseToRoadChunks.Add(chunk);
+            _activeCloseToRoadChunks.Add(chunk);
         }
 
         /// <summary>
@@ -488,11 +542,11 @@ namespace Route95.World {
         public Chunk RandomCloseToRoadChunk() {
 
             // Check if no active chunks near a road
-            if (activeCloseToRoadChunks.Count == 0)
+            if (_activeCloseToRoadChunks.Count == 0)
                 return null;
 
             // Pick a random chunk near the road.
-            Chunk chunk = activeCloseToRoadChunks[UnityEngine.Random.Range(0, activeCloseToRoadChunks.Count)];
+            Chunk chunk = _activeCloseToRoadChunks[UnityEngine.Random.Range(0, _activeCloseToRoadChunks.Count)];
 
             // Check if chunk is null
             if (chunk == null) {
@@ -530,7 +584,7 @@ namespace Route95.World {
 
             while (true) {
 
-                if (!randomized && !randomizing) {
+                if (!_randomized && !randomizing) {
 
                     //ensure width and depth are odd
                     if (width % 2 == 0)
@@ -543,12 +597,12 @@ namespace Route95.World {
                                                //Debug.Log("Size is: " + size);
                     if (size < 2) yield break;
                     heightmap = new float[size + 1, size + 1];
-                    float[] corners = InitializeCorners(vertexmap, x, y, width, depth);
+                    float[] corners = InitializeCorners(_vertexMap, x, y, width, depth);
                     FillDiamondSquare(heightmap, corners, height, rough, rangeMin, rangeMax);
                     randomizing = true;
 
                 }
-                else if (randomized) {
+                else if (_randomized) {
 
                     //set vertices
                     int minX = x - width / 2;
@@ -562,7 +616,7 @@ namespace Route95.World {
                         int xCeil = Mathf.FloorToInt(normalizedX * (float)mapMax);
                         float xT = normalizedX % 1f;
                         for (int j = minY; j <= maxY; j++) {
-                            if (vertexmap.ContainsVertex(i, j)) {
+                            if (_vertexMap.ContainsVertex(i, j)) {
                                 float normalizedY = (float)(j - minY) / (float)(maxY - minY);
                                 int yFloor = Mathf.FloorToInt(normalizedY * (float)mapMax);
                                 int yCeil = Mathf.FloorToInt(normalizedY * (float)mapMax);
@@ -572,8 +626,8 @@ namespace Route95.World {
                                 float p01 = GetFromHMap(heightmap, xFloor, yCeil);
                                 float p11 = GetFromHMap(heightmap, xCeil, yCeil);
                                 float interpH = ((1 - xT) * (1 - yT)) * p00 + ((xT) * (1 - yT)) * p10 + ((1 - xT) * (yT)) * p01 + ((xT) * (yT)) * p11;
-                                if (!vertexmap.IsConstrained(i, j) && !vertexmap.IsLocked(i, j)) {
-                                    vertexmap.SetHeight(i, j, interpH);
+                                if (!_vertexMap.IsConstrained(i, j) && !_vertexMap.IsLocked(i, j)) {
+                                    _vertexMap.SetHeight(i, j, interpH);
                                     GameManager.Instance.ReportLoaded(1);
                                 }
                             }
@@ -721,7 +775,7 @@ namespace Route95.World {
                 float scale = size * rough;
                 if (half < 1) {//past the minimum size
                                //Debug.Log("break");
-                    randomized = true;
+                    _randomized = true;
                     yield break;
                 }
 
@@ -806,7 +860,7 @@ namespace Route95.World {
         public void SetDebugColors(DebugColors colors) {
             switch (colors) {
                 case DebugColors.Constrained:
-                    foreach (Chunk chunk in activeChunks) {
+                    foreach (Chunk chunk in _activeChunks) {
                         chunk.GetComponent<MeshRenderer>().material = WorldManager.Instance.terrainDebugMaterial;
                         chunk.SetDebugColors(colors);
                     }

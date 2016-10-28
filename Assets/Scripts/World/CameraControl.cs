@@ -378,6 +378,10 @@ namespace Route95.World {
             _resetDistance = WorldManager.Instance.chunkLoadRadius *
                 0.5f * WorldManager.Instance.chunkSize;
             _currentAngle = _outsideCar;
+
+			UIManager.Instance.onSwitchMenus.AddListener(()=> {
+				_doSway = 
+			});
         }
 
         void Update() {
@@ -484,13 +488,18 @@ namespace Route95.World {
             }
         }
 
-        #endregion
-        #region CameraControl Live Mode Methods
+		#endregion
+		#region Properties
 
-        /// <summary>
-        /// Start camera live mode.
-        /// </summary>
-        public void StartLiveMode() {
+		public State CurrentState { get { return _state; } }
+
+		#endregion
+		#region CameraControl Live Mode Methods
+
+		/// <summary>
+		/// Start camera live mode.
+		/// </summary>
+		public void StartLiveMode() {
             if (_state == State.Free) return;
             _state = State.Live;
             ChangeAngle();

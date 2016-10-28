@@ -151,7 +151,23 @@ namespace Route95.World {
 		#endregion
 		#region Properties
 
-		public float Priority { get { return _priority; } }
+		public int X { get { return _x; } }
+
+		public int Y { get { return _y; } }
+
+		public float Priority {
+			get { return _priority; }
+			set { _priority = value; }
+		}
+
+		public bool HasRoad { get { return _hasRoad; } }
+
+		public bool NearRoad { get { return _nearRoad; } }
+
+		public bool HasCheckedForRoad {
+			get { return _hasCheckedForRoad; }
+			set { _hasCheckedForRoad = value; }
+		}
 
 		#endregion
 		#region Chunk Methods
@@ -167,7 +183,7 @@ namespace Route95.World {
             _x = x;
             _y = y;
 
-            VertexMap vmap = terrain.vertexmap;
+            VertexMap vmap = terrain.VertexMap;
             int chunkRes = WorldManager.Instance.ChunkResolution;
             float chunkSize = WorldManager.Instance.ChunkSize;
 
@@ -270,7 +286,7 @@ namespace Route95.World {
         /// </summary>
         public void Reuse(int x, int y) {
             DynamicTerrain terrain = WorldManager.Instance.terrain;
-			VertexMap vmap = terrain.vertexmap;
+			VertexMap vmap = terrain.VertexMap;
 			float chunkSize = WorldManager.Instance.ChunkSize;
 
             // Update vars
@@ -517,7 +533,7 @@ namespace Route95.World {
             Vector3 playerPos = PlayerMovement.Instance.transform.position;
             Vector3 chunkPos = transform.position;
 			DynamicTerrain terrain = WorldManager.Instance.terrain;
-			VertexMap vmap = terrain.vertexmap;
+			VertexMap vmap = terrain.VertexMap;
 
             int v = 0;
             for (; v < _numVerts; v++) {
@@ -531,7 +547,7 @@ namespace Route95.World {
                 // Update vertex height
                 UpdateVertex(v, vert.height);
 
-                if (terrain.freqData == null) yield break;
+                if (terrain.FreqData == null) yield break;
 
                 // If vertex is not locked and there is frequency data to use
                 if (!vert.locked) {
@@ -547,7 +563,7 @@ namespace Route95.World {
                         Vector3 angleVector = vertPos - playerPos;
                         float angle = Vector3.Angle(Vector3.right, angleVector);
                         float linIntInput = angle / 360f;
-                        float newY = terrain.freqData.GetDataPoint(linIntInput) *
+                        float newY = terrain.FreqData.GetDataPoint(linIntInput) *
                                       WorldManager.Instance.heightScale;
 
                         // If new height, set it
@@ -690,7 +706,7 @@ namespace Route95.World {
                 Vector3 rayOrigin = new Vector3(tr.position.x, WorldManager.Instance.heightScale, tr.position.z);
                 if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))
                     tr.position = new Vector3(tr.position.x, hit.point.y +
-                        tr.gameObject.GetComponent<Decoration>().positionOffset.y, tr.position.z);
+                        tr.gameObject.GetComponent<Decoration>().PositionOffset.y, tr.position.z);
             }
         }
 
@@ -716,6 +732,10 @@ namespace Route95.World {
                     break;
             }
         }
+
+		public void AddDecoration (GameObject deco) {
+			_decorations.Add(deco);
+		}
 
         #endregion
 

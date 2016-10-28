@@ -193,11 +193,24 @@ namespace Route95.World {
             Randomize();
         }
 
-        #endregion
-        #region Decoration Methods
+		#endregion
+		#region Properties
 
-        // Starts with base position/rotation, and adds variance
-        public void Randomize() {
+		public Group DecoGroup { get { return _group; } }
+
+		public Distribution DistributionType { get { return _distribution; } }
+
+		public bool Dynamic { get { return _dynamic; } }
+
+		public float Density { get { return _density; } }
+
+		public Vector3 PositionOffset { get { return _positionOffset; } }
+
+		#endregion
+		#region Methods
+
+		// Starts with base position/rotation, and adds variance
+		public void Randomize() {
             transform.localScale = _normalScale;
             transform.position += _positionOffset;
             transform.rotation = Quaternion.Euler(_rotationOffset.x, _rotationOffset.y, _rotationOffset.z);

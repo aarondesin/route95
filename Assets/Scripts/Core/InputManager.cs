@@ -320,7 +320,7 @@ namespace Route95.Core {
             }
 
             // If in free camera mode
-            if (CameraControl.Instance.state == CameraControl.State.Free) {
+            if (CameraControl.Instance.CurrentState == CameraControl.State.Free) {
 
                 // Space -> start car movement
                 if (Input.GetKeyDown(KeyCode.Space)) UIManager.Instance.SwitchToLive();

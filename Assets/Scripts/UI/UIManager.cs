@@ -6,15 +6,21 @@ using Route95.Music;
 using Route95.World;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Route95.UI {
 
     public class UIManager : SingletonMonoBehaviour<UIManager> {
 
-        #region UIManager Vars
+		#region Nested Classes
 
-        //-----------------------------------------------------------------------------------------------------------------
-        [Header("UI Resources")]
+		public class UIEvent : UnityEvent<MenuBase> { }
+
+		#endregion
+		#region Vars
+
+		//-----------------------------------------------------------------------------------------------------------------
+		[Header("UI Resources")]
 
         /// <summary>
         /// Font to use for UI.
@@ -160,6 +166,33 @@ namespace Route95.UI {
         /// Dimensions of the tooltip object.
         /// </summary>
         Vector2 _tooltipDimensions;
+
+		[HideInInspector]
+		public UIEvent onSwitchMenus;
+
+		[HideInInspector]
+		public UIEvent onSwitchModes;
+
+		[HideInInspector]
+		public UIEvent onSwitchToMainMenu;
+
+		[HideInInspector]
+		public UIEvent onSwitchToPlaylistMenu;
+
+		[HideInInspector]
+		public UIEvent onSwitchToKeySelectMenu;
+
+		[HideInInspector]
+		public UIEvent onSwitchToSongArrangeMenu;
+
+		[HideInInspector]
+		public UIEvent onSwitchToRiffEditor;
+
+		[HideInInspector]
+		public UIEvent onSwitchToPostPlayMenu;
+
+		[HideInInspector]
+		public UIEvent onSwitchToLiveMode;
 
         #endregion
         #region Unity Callbacks
@@ -321,6 +354,12 @@ namespace Route95.UI {
         #endregion
         #region UIManager Menu Methods
 
+		public void InitEvents () {
+			onSwitchMenus = new UIEvent();
+
+			onSwitchModes = new UIEvent();
+		}
+
         /// <summary>
         /// Show the specified menu, fading if possible.
         /// </summary>
@@ -378,6 +417,8 @@ namespace Route95.UI {
         /// Goes to main menu.
         /// </summary>
         public void GoToMainMenu() {
+
+			onSwitchToMainMenu.Invoke();
 
             GameManager.Instance.CurrentState = GameManager.State.Setup;
 
