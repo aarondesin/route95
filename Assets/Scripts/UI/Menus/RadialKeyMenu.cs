@@ -77,6 +77,11 @@ namespace Route95.UI {
             _numScales = ScaleInfo.AllScales.Count;
         }
 
+		void Start () {
+
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(Refresh);
+		}
+
         #endregion
         #region RadialKeyMenu Vars
 

@@ -8,7 +8,7 @@ namespace Route95.World {
 	/// <summary>
 	/// Structure to hold all camera view information.
 	/// </summary>
-	public struct CameraView {
+	public class CameraView {
 
 		#region CameraView Enums
 

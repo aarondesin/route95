@@ -375,13 +375,43 @@ namespace Route95.World {
         }
 
         void Start() {
-            _resetDistance = WorldManager.Instance.chunkLoadRadius *
-                0.5f * WorldManager.Instance.chunkSize;
+            _resetDistance = WorldManager.Instance.ChunkLoadRadius *
+                0.5f * WorldManager.Instance.ChunkSize;
             _currentAngle = _outsideCar;
 
-			UIManager.Instance.onSwitchMenus.AddListener(()=> {
-				_doSway = 
+			UIManager.Instance.onSwitchToMainMenu.AddListener(()=> {
+				LerpToView(_outsideCar);
+				_doSway = true;
 			});
+
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(()=> {
+				LerpToView(_driving);
+				_doSway = true;
+			});
+
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(()=>{
+				LerpToView(_radio);
+				_doSway = false;
+			});
+
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(()=> {
+				LerpToView(_driving);
+				_doSway = true;
+			});
+
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				StopLiveMode();
+				LerpToView(_outsideCar);
+				_doSway = true;
+			});
+
+			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(()=> {
+				_doSway = true;
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(StartLiveMode);
+
+			UIManager.Instance.onSwitchToPostplayMode.AddListener(StopLiveMode);
         }
 
         void Update() {
@@ -625,7 +655,7 @@ namespace Route95.World {
         /// <param name="maxHeight"></param>
         /// <returns></returns>
         Vector3 PickRandomPosition(float minHeight, float maxHeight) {
-            float chunkSize = WorldManager.Instance.chunkSize;
+            float chunkSize = WorldManager.Instance.ChunkSize;
 
             Vector3 point = new Vector3(
                 PlayerMovement.Instance.transform.position.x + Random.Range(-chunkSize / 2f, chunkSize / 2f),

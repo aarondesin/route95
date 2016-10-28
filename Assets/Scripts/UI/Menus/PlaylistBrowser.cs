@@ -92,6 +92,13 @@ namespace Route95.UI {
             });
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				Refresh();
+				RefreshName();
+			});
+		}
+
         #endregion
         #region PlaylistBrowser Callbacks
 

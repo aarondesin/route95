@@ -49,6 +49,10 @@ namespace Route95.UI {
             columnHeight = ((RectTransform)timeline_tr.parent).rect.height;
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(RefreshTimeline);
+		}
+
         #endregion
         #region SongTimeline Methods
 

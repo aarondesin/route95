@@ -1,5 +1,6 @@
 ﻿using Route95.Core;
 using Route95.Music;
+using Route95.UI;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,13 +67,18 @@ namespace Route95.World {
             GetComponent<AudioSource>().volume = 0.0f;
 
             dOffset = 0f;
-
-
-
         }
 
         void Start() {
             road = WorldManager.Instance.road;
+
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				StopMoving();
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(StartMoving);
+
+			UIManager.Instance.onSwitchToPostplayMode.AddListener(StopMoving);
         }
 
         public void StartMoving() {

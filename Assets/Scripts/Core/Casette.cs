@@ -1,6 +1,8 @@
 ﻿// Casette.cs
 // ©2016 Team 95
 
+using Route95.UI;
+
 using UnityEngine;
 
 namespace Route95.Core {
@@ -70,6 +72,37 @@ namespace Route95.Core {
             // Init vars
             _lerpProgress = 0f;
         }
+
+		void Start () {
+
+			UIManager.Instance.onSwitchToMainMenu.AddListener(()=> {
+				MoveToBack();
+			});
+
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(()=> {
+				MoveToBack();
+			});
+
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(()=> {
+				MoveToBack();
+			});
+
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(()=> {
+				MoveToBack();
+			});
+
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				_willMoveCasette = true;
+			});
+
+			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(()=> {
+				MoveToBack();
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(()=> {
+				SnapBack();
+			});
+		}
 
         void Update() {
             // Move casette

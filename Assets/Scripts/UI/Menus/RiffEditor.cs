@@ -125,6 +125,10 @@ namespace Route95.UI {
             });
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(Initialize);
+		}
+
         #endregion
         #region RiffEditor Methods
 

@@ -44,6 +44,12 @@ namespace Route95.UI {
             songNameInputField.onEndEdit.AddListener(delegate { MusicManager.Instance.CurrentSong.Name = songNameInputField.text; });
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(Refresh);
+
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(UpdateValue);
+		}
+
         #endregion
         #region SongArrangeMenu Methods
 

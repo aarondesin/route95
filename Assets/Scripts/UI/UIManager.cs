@@ -14,7 +14,7 @@ namespace Route95.UI {
 
 		#region Nested Classes
 
-		public class UIEvent : UnityEvent<MenuBase> { }
+		public class UIEvent : UnityEvent { }
 
 		#endregion
 		#region Vars
@@ -194,6 +194,9 @@ namespace Route95.UI {
 		[HideInInspector]
 		public UIEvent onSwitchToLiveMode;
 
+		[HideInInspector]
+		public UIEvent onSwitchToPostplayMode;
+
         #endregion
         #region Unity Callbacks
 
@@ -216,6 +219,9 @@ namespace Route95.UI {
             _melodicVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar_Melodic");
             _fillSprite = Resources.Load<Sprite>("Sprites/FillSprite");
             _scribbleCircle = Resources.Load<Sprite>("Sprites/ScribbleHighlight");
+
+			onSwitchToLiveMode = new UIEvent();
+			onSwitchToPostplayMode = new UIEvent();
         }
 
         void Start() {
@@ -417,69 +423,39 @@ namespace Route95.UI {
         /// Goes to main menu.
         /// </summary>
         public void GoToMainMenu() {
-
-			onSwitchToMainMenu.Invoke();
-
-            GameManager.Instance.CurrentState = GameManager.State.Setup;
-
             // Hide other menus
             HideAllMenus();
-            Casette.Instance.MoveToBack();
 
             // Show main menu
             ShowMenu(MainMenu.Instance);
 
-            // Move camera to outside view
-            CameraControl.Instance.LerpToView(CameraControl.Instance.OutsideCar);
-            CameraControl.Instance.doSway = true;
+			onSwitchToMainMenu.Invoke();
         }
 
         /// <summary>
         /// Goes to key select menu.
         /// </summary>
         public void GoToKeySelectMenu() {
-
-            GameManager.Instance.CurrentState = GameManager.State.Setup;
-
-            // Hide other menus
-            Casette.Instance.MoveToBack();
+			// Hide other menus
             HideAllMenus();
 
             // Show key select menu
             ShowMenu(KeySelectMenu.Instance);
 
-            // Move camera to driving view
-            CameraControl.Instance.LerpToView(CameraControl.Instance.Driving);
-            CameraControl.Instance.doSway = true;
-
-            // Refresh radial menu
-            RadialKeyMenu.Instance.Refresh();
-
-            // Enable/disable confirmation button
-            KeySelectConfirmButton.Instance.SetInteractable(
-                MusicManager.Instance.CurrentSong.Scale != -1 && MusicManager.Instance.CurrentSong.Key != Key.None
-            );
+			onSwitchToKeySelectMenu.Invoke();
         }
 
         /// <summary>
         /// Goes to song arrange menu.
         /// </summary>
         public void GoToSongArrangeMenu() {
-
-            GameManager.Instance.CurrentState = GameManager.State.Setup;
-
             // Hide other menus
-            Casette.Instance.MoveToBack();
             HideAllMenus();
 
             // Show and refresh song arranger menu
             ShowMenu(SongArrangeMenu.Instance);
-            SongArrangeMenu.Instance.Refresh();
-            SongTimeline.Instance.RefreshTimeline();
 
-            // Move camera to radio view
-            CameraControl.Instance.LerpToView(CameraControl.Instance.Radio);
-            CameraControl.Instance.doSway = false;
+			onSwitchToSongArrangeMenu.Invoke();
         }
 
         /// <summary>
@@ -487,26 +463,17 @@ namespace Route95.UI {
         /// </summary>
         public void GoToRiffEditor() {
 
-            GameManager.Instance.CurrentState = GameManager.State.Setup;
-
             // Hide other menus
-            Casette.Instance.MoveToBack();
             HideAllMenus();
 
             // If no scale selected, go to key select first
             if (MusicManager.Instance.CurrentSong.Scale == -1) GoToKeySelectMenu();
 
             else {
-                SongArrangeMenu.Instance.UpdateValue();
-
                 // Otherwise show riff editor
                 ShowMenu(RiffEditor.Instance);
-                RiffEditor.Instance.Initialize();
 
-
-                // Move camera to driving view
-                CameraControl.Instance.LerpToView(CameraControl.Instance.Driving);
-                CameraControl.Instance.doSway = true;
+				onSwitchToRiffEditor.Invoke();
             }
         }
 
@@ -514,16 +481,6 @@ namespace Route95.UI {
         /// Goes to playlist menu.
         /// </summary>
         public void GoToPlaylistMenu() {
-
-            // Switch modes
-            GameManager.Instance.CurrentState = GameManager.State.Setup;
-
-            // Stop music/live mode operations
-            MusicManager.Instance.StopPlaying();
-            PlayerMovement.Instance.StopMoving();
-            CameraControl.Instance.StopLiveMode();
-            GameManager.Instance.Paused = false;
-
             // Hide other menus
             HideAllMenus();
             HideMenu(LiveInstrumentIcons.Instance);
@@ -531,33 +488,21 @@ namespace Route95.UI {
 
             // Show playlist menu
             ShowMenu(PlaylistBrowser.Instance);
-            PlaylistBrowser.Instance.Refresh();
-            PlaylistBrowser.Instance.RefreshName();
 
-            // Queue casette to move when done moving camera
-            Casette.Instance.WillMove = true;
-
-            // Move camera to outside view
-            CameraControl.Instance.LerpToView(CameraControl.Instance.OutsideCar);
-            CameraControl.Instance.doSway = true;
+			onSwitchToPlaylistMenu.Invoke();
         }
 
         /// <summary>
         /// Goes to post play menu.
         /// </summary>
         public void GoToPostPlayMenu() {
-
-            // Switch mode
-            GameManager.Instance.CurrentState = GameManager.State.Postplay;
-
             // Hide other menus
-            Casette.Instance.MoveToBack();
             HideAllMenus();
 
             // Show postplay menu
             ShowMenu(PostPlayMenu.Instance);
 
-            CameraControl.Instance.doSway = true;
+			onSwitchToPostPlayMenu.Invoke();
         }
 
         #endregion
@@ -568,12 +513,7 @@ namespace Route95.UI {
         /// </summary>
         public void SwitchToLive() {
 
-            // Switch mode
-            GameManager.Instance.CurrentState = GameManager.State.Live;
-            GameManager.Instance.Paused = false;
-
             // Hide menus
-            Casette.Instance.SnapBack();
             HideAllMenus();
 
             // Show live menus
@@ -582,40 +522,15 @@ namespace Route95.UI {
             if (MusicManager.Instance.LoopPlaylist) ShowMenu(LoopIcon.Instance);
             else HideMenu(LoopIcon.Instance);
 
-            // Init music
-            MusicManager.Instance.CurrentPlayingSong = 0;
-            MusicManager.Instance.CurrentSong = (
-                MusicManager.Instance.CurrentProject.Songs.Count > 0 ? MusicManager.Instance.CurrentProject.Songs[0] : null);
-            if (MusicManager.Instance.CurrentSong != null) {
-                MusicManager.Instance.StartPlaylist();
-                MusicManager.Instance.StartSong();
-            }
-
-            // Start live operations
-            InstrumentDisplay.Instance.Refresh();
-            CameraControl.Instance.StartLiveMode();
-            PlayerMovement.Instance.StartMoving();
+			onSwitchToLiveMode.Invoke();
         }
 
         /// <summary>
         /// Switches to postplay mode.
         /// </summary>
         public void SwitchToPostplay() {
-
-            // Switch mode
-            GameManager.Instance.CurrentState = GameManager.State.Postplay;
-            GameManager.Instance.Paused = false;
-
             HideMenu(LiveInstrumentIcons.Instance);
             HideMenu(SongProgressBar.Instance);
-
-            // Stop music/live operations
-            MusicManager.Instance.StopPlaying();
-            PlayerMovement.Instance.StopMoving();
-            CameraControl.Instance.StopLiveMode();
-
-            // Show prompt
-            //livePlayQuitPrompt.GetComponent<Image>().color = Color.white;
 
             // Go to postplay menu
             GoToPostPlayMenu();

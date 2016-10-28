@@ -284,6 +284,22 @@ namespace Route95.Music {
                 Instrument.AllInstruments.Count * (Enum.GetValues(typeof(Key)).Length - 1) * ScaleInfo.AllScales.Count;
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				StopPlaying();
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(()=> {
+				ResetPlayback();
+				if (_currentSong != null) {
+					StartPlaylist();
+					StartSong();
+				}
+			});
+
+			UIManager.Instance.onSwitchToPostplayMode.AddListener(StopPlaying);
+		}
+
         void FixedUpdate() {
 
             // Return if not playing or game is paused
@@ -703,6 +719,11 @@ namespace Route95.Music {
             _riffMode = false;
             Loop();
         }
+
+		public void ResetPlayback () {
+			_currentPlayingSong = 0;
+			_currentSong = _currentProject.Empty ? null : _currentProject.Songs[0];
+		}
 
         /// <summary>
         /// Returns the AudioSource for the specified instrument.

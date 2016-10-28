@@ -49,6 +49,10 @@ namespace Route95.UI {
             _icon = GetComponent<Image>();
         }
 
+		void Start () {
+			UIManager.Instance.onSwitchToLiveMode.AddListener(Refresh);
+		}
+
         void FixedUpdate() {
 
             if (GameManager.Instance.CurrentState != GameManager.State.Live) return;

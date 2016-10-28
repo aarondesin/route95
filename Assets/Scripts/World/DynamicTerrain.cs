@@ -146,7 +146,7 @@ namespace Route95.World {
             _playerChunkPos = new IntVector2(0, 0);
 
             // Init frequency data vars
-            int freqSampleSize = WorldManager.Instance.freqArraySize;
+            int freqSampleSize = WorldManager.Instance.FrequencySampleSize;
             _data = new float[freqSampleSize];
         }
 

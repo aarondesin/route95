@@ -191,6 +191,37 @@ namespace Route95.Core {
 
             // Stop 3D rendering while loading
             StopRendering();
+
+			UIManager.Instance.onSwitchToMainMenu.AddListener(()=> {
+				_currentState = State.Setup;
+			});
+
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				_currentState = State.Setup;
+				_paused = false;
+			});
+
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(()=> {
+				_currentState = State.Setup;
+			});
+
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(()=> {
+				_currentState = State.Setup;
+			});
+
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(()=> {
+				_currentState = State.Setup;
+			});
+
+			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(()=> {
+				_currentState = State.Postplay;
+				_paused = false;
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(()=> {
+				_currentState = State.Live;
+				_paused = false;
+			});
         }
 
         void Update() {

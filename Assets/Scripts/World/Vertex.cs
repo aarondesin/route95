@@ -32,7 +32,7 @@ namespace Route95.World {
             chunkVertices = new List<KeyValuePair<IntVector2, int>>();
             decorations = new List<GameObject>();
             chunkRes = WorldManager.Instance.ChunkResolution;
-            chunkSize = WorldManager.Instance.chunkSize;
+            chunkSize = WorldManager.Instance.ChunkSize;
             color = new Color(
                 0f,
                 UnityEngine.Random.Range(0f, 1f),
@@ -274,28 +274,28 @@ namespace Route95.World {
 
                     Chunk ul = terrain.ChunkAt(ChunkMin(x), ChunkMax(y));
                     if (ul != null) {
-                        index = CoordToIndex(ul.x, ul.y);
+                        index = CoordToIndex(ul.X, ul.Y);
                         ul.UpdateVertex(index, height, true);
                         ul.UpdateColor(index, color);
                     }
 
                     Chunk ur = terrain.ChunkAt(ChunkMax(x), ChunkMax(y));
                     if (ur != null) {
-                        index = CoordToIndex(ur.x, ur.y);
+                        index = CoordToIndex(ur.X, ur.Y);
                         ur.UpdateVertex(index, height, true);
                         ur.UpdateColor(index, color);
                     }
 
                     Chunk dl = terrain.ChunkAt(ChunkMin(x), ChunkMin(y));
                     if (dl != null) {
-                        index = CoordToIndex(dl.x, dl.y);
+                        index = CoordToIndex(dl.X, dl.Y);
                         dl.UpdateVertex(index, height, true);
                         dl.UpdateColor(index, color);
                     }
 
                     Chunk dr = terrain.ChunkAt(ChunkMax(x), ChunkMin(y));
                     if (dr != null) {
-                        index = CoordToIndex(dr.x, dr.y);
+                        index = CoordToIndex(dr.X, dr.Y);
                         dr.UpdateVertex(index, height, true);
                         dr.UpdateColor(index, color);
                     }
@@ -305,14 +305,14 @@ namespace Route95.World {
                 else {
                     Chunk left = terrain.ChunkAt(ChunkMin(x), ChunkAt(y));
                     if (left != null) {
-                        index = CoordToIndex(left.x, left.y);
+                        index = CoordToIndex(left.X, left.Y);
                         left.UpdateVertex(index, height, true);
                         left.UpdateColor(index, color);
                     }
 
                     Chunk right = terrain.ChunkAt(ChunkMax(x), ChunkAt(y));
                     if (right != null) {
-                        index = CoordToIndex(right.x, right.y);
+                        index = CoordToIndex(right.X, right.Y);
                         right.UpdateVertex(index, height, true);
                         right.UpdateColor(index, color);
                     }
@@ -323,14 +323,14 @@ namespace Route95.World {
             else if (IsEdge(y)) {
                 Chunk bottom = terrain.ChunkAt(ChunkAt(x), ChunkMin(y));
                 if (bottom != null) {
-                    index = CoordToIndex(bottom.x, bottom.y);
+                    index = CoordToIndex(bottom.X, bottom.Y);
                     bottom.UpdateVertex(index, height, true);
                     bottom.UpdateColor(index, color);
                 }
 
                 Chunk top = terrain.ChunkAt(ChunkAt(x), ChunkMax(y));
                 if (top != null) {
-                    index = CoordToIndex(top.x, top.y);
+                    index = CoordToIndex(top.X, top.Y);
                     top.UpdateVertex(index, height, true);
                     top.UpdateColor(index, color);
                 }
@@ -340,7 +340,7 @@ namespace Route95.World {
             else {
                 Chunk chunk = terrain.ChunkAt(ChunkAt(x), ChunkAt(y));
                 if (chunk != null) {
-                    index = CoordToIndex(chunk.x, chunk.y);
+                    index = CoordToIndex(chunk.X, chunk.Y);
                     chunk.UpdateVertex(index, height, false);
                     chunk.UpdateColor(index, color);
                 }

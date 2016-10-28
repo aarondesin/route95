@@ -1,6 +1,8 @@
 ﻿// KeySelectConfirmButton.cs
 // ©2016 Team95
 
+using Route95.Music;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +25,13 @@ namespace Route95.UI {
             // Init vars
             _button = GetComponent<Button>();
         }
+
+		void Start () {
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(()=> {
+				SetInteractable(MusicManager.Instance.CurrentSong.Scale != -1 &&
+					MusicManager.Instance.CurrentSong.Key != Key.None);
+			});
+		}
 
 		#endregion
 		#region Methods
