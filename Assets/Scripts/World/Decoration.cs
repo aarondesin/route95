@@ -164,7 +164,7 @@ namespace Route95.World {
 
         void Awake() {
             _normalScale = transform.localScale;
-            _partSystem = ((GameObject)Instantiate(WorldManager.Instance.decorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
+            _partSystem = ((GameObject)Instantiate(WorldManager.Instance.DecorationParticleEmitter.gameObject)).GetComponent<ParticleSystem>();
             _partSystem.gameObject.transform.parent = transform.parent;
         }
 
@@ -172,11 +172,11 @@ namespace Route95.World {
             if (_dynamic) {
 
                 // Remove if decoration fell below
-                if (transform.position.y < -WorldManager.Instance.heightScale)
+                if (transform.position.y < -WorldManager.Instance.HeightScale)
                     WorldManager.Instance.RemoveDecoration(gameObject);
 
                 // Push with wind
-                GetComponent<Rigidbody>().AddForce(WorldManager.Instance.wind);
+                GetComponent<Rigidbody>().AddForce(WorldManager.Instance.Wind);
             }
         }
 

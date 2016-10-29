@@ -177,7 +177,7 @@ namespace Route95.World {
 		/// </summary>
 		public void Initialize(int x, int y) {
 
-            DynamicTerrain terrain = WorldManager.Instance.terrain;
+            DynamicTerrain terrain = DynamicTerrain.Instance;
 
             // Init vars
             _x = x;
@@ -244,7 +244,7 @@ namespace Route95.World {
 
             // Assign material
             MeshRenderer renderer = GetComponent<MeshRenderer>();
-            renderer.sharedMaterial = WorldManager.Instance.terrainMaterial;
+            renderer.sharedMaterial = WorldManager.Instance.TerrainMaterial;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             renderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 
@@ -261,7 +261,7 @@ namespace Route95.World {
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
             // Add grass system
-            _grassEmitter = GameObject.Instantiate(WorldManager.Instance.grassEmitterTemplate);
+            _grassEmitter = GameObject.Instantiate(WorldManager.Instance.GrassEmitterPrefab);
             _grassEmitter.transform.parent = transform;
             _grassEmitter.transform.localPosition = Vector3.zero;
 
@@ -285,7 +285,7 @@ namespace Route95.World {
         /// Resets necessary variables after de-pooling a chunk.
         /// </summary>
         public void Reuse(int x, int y) {
-            DynamicTerrain terrain = WorldManager.Instance.terrain;
+            DynamicTerrain terrain = DynamicTerrain.Instance;
 			VertexMap vmap = terrain.VertexMap;
 			float chunkSize = WorldManager.Instance.ChunkSize;
 
@@ -532,7 +532,7 @@ namespace Route95.World {
             float startTime = Time.realtimeSinceStartup;
             Vector3 playerPos = PlayerMovement.Instance.transform.position;
             Vector3 chunkPos = transform.position;
-			DynamicTerrain terrain = WorldManager.Instance.terrain;
+			DynamicTerrain terrain = DynamicTerrain.Instance;
 			VertexMap vmap = terrain.VertexMap;
 
             int v = 0;
@@ -557,14 +557,14 @@ namespace Route95.World {
                     float distance = Vector3.Distance(vertPos, playerPos);
 
                     // If vertex is close enough
-                    if (CheckDist(distance, WorldManager.Instance.vertexUpdateDistance, margin)) {
+                    if (CheckDist(distance, WorldManager.Instance.VertexUpdateDistance, margin)) {
 
                         // Calculate new height
                         Vector3 angleVector = vertPos - playerPos;
                         float angle = Vector3.Angle(Vector3.right, angleVector);
                         float linIntInput = angle / 360f;
                         float newY = terrain.FreqData.GetDataPoint(linIntInput) *
-                                      WorldManager.Instance.heightScale;
+                                      WorldManager.Instance.HeightScale;
 
                         // If new height, set it
                         //if (newY != vmap.VertexAt(coord, false).height) vmap.SetHeight (coord, newY);
@@ -602,8 +602,8 @@ namespace Route95.World {
             if (_needsColorUpdate) UpdateColors();
 
             // Check for road if necessary
-            if (!_hasCheckedForRoad && WorldManager.Instance.road.loaded)
-                CheckForRoad(PlayerMovement.Instance.moving ? PlayerMovement.Instance.progress : 0f);
+            if (!_hasCheckedForRoad && WorldManager.Instance.Road.IsLoaded)
+                CheckForRoad(PlayerMovement.Instance.Moving ? PlayerMovement.Instance.Progress : 0f);
 
             // Update verts if possible
             if (!_isUpdatingVerts) StartCoroutine("UpdateVerts");
@@ -617,8 +617,8 @@ namespace Route95.World {
         /// <param name="startProgress">Start progress.</param>
         public void CheckForRoad(float startProgress) {
             _hasCheckedForRoad = true;
-            Road road = WorldManager.Instance.road;
-			DynamicTerrain terrain = WorldManager.Instance.terrain;
+            Road road = WorldManager.Instance.Road;
+			DynamicTerrain terrain = DynamicTerrain.Instance;
             Vector3 chunkPos = transform.position;
 			float chunkSize = WorldManager.Instance.ChunkSize;
             float checkResolution = (1f - startProgress) * WorldManager.Instance.roadPathCheckResolution;
@@ -703,7 +703,7 @@ namespace Route95.World {
 
                 // Raycast down
                 RaycastHit hit;
-                Vector3 rayOrigin = new Vector3(tr.position.x, WorldManager.Instance.heightScale, tr.position.z);
+                Vector3 rayOrigin = new Vector3(tr.position.x, WorldManager.Instance.HeightScale, tr.position.z);
                 if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))
                     tr.position = new Vector3(tr.position.x, hit.point.y +
                         tr.gameObject.GetComponent<Decoration>().PositionOffset.y, tr.position.z);

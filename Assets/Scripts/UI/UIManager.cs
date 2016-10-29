@@ -203,6 +203,19 @@ namespace Route95.UI {
         new void Awake () {
             base.Awake();
 
+			// Init events
+			onSwitchMenus = new UIEvent();
+			onSwitchModes = new UIEvent();
+			onSwitchToMainMenu = new UIEvent();
+			onSwitchToPlaylistMenu = new UIEvent();
+			onSwitchToKeySelectMenu = new UIEvent();
+			onSwitchToSongArrangeMenu = new UIEvent();
+			onSwitchToRiffEditor = new UIEvent();
+			onSwitchToPostPlayMenu = new UIEvent();
+			onSwitchToLiveMode = new UIEvent();
+			onSwitchToPostplayMode = new UIEvent();
+		
+
             // Load UI resources
             _font = Resources.Load<Font>("Fonts/LemonMilk");
             _handwrittenFont = Resources.Load<Font>("Fonts/Handwritten");

@@ -26,11 +26,11 @@ namespace Route95.World {
         public VertexMap() {
             decorationDeletes = new List<GameObject>();
 
-            chunkSize = WorldManager.Instance.chunkSize;
+            chunkSize = WorldManager.Instance.ChunkSize;
             chunkRes = WorldManager.Instance.ChunkResolution;
-            chunkRadius = WorldManager.Instance.chunkLoadRadius;
-            nearbyRoadDistance = WorldManager.Instance.roadWidth * 0.75f;
-            noDecorationsDistance = WorldManager.Instance.roadWidth * 1.5f;
+            chunkRadius = WorldManager.Instance.ChunkLoadRadius;
+            nearbyRoadDistance = WorldManager.Instance.RoadWidth * 0.75f;
+            noDecorationsDistance = WorldManager.Instance.RoadWidth * 1.5f;
             int width = chunkRadius * (chunkRes - 1);
             if (width % 2 == 1) width++;
             vertices = new Map<Vertex>(width);

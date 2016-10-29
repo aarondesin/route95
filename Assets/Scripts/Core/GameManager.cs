@@ -289,7 +289,7 @@ namespace Route95.Core {
 
             // Calculate operations to do
             _loadOpsToDo = MusicManager.Instance.LoadOps +
-                    WorldManager.Instance.loadsToDo;
+                    WorldManager.Instance.LoadOpsToDo;
 
             // Init vars
             _loadStartTime = Time.realtimeSinceStartup;

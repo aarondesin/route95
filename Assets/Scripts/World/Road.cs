@@ -96,7 +96,7 @@ namespace Route95.World {
                 LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
             }
 
-            float progress = PlayerMovement.Instance.progress;
+            float progress = PlayerMovement.Instance.Progress;
 
             Vector3 playerPosition = PlayerMovement.Instance.transform.position;
 
@@ -114,7 +114,7 @@ namespace Route95.World {
                 AddCurve();
 
                 // Update player progress
-                PlayerMovement.Instance.progress = numerator / CurveCount;
+                PlayerMovement.Instance.Progress = numerator / CurveCount;
 
                 changesMade = true;
             }
@@ -130,7 +130,7 @@ namespace Route95.World {
                 Backtrack();
 
                 // Update player progress
-                PlayerMovement.Instance.progress = (numerator + 2f) / (denominatorOld + 2f);
+                PlayerMovement.Instance.Progress = (numerator + 2f) / (denominatorOld + 2f);
 
                 changesMade = true;
 
@@ -145,7 +145,7 @@ namespace Route95.World {
                 RemoveCurve();
 
                 // Update player progress
-                PlayerMovement.Instance.progress = (numerator - 2f) / (denominator - 2f);
+                PlayerMovement.Instance.Progress = (numerator - 2f) / (denominator - 2f);
 
                 changesMade = true;
 
@@ -153,10 +153,10 @@ namespace Route95.World {
             }
             else if (!_loaded) {
                 _loaded = true;
-				float height = WorldManager.Instance.roadHeight;
+				float height = WorldManager.Instance.RoadHeight;
                 PlayerMovement.Instance.transform.position = GetPoint(0.6f) + new Vector3(0f, 2.27f + height, 0f);
                 PlayerMovement.Instance.transform.LookAt(GetPoint(0.6f) + GetVelocity(0.6f), Vector3.up);
-                if (WorldManager.Instance.doDecorate)
+                if (WorldManager.Instance.DoDecorate)
                     WorldManager.Instance.DoLoadDecorations();
                 else WorldManager.Instance.FinishLoading();
             }
@@ -166,13 +166,19 @@ namespace Route95.World {
 
         }
 
-        #endregion
-        #region Road Methods
+		#endregion
+		#region Properties
 
-        /// <summary>
-        /// Generates initial road points.
-        /// </summary>
-        public void Reset() {
+		public bool IsLoaded { get { return _loaded; } }
+
+		#endregion
+		#region Road Methods
+
+		/// <summary>
+		/// Generates initial road points.
+		/// </summary>
+		public void Reset() {
+			float heightScale = WorldManager.Instance.HeightScale;
 
             // Get initial point
             Vector3 point = new Vector3(0f, heightScale, 0f);
@@ -183,9 +189,7 @@ namespace Route95.World {
                 point.y = hit.point.y;
 
             // Init points list
-            points = new List<Vector3>() {
-            point
-        };
+            _points = new List<Vector3>() { point };
 
             // Init modes list
             _modes = new List<BezierControlPointMode>() {
@@ -206,7 +210,7 @@ namespace Route95.World {
 			float placementDistance = WorldManager.Instance.roadPlacementDistance;
 			float variance = WorldManager.Instance.roadVariance;
             float displacedDirection = placementDistance * variance; //placementRange;
-			float worldHeightScale = WorldManager.Instance.heightScale;
+			float worldHeightScale = WorldManager.Instance.HeightScale;
 			float maxSlope = WorldManager.Instance.roadMaxSlope;
 			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
 
@@ -250,13 +254,18 @@ namespace Route95.World {
             _modes.Add(_modes.Tail());
             EnforceMode(_points.Count - 4);
             _steps += stepsPerCurve;
-            DoBulldoze(PlayerMovement.Instance.moving ? PlayerMovement.Instance.progress : 0f);
+            DoBulldoze(PlayerMovement.Instance.Moving ? PlayerMovement.Instance.Progress : 0f);
         }
 
         public void Backtrack() {
+			float placementDistance = WorldManager.Instance.roadPlacementDistance;
+			float variance = WorldManager.Instance.roadVariance;
             float displacedDirection = placementDistance * variance; //placementRange;
+			float maxSlope = WorldManager.Instance.roadMaxSlope;
+			float heightScale = WorldManager.Instance.HeightScale;
+			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
 
-            Vector3 point = points.Head();
+            Vector3 point = _points.Head();
             Vector3 old = point;
 
             Vector3 direction = -GetDirection(0f) * placementDistance;
@@ -278,14 +287,14 @@ namespace Route95.World {
                 if (Physics.Raycast(rayStart, Vector3.down, out hit, Mathf.Infinity))
                     point.y += Mathf.Clamp(hit.point.y - point.y, -dist * maxSlope, dist * maxSlope);
 
-                points.Insert(0, point);
+                _points.Insert(0, point);
             }
 
-            terrain.OnExtendRoad();
+            DynamicTerrain.Instance.OnExtendRoad();
 
-            modes.Add(modes.Tail());
+            _modes.Add(_modes.Tail());
             EnforceMode(4);
-            steps += stepsPerCurve;
+            _steps += stepsPerCurve;
             DoBulldoze(0f, 1f / (float)CurveCount);
 
         }
@@ -295,10 +304,11 @@ namespace Route95.World {
         /// </summary>
         void RemoveCurve() {
 
-            for (int i = 0; i < 3; i++) points.RemoveAt(0);
-            modes.RemoveAt(0);
+            for (int i = 0; i < 3; i++) _points.RemoveAt(0);
+            _modes.RemoveAt(0);
 
-            steps -= stepsPerCurve;
+			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
+            _steps -= stepsPerCurve;
 
         }
 
@@ -316,7 +326,7 @@ namespace Route95.World {
             float resolution = WorldManager.Instance.roadPathCheckResolution * diff;
             while (progress < endProgress) {
                 Vector3 point = GetPoint(progress);
-                toCheck.Add(point);
+                _toCheck.Add(point);
                 progress += diff / resolution;
 
                 if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
@@ -324,12 +334,12 @@ namespace Route95.World {
                     startTime = Time.realtimeSinceStartup;
                 }
             }
-            toCheck.Add(GetPoint(endProgress));
+            _toCheck.Add(GetPoint(endProgress));
             yield return null;
         }
 
         void Check(Vector3 point) {
-            terrain.vertexmap.DoCheckRoads(point);
+            DynamicTerrain.Instance.VertexMap.DoCheckRoads(point);
         }
 
         // Sets the road mesh
@@ -357,9 +367,9 @@ namespace Route95.World {
         // Calculates vertices, UVs, and tris for road mesh
         void BuildRoadMesh() {
 
-			float height = WorldManager.Instance.roadHeight;
-			float width = WorldManager.Instance.roadWidth;
-			float slope = WorldManager.Instance.roadSlope;
+			float height = WorldManager.Instance.RoadHeight;
+			float width = WorldManager.Instance.RoadWidth;
+			float slope = WorldManager.Instance.RoadSlope;
 
             _verts.Clear();
             _uvs.Clear();

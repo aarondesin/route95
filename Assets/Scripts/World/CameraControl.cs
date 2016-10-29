@@ -663,7 +663,7 @@ namespace Route95.World {
                 PlayerMovement.Instance.transform.position.z + Random.Range(-chunkSize / 2f, chunkSize / 2f)
             );
 
-            Vector3 rayOrigin = new Vector3(point.x, WorldManager.Instance.heightScale, point.z);
+            Vector3 rayOrigin = new Vector3(point.x, WorldManager.Instance.HeightScale, point.z);
 
             RaycastHit hit;
             if (Physics.Raycast(rayOrigin, Vector3.down, out hit, Mathf.Infinity))

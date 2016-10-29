@@ -50,8 +50,8 @@ namespace Route95.World {
 
             if (GUILayout.Button("Show coordinates")) {
                 WorldManager wm = target as WorldManager;
-                Vertex vert = wm.terrain.vertexmap.VertexAt(_x, _y);
-                wm.vertexIndicator.transform.position = vert.WorldPos();
+                Vertex vert = DynamicTerrain.Instance.VertexMap.VertexAt(_x, _y);
+                wm.VertexIndicator.transform.position = vert.WorldPos();
                 _vertBlend = vert.color.a;
             }
         }

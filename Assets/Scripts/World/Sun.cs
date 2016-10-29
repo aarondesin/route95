@@ -1,46 +1,25 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// Sun.cs
+// ©2016 Team 95
+
+using UnityEngine;
 
 namespace Route95.World {
 
-    public class Sun : GlobalLightSource {
-        public static Sun Instance;
+    public class Sun : GlobalLightSource<Sun> {
 
-        public Light shadowCaster;
+		[SerializeField]
+        bool _invert = false;
 
-        private float xScale = 1000;
-        private float yScale = 1000;
-        private float zScale = 1000;
+        new void Start() {
+			base.Start();
 
-        public bool invert = false;
-
-        private Vector3 sunTarget; // target for the sun to point at: the car or the origin
-
-        private void UpdateTransform() {
-            sunTarget = PlayerMovement.Instance.transform.position;
-            float newX = xScale * Mathf.Cos(WorldManager.Instance.timeOfDay);
-            float newY = yScale * Mathf.Sin(WorldManager.Instance.timeOfDay);
-            float newZ = -zScale * Mathf.Cos(WorldManager.Instance.timeOfDay + Mathf.PI / 5);
-            this.transform.position = new Vector3(newX, newY, newZ);
-            transform.localScale = new Vector3(200f, 200f, 200f);
-
-            this.transform.LookAt(sunTarget);
-            if (invert) this.transform.Rotate(new Vector3(180f, 0f, 0f));
-        }
-
-        void Start() {
-            Instance = this;
-            transform.parent = PlayerMovement.Instance.transform;
-            //this.GetComponent<Light> ().range = 100f;
-            //this.GetComponent<Light> ().type = LightType.Directional;
-            //GetComponent<Light>().shadowBias = 1f;
             GetComponent<Light>().cullingMask = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
         }
 
-        // Update is called once per frame
-        void Update() {
-            UpdateTransform();
-        }
+		new void UpdateTransform() {
+            base.UpdateTransform();
 
+            if (_invert) transform.Rotate(new Vector3(180f, 0f, 0f));
+        }
     }
 }

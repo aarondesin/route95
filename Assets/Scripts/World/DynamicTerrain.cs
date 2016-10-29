@@ -119,13 +119,6 @@ namespace Route95.World {
         new void Awake() {
 			base.Awake();
 
-			int chunkLoadRadius = WorldManager.Instance.ChunkLoadRadius;
-			int chunkRes = WorldManager.Instance.ChunkResolution;
-
-			// Init verts
-            int verts = 2 * chunkLoadRadius * (chunkRes - 1);
-            _loadOpsToDo = verts * verts;
-
             // Init chunk pool
             _chunkPool = new ObjectPool<Chunk>();
 
@@ -136,19 +129,28 @@ namespace Route95.World {
             _activeCloseToRoadChunks = new List<Chunk>();
             _deletions = new List<Chunk>();
 
-            // Init vertex map
+            // Init player chunk position
+            _playerChunkPos = new IntVector2(0, 0);   
+        }
+
+		void Start () {
+			int chunkLoadRadius = WorldManager.Instance.ChunkLoadRadius;
+			int chunkRes = WorldManager.Instance.ChunkResolution;
+
+			// Init verts
+            int verts = 2 * chunkLoadRadius * (chunkRes - 1);
+            _loadOpsToDo = verts * verts;
+
+			// Init vertex map
             _vertexMap = new VertexMap();
 
-            // Init chunk map
-            _chunkMap = new Map<Chunk>(chunkLoadRadius * 2);
+			// Init chunk map
+			_chunkMap = new Map<Chunk>(chunkLoadRadius * 2);
 
-            // Init player chunk position
-            _playerChunkPos = new IntVector2(0, 0);
-
-            // Init frequency data vars
+			// Init frequency data vars
             int freqSampleSize = WorldManager.Instance.FrequencySampleSize;
             _data = new float[freqSampleSize];
-        }
+		}
 
 		#endregion
 		#region Properties
@@ -263,7 +265,7 @@ namespace Route95.World {
                         if (_chunkMap.At(x, y) != null) continue;
 
                         // Skip if chunk too far (circular generation)
-                        if (WorldManager.Instance.chunkGenerationMode == WorldManager.ChunkGenerationMode.Circular)
+                        if (WorldManager.Instance.ChunkGenMode == WorldManager.ChunkGenerationMode.Circular)
                             if (IntVector2.Distance(new IntVector2(x, y), _playerChunkPos) > (float)chunkLoadRadius)
                                 continue;
 
@@ -354,7 +356,7 @@ namespace Route95.World {
 
             // Check if each active chunk is within chunk load radius
             foreach (Chunk chunk in _activeChunks) {
-                switch (WorldManager.Instance.chunkGenerationMode) {
+                switch (WorldManager.Instance.ChunkGenMode) {
                     case WorldManager.ChunkGenerationMode.Circular:
                         if (IntVector2.Distance(new IntVector2(chunk.X, chunk.Y), _playerChunkPos) > chunkLoadRadius)
                             _deletions.Add(chunk);
@@ -861,7 +863,7 @@ namespace Route95.World {
             switch (colors) {
                 case DebugColors.Constrained:
                     foreach (Chunk chunk in _activeChunks) {
-                        chunk.GetComponent<MeshRenderer>().material = WorldManager.Instance.terrainDebugMaterial;
+                        chunk.GetComponent<MeshRenderer>().material = WorldManager.Instance.TerrainDebugMaterial;
                         chunk.SetDebugColors(colors);
                     }
                     break;

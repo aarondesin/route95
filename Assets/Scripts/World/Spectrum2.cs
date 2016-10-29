@@ -1,69 +1,141 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿// Spectrum2.cs
+// ©2016 Team 95
+
+using UnityEngine;
 
 namespace Route95.World {
 
-    public class Spectrum2 : MonoBehaviour {
-        public static Spectrum2 Instance;
+	/// <summary>
+	/// Class to handle equalizer visualization.
+	/// </summary>
+    public class Spectrum2 : SingletonMonoBehaviour<Spectrum2> {
 
-        DynamicTerrain terrain;
+		#region Vars
 
-        // Use this for initialization
-        public int numberOfObjects = 20;
-        public float height;
-        public float radius;
-        public Transform[] objects;
-        public Vector3[] points;
-        public float scale = 20f;
-        public float opacity;
-        public float fallRate;
+		/// <summary>
+		/// Number of points in graph.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Number of points in graph.")]
+        int _numberOfPoints = 20;
 
-        float minHeight;
-        float maxHeight;
+		/// <summary>
+		/// Base height of visualization.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Base height of visualization.")]
+        float _height;
 
-        void Awake() {
-            Instance = this;
+		/// <summary>
+		/// Radius of visualization.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Radius of visualization.")]
+        float _radius;
 
-            minHeight = height - scale;
-            maxHeight = height + scale;
+		/// <summary>
+		/// 
+		/// </summary>
+        Transform[] _objects;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Vector3[] _points;
+
+		/// <summary>
+		/// Scale of visualization.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Scale of visualization.")]
+        float _scale = 20f;
+
+		/// <summary>
+		/// Opacity of visualization.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Opacity of visualization.")]
+        float _opacity;
+
+		/// <summary>
+		/// Point fall rate.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Point fall rate.")]
+        float _fallRate;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        float _minHeight;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        float _maxHeight;
+
+		/// <summary>
+		/// Reference to LineRenderer.
+		/// </summary>
+		LineRenderer _lineRenderer;
+
+		#endregion
+		#region Unity Callbacks
+
+		new void Awake() {
+            base.Awake();
+
+			// Init vars
+			_lineRenderer = GetComponent<LineRenderer>();
+            _minHeight = _height - _scale;
+            _maxHeight = _height + _scale;
 
             // Initialize visualizer points
-            objects = new Transform[numberOfObjects + 1];
-            points = new Vector3[numberOfObjects + 1];
-            for (int i = 0; i < numberOfObjects + 1; i++) {
-                float angle = i * Mathf.PI * 2f / numberOfObjects;
-                Vector3 pos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            _objects = new Transform[_numberOfPoints + 1];
+            _points = new Vector3[_numberOfPoints + 1];
+            for (int i = 0; i < _numberOfPoints + 1; i++) {
+                float angle = i * Mathf.PI * 2f / _numberOfPoints;
+                Vector3 pos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * _radius;
                 GameObject point = new GameObject("Point" + i);
-                objects[i] = point.transform;
+                _objects[i] = point.transform;
                 point.transform.position = pos;
                 point.transform.SetParent(transform);
-                points[i] = point.transform.position;
+                _points[i] = point.transform.position;
             }
-            GetComponent<LineRenderer>().SetVertexCount(numberOfObjects + 1);
-            GetComponent<LineRenderer>().SetPositions(points);
+            _lineRenderer.SetVertexCount(_numberOfPoints + 1);
+            _lineRenderer.SetPositions(_points);
         }
 
         // Update is called once per frame
         void Update() {
-            if (terrain == null) terrain = WorldManager.Instance.terrain;
-            if (terrain.freqData == null) return;
+            if (DynamicTerrain.Instance.FreqData == null) return;
 
-            for (int i = 0; i < numberOfObjects + 1; i++) {
-                points[i].x = objects[i].position.x;
-                points[i].z = objects[i].position.z;
+            for (int i = 0; i < _numberOfPoints + 1; i++) {
+                _points[i].x = _objects[i].position.x;
+                _points[i].z = _objects[i].position.z;
                 //float y = height + Mathf.Log (terrain.freqData.GetDataPoint ((float)(i==0 ? (numberOfObjects-1) : i) / numberOfObjects)) * scale;
-                float r = (float)(i == numberOfObjects ? 0 : i) / numberOfObjects;
-                float y = Mathf.Clamp(height + scale * 10f * terrain.freqData.GetDataPoint(r), minHeight, maxHeight);
+                float r = (float)(i == _numberOfPoints ? 0 : i) / _numberOfPoints;
+                float y = Mathf.Clamp(_height + _scale * 10f * DynamicTerrain.Instance.FreqData.GetDataPoint(r), _minHeight, _maxHeight);
                 if (y != float.NaN) {
-                    if (y < points[i].y && points[i].y >= minHeight + fallRate)
-                        points[i].y -= fallRate;
-                    else points[i].y = y;
+                    if (y < _points[i].y && _points[i].y >= _minHeight + _fallRate)
+                        _points[i].y -= _fallRate;
+                    else _points[i].y = y;
                 }
 
             }
-            GetComponent<LineRenderer>().SetPositions(points);
+            _lineRenderer.SetPositions(_points);
         }
 
-    }
+		#endregion
+		#region Methods
+
+		public void SetColor (Color color) {
+			color.a = _opacity;
+
+            _lineRenderer.SetColors(color, color);
+            _lineRenderer.material.color = color;
+		}
+
+		#endregion
+	}
 }
