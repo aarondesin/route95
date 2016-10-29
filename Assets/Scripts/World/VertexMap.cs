@@ -1,45 +1,80 @@
-﻿using Route95.Core;
-using UnityEngine;
+﻿// VertexMap.cs
+// ©2016 Team 95
+
+using Route95.Core;
+
 using System.Collections;
 using System.Collections.Generic;
 
+using UnityEngine;
+
 namespace Route95.World {
 
+	/// <summary>
+	/// Class to hold vertex data.
+	/// </summary>
     public class VertexMap {
-        public Map<Vertex> vertices;
-        public DynamicTerrain terrain;
-        //const float NEARBY_ROAD_DISTANCE = 8f; // max dist from a road for a vert to be considered nearby a road
-        float nearbyRoadDistance;
-        float noDecorationsDistance;
 
-        public int xMin = 0;
-        public int xMax = 0;
-        public int yMin = 0;
-        public int yMax = 0;
+		#region Vars
 
-        float chunkSize;
-        int chunkRes;
-        int chunkRadius;
+		/// <summary>
+		/// Map of all vertices.
+		/// </summary>
+		Map<Vertex> _vertices;
 
-        List<GameObject> decorationDeletes;
+		/// <summary>
+		/// Distance from a road for a vertex to be considered close to a road.
+		/// </summary>
+        float _nearbyRoadDistance;
 
-        public VertexMap() {
-            decorationDeletes = new List<GameObject>();
+		/// <summary>
+		/// Distance from a road for a vertex to block decorations.
+		/// </summary>
+        float _noDecorationsDistance;
 
-            chunkSize = WorldManager.Instance.ChunkSize;
-            chunkRes = WorldManager.Instance.ChunkResolution;
-            chunkRadius = WorldManager.Instance.ChunkLoadRadius;
-            nearbyRoadDistance = WorldManager.Instance.RoadWidth * 0.75f;
-            noDecorationsDistance = WorldManager.Instance.RoadWidth * 1.5f;
+        int _xMin = 0;
+        int _xMax = 0;
+        int _yMin = 0;
+        int _yMax = 0;
+
+        List<GameObject> _decorationDeletes;
+
+		#endregion
+		#region Constructors
+
+		public VertexMap() {
+            _decorationDeletes = new List<GameObject>();
+
+            _nearbyRoadDistance = WorldManager.Instance.RoadWidth * 0.75f;
+            _noDecorationsDistance = WorldManager.Instance.RoadWidth * 1.5f;
+
+			int chunkRadius = WorldManager.Instance.ChunkLoadRadius;
+			int chunkRes = WorldManager.Instance.ChunkResolution;
             int width = chunkRadius * (chunkRes - 1);
             if (width % 2 == 1) width++;
-            vertices = new Map<Vertex>(width);
+            _vertices = new Map<Vertex>(width);
         }
 
-        //
-        // Functions to check if the vertex map contains a vertex
-        //
-        public bool ContainsVertex(IntVector2 i) {
+		#endregion
+		#region Properties
+
+		public int XMax { get { return _xMax; } }
+
+		public int XMin { get { return _xMin; } }
+
+		public int YMax { get { return _yMax; } }
+
+		public int YMin { get { return _yMin; } }
+
+		public int Width { get { return _vertices.Width; } }
+
+		#endregion
+		#region Methods
+
+		//
+		// Functions to check if the vertex map contains a vertex
+		//
+		public bool ContainsVertex(IntVector2 i) {
             return ContainsVertex(i.x, i.y);
         }
 
@@ -56,7 +91,7 @@ namespace Route95.World {
 
         public float GetHeight(int x, int y) {
             if (!ContainsVertex(x, y)) return float.NaN;
-            return VertexAt(x, y).height;
+            return VertexAt(x, y).Height;
         }
 
         //
@@ -76,17 +111,6 @@ namespace Route95.World {
         }
 
         //
-        //
-        //
-        public Vector3 GetNormal(IntVector2 i) {
-            return GetNormal(i.x, i.y);
-        }
-
-        public Vector3 GetNormal(int x, int y) {
-            return VertexAt(x, y).normal;
-        }
-
-        //
         // Lock a vertex
         //
         public void Lock(IntVector2 i) {
@@ -94,11 +118,11 @@ namespace Route95.World {
         }
 
         public void Lock(int x, int y) {
-            VertexAt(x, y).locked = true;
+            VertexAt(x, y).Lock();
         }
 
         public void Unlock(int x, int y) {
-            VertexAt(x, y).locked = false;
+            VertexAt(x, y).Unlock();
         }
 
         //
@@ -109,7 +133,7 @@ namespace Route95.World {
         }
 
         public bool IsLocked(int x, int y) {
-            return (ContainsVertex(x, y) ? VertexAt(x, y).locked : true);
+            return (ContainsVertex(x, y) ? VertexAt(x, y).Locked : true);
         }
 
         //
@@ -121,7 +145,7 @@ namespace Route95.World {
 
         public bool IsConstrained(int x, int y) {
             if (!ContainsVertex(x, y)) return false;
-            return VertexAt(x, y).nearRoad;
+            return VertexAt(x, y).NearRoad;
         }
         // 
 
@@ -133,44 +157,46 @@ namespace Route95.World {
             float startTime = Time.realtimeSinceStartup;
             float xWPos;
             float yWPos;
+			float chunkSize = WorldManager.Instance.ChunkSize;
+			int chunkRes = WorldManager.Instance.ChunkResolution;
 
-            for (int x = xMin; x <= xMax; x++) {
+            for (int x = _xMin; x <= _xMax; x++) {
 
                 // Skip if impossible for a point to be in range
                 xWPos = x * chunkSize / (chunkRes - 1) - chunkSize / 2f;
-                if (Mathf.Abs(xWPos - roadPoint.x) > noDecorationsDistance)
+                if (Mathf.Abs(xWPos - roadPoint.x) > _noDecorationsDistance)
                     continue;
 
-                for (int y = yMin; y < yMax; y++) {
+                for (int y = _yMin; y < _yMax; y++) {
 
                     // Skip if impossible for a point to be in range
                     yWPos = y * chunkSize / (chunkRes - 1) - chunkSize / 2f;
-                    if (Mathf.Abs(yWPos - roadPoint.z) > noDecorationsDistance)
+                    if (Mathf.Abs(yWPos - roadPoint.z) > _noDecorationsDistance)
                         continue;
 
-                    Vertex vert = vertices.At(x, y);
+                    Vertex vert = _vertices.At(x, y);
 
                     float dist = Vector2.Distance(new Vector2(xWPos, yWPos), new Vector2(roadPoint.x, roadPoint.z));
-                    vert.color.g = Mathf.Clamp01(noDecorationsDistance / (dist + .01f));
+                    vert.SetGreen(Mathf.Clamp01(_noDecorationsDistance / (dist + .01f)));
 
-                    if (!vert.noDecorations) {
-                        vert.noDecorations = dist <= noDecorationsDistance;
+                    if (!vert.NoDecorations) {
+                        vert.NoDecorations = dist <= _noDecorationsDistance;
                         vert.RemoveDecorations();
                     }
 
                     if (vert == null) continue;
-                    if (vert.locked) continue;
+                    if (vert.Locked) continue;
 
-                    if (vert.noDecorations) {
-                        vert.nearRoad = dist <= nearbyRoadDistance;
+                    if (vert.NoDecorations) {
+                        vert.NearRoad = dist <= _nearbyRoadDistance;
 
-                        if (vert.nearRoad) {
+                        if (vert.NearRoad) {
                             vert.SmoothHeight(roadPoint.y, UnityEngine.Random.Range(0.98f, 0.99f), UnityEngine.Random.Range(2, 8));
-                            foreach (GameObject decoration in vert.decorations) decorationDeletes.Add(decoration);
-                            foreach (GameObject decoration in decorationDeletes)
+                            foreach (GameObject decoration in vert.Decorations) _decorationDeletes.Add(decoration);
+                            foreach (GameObject decoration in _decorationDeletes)
                                 WorldManager.Instance.RemoveDecoration(decoration);
-                            decorationDeletes.Clear();
-                            vert.locked = true;
+                            _decorationDeletes.Clear();
+                            vert.Lock();
                         }
 
                         if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
@@ -189,7 +215,7 @@ namespace Route95.World {
         }
 
         public void Randomize(float noise) {
-            int x = vertices.Width;
+            int x = _vertices.Width;
             //Debug.Log(x);
             //return;
             for (int i = 0; i < x; i++) {
@@ -200,10 +226,10 @@ namespace Route95.World {
             }
             while (!Mathf.IsPowerOfTwo(x - 1)) x--;
 
-            vertices.At(0, 0).SetHeight(UnityEngine.Random.Range(-noise, noise));
-            vertices.At(x, 0).SetHeight(UnityEngine.Random.Range(-noise, noise));
-            vertices.At(0, x).SetHeight(UnityEngine.Random.Range(-noise, noise));
-            vertices.At(x, x).SetHeight(UnityEngine.Random.Range(-noise, noise));
+            _vertices.At(0, 0).SetHeight(UnityEngine.Random.Range(-noise, noise));
+            _vertices.At(x, 0).SetHeight(UnityEngine.Random.Range(-noise, noise));
+            _vertices.At(0, x).SetHeight(UnityEngine.Random.Range(-noise, noise));
+            _vertices.At(x, x).SetHeight(UnityEngine.Random.Range(-noise, noise));
             int currRes = x - 1;
             var currNoise = noise;
             while (currRes % 1 == 0 && currRes > 1) {
@@ -212,14 +238,14 @@ namespace Route95.World {
                     for (int j = 0; j < x - 1; j += currRes) {
                         int midptX = i + currRes / 2;
                         int midptY = j + currRes / 2;
-                        float avg = (vertices.At(i, j).height + vertices.At(i + currRes, j).height +
-                            vertices.At(i, j + currRes).height + vertices.At(i + currRes, j + currRes).height) / 4f;
-                        vertices.At(midptX, midptY).SetHeight(avg + UnityEngine.Random.Range(-currNoise, currNoise));
+                        float avg = (_vertices.At(i, j).Height + _vertices.At(i + currRes, j).Height +
+                            _vertices.At(i, j + currRes).Height + _vertices.At(i + currRes, j + currRes).Height) / 4f;
+                        _vertices.At(midptX, midptY).SetHeight(avg + UnityEngine.Random.Range(-currNoise, currNoise));
 
-                        vertices.At(midptX, j).SetHeight((vertices.At(i, j).height + vertices.At(i + currRes, j).height) / 2f + UnityEngine.Random.Range(0f, currNoise));
-                        vertices.At(midptX, j + currRes).SetHeight((vertices.At(i, j + currRes).height + vertices.At(i + currRes, j + currRes).height) / 2f + UnityEngine.Random.Range(0f, currNoise));
-                        vertices.At(i, midptY).SetHeight((vertices.At(i, j).height + vertices.At(i, j + currRes).height) / 2f + UnityEngine.Random.Range(0f, currNoise));
-                        vertices.At(i + currRes, midptY).SetHeight((vertices.At(i + currRes, j).height + vertices.At(i + currRes, j + currRes).height) / 2f + UnityEngine.Random.Range(0f, currNoise));
+                        _vertices.At(midptX, j).SetHeight((_vertices.At(i, j).Height + _vertices.At(i + currRes, j).Height) / 2f + UnityEngine.Random.Range(0f, currNoise));
+                        _vertices.At(midptX, j + currRes).SetHeight((_vertices.At(i, j + currRes).Height + _vertices.At(i + currRes, j + currRes).Height) / 2f + UnityEngine.Random.Range(0f, currNoise));
+                        _vertices.At(i, midptY).SetHeight((_vertices.At(i, j).Height + _vertices.At(i, j + currRes).Height) / 2f + UnityEngine.Random.Range(0f, currNoise));
+                        _vertices.At(i + currRes, midptY).SetHeight((_vertices.At(i + currRes, j).Height + _vertices.At(i + currRes, j + currRes).Height) / 2f + UnityEngine.Random.Range(0f, currNoise));
                     }
                 }
                 currRes /= 2;
@@ -244,11 +270,11 @@ namespace Route95.World {
 
         public void RegisterChunkVertex(IntVector2 vertCoords, IntVector2 chunkCoords, int vertIndex) {
             Vertex vert = VertexAt(vertCoords, true);
-            vert.chunkVertices.Add(new KeyValuePair<IntVector2, int>(chunkCoords, vertIndex));
+			vert.AddChunkVertex (chunkCoords, vertIndex);
         }
 
         public Vertex VertexAt(int x, int y, bool make = false) {
-            Vertex vert = vertices.At(x, y);
+            Vertex vert = _vertices.At(x, y);
             if (vert == null && make) vert = AddVertex(x, y);
             return vert;
         }
@@ -260,25 +286,25 @@ namespace Route95.World {
         public void RegisterDecoration(IntVector2 i, GameObject deco) {
             if (!ContainsVertex(i.x, i.y)) AddVertex(i.x, i.y);
 
-            VertexAt(i.x, i.y).decorations.Add(deco);
+            VertexAt(i.x, i.y).Decorations.Add(deco);
         }
 
         public Vertex LeftNeighbor(Vertex v) {
-            if (ContainsVertex(v.x - 1, v.y)) return VertexAt(v.x - 1, v.y);
+            if (ContainsVertex(v.X - 1, v.Y)) return VertexAt(v.X - 1, v.Y);
             else return null;
         }
 
         public Vertex RightNeighbor(Vertex v) {
-            if (ContainsVertex(v.x + 1, v.y)) return VertexAt(v.x + 1, v.y);
+            if (ContainsVertex(v.X + 1, v.Y)) return VertexAt(v.X + 1, v.Y);
             else return null;
         }
 
         public Vertex DownNeighbor(Vertex v) {
-            if (ContainsVertex(v.x, v.y - 1)) return VertexAt(v.x, v.y - 1);
+            if (ContainsVertex(v.X, v.Y - 1)) return VertexAt(v.X, v.Y - 1);
             else return null;
         }
         public Vertex UpNeighbor(Vertex v) {
-            if (ContainsVertex(v.x, v.y + 1)) return VertexAt(v.x, v.y + 1);
+            if (ContainsVertex(v.X, v.Y + 1)) return VertexAt(v.X, v.Y + 1);
             else return null;
         }
 
@@ -291,13 +317,11 @@ namespace Route95.World {
         Vertex AddVertex(int x, int y) {
             //AddVertex (new Vertex (x, y));
             Vertex result = new Vertex(x, y);
-            result.map = this;
-            result.terrain = terrain;
-            vertices.Set(x, y, result);
-            if (x < xMin) xMin = x;
-            if (x > xMax) xMax = x;
-            if (y < yMin) yMin = y;
-            if (y > yMax) yMax = y;
+            _vertices.Set(x, y, result);
+            if (x < _xMin) _xMin = x;
+            if (x > _xMax) _xMax = x;
+            if (y < _yMin) _yMin = y;
+            if (y > _yMax) _yMax = y;
             return result;
             /*float avgH = 0f;
             avgH += (ContainsVertex(x-1, y) ? vertices[x-1,y].height/4f : 0f);
@@ -310,5 +334,6 @@ namespace Route95.World {
 
         }
 
-    }
+		#endregion
+	}
 }

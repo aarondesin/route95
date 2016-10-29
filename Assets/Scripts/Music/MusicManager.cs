@@ -399,8 +399,8 @@ namespace Route95.Music {
                             _keyboardDensity = (float)_keyboardNotes / (float)_beatsElapsedInCurrentSong;
                             _brassDensity = (float)_brassNotes / (float)_beatsElapsedInCurrentSong;
                             if (WorldManager.Instance.Shakers > 2) WorldManager.Instance.Shakers -= 2;
-                            WorldManager.Instance.roadVariance = Mathf.Clamp(_guitarDensity * 0.6f, 0.2f, 0.6f);
-                            WorldManager.Instance.roadMaxSlope = Mathf.Clamp(_keyboardDensity * 0.002f, 0.002f, 0.001f);
+                            WorldManager.Instance.RoadVariance = Mathf.Clamp(_guitarDensity * 0.6f, 0.2f, 0.6f);
+                            WorldManager.Instance.RoadMaxSlope = Mathf.Clamp(_keyboardDensity * 0.002f, 0.002f, 0.001f);
                             WorldManager.Instance.DecorationDensity = Mathf.Clamp(_brassDensity * 2f, 1f, 2f);
                         }
                         break;

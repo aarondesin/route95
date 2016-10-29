@@ -34,7 +34,7 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour
 	#endregion
 	#region Unity Callbacks
 
-	public void Awake () {
+	protected void Awake () {
 
 		// Check if an Instance already exists
 		if (_Instance != null)

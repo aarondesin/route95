@@ -16,6 +16,10 @@ TagManager:
   - ViewFrontLeftWheel
   - ViewRearRightWheel
   - ViewRearLeftWheel
+  - FrontRightWheel
+  - FrontLeftWheel
+  - RearRightWheel
+  - RearLeftWheel
   layers:
   - Default
   - TransparentFX

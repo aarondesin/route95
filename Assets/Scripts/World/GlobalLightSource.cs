@@ -46,7 +46,7 @@ namespace Route95.World {
 		#endregion
 		#region Unity Callbacks
 
-		new void Awake () {
+		new protected void Awake () {
 			base.Awake();
 
 			// Init vars
@@ -65,6 +65,8 @@ namespace Route95.World {
 		#endregion
 		#region Properties
 
+		public Light Light { get { return _light; } }
+
 		public Light ShadowCaster { get { return _shadowCaster; } }
 
 		#endregion
@@ -73,9 +75,9 @@ namespace Route95.World {
 		protected void UpdateTransform() {
             _target = PlayerMovement.Instance.transform.position;
 
-            float newX = -_radius * Mathf.Cos(WorldManager.Instance.timeOfDay);
-            float newY = -_radius * Mathf.Sin(WorldManager.Instance.timeOfDay);
-            float newZ = -_radius * Mathf.Cos(WorldManager.Instance.timeOfDay + Mathf.PI / 5);
+            float newX = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay);
+            float newY = -_radius * Mathf.Sin(WorldManager.Instance.TimeOfDay);
+            float newZ = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay + Mathf.PI / 5);
             transform.position = new Vector3(newX, newY, newZ);
 
             transform.LookAt(_target);

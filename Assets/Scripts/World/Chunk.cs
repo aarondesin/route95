@@ -238,8 +238,8 @@ namespace Route95.World {
                 _mapVerts[i] = vmap.VertexAt(coord, true);
 
                 // If vertex exists, get height
-                UpdateVertex(i, _mapVerts[i].height);
-                UpdateColor(i, _mapVerts[i].color);
+                UpdateVertex(i, _mapVerts[i].Height);
+                UpdateColor(i, _mapVerts[i].Color);
             }
 
             // Assign material
@@ -267,7 +267,7 @@ namespace Route95.World {
 
             // Randomize grass density
             ParticleSystem sys = _grassEmitter.GetComponent<ParticleSystem>();
-            sys.maxParticles = UnityEngine.Random.Range(0, WorldManager.Instance.grassPerChunk);
+            sys.maxParticles = UnityEngine.Random.Range(0, WorldManager.Instance.GrassPerChunk);
             sys.playOnAwake = true;
 
             // Assign particle system emission shape
@@ -276,7 +276,7 @@ namespace Route95.World {
 
             // Assign particle system emission rate
             ParticleSystem.EmissionModule emit = sys.emission;
-            emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.Instance.decorationsPerStep);
+            emit.rate = new ParticleSystem.MinMaxCurve(WorldManager.Instance.DecorationsPerStep);
 
             UpdateCollider();
         }
@@ -316,7 +316,7 @@ namespace Route95.World {
                 _mapVerts[i] = vmap.VertexAt(coord, true);
 
                 // Get height from vertex
-                UpdateVertex(i, _mapVerts[i].height);
+                UpdateVertex(i, _mapVerts[i].Height);
 
             }
 
@@ -545,12 +545,12 @@ namespace Route95.World {
                 Vertex vert = _mapVerts[v];
 
                 // Update vertex height
-                UpdateVertex(v, vert.height);
+                UpdateVertex(v, vert.Height);
 
                 if (terrain.FreqData == null) yield break;
 
                 // If vertex is not locked and there is frequency data to use
-                if (!vert.locked) {
+                if (!vert.Locked) {
 
                     // Distance between player and vertex
                     Vector3 vertPos = chunkPos + _verts[v];
@@ -621,7 +621,7 @@ namespace Route95.World {
 			DynamicTerrain terrain = DynamicTerrain.Instance;
             Vector3 chunkPos = transform.position;
 			float chunkSize = WorldManager.Instance.ChunkSize;
-            float checkResolution = (1f - startProgress) * WorldManager.Instance.roadPathCheckResolution;
+            float checkResolution = (1f - startProgress) * WorldManager.Instance.RoadPathCheckResolution;
 
             // Set boundaries for "near road" consideration
             Vector2 nearMin = new Vector2(chunkPos.x - chunkSize, chunkPos.z - chunkSize);
@@ -726,7 +726,7 @@ namespace Route95.World {
             switch (color) {
                 case DynamicTerrain.DebugColors.Constrained:
                     for (int v = 0; v < _numVerts; v++) {
-                        _colors[v] = _mapVerts[v].noDecorations ? Color.black : Color.white;
+                        _colors[v] = _mapVerts[v].NoDecorations ? Color.black : Color.white;
                     }
                     _mesh.colors = _colors;
                     break;

@@ -52,7 +52,7 @@ namespace Route95.World {
                 WorldManager wm = target as WorldManager;
                 Vertex vert = DynamicTerrain.Instance.VertexMap.VertexAt(_x, _y);
                 wm.VertexIndicator.transform.position = vert.WorldPos();
-                _vertBlend = vert.color.a;
+                _vertBlend = vert.Color.a;
             }
         }
 

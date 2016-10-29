@@ -651,9 +651,6 @@ namespace Route95.World {
         /// <summary>
         /// Picks a random position.
         /// </summary>
-        /// <param name="minHeight"></param>
-        /// <param name="maxHeight"></param>
-        /// <returns></returns>
         Vector3 PickRandomPosition(float minHeight, float maxHeight) {
             float chunkSize = WorldManager.Instance.ChunkSize;
 

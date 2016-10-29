@@ -2550,10 +2550,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 111705297}
---- !u!1 &111926570 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
-  m_PrefabInternal: {fileID: 302524263}
 --- !u!1 &112264763
 GameObject:
   m_ObjectHideFlags: 0
@@ -5045,7 +5041,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &177463291
@@ -7448,6 +7444,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_TagString
+      value: FrontLeftWheel
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -7587,6 +7587,10 @@ Prefab:
     - target: {fileID: 400000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -89.980194
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_TagString
+      value: FrontRightWheel
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
@@ -9558,6 +9562,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_TagString
+      value: RearLeftWheel
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -10820,19 +10828,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6569196e08e6074a8985e2e361ee9ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightRight: {fileID: 1080503465}
-  lightLeft: {fileID: 1299636034}
-  moving: 0
-  lights: 0
-  progress: 0
-  particles:
+  _headlights:
+  - {fileID: 1299636036}
+  - {fileID: 1080503467}
+  _particles:
   - {fileID: 419966875}
   - {fileID: 645894584}
-  frontLeftWheel: {fileID: 997807496}
-  frontRightWheel: {fileID: 1627868126}
-  backLeftWheel: {fileID: 111926570}
-  backRightWheel: {fileID: 1805006400}
-  engineClip: {fileID: 8300000, guid: b29e7bd30626f2c4ca02487d7604a91d, type: 3}
 --- !u!82 &371512239
 AudioSource:
   m_ObjectHideFlags: 0
@@ -23356,172 +23357,78 @@ MonoBehaviour:
   _chunkGenerationMode: 1
   _heightScale: 800
   _vertexUpdateDistance: 600
-  _terrainMaterial: {fileID: 0}
+  _terrainMaterial: {fileID: 2100000, guid: 8e48c9093054ffe4e80c62392702b090, type: 2}
   _wind: {x: 0, y: 0, z: 0}
   _doDecorate: 1
-  _maxDecorations: 0
+  _maxDecorations: 304
   _numDecorations: 0
   _vegetationGroup:
     group: 0
     numActive: 0
-    maxActive: 0
+    maxActive: 250
   _roadSignGroup:
     group: 0
     numActive: 0
-    maxActive: 0
+    maxActive: 4
   _rockGroup:
     group: 0
     numActive: 0
-    maxActive: 0
+    maxActive: 50
   _decorationDensity: 1
-  _grassModel: {fileID: 0}
-  _vegetationMaterial: {fileID: 0}
+  _grassModel: {fileID: 4300000, guid: de6580a574cfb2d44b3cf930e6318df1, type: 3}
+  _vegetationMaterial: {fileID: 2100000, guid: d16ff166cab38764e84a1d096fb4d803, type: 2}
   _grassEmitterPrefab: {fileID: 1684075852}
-  _decorationParticleEmitter: {fileID: 0}
+  _decorationParticleEmitter: {fileID: 1367707438}
   _baseLightningIntensity: 1.5
   _lightningStriker: {fileID: 478507253}
-  _lightningFlash: {fileID: 0}
-  _starEmitter: {fileID: 0}
+  _lightningFlash: {fileID: 1436337460}
+  _starEmitter: {fileID: 1592348090}
   _starEmissionRate: 6
-  _shootingStarTemplate: {fileID: 0}
-  _cloudEmitter: {fileID: 0}
+  _shootingStarTemplate: {fileID: 1231141450}
+  _cloudEmitter: {fileID: 190642049}
   _minCloudDensity: 0
   _maxCloudDensity: 0
   _cloudDensity: 0
-  _rainEmitter: {fileID: 0}
+  _rainEmitter: {fileID: 1686887395}
   _minRainDensity: 0
   rainDensity: 0
   _roadWidth: 10
   _roadHeight: 0.2
   _roadSlope: 0.9
-  roadStepsPerCurve: 25
-  roadPlacementDistance: 50
-  roadVariance: 0.4
-  roadMaxSlope: 0.002
-  roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
-  timeScale: 0.01
-  timeOfDay: 0
-  sun: {fileID: 1294310294}
-  sunScale: 0
-  maxSunIntensity: 0.5
-  minSunIntensity: 0.5
-  sunFlare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
-  moon: {fileID: 1802540240}
-  moonScale: 0
-  maxMoonIntensity: 1
-  minMoonIntensity: 1
-  moonSprites:
-  - {fileID: 21300000, guid: 772d79f9b948a0048b96102168e04d45, type: 3}
-  - {fileID: 21300000, guid: 772d79f9b948a0048b96102168e04d45, type: 3}
-  - {fileID: 21300000, guid: 772d79f9b948a0048b96102168e04d45, type: 3}
-  - {fileID: 21300000, guid: 772d79f9b948a0048b96102168e04d45, type: 3}
-  primaryColor: {r: 0, g: 0, b: 0, a: 0}
-  secondaryColor: {r: 0, g: 0, b: 0, a: 0}
-  primaryColors:
+  _roadStepsPerCurve: 100
+  _roadPlacementDistance: 30
+  _roadVariance: 0.4
+  _roadMaxSlope: 0.0015
+  _roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
+  _timeScale: 0.01
+  _timeOfDay: 0
+  _maxSunIntensity: 0
+  _minSunIntensity: 0
+  _sunFlare: {fileID: 0}
+  _maxMoonIntensity: 0
+  _minMoonIntensity: 0
+  _moonSprites: []
+  _primaryColor: {r: 0, g: 0, b: 0, a: 0}
+  _secondaryColor: {r: 0, g: 0, b: 0, a: 0}
+  _primaryColors:
     key0:
       serializedVersion: 2
-      rgba: 4278239487
+      rgba: 4294967295
     key1:
       serializedVersion: 2
       rgba: 4294967295
     key2:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 0
     key3:
       serializedVersion: 2
-      rgba: 4278239487
+      rgba: 0
     key4:
       serializedVersion: 2
-      rgba: 4280427042
+      rgba: 0
     key5:
       serializedVersion: 2
-      rgba: 1445641
-    key6:
-      serializedVersion: 2
-      rgba: 2236962
-    key7:
-      serializedVersion: 2
-      rgba: 46319
-    ctime0: 0
-    ctime1: 6554
-    ctime2: 26214
-    ctime3: 32768
-    ctime4: 39321
-    ctime5: 49151
-    ctime6: 58982
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 65535
-    atime3: 65535
-    atime4: 65535
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_NumColorKeys: 8
-    m_NumAlphaKeys: 2
-  secondaryColors:
-    key0:
-      serializedVersion: 2
-      rgba: 4282421503
-    key1:
-      serializedVersion: 2
-      rgba: 4291602041
-    key2:
-      serializedVersion: 2
-      rgba: 13084029
-    key3:
-      serializedVersion: 2
-      rgba: 32767
-    key4:
-      serializedVersion: 2
-      rgba: 3151379
-    key5:
-      serializedVersion: 2
-      rgba: 3150863
-    key6:
-      serializedVersion: 2
-      rgba: 3966959
-    key7:
-      serializedVersion: 2
-      rgba: 3966959
-    ctime0: 0
-    ctime1: 5358
-    ctime2: 26214
-    ctime3: 32768
-    ctime4: 39321
-    ctime5: 58982
-    ctime6: 65535
-    ctime7: 65535
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_NumColorKeys: 7
-    m_NumAlphaKeys: 2
-  skyboxFade:
-    key0:
-      serializedVersion: 2
-      rgba: 1073741823
-    key1:
-      serializedVersion: 2
-      rgba: 16777215
-    key2:
-      serializedVersion: 2
-      rgba: 1073741823
-    key3:
-      serializedVersion: 2
-      rgba: 4278190080
-    key4:
-      serializedVersion: 2
-      rgba: 2130706432
-    key5:
-      serializedVersion: 2
-      rgba: 1056964608
+      rgba: 0
     key6:
       serializedVersion: 2
       rgba: 0
@@ -23530,29 +23437,114 @@ MonoBehaviour:
       rgba: 0
     ctime0: 0
     ctime1: 65535
-    ctime2: 65535
+    ctime2: 0
     ctime3: 0
     ctime4: 0
     ctime5: 0
     ctime6: 0
     ctime7: 0
     atime0: 0
-    atime1: 3277
-    atime2: 36044
-    atime3: 39321
-    atime4: 58982
-    atime5: 65535
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
     atime6: 0
     atime7: 0
     m_NumColorKeys: 2
-    m_NumAlphaKeys: 6
+    m_NumAlphaKeys: 2
+  _secondaryColors:
+    key0:
+      serializedVersion: 2
+      rgba: 4294967295
+    key1:
+      serializedVersion: 2
+      rgba: 4294967295
+    key2:
+      serializedVersion: 2
+      rgba: 0
+    key3:
+      serializedVersion: 2
+      rgba: 0
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  _skyboxFade:
+    key0:
+      serializedVersion: 2
+      rgba: 4294967295
+    key1:
+      serializedVersion: 2
+      rgba: 4294967295
+    key2:
+      serializedVersion: 2
+      rgba: 0
+    key3:
+      serializedVersion: 2
+      rgba: 0
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
   _chunkUpdatesPerCycle: 4
   _frequencySampleSize: 256
   _frequencyFFTWindow: 0
-  decorationsPerStep: 100
-  grassPerChunk: 25
-  roadPathCheckResolution: 60
-  loadedTerrain: 0
+  _decorationsPerStep: 100
+  _grassPerChunk: 0
+  _roadPathCheckResolution: 4
 --- !u!1 &902385621
 GameObject:
   m_ObjectHideFlags: 0
@@ -25880,10 +25872,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 996605089}
---- !u!1 &997807496 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
-  m_PrefabInternal: {fileID: 199396362}
 --- !u!1 &1002243537
 GameObject:
   m_ObjectHideFlags: 0
@@ -26408,7 +26396,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000091552734, y: 0}
+  m_AnchoredPosition: {x: -0.009857178, y: 0}
   m_SizeDelta: {x: 1680, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -31418,6 +31406,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -89.980194
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
+      propertyPath: m_TagString
+      value: RearRightWheel
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
   m_IsPrefabParent: 0
@@ -31550,16 +31542,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b972a61e97111a14caea0204a37f6b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alpha:
+  _alpha:
     key0:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4294967295
     key1:
       serializedVersion: 2
       rgba: 4294967295
     key2:
       serializedVersion: 2
-      rgba: 4278190080
+      rgba: 0
     key3:
       serializedVersion: 2
       rgba: 0
@@ -31584,17 +31576,17 @@ MonoBehaviour:
     ctime6: 0
     ctime7: 0
     atime0: 0
-    atime1: 11492
-    atime2: 56994
-    atime3: 65535
+    atime1: 65535
+    atime2: 0
+    atime3: 0
     atime4: 0
     atime5: 0
     atime6: 0
     atime7: 0
     m_NumColorKeys: 2
-    m_NumAlphaKeys: 4
-  minLifetime: 0.5
-  maxLifetime: 2
+    m_NumAlphaKeys: 2
+  _minLifetime: 0
+  _maxLifetime: 0
 --- !u!1 &1239745010
 GameObject:
   m_ObjectHideFlags: 0
@@ -31979,7 +31971,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 0.000005086263
+  m_Value: 0.0004119873
   m_Size: 0.98571426
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -32163,14 +32155,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f22a0d760772c1f4d9e83da0e7e49b63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfObjects: 50
-  height: 0
-  radius: 1000
-  objects: []
-  points: []
-  scale: 250
-  opacity: 0.5
-  fallRate: 5
+  _numberOfPoints: 20
+  _height: 0
+  _radius: 0
+  _scale: 20
+  _opacity: 0
+  _fallRate: 0
 --- !u!120 &1277712147
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -43095,10 +43085,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1627327292}
---- !u!1 &1627868126 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
-  m_PrefabInternal: {fileID: 202934960}
 --- !u!1 &1632941710
 GameObject:
   m_ObjectHideFlags: 0
@@ -49651,10 +49637,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!1 &1805006400 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100000, guid: b3a93352b2ac12e4083f82bab94482bc, type: 3}
-  m_PrefabInternal: {fileID: 1216750873}
 --- !u!1 &1815893181
 GameObject:
   m_ObjectHideFlags: 0

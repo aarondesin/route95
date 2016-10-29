@@ -56,6 +56,8 @@ namespace Route95.World {
 		/// <summary>
 		/// Dust emitters.
 		/// </summary>
+		[SerializeField]
+		[Tooltip("Dust emitters.")]
         List<ParticleSystem> _particles;
 
 		/// <summary>
@@ -118,6 +120,8 @@ namespace Route95.World {
 
 		// Use this for initialization
 		new void Awake() {
+			base.Awake();
+
 			// Init vars
             _FRWheel = GameObject.FindGameObjectWithTag("FrontRightWheel");
 			_FLWheel = GameObject.FindGameObjectWithTag("FrontLeftWheel");
@@ -195,8 +199,8 @@ namespace Route95.World {
 
                 }
 
-                _lightsOn = (WorldManager.Instance.timeOfDay > (Mathf.PI * (7f / 8f))
-                    || WorldManager.Instance.timeOfDay <= Mathf.PI * (1f / 8f));
+                _lightsOn = (WorldManager.Instance.TimeOfDay > (Mathf.PI * (7f / 8f))
+                    || WorldManager.Instance.TimeOfDay <= Mathf.PI * (1f / 8f));
 				foreach (Light light in _headlights) light.enabled = _lightsOn;
             }
         }

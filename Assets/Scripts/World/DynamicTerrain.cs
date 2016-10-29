@@ -295,7 +295,7 @@ namespace Route95.World {
                     foreach (Chunk chunk in _activeChunks) chunk.UpdateCollider();
 
                     // Deform initial terrain
-                    int res = _vertexMap.vertices.Width;
+                    int res = _vertexMap.Width;
                     StartCoroutine(CreateMountain(0, 0, res, res, 5f, 20f, -0.03f, 0.03f));
 
                     // If updating terrain

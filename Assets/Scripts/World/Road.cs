@@ -70,6 +70,7 @@ namespace Route95.World {
 
         void Awake() {
 
+			// Init vars
             _toCheck = new List<Vector3>();
 
             _verts = new List<Vector3>();
@@ -81,7 +82,6 @@ namespace Route95.World {
 
             // Init road points
             _points = new List<Vector3>();
-
         }
 
         public void Update() {
@@ -102,8 +102,8 @@ namespace Route95.World {
 
             bool changesMade = false;
 
-			float generateRoadRadius = WorldManager.Instance.roadExtendRadius;
-			float cleanupRoadRadius = WorldManager.Instance.roadCleanupRadius;
+			float generateRoadRadius = WorldManager.Instance.RoadExtendRadius;
+			float cleanupRoadRadius = WorldManager.Instance.RoadCleanupRadius;
 
             // Create new points in front of player
             if (Vector3.Distance(_points.Tail(), playerPosition) < generateRoadRadius) {
@@ -207,12 +207,12 @@ namespace Route95.World {
 
         // Adds a new curve to the road bezier
         void AddCurve(bool ignoreMaxSlope = false) {
-			float placementDistance = WorldManager.Instance.roadPlacementDistance;
-			float variance = WorldManager.Instance.roadVariance;
+			float placementDistance = WorldManager.Instance.RoadPlacementDistance;
+			float variance = WorldManager.Instance.RoadVariance;
             float displacedDirection = placementDistance * variance; //placementRange;
 			float worldHeightScale = WorldManager.Instance.HeightScale;
-			float maxSlope = WorldManager.Instance.roadMaxSlope;
-			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
+			float maxSlope = WorldManager.Instance.RoadMaxSlope;
+			int stepsPerCurve = WorldManager.Instance.RoadStepsPerCurve;
 
             Vector3 point = _points.Tail();
             Vector3 old = point;
@@ -258,12 +258,12 @@ namespace Route95.World {
         }
 
         public void Backtrack() {
-			float placementDistance = WorldManager.Instance.roadPlacementDistance;
-			float variance = WorldManager.Instance.roadVariance;
+			float placementDistance = WorldManager.Instance.RoadPlacementDistance;
+			float variance = WorldManager.Instance.RoadVariance;
             float displacedDirection = placementDistance * variance; //placementRange;
-			float maxSlope = WorldManager.Instance.roadMaxSlope;
+			float maxSlope = WorldManager.Instance.RoadMaxSlope;
 			float heightScale = WorldManager.Instance.HeightScale;
-			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
+			int stepsPerCurve = WorldManager.Instance.RoadStepsPerCurve;
 
             Vector3 point = _points.Head();
             Vector3 old = point;
@@ -307,7 +307,7 @@ namespace Route95.World {
             for (int i = 0; i < 3; i++) _points.RemoveAt(0);
             _modes.RemoveAt(0);
 
-			int stepsPerCurve = WorldManager.Instance.roadStepsPerCurve;
+			int stepsPerCurve = WorldManager.Instance.RoadStepsPerCurve;
             _steps -= stepsPerCurve;
 
         }
@@ -323,7 +323,7 @@ namespace Route95.World {
             float progress = startProgress;
             float diff = endProgress - startProgress;
             if (diff < 0f) yield break;
-            float resolution = WorldManager.Instance.roadPathCheckResolution * diff;
+            float resolution = WorldManager.Instance.RoadPathCheckResolution * diff;
             while (progress < endProgress) {
                 Vector3 point = GetPoint(progress);
                 _toCheck.Add(point);

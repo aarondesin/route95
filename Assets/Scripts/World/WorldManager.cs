@@ -442,11 +442,17 @@ namespace Route95.World {
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Road Settings")]
 
+		/// <summary>
+		/// Width of generated road.
+		/// </summary>
         [Tooltip("Width of generated road.")]
         [Range(1f, 20f)]
 		[SerializeField]
         float _roadWidth = DEFAULT_ROAD_WIDTH;
 
+		/// <summary>
+		/// Height of generated road.
+		/// </summary>
         [Tooltip("Height of generated road.")]
         [Range(0.1f, 1.0f)]
 		[SerializeField]
@@ -459,23 +465,43 @@ namespace Route95.World {
 		[SerializeField]
         float _roadSlope = DEFAULT_ROAD_SLOPE;
 
+		/// <summary>
+		/// Number of mesh subdivisions per road segment.
+		/// </summary>
         [Tooltip("Number of mesh subdivisions per road segment.")]
-        public int roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
+		[SerializeField]
+        int _roadStepsPerCurve = DEFAULT_ROAD_STEPS_PER_CURVE;
 
-        [NonSerialized]
-        public float roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
+		/// <summary>
+		/// Distance from player for road to try to extend.
+		/// </summary>
+        float _roadExtendRadius = DEFAULT_ROAD_EXTEND_RADIUS;
 
-        [NonSerialized]
-        public float roadCleanupRadius;
+        /// <summary>
+		/// Distance from player for road to cleanup points.
+		/// </summary>
+        float _roadCleanupRadius;
 
+		/// <summary>
+		/// Radius within which to place road.
+		/// </summary>
         [Tooltip("Radius within which to place road.")]
-        public float roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
+		[SerializeField]
+        float _roadPlacementDistance = DEFAULT_ROAD_PLACEMENT_DISTANCE;
 
+		/// <summary>
+		/// Percentage radius of road placement distance within which to place road.
+		/// </summary>
         [Tooltip("Percentage radius of road placement distance within which to place road.")]
-        public float roadVariance = DEFAULT_ROAD_VARIANCE;
+		[SerializeField]
+        float _roadVariance = DEFAULT_ROAD_VARIANCE;
 
+		/// <summary>
+		/// Max road slope per world unit of distance.
+		/// </summary>
         [Tooltip("Max road slope per world unit of distance.")]
-        public float roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
+		[SerializeField]
+        float _roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
 
 		/// <summary>
 		/// Reference to the road object.
@@ -483,111 +509,201 @@ namespace Route95.World {
         [NonSerialized]
         Road _road;
 
+		/// <summary>
+		/// Material to use for road.
+		/// </summary>
         [Tooltip("Material to use for road.")]
-        public Material roadMaterial;
+		[SerializeField]
+        Material _roadMaterial;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Day/Night Cycle Settings")]
 
+		/// <summary>
+		/// Global time scale for day/night cycle.
+		/// </summary>
         [Tooltip("Global time scale for day/night cycle.")]
         [Range(0.001f, 0.1f)]
-        public float timeScale = DEFAULT_TIME_SCALE;
+		[SerializeField]
+        float _timeScale = DEFAULT_TIME_SCALE;
 
+		/// <summary>
+		/// Current time of day.
+		/// </summary>
         [Tooltip("Current time of day.")]
         [Range(0f, 2f * Mathf.PI)]
-        public float timeOfDay;
+		[SerializeField]
+        float _timeOfDay;
 
-        public GameObject sun;                               // Sun object
-        Light sunLight;                                      // Sun object's light
-
-        [Tooltip("Scale to use for the sun.")]
-        public float sunScale;
-
+		/// <summary>
+		/// Daytime intensity of the sun.
+		/// </summary>
         [Tooltip("Daytime intensity of the sun.")]
         [Range(0f, 8f)]
-        public float maxSunIntensity;
+		[SerializeField]
+        float _maxSunIntensity;
 
+		/// <summary>
+		/// Nighttime intensity of the sun.
+		/// </summary>
         [Tooltip("Nighttime intensity of the sun.")]
         [Range(0f, 8f)]
-        public float minSunIntensity;
+		[SerializeField]
+        float _minSunIntensity;
 
-        float sunIntensityAxis;                              // Axis of sun intensity oscillation
-        float sunIntensityAmplitude;                         // Amplitude of sun intensity oscillation
+		/// <summary>
+		/// Axis of sun intensity oscillation.
+		/// </summary>
+        float _sunIntensityAxis;
 
+		/// <summary>
+		/// Amplitude of sun intensity oscillation.
+		/// </summary>
+        float _sunIntensityAmplitude;
+
+		/// <summary>
+		/// Flare texture to use for the sun.
+		/// </summary>
         [Tooltip("Flare texture to use for the sun.")]
-        public Flare sunFlare;
+		[SerializeField]
+        Flare _sunFlare;
 
-        public GameObject moon;                              // Moon object
-        Light moonLight;                                     // Moon object's light
-
-        [Tooltip("Scale to use for the moon.")]
-        public float moonScale;
-
+		/// <summary>
+		/// Nighttime intensity of the moon.
+		/// </summary>
         [Tooltip("Nighttime intensity of the moon.")]
         [Range(0f, 8f)]
-        public float maxMoonIntensity;
+		[SerializeField]
+        float _maxMoonIntensity;
 
+		/// <summary>
+		/// Daytime intensity of the moon.
+		/// </summary>
         [Tooltip("Daytime intensity of the moon.")]
         [Range(0f, 8f)]
-        public float minMoonIntensity;
+		[SerializeField]
+        float _minMoonIntensity;
 
-        float moonIntensityAxis;                             // Axis of moon intensity oscillation
-        float moonIntensityAmplitude;                        // Amplitude of moon intensity oscillation
+		/// <summary>
+		/// Axis of moon intensity oscillation.
+		/// </summary>
+        float _moonIntensityAxis;
 
+		/// <summary>
+		/// Amplitude of moon intensity oscillation.
+		/// </summary>
+        float _moonIntensityAmplitude;
+
+		/// <summary>
+		/// Sprites to randomize for the moon.
+		/// </summary>
         [Tooltip("Sprites to randomize for the moon.")]
-        public List<Sprite> moonSprites;
+		[SerializeField]
+        List<Sprite> _moonSprites;
 
+		/// <summary>
+		/// Current primary color.
+		/// </summary>
         [Tooltip("Current primary color.")]
         [SerializeField]
-        private Color primaryColor;
+        Color _primaryColor;
 
+		/// <summary>
+		/// Current secondary color.
+		/// </summary>
         [Tooltip("Current secondary color.")]
         [SerializeField]
-        private Color secondaryColor;
+        Color _secondaryColor;
 
+		/// <summary>
+		/// Primary color cycle.
+		/// </summary>
         [Tooltip("Primary color cycle.")]
-        public Gradient primaryColors;
+		[SerializeField]
+        Gradient _primaryColors;
 
+		/// <summary>
+		/// Secondary color cycle.
+		/// </summary>
         [Tooltip("Secondary color cycle.")]
-        public Gradient secondaryColors;
+		[SerializeField]
+        Gradient _secondaryColors;
 
+		/// <summary>
+		/// Skybox transition cycle.
+		/// </summary>
         [Tooltip("Skybox transition cycle.")]
-        public Gradient skyboxFade;
+		[SerializeField]
+        Gradient _skyboxFade;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("Performance Settings")]
 
+		/// <summary>
+		/// Maximum number of chunk updates per cycle.
+		/// </summary>
         [Tooltip("Maximum number of chunk updates per cycle.")]
         [Range(1, 16)]
 		[SerializeField]
         int _chunkUpdatesPerCycle = DEFAULT_CHUNK_UPDATES_PER_CYCLE;
 
+		/// <summary>
+		/// Resolution used in frequency spectrum analysis. Must be a power of 2.
+		/// </summary>
         [Tooltip("Resolution used in frequency spectrum analysis. Must be a power of 2.")]
 		[SerializeField]
         int _frequencySampleSize = DEFAULT_FREQ_ARRAY_SIZE;
 
-        LineRenderer visualizer;                                // Frequency visualizer
-
+		/// <summary>
+		/// FFT window to use when sampling music frequencies.
+		/// </summary>
         [Tooltip("FFT window to use when sampling music frequencies.")]
 		[SerializeField]
         FFTWindow _frequencyFFTWindow;
 
+		/// <summary>
+		/// Maximum number of decorations to place per update cycle.
+		/// </summary>
         [Tooltip("Maximum number of decorations to place per update cycle.")]
         [Range(10, 200)]
-        public int decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
+		[SerializeField]
+        int _decorationsPerStep = DEFAULT_DECORATIONS_PER_STEP;
 
+		/// <summary>
+		/// Maximum number of grass particles to place per chunk.
+		/// </summary>
         [Tooltip("Maximum number of grass particles to place per chunk.")]
         [Range(0, 100)]
-        public int grassPerChunk;
+		[SerializeField]
+        int _grassPerChunk;
 
+		/// <summary>
+		/// The accuracy used in road distance checks.
+		/// </summary>
         [Tooltip("The accuracy used in road distance checks.")]
         [Range(1f, 500f)]
-        public float roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
+		[SerializeField]
+        float _roadPathCheckResolution = DEFAULT_ROAD_PATH_CHECK_RESOLUTION;
 
-        float startLoadTime;
-        bool loaded = false;
-        public bool loadedTerrain = false;
-        bool hasRandomized = false;
+		/// <summary>
+		/// Time at which loading started.
+		/// </summary>
+        float _loadStartTime;
+
+		/// <summary>
+		/// Is WorldManager loaded?
+		/// </summary>
+        bool _loaded = false;
+
+		/// <summary>
+		/// Is terrain loaded?
+		/// </summary>
+        bool _loadedTerrain = false;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        bool _hasRandomized = false;
 
         #endregion
         #region Unity Callbacks
@@ -601,27 +717,20 @@ namespace Route95.World {
             _wind = UnityEngine.Random.insideUnitSphere;
 
             //roadPlacementDistance = chunkSize * 2f;
-            roadCleanupRadius = _chunkSize * (_chunkLoadRadius);
-            roadPlacementDistance = _chunkSize * 0.4f;
-            roadExtendRadius = _chunkSize * (_chunkLoadRadius / 2);
+            _roadCleanupRadius = _chunkSize * (_chunkLoadRadius);
+            _roadPlacementDistance = _chunkSize * 0.4f;
+            _roadExtendRadius = _chunkSize * (_chunkLoadRadius / 2);
             _road = CreateRoad();
 
             _numDecorations = 0;
             _decorationPool = new ObjectPool<Decoration>();
 
-            timeOfDay = UnityEngine.Random.Range(0, 2 * Mathf.PI);
-            CreateSun();
-            sunLight = sun.GetComponent<Light>();
-            sunIntensityAmplitude = (maxSunIntensity - minSunIntensity) / 2f;
-            sunIntensityAxis = minSunIntensity + sunIntensityAmplitude;
+            _timeOfDay = UnityEngine.Random.Range(0, 2 * Mathf.PI);
+            _sunIntensityAmplitude = (_maxSunIntensity - _minSunIntensity) / 2f;
+            _sunIntensityAxis = _minSunIntensity + _sunIntensityAmplitude;
 
-            CreateMoon();
-            moonLight = moon.GetComponent<Light>();
-            moonIntensityAmplitude = (maxMoonIntensity - maxMoonIntensity) / 2f;
-            moonIntensityAxis = minMoonIntensity + moonIntensityAmplitude;
-
-            //RenderSettings.ambientMode = AmbientMode.Flat;
-            //RenderSettings.ambientIntensity = 0.5f;
+            _moonIntensityAmplitude = (_maxMoonIntensity - _maxMoonIntensity) / 2f;
+            _moonIntensityAxis = _minMoonIntensity + _moonIntensityAmplitude;
 
             _lightningStriker.SetActive(false);
             _rainEmitter.SetRate(0f);
@@ -640,9 +749,9 @@ namespace Route95.World {
 
         // Update is called once per frame
         void Update() {
-            if (loadedTerrain && !hasRandomized)
+            if (_loadedTerrain && !_hasRandomized)
                 Load();
-            if (loaded && _road.IsLoaded) {
+            if (_loaded && _road.IsLoaded) {
 
                 //terrain.Update(freqDataArray);
                 UpdateTime();
@@ -662,7 +771,7 @@ namespace Route95.World {
                 rainDensity = Mathf.FloorToInt(_minRainDensity + rd * (_maxRainDensity - _minRainDensity));
                 _rainEmitter.SetRate(rainDensity);
 
-                _starEmitter.SetRate(0.5f * _starEmissionRate * -Mathf.Sin(timeOfDay) + _starEmissionRate / 2f);
+                _starEmitter.SetRate(0.5f * _starEmissionRate * -Mathf.Sin(_timeOfDay) + _starEmissionRate / 2f);
             }
 
         }
@@ -697,6 +806,11 @@ namespace Route95.World {
 
 		public float HeightScale { get { return _heightScale; } }
 
+		public float TimeOfDay {
+			get { return _timeOfDay; }
+			set { _timeOfDay = value; }
+		}
+
 		public Road Road { get { return _road; } }
 
 		public float RoadWidth { get { return _roadWidth; } }
@@ -704,6 +818,26 @@ namespace Route95.World {
 		public float RoadHeight { get { return _roadHeight; } }
 
 		public float RoadSlope { get { return _roadSlope; } } 
+
+		public float RoadMaxSlope {
+			get { return _roadMaxSlope; }
+			set { _roadMaxSlope = value; }
+		}
+
+		public float RoadCleanupRadius { get { return _roadCleanupRadius; } }
+
+		public float RoadExtendRadius { get { return _roadExtendRadius; } }
+
+		public float RoadPlacementDistance { get { return _roadPlacementDistance; } }
+
+		public float RoadPathCheckResolution { get { return _roadPathCheckResolution; } }
+
+		public float RoadVariance {
+			get { return _roadVariance; }
+			set { _roadVariance = value; }
+		}
+
+		public int RoadStepsPerCurve { get { return _roadStepsPerCurve; } }
 
 		public FFTWindow FrequencyFFTWindow { get { return _frequencyFFTWindow; } }
 
@@ -716,6 +850,10 @@ namespace Route95.World {
 		public GameObject GrassEmitterPrefab { get { return _grassEmitterPrefab; } }
 
 		public ParticleSystem DecorationParticleEmitter { get { return _decorationParticleEmitter; } }
+
+		public int DecorationsPerStep { get { return _decorationsPerStep; } }
+
+		public int GrassPerChunk { get { return _grassPerChunk; } }
 
 		public Vector3 Wind { get { return _wind; } }
 
@@ -741,10 +879,10 @@ namespace Route95.World {
 
 		public void Load() {
 
-            Camera.main.GetComponent<SunShafts>().sunTransform = sun.transform;
+            Camera.main.GetComponent<SunShafts>().sunTransform = Sun.Instance.transform;
 
             // Get start time
-            startLoadTime = Time.realtimeSinceStartup;
+            _loadStartTime = Time.realtimeSinceStartup;
 
             // Start by loading chunks
             DynamicTerrain.Instance.DoLoadChunks();
@@ -752,10 +890,10 @@ namespace Route95.World {
 
         public void FinishLoading() {
 
-            loaded = true;
+            _loaded = true;
 
             // Print time taken
-            Debug.Log("WorldManager.Load(): finished in " + (Time.realtimeSinceStartup - startLoadTime).ToString("0.0000") + " seconds.");
+            Debug.Log("WorldManager.Load(): finished in " + (Time.realtimeSinceStartup - _loadStartTime).ToString("0.0000") + " seconds.");
 
             Spectrum2.Instance.enabled = true;
 
@@ -812,7 +950,7 @@ namespace Route95.World {
                 if (_numDecorations < _maxDecorations) {
                     numLoaded += (AttemptDecorate() ? 1 : 0);
 
-                    if (_numDecorations == _maxDecorations && !loaded) {
+                    if (_numDecorations == _maxDecorations && !_loaded) {
                         FinishLoading();
                         yield return null;
                     }
@@ -820,7 +958,7 @@ namespace Route95.World {
                     if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
                         yield return null;
                         startTime = Time.realtimeSinceStartup;
-                        if (!loaded) GameManager.Instance.ReportLoaded(numLoaded);
+                        if (!_loaded) GameManager.Instance.ReportLoaded(numLoaded);
                         numLoaded = 0;
                     }
 
@@ -836,34 +974,34 @@ namespace Route95.World {
 
         void UpdateColor() {
 
-            float progress = timeOfDay / (Mathf.PI * 2f);
+            float progress = _timeOfDay / (Mathf.PI * 2f);
 
-            primaryColor = primaryColors.Evaluate(progress);
-            secondaryColor = secondaryColors.Evaluate(progress);
+            _primaryColor = _primaryColors.Evaluate(progress);
+            _secondaryColor = _secondaryColors.Evaluate(progress);
 
-            sunLight.intensity = sunIntensityAxis + sunIntensityAmplitude * Mathf.Sin(timeOfDay);
-            sunLight.color = primaryColor;
-            sun.GetComponent<Sun>().ShadowCaster.intensity = sunLight.intensity / 2f;
-            sun.GetComponent<Sun>().ShadowCaster.color = sunLight.color;
+            Sun.Instance.Light.intensity = _sunIntensityAxis + _sunIntensityAmplitude * Mathf.Sin(_timeOfDay);
+            Sun.Instance.Light.color = _primaryColor;
+            Sun.Instance.ShadowCaster.intensity = Sun.Instance.Light.intensity / 2f;
+            Sun.Instance.ShadowCaster.color = Sun.Instance.Light.color;
 
-            moonLight.color = Color.white;
-            moonLight.intensity = moonIntensityAxis + moonIntensityAmplitude * Mathf.Cos(timeOfDay - (Mathf.PI / 2f));
-            moon.GetComponent<Moon>().ShadowCaster.intensity = moonLight.intensity / 4f;
-            moon.GetComponent<Moon>().ShadowCaster.color = moonLight.color;
+            Moon.Instance.Light.color = Color.white;
+            Moon.Instance.Light.intensity = _moonIntensityAxis + _moonIntensityAmplitude * Mathf.Cos(_timeOfDay - (Mathf.PI / 2f));
+            Moon.Instance.ShadowCaster.intensity = Moon.Instance.Light.intensity / 4f;
+            Moon.Instance.ShadowCaster.color = Moon.Instance.Light.color;
 
-            RenderSettings.fogColor = secondaryColor;
-            RenderSettings.ambientLight = secondaryColor;
+            RenderSettings.fogColor = _secondaryColor;
+            RenderSettings.ambientLight = _secondaryColor;
 
-            RenderSettings.skybox.SetFloat("_Value", skyboxFade.Evaluate(progress).a);
+            RenderSettings.skybox.SetFloat("_Value", _skyboxFade.Evaluate(progress).a);
 
             if (Spectrum2.Instance != null)
-				Spectrum2.Instance.SetColor (primaryColor);
+				Spectrum2.Instance.SetColor (_primaryColor);
         }
 
         private void UpdateTime() {
-            timeOfDay += timeScale * Time.deltaTime;
-            while (timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
-                timeOfDay -= 2 * Mathf.PI;
+            _timeOfDay += _timeScale * Time.deltaTime;
+            while (_timeOfDay > (2 * Mathf.PI)) { //clamp timeOfDay between 0 and 2PI)
+                _timeOfDay -= 2 * Mathf.PI;
             }
         }
 
@@ -917,49 +1055,6 @@ namespace Route95.World {
             return false;
         }
 
-        /*GameObject CreateSun(){
-            GameObject sun = new GameObject ("Sun",
-                typeof (Light),
-                typeof (Sun),
-                typeof (LensFlare)
-            );
-
-            Light light = sun.GetComponent<Light>();
-            light.shadows = LightShadows.Soft;
-            light.flare = sunFlare;
-
-            LensFlare flare = sun.GetComponent<LensFlare>();
-            flare.flare = sunFlare;
-            //flare.
-
-            return sun;
-        }*/
-
-        void CreateSun() {
-
-        }
-
-        void CreateMoon() {
-            moon.GetComponent<SpriteRenderer>().sprite =
-                moonSprites[UnityEngine.Random.Range(0, moonSprites.Count)];
-        }
-
-        /*GameObject CreateMoon(){
-            GameObject moon = new GameObject ("Moon",
-                typeof (Light),
-                typeof (Moon),
-                typeof (SpriteRenderer)
-            );
-
-            Light light = moon.GetComponent<Light>();
-            light.shadows = LightShadows.Soft;
-
-            // Random moon phase
-            moon.GetComponent<SpriteRenderer>().sprite = 
-                moonSprites[UnityEngine.Random.Range(0,moonSprites.Count)];
-            return  moon;
-        }*/
-
         Road CreateRoad() {
 
             // Create road object
@@ -971,7 +1066,7 @@ namespace Route95.World {
 
             // Change renderer properties
             MeshRenderer roadRenderer = roadObj.GetComponent<MeshRenderer>();
-            roadRenderer.sharedMaterial = roadMaterial;
+            roadRenderer.sharedMaterial = _roadMaterial;
             roadRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
 
             // Pass on road properties
@@ -1003,7 +1098,7 @@ namespace Route95.World {
             }
 
             // Check if constrained
-            if (DynamicTerrain.Instance.VertexMap.VertexAt(nearestVertex).noDecorations) {
+            if (DynamicTerrain.Instance.VertexMap.VertexAt(nearestVertex).NoDecorations) {
                 //Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
                 return false;
             }
@@ -1250,7 +1345,7 @@ namespace Route95.World {
             IntVector2 coords = Chunk.ToNearestVMapCoords(origin.x, origin.z);
             Vertex v = DynamicTerrain.Instance.VertexMap.VertexAt(coords);
             if (v == null) v = DynamicTerrain.Instance.VertexMap.AddVertex(coords);
-            if (!v.locked && !v.nearRoad) v.SmoothHeight(v.height + _heightScale / 32f, 0.95f);
+            if (!v.Locked && !v.NearRoad) v.SmoothHeight(v.Height + _heightScale / 32f, 0.95f);
 
             //Debug.Log(v.ToString());
         }
@@ -1301,10 +1396,10 @@ namespace Route95.World {
     public void PrintVertexMap() {
         VertexMap vmap = DynamicTerrain.Instance.VertexMap;
         string log = "";
-        for (int i = vmap.xMin; i <= vmap.xMax; i++) {
-            for (int j = vmap.yMin; j <= vmap.yMax; j++) {
+        for (int i = vmap.XMin; i <= vmap.XMax; i++) {
+            for (int j = vmap.YMin; j <= vmap.YMax; j++) {
                 Vertex vert = vmap.VertexAt(i, j);
-                log += "[" + (vert != null ? (vert.height < 0f ? "-" : " ") + vert.height.ToString("000") : "    ") + "]";
+                log += "[" + (vert != null ? (vert.Height < 0f ? "-" : " ") + vert.Height.ToString("000") : "    ") + "]";
             }
             log += "\n";
         }
