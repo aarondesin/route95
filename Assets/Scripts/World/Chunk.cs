@@ -633,7 +633,6 @@ namespace Route95.World {
 
             float progress = startProgress;
             while (progress <= 1f) {
-
                 // Sample road and check distance to chunk
                 Vector3 sample = road.GetPoint(progress);
                 if (sample.x >= nearMin.x && sample.x <= nearMax.x &&

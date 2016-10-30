@@ -11,10 +11,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityStandardAssets.ImageEffects;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace Route95.Core {
 
     /// <summary>
@@ -66,6 +62,8 @@ namespace Route95.Core {
         /// Target FPS -- useful for coroutines.
         /// </summary>
 	    public static float TargetDeltaTime;
+
+		public static float LoadingTargetDeltaTime;
 
         //----------------------------------------------------------------------
         [Header("Load Status")]
@@ -172,6 +170,7 @@ namespace Route95.Core {
             // Set application target frame rate
             Application.targetFrameRate = 120;
             TargetDeltaTime = 1f / (float)Application.targetFrameRate;
+			LoadingTargetDeltaTime = TargetDeltaTime * 2f;
 
             // Init save paths
             _projectSavePath = Application.dataPath + _projectSaveFolder;

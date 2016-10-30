@@ -205,6 +205,7 @@ namespace Route95.World {
 		/// Material to use when debugging terrain.
 		/// </summary>
         [Tooltip("Material to use when debugging terrain.")]
+		[SerializeField]
         Material _terrainDebugMaterial;
 
         //-----------------------------------------------------------------------------------------------------------------
@@ -233,6 +234,8 @@ namespace Route95.World {
         [SerializeField]
         [Tooltip("Total max decorations.")]
         int _maxDecorations;
+
+		bool _initialDecoration = true;
 
 		/// <summary>
 		/// Current number of active decorations.
@@ -297,9 +300,9 @@ namespace Route95.World {
 		/// Current global decoration density.
 		/// </summary>
         [Tooltip("Current global decoration density.")]
-        [Range(0f, 2f)]
+        [Range(1, 50)]
 		[SerializeField]
-        float _decorationDensity = 1f;
+        int _decorationDensity = 25;
 
 		/// <summary>
 		/// Mesh to use for grass particles.
@@ -425,7 +428,7 @@ namespace Route95.World {
 		/// 
 		/// </summary>
         [SerializeField]
-        int rainDensity;
+        int _rainDensity;
 
 		/// <summary>
 		/// Number of active shakers.
@@ -768,8 +771,8 @@ namespace Route95.World {
                 _cloudEmitter.maxParticles = _cloudDensity;
 
                 float rd = _shakers / (Riff.MAX_BEATS * 2f);
-                rainDensity = Mathf.FloorToInt(_minRainDensity + rd * (_maxRainDensity - _minRainDensity));
-                _rainEmitter.SetRate(rainDensity);
+                _rainDensity = Mathf.FloorToInt(_minRainDensity + rd * (_maxRainDensity - _minRainDensity));
+                _rainEmitter.SetRate(_rainDensity);
 
                 _starEmitter.SetRate(0.5f * _starEmissionRate * -Mathf.Sin(_timeOfDay) + _starEmissionRate / 2f);
             }
@@ -869,7 +872,7 @@ namespace Route95.World {
 			set { _doDecorate = value; }
 		}
 
-		public float DecorationDensity {
+		public int DecorationDensity {
 			get { return _decorationDensity; }
 			set { _decorationDensity = value; }
 		}
@@ -936,11 +939,11 @@ namespace Route95.World {
 
         IEnumerator DecorationLoop() {
 
-            List<string> loadMessages = new List<string>() {
-            "Planting cacti...",
-            "Placing doodads...",
-            "Landscaping...",
-        };
+			List<string> loadMessages = new List<string>() {
+				"Planting cacti...",
+				"Placing doodads...",
+				"Landscaping...",
+			};
 
             LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
             float startTime = Time.realtimeSinceStartup;
@@ -955,11 +958,11 @@ namespace Route95.World {
                         yield return null;
                     }
 
-                    if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
-                        yield return null;
+                    if (Time.realtimeSinceStartup - startTime > GameManager.LoadingTargetDeltaTime) {
                         startTime = Time.realtimeSinceStartup;
                         if (!_loaded) GameManager.Instance.ReportLoaded(numLoaded);
                         numLoaded = 0;
+						yield return null;
                     }
 
                 }
@@ -1015,8 +1018,6 @@ namespace Route95.World {
                 createNew = true;
             }
             else decoration = _decorationPool.Peek().gameObject;
-
-            //if (!createNew) Debug.Log("old");
 
             Decoration deco = decoration.GetComponent<Decoration>();
 
@@ -1076,12 +1077,12 @@ namespace Route95.World {
         }
 
         bool DecorateRandom(Chunk chunk, GameObject decorationPrefab, bool createNew) {
+
+			// Check for invalid chunk
             if (chunk == null) {
                 Debug.LogError("WorldManager.DecorateRandom(): invalid chunk!");
                 return false;
             }
-
-            //if (!createNew) Debug.Log("old");
 
             // Pick a random coordinate
             Vector2 coordinate = new Vector2(
@@ -1099,16 +1100,16 @@ namespace Route95.World {
 
             // Check if constrained
             if (DynamicTerrain.Instance.VertexMap.VertexAt(nearestVertex).NoDecorations) {
-                //Debug.Log(nearestVertex.ToString() + " was constrained, picked chunk "+chunk.name);
                 return false;
             }
 
             // Roll based on density
             float density = decorationPrefab.GetComponent<Decoration>().Density;
-            float spawnThreshold = density / DynamicTerrain.Instance.NumActiveChunks * _decorationDensity;
+            float spawnThreshold = (float)density / DynamicTerrain.Instance.NumActiveChunks * _decorationDensity;
+			bool roll = Mathf.PerlinNoise(coordinate.x, coordinate.y) < spawnThreshold || !_loaded;
 
             // If roll succeeded
-            if (!createNew || Mathf.PerlinNoise(coordinate.x, coordinate.y) < spawnThreshold) {
+            if (!createNew || roll) {
 
                 // Instantiate or grab object
                 GameObject decoration;
@@ -1213,13 +1214,30 @@ namespace Route95.World {
             GameObject decoration = (GameObject)Resources.Load(path);
             if (decoration == null) {
                 Debug.LogError("Failed to load decoration at " + path);
-            }
-            else {
-                //Debug.Log("Loaded "+path);
-                _decorations.Add(decoration);
-                //GameManager.Instance.IncrementLoadProgress();
+            } else {
+				bool valid = CheckDecoration (decoration.GetComponent<Decoration>());
+				if (valid)_decorations.Add(decoration);
             }
         }
+
+		bool CheckDecoration (Decoration decoration) {
+			if (decoration.DistributionType == Decoration.Distribution.None) {
+				Debug.LogError ("Decoration " + decoration.name + " has no distribution type!");
+				return false;
+			}
+
+			if (decoration.Density <= 0f) {
+				Debug.LogError ("Decoration " + decoration.name + " has a zero or negative distribution!");
+				return false;
+			}
+
+			if (decoration.DecoGroup == Decoration.Group.None) {
+				Debug.LogError ("Decoration " + decoration.name + " has no group!");
+				return false;
+			}
+
+			return true;
+		}
 
         public void RemoveDecoration(GameObject deco) {
             Decoration d = deco.GetComponent<Decoration>();

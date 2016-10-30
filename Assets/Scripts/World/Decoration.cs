@@ -20,6 +20,7 @@ namespace Route95.World {
         /// Type of decoration distribution.
         /// </summary>
         public enum Distribution {
+			None,
             Random,     // Truly random, based on density
             Roadside,   // For signs, placed alongside road facing either direction
             CloseToRoad // Placed close to road (good for small objects)

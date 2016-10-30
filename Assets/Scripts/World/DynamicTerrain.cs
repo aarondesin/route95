@@ -231,9 +231,9 @@ namespace Route95.World {
             float startTime = Time.realtimeSinceStartup;
 
             List<string> loadMessages = new List<string>() {
-            "Building your new playground...",
-            "Desertifying the desert..."
-        };
+				"Building your new playground...",
+				"Desertifying the desert..."
+			};
 
             // Change loading screen message
             if (!_loaded) LoadingScreen.Instance.SetLoadingMessage(loadMessages.Random());
@@ -493,11 +493,7 @@ namespace Route95.World {
             return chunk;
         }
 
-        public int NumActiveChunks {
-            get {
-                return _activeChunks.Count;
-            }
-        }
+        public int NumActiveChunks { get { return _activeChunks.Count; } }
 
         /// <summary>
         /// Registers a chunk as having a road on it.

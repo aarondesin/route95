@@ -401,7 +401,7 @@ namespace Route95.Music {
                             if (WorldManager.Instance.Shakers > 2) WorldManager.Instance.Shakers -= 2;
                             WorldManager.Instance.RoadVariance = Mathf.Clamp(_guitarDensity * 0.6f, 0.2f, 0.6f);
                             WorldManager.Instance.RoadMaxSlope = Mathf.Clamp(_keyboardDensity * 0.002f, 0.002f, 0.001f);
-                            WorldManager.Instance.DecorationDensity = Mathf.Clamp(_brassDensity * 2f, 1f, 2f);
+                            //WorldManager.Instance.DecorationDensity = Mathf.Clamp(_brassDensity * 2f, 1f, 2f);
                         }
                         break;
                 }

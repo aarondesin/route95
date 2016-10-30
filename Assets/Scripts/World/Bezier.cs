@@ -72,7 +72,7 @@ namespace Route95.World {
 		/// <summary>
 		/// Number of curves in the bezier. (read-only).
 		/// </summary>
-		public int CurveCount { get { return _points.Count - 1 / 3; } }
+		public int CurveCount { get { return (_points.Count - 1) / 3; } }
 
 		/// <summary>
 		/// Number of control modes in the bezier (read-only).
@@ -153,7 +153,7 @@ namespace Route95.World {
 				i = _points.Count - 4;
 			} else {
 				t = Mathf.Clamp01(t) * CurveCount;
-				i = (int)t;
+				i = Mathf.FloorToInt(t);
 				t -= i;
 				i *= 3;
 			}
