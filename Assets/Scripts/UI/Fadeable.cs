@@ -34,7 +34,7 @@ namespace Route95.UI {
         /// </summary>
         [Tooltip("Block raycasts while faded?")]
         [SerializeField]
-        bool _blockRaycastsWhileFaded = true;
+        bool _blockRaycastsWhileFaded = false;
 
         /// <summary>
         /// If true, busy fading.
@@ -56,9 +56,7 @@ namespace Route95.UI {
             // Initially fade if necessary
             if (_startFaded) {
                 _group.alpha = 0f;
-                
-                if (_blockRaycastsWhileFaded)
-                    _group.blocksRaycasts = true;
+                _group.blocksRaycasts = _blockRaycastsWhileFaded;
             }
         }
 
@@ -106,7 +104,7 @@ namespace Route95.UI {
         /// </summary>
         public void Fade() {
             if (gameObject.activeSelf) StopCoroutine("DoUnFade");
-            //else return;
+            _group.blocksRaycasts = _blockRaycastsWhileFaded;
             _busy = true;
             StartCoroutine("DoFade");
         }
@@ -116,7 +114,7 @@ namespace Route95.UI {
         /// </summary>
         public void UnFade() {
             if (gameObject.activeSelf) StopCoroutine("DoFade");
-            //else gameObject.SetActive(true);
+			_group.blocksRaycasts = true;
             _busy = true;
             StartCoroutine("DoUnFade");
         }

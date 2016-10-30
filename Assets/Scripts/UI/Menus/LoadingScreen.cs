@@ -17,7 +17,7 @@ namespace Route95.UI {
         #endregion
         #region Unity Callbacks
 
-        new void Awake () {
+        new protected void Awake () {
             base.Awake();
 
             // Init vars

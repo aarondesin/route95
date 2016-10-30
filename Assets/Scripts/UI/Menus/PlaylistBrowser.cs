@@ -34,6 +34,8 @@ namespace Route95.UI {
 		/// <summary>
 		/// Panel to use for playlist entries.
 		/// </summary>
+		[Tooltip("Panel to use for playlist entries.")]
+		[SerializeField]
         RectTransform _playlistTR;
 
 		/// <summary>

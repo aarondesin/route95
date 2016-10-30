@@ -1,35 +1,39 @@
-﻿using UnityEngine;
+﻿// Tooltip.cs
+// ©2016 Team 95
+
 using UnityEngine.UI;
-using System.Collections;
 
-/// <summary>
-/// Class to handle generic tooltips.
-/// </summary>
-public class Tooltip : MenuBase<Tooltip> {
+namespace Route95.UI {
 
-	#region Tooltip Vars
+	/// <summary>
+	/// Class to handle generic tooltips.
+	/// </summary>
+	public class Tooltip : MenuBase<Tooltip> {
 
-	Text textObj;
+		#region Tooltip Vars
 
-	#endregion
-	#region Unity Callbacks
+		Text textObj;
 
-	new void Awake () {
-        base.Awake();
+		#endregion
+		#region Unity Callbacks
 
-		// Init vars
-		textObj = GetComponentInChildren<Text>();
+		new void Awake() {
+			base.Awake();
+
+			// Init vars
+			textObj = GetComponentInChildren<Text>();
+		}
+
+		#endregion
+		#region Tooltip Methods
+
+		/// <summary>
+		/// Sets the text of the tooltip.
+		/// </summary>
+		public void SetText(string text) {
+			textObj.text = text;
+		}
+
+		#endregion
 	}
-
-	#endregion
-	#region Tooltip Methods
-
-    /// <summary>
-    /// Sets the text of the tooltip.
-    /// </summary>
-	public void SetText (string text) {
-		textObj.text = text;
-	}
-
-	#endregion
 }

@@ -89,7 +89,7 @@ namespace Route95.Music {
                         numLoaded++;
 
                         // If over time, skip until next frame
-                        if (Time.realtimeSinceStartup - startTime > GameManager.TargetDeltaTime) {
+                        if (Time.realtimeSinceStartup - startTime > GameManager.LoadingTargetDeltaTime) {
                             yield return null;
                             startTime = Time.realtimeSinceStartup;
                             GameManager.Instance.ReportLoaded(numLoaded);

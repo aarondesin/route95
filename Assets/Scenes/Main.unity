@@ -14442,7 +14442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &433132278
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -15399,7 +15399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &484484987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16115,7 +16115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &529178215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16136,7 +16136,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &530240446
 GameObject:
@@ -16222,6 +16222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scribbleSounds: []
+  _playlistTR: {fileID: 1095947005}
   _buttonHeight: 0
   _horizontalPadding: 0
   _verticalPadding: 0
@@ -16240,7 +16241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &537561992
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -17234,7 +17235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &589210709
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -20530,7 +20531,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &699958036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21904,7 +21905,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &796519853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22897,7 +22898,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &863281887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23350,7 +23351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8df0c0bcc057f3f42818b120188a7663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _vertexIndicator: {fileID: 0}
+  _vertexIndicator: {fileID: 70034783}
   _chunkSize: 100
   _chunkResolution: 8
   _chunkLoadRadius: 4
@@ -23751,7 +23752,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &909404792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26398,7 +26399,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.8008728, y: 0}
+  m_AnchoredPosition: {x: -23.999847, y: 0}
   m_SizeDelta: {x: 1680, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -30267,7 +30268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &1170065703
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -31973,7 +31974,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 0.03337097
+  m_Value: 0.99999493
   m_Size: 0.98571426
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -33518,14 +33519,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92efc10c71b48941b29b4206d79e4ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _state: 0
   _rotateSensitivity: 0.25
   _moveSensitivity: 0.4
-  _swaySpeed: 1
-  _baseSway: 1
-  _progress: 0
-  _transitionTimer: 0
-  _liveModeTransitionFreq: 0
+  _swaySpeed: 0.5
+  _baseSway: 0.01
+  _liveModeTransitionFreq: 180
 --- !u!114 &1334809321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37117,7 +37115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!222 &1415144761
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -40184,7 +40182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &1585738788
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -49594,7 +49592,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &1803614120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51348,7 +51346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &1989535862
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -51954,7 +51952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!225 &2011310446
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -52520,7 +52518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startFaded: 1
   _fadeSpeed: 0.05
-  _blockRaycastsWhileFaded: 1
+  _blockRaycastsWhileFaded: 0
 --- !u!114 &2076667130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52541,7 +52539,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &2079469087
 GameObject:

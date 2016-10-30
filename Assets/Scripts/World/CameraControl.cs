@@ -43,7 +43,6 @@ namespace Route95.World {
 		/// Current camera state.
 		/// </summary>
         [Tooltip("Current camera state.")]
-		[SerializeField]
         State _state = State.Setup;
 
 		/// <summary>
@@ -72,7 +71,7 @@ namespace Route95.World {
 		/// </summary>
         [Tooltip("Camera base sway amount.")]
 		[SerializeField]
-        float _baseSway = 1f;
+        float _baseSway = 0.5f;
 
 		/// <summary>
 		/// Camera sway enabled.
@@ -122,7 +121,6 @@ namespace Route95.World {
 		/// <summary>
 		/// Lerp progress.
 		/// </summary>
-        [SerializeField]
         float _progress = 0f;
 
         /// <summary>
@@ -138,7 +136,6 @@ namespace Route95.World {
 		/// <summary>
 		/// Timer to next angle change.
 		/// </summary>
-        [SerializeField]
         float _transitionTimer;
 
 		/// <summary>
@@ -176,7 +173,7 @@ namespace Route95.World {
         [Tooltip("Frequency with which to automatically change camera angle in live mode.")]
         [Range(1f, 600f)]
 		[SerializeField]
-        float _liveModeTransitionFreq;
+        float _liveModeTransitionFreq = 180f;
 
 		/// <summary>
 		/// Initial control mode.
