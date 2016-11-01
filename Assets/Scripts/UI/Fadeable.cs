@@ -55,8 +55,7 @@ namespace Route95.UI {
 
             // Initially fade if necessary
             if (_startFaded) {
-                _group.alpha = 0f;
-                _group.blocksRaycasts = _blockRaycastsWhileFaded;
+                FadeInstant();
             }
         }
 
@@ -108,6 +107,13 @@ namespace Route95.UI {
             _busy = true;
             StartCoroutine("DoFade");
         }
+
+		public void FadeInstant () {
+			StopAllCoroutines();
+			_group.blocksRaycasts = _blockRaycastsWhileFaded;
+			_group.alpha = 0f;
+			_busy = false;
+		}
 
         /// <summary>
         /// Starts unfading the object.

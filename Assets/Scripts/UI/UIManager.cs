@@ -177,6 +177,9 @@ namespace Route95.UI {
 		public UIEvent onSwitchToMainMenu;
 
 		[HideInInspector]
+		public UIEvent onSwitchToCreditsMenu;
+
+		[HideInInspector]
 		public UIEvent onSwitchToPlaylistMenu;
 
 		[HideInInspector]
@@ -207,6 +210,7 @@ namespace Route95.UI {
 			onSwitchMenus = new UIEvent();
 			onSwitchModes = new UIEvent();
 			onSwitchToMainMenu = new UIEvent();
+			onSwitchToCreditsMenu = new UIEvent();
 			onSwitchToPlaylistMenu = new UIEvent();
 			onSwitchToKeySelectMenu = new UIEvent();
 			onSwitchToSongArrangeMenu = new UIEvent();
@@ -420,6 +424,7 @@ namespace Route95.UI {
         /// </summary>
         public void HideAllMenus() {
             HideMenu(MainMenu.Instance);
+			HideMenu(CreditsMenu.Instance);
             HideMenu(PlaylistBrowser.Instance);
             HideMenu(KeySelectMenu.Instance);
             HideMenu(SongArrangeMenu.Instance);
@@ -444,6 +449,16 @@ namespace Route95.UI {
 
 			onSwitchToMainMenu.Invoke();
         }
+
+		public void GoToCreditsMenu () {
+			// Hide other menus
+			HideAllMenus();
+
+			// Show credits menu
+			ShowMenu(CreditsMenu.Instance);
+
+			onSwitchToCreditsMenu.Invoke();
+		}
 
         /// <summary>
         /// Goes to key select menu.
