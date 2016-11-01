@@ -383,7 +383,7 @@ namespace Route95.UI {
         /// Show the specified menu, fading if possible.
         /// </summary>
         /// <param name="menu">Menu to show.</param>
-        public void ShowMenu<T>(MenuBase<T> menu) where T : MonoBehaviour {
+        public void ShowMenu<T>(MenuBase<T> menu) where T: MonoBehaviour {
             menu.gameObject.SetActive(true);
             Fadeable fade = menu.GetComponent<Fadeable>();
             if (fade != null) fade.UnFade();

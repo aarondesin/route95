@@ -33,6 +33,7 @@ namespace Route95.UI {
 		/// <summary>
 		/// Transform of the actual panel with all of the files listed.
 		/// </summary>
+		[SerializeField]
         RectTransform _fileList;
 
 		/// <summary>
@@ -92,6 +93,7 @@ namespace Route95.UI {
             base.Awake();
 
             // Init vars
+			_header = GetComponentInChildren<Text>();
             _fileButtons = new List<GameObject>();
         }
 

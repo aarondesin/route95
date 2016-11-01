@@ -7,8 +7,7 @@ namespace Route95.UI {
 
 	[RequireComponent(typeof(Fadeable))]
 	[RequireComponent(typeof(CanvasGroup))]
-	public abstract class MenuBase<T> : SingletonMonoBehaviour<T>
-		where T : MonoBehaviour {
+	public abstract class MenuBase<T> : SingletonMonoBehaviour<T> where T: MonoBehaviour {
 		Fadeable _fade;
 
 		new protected void Awake() {

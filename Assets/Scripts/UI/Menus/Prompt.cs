@@ -1,6 +1,7 @@
 ﻿// Prompt.cs
 // ©2016 Team 95
 
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Route95.UI {
@@ -15,16 +16,19 @@ namespace Route95.UI {
 		/// <summary>
 		/// Reference to title text.
 		/// </summary>
+		[SerializeField]
         Text _titleText;
 
 		/// <summary>
 		/// Reference to message body text.
 		/// </summary>
+		[SerializeField]
         Text _messageText;
 
 		/// <summary>
 		/// Reference to button text.
 		/// </summary>
+		[SerializeField]
         Text _buttonText;
 
         #endregion
@@ -41,13 +45,6 @@ namespace Route95.UI {
             _messageText.text = message;
             _buttonText.text = button;
             UIManager.Instance.ShowMenu(this);
-        }
-
-        /// <summary>
-        /// Hides the dialog.
-        /// </summary>
-        public void HideDialog() {
-            UIManager.Instance.HideMenu(this);
         }
 
         #endregion

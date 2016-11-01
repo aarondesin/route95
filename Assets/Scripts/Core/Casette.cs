@@ -92,6 +92,7 @@ namespace Route95.Core {
 			});
 
 			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				MoveToFront();
 				_willMoveCasette = true;
 			});
 
