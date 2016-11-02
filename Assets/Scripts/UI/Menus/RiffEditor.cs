@@ -1,11 +1,13 @@
+// RiffEditor.cs
+// ©2016 Team 95
+
 using Route95.Core;
 using Route95.Music;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using System;
-using System.Collections;
+
 using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Route95.UI {
 
@@ -16,92 +18,212 @@ namespace Route95.UI {
 
         #region RiffEditor Vars
 
-        /// <summary>
-        /// Sound to use when enabling an effect.
-        /// </summary>
-        [Tooltip("Sound to use when enabling an effect.")]
-        [SerializeField]
-        AudioClip _enableEffectSound;
+        bool _initialized = false;
 
-        /// <summary>
-        /// Sound to use when disabling an effect.
-        /// </summary>
-        [Tooltip("Sound to use when disabling an effect.")]
-        [SerializeField]
-        AudioClip _disableEffectSound;
-
-        public bool initialized = false;
-        public static Riff CurrentRiff;         // Current riff being edited
+		/// <summary>
+		/// Current riff being edited.
+		/// </summary>
+        public static Riff CurrentRiff;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("UI Settings")]
 
-        public float buttonSpacing = 4f;          // Spacing between buttons
-        public float halfNoteScale = 0.8f;        // Scaler for half beat notes
-        public float quarterNoteScale = 0.6f;     // Scaler for quarter beat notes
-        public float volumeScale = 1.3f;          // Scaler for volume slider
-        public float evenBackgroundAlpha = 0.05f; // Alpha for background on even notes
-        public float oddBackgroundAlpha = 0.03f;  // Alpha for background on odd notes
-        public float scrollbarWidth = 20f;        // Width of scrollbars
-        public float initialScrollV = 0.99f;      // Initial vertical scroll value
+		/// <summary>
+		/// Spacing between buttons.
+		/// </summary>
+		[SerializeField]
+        float _buttonSpacing = 4f;
 
-        Vector2 squareSize;                       // Size of an intersection between grids
-        Vector2 buttonSize;                       // Size of a button (smaller than square size)
+		/// <summary>
+		/// Scaler for half beat notes.
+		/// </summary>
+		[SerializeField]
+        float _halfNoteScale = 0.8f;
 
-        int numNotes;                           // Number of rows
-        int numButtons;                         // Number of columns
-        int maxOctaves;                         // Maximum number of octaves supported by scale
-        int octavesShown = 2;                   // Number of octaves currently shown
+		/// <summary>
+		/// Scaler for quarter beat notes.
+		/// </summary>
+		[SerializeField]
+        float _quarterNoteScale = 0.6f;
 
-        List<GameObject> objects;               // List of all buttons and objects
-        List<GameObject> columnBackgrounds;           // List of all backgrounds
-        List<GameObject> rowBackgrounds;
-        List<List<GameObject>> buttonGrid;      // 2D grid of buttons (for AI)
-        List<GameObject> suggestions;           // List of suggestion objects
+		/// <summary>
+		/// Scaler for volume slider.
+		/// </summary>
+		[SerializeField]
+        float _volumeScale = 1.3f;
+
+		/// <summary>
+		/// Alpha for background on even notes.
+		/// </summary>
+		[SerializeField]
+        float _evenBackgroundAlpha = 0.05f;
+
+		/// <summary>
+		/// Alpha for background on odd notes.
+		/// </summary>
+		[SerializeField]
+        float _oddBackgroundAlpha = 0.03f;
+
+		/// <summary>
+		/// Width of scrollbars.
+		/// </summary>
+		[SerializeField]
+        float _scrollbarWidth = 20f;
+
+		/// <summary>
+		/// Initial vertical scroll value.
+		/// </summary>
+        float _initialScrollV = 0.99f;
+
+		/// <summary>
+		/// Size of an intersection between grids.
+		/// </summary>
+        Vector2 _squareSize;
+
+		/// <summary>
+		/// Size of a button (smaller than square size).
+		/// </summary>
+        Vector2 _buttonSize;
+
+		/// <summary>
+		/// Number of rows.
+		/// </summary>
+        int _numNotes;
+
+		/// <summary>
+		/// Number of columns.
+		/// </summary>
+        int _numButtons;
+
+		/// <summary>
+		/// Maximum number of octaves supported by scale.
+		/// </summary>
+        int _maxOctaves;
+
+		/// <summary>
+		/// Number of octaves currently shown.
+		/// </summary>
+        int _octavesShown = 2;
+
+		/// <summary>
+		/// List of all buttons and objects.
+		/// </summary>
+        List<GameObject> _objects;
+
+		/// <summary>
+		/// List of all backgrounds.
+		/// </summary>
+        List<GameObject> _columnBackgrounds;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        List<GameObject> _rowBackgrounds;
+
+		/// <summary>
+		/// 2D grid of buttons (for AI).
+		/// </summary>
+        List<List<GameObject>> _buttonGrid;
+
+		/// <summary>
+		/// List of suggestion objects.
+		/// </summary>
+        List<GameObject> _suggestions;
 
         //-----------------------------------------------------------------------------------------------------------------
         [Header("UI References")]
 
-        public InputField nameInputField;
-        public Scrollbar scrollBarH;
-        public Scrollbar scrollBarV;
-        RectTransform notePanel;
-        public Image playRiffButton;
-        public Text tempoText;
-        public Scrollbar iconBar;
-        public RectTransform iconBar_tr;
-        public List<GameObject> sliders;
-        public Scrollbar beatsBar;
-        public RectTransform beatsBar_tr;
-        public Slider riffVolumeSlider;
-        public GameObject octaveParent;
+        InputField _nameInputField;
 
-        //public List<EffectSlider> effectSliders;
+		/// <summary>
+		/// 
+		/// </summary>
+        Scrollbar _scrollBarH;
 
-        public Image distortionButton;
-        public Image tremoloButton;
-        public Image chorusButton;
-        public Image flangerButton;
-        public Image echoButton;
-        public Image reverbButton;
+		/// <summary>
+		/// 
+		/// </summary>
+        Scrollbar _scrollBarV;
 
-        //-----------------------------------------------------------------------------------------------------------------
-        [Header("UI Art")]
+		/// <summary>
+		/// 
+		/// </summary>
+        RectTransform _notePanel;
 
-        // Icons for percussion setup buttons
-        public Sprite percussionEmpty;
-        public Sprite percussionFilled;
-        public Sprite percussionSuggested;
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _playRiffButton;
 
-        // Icons for melodic setup buttons
-        public Sprite melodicEmpty;
-        public Sprite melodicFilled;
-        public Sprite melodicSuggested;
+		/// <summary>
+		/// 
+		/// </summary>
+        Text _tempoText;
 
-        public Sprite minorSuggestion;
-        public Sprite majorSuggestion;
-        public Sprite powerSuggestion;
-        public Sprite octaveSuggestion;
+		/// <summary>
+		/// 
+		/// </summary>
+        Scrollbar _iconBar;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        RectTransform _iconBar_tr;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        List<GameObject> _sliders;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Scrollbar _beatsBar;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        RectTransform _beatsBar_tr;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Slider _riffVolumeSlider;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        GameObject _octaveParent;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _distortionButton;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _tremoloButton;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _chorusButton;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _flangerButton;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _echoButton;
+
+		/// <summary>
+		/// 
+		/// </summary>
+        Image _reverbButton;
 
         #endregion
         #region Unity Callbacks
@@ -110,18 +232,19 @@ namespace Route95.UI {
             base.Awake();
 
             // Init vars
-            notePanel = GetComponent<RectTransform>();
+            _notePanel = GameObject.FindGameObjectWithTag("RiffEditorNotePanel").GetComponent<RectTransform>();
+			_nameInputField = GetComponentInChildren<InputField>();
 
             // Init lists
-            objects = new List<GameObject>();
-            columnBackgrounds = new List<GameObject>();
-            rowBackgrounds = new List<GameObject>();
-            buttonGrid = new List<List<GameObject>>();
-            suggestions = new List<GameObject>();
+            _objects = new List<GameObject>();
+            _columnBackgrounds = new List<GameObject>();
+            _rowBackgrounds = new List<GameObject>();
+            _buttonGrid = new List<List<GameObject>>();
+            _suggestions = new List<GameObject>();
 
             // Set up riff name input field
-            nameInputField.onEndEdit.AddListener(delegate {
-                CurrentRiff.Name = nameInputField.text;
+            _nameInputField.onEndEdit.AddListener(delegate {
+                CurrentRiff.Name = _nameInputField.text;
             });
         }
 
@@ -136,7 +259,7 @@ namespace Route95.UI {
         /// Sets up riff editor and calls appropriate init function.
         /// </summary>
         public void Initialize() {
-            initialized = false;
+            _initialized = false;
 
             // Check if riff is valid
             if (CurrentRiff == null) {
@@ -144,27 +267,21 @@ namespace Route95.UI {
                 return;
             }
 
-            // Initialize effect sliders
-            /*foreach (EffectSlider effectSlider in effectSliders) {
-                effectSlider.gameObject.SetActive(true);
-                effectSlider.Initialize();
-            }*/
-
             // Initialize effect status sprites
             AudioSource source = MusicManager.Instance.GetAudioSource(CurrentRiff.Instrument);
 
             // Initialize effect toggle sprites
-            distortionButton.sprite =
+            _distortionButton.sprite =
                 source.GetComponent<AudioDistortionFilter>().enabled ? percussionFilled : percussionEmpty;
-            tremoloButton.sprite =
+            _tremoloButton.sprite =
                 source.GetComponent<AudioTremoloFilter>().enabled ? percussionFilled : percussionEmpty;
-            chorusButton.sprite =
+            _chorusButton.sprite =
                 source.GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
-            flangerButton.sprite =
+            _flangerButton.sprite =
                 source.GetComponent<AudioChorusFilter>().enabled ? percussionFilled : percussionEmpty;
-            echoButton.sprite =
+            _echoButton.sprite =
                 source.GetComponent<AudioEchoFilter>().enabled ? percussionFilled : percussionEmpty;
-            reverbButton.sprite =
+            _reverbButton.sprite =
                 source.GetComponent<AudioReverbFilter>().enabled ? percussionFilled : percussionEmpty;
 
             HideSliders();
@@ -173,7 +290,7 @@ namespace Route95.UI {
             Cleanup();
 
             // Set up riff editor properties
-            nameInputField.text = CurrentRiff.Name;
+            _nameInputField.text = CurrentRiff.Name;
             playRiffButton.sprite = UIManager.Instance.PlayIcon;
             UpdateTempoText();
 
@@ -209,20 +326,6 @@ namespace Route95.UI {
 
             foreach (GameObject obj in objects) Destroy(obj);
             objects.Clear();
-        }
-
-        /// <summary>
-        /// Plays an effects on noise.
-        /// </summary>
-        public void EffectsOn() {
-            MusicManager.PlayMenuSound(_enableEffectSound);
-        }
-
-        /// <summary>
-        /// Plays an effects off noise.
-        /// </summary>
-        public void EffectsOff() {
-            MusicManager.PlayMenuSound(_disableEffectSound);
         }
 
         /// <summary>
