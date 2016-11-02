@@ -32,6 +32,9 @@ namespace Route95.UI {
         [SerializeField]
         float _scaleFactor;
 
+		[SerializeField]
+		AudioClip _keySound;
+
         /// <summary>
         /// Current button placement radius.
         /// </summary>
@@ -95,7 +98,7 @@ namespace Route95.UI {
             _objects.Clear();
 
             // Init radius and scale
-            _radius = (_tr.rect.width - _baseScale) / 2f;
+            _radius = (_tr.rect.width - _baseScale / 2f) / 2f;
             _scale = _baseScale;
 
             // Layer one -- keys
@@ -120,12 +123,12 @@ namespace Route95.UI {
                 if (key.ToString().Contains("Sharp"))
                     text.text = key.ToString()[0] + "#";
                 text.font = UIManager.Instance.Font;
-                text.fontSize = (int)(_scale / 2f);
+                text.fontSize = (int)(_scale / 2.5f);
                 text.color = _GRAY;
 
                 // Set button image
                 Image img = button.GetComponent<Image>();
-                img.sprite = UIManager.Instance.CircleIcon;
+				img.sprite = UIManager.Instance.PercussionVolumeIcon;
                 img.color = _GRAY;
 
                 // Highlight if selected key
@@ -155,7 +158,7 @@ namespace Route95.UI {
                 });
 
                 // Set button show/hide
-                //ShowHide sh = button.AddComponent<ShowHide>();
+                Highlighted buttonHighlighted = button.AddComponent<Highlighted>();
                 GameObject highlight = UIHelpers.MakeImage(
                     key.ToString() + "_Highlight");
                 tr = highlight.GetComponent<RectTransform>();
@@ -168,10 +171,12 @@ namespace Route95.UI {
                     UIManager.Instance.PercussionVolumeIcon;
                 highlight.GetComponent<Image>().color = Color.white;
 
-                //sh.objects = new List<GameObject>();
-                //sh.objects.Add(highlight);
+				Fadeable highlightFade = highlight.AddComponent<Fadeable>();
+				highlightFade.StartFaded = true;
+				highlightFade.BlockRaycastsWhileFaded = false;
+				highlightFade.FadeSpeed = 0.1f;
 
-                highlight.SetActive(false);
+                buttonHighlighted.HighlightObject = highlightFade;
 
                 _objects.Add(button);
             }
@@ -198,12 +203,12 @@ namespace Route95.UI {
                 // Set button text
                 Text text = button.GetComponentInChildren<Text>();
                 text.font = UIManager.Instance.Font;
-                text.fontSize = (int)(_baseScale / 6f);
+                text.fontSize = (int)(_baseScale / 8f);
                 text.color = _GRAY;
 
                 // Set button image
                 Image img = button.GetComponent<Image>();
-                img.sprite = UIManager.Instance.CircleIcon;
+                img.sprite = UIManager.Instance.PercussionVolumeIcon;
                 img.color = _GRAY;
 
                 // Set highlighted button
@@ -220,7 +225,7 @@ namespace Route95.UI {
                 });
 
                 // Set show/hide
-                //ShowHide sh = button.AddComponent<ShowHide>();
+                Highlighted buttonHighlight = button.AddComponent<Highlighted>();
                 GameObject highlight = UIHelpers.MakeImage(
                     scalei.Name + "_Highlight");
                 tr = highlight.GetComponent<RectTransform>();
@@ -233,10 +238,12 @@ namespace Route95.UI {
                     UIManager.Instance.PercussionVolumeIcon;
                 highlight.GetComponent<Image>().color = Color.white;
 
-                //sh.objects = new List<GameObject>();
-                //sh.objects.Add(highlight);
+                Fadeable highlightFade = highlight.AddComponent<Fadeable>();
+				highlightFade.StartFaded = true;
+				highlightFade.BlockRaycastsWhileFaded = false;
+				highlightFade.FadeSpeed = 0.1f;
 
-                highlight.SetActive(false);
+                buttonHighlight.HighlightObject = highlightFade;
 
                 _objects.Add(button);
 
@@ -248,11 +255,15 @@ namespace Route95.UI {
             // Confirm button
             if (MusicManager.Instance.CurrentSong.Key != Key.None &&
                 MusicManager.Instance.CurrentSong.Scale != -1) {
+				PlayKeySound();
+				KeySelectConfirmButton.Instance.Show();
                 confirmButton.GetComponent<Button>().interactable = true;
-                confirmButton.SetActive(true);
             }
-            else confirmButton.SetActive(false);
         }
+
+		void PlayKeySound () {
+			MusicManager.PlayMenuSound (_keySound);
+		}
 
         #endregion
     }

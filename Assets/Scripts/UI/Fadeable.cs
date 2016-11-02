@@ -98,6 +98,16 @@ namespace Route95.UI {
             }
         }
 
+		public bool BlockRaycastsWhileFaded {
+			get { return _blockRaycastsWhileFaded; }
+			set { _blockRaycastsWhileFaded = value; }
+		}
+
+		public float FadeSpeed {
+			get { return _fadeSpeed; }
+			set { _fadeSpeed = value; }
+		}
+
         /// <summary>
         /// Starts fading the object.
         /// </summary>

@@ -22,6 +22,8 @@ namespace Route95.UI {
 		#region Unity Callbacks
 
 		new void Awake () {
+			base.Awake();
+
             // Init vars
             _button = GetComponent<Button>();
         }

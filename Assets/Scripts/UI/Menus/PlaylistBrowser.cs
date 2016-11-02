@@ -108,7 +108,7 @@ namespace Route95.UI {
         /// Plays a random pen scribble sound.
         /// </summary>
         public void PlayScribbleSound() {
-            MusicManager.PlayMenuSound(_scribbleSounds.Random(), 0.75f);
+            MusicManager.PlayMenuSound(_scribbleSounds.Random(), 0.5f);
         }
 
         /// <summary>
@@ -159,16 +159,14 @@ namespace Route95.UI {
                 listing_img.sprite = UIManager.Instance.FillSprite;
                 listing_img.color = new Color(0f, 0f, 1f, 0f);
 
-                /*ShowHide listing_sh = listing.ShowHide();
-
                 // Create background for listing
                 GameObject listing_bg = UIHelpers.MakeImage(song.Name + "_bg");
                 RectTransform listing_bg_tr = listing_bg.GetComponent<RectTransform>();
-                listing_bg_tr.SetParent(playlist);
-                listing_bg_tr.sizeDelta = new Vector2(listing_tr.sizeDelta.x - 2f * horizontalPadding, listing_tr.sizeDelta.y);
+                listing_bg_tr.SetParent(_playlistTR);
+                listing_bg_tr.sizeDelta = new Vector2(listing_tr.sizeDelta.x - 2f * _horizontalPadding, listing_tr.sizeDelta.y);
                 listing_bg_tr.AnchorAtPoint(0f, 1f);
                 listing_bg_tr.anchoredPosition3D = new Vector3(
-                    horizontalPadding + listing_tr.sizeDelta.x / 2f,
+                    _horizontalPadding + listing_tr.sizeDelta.x / 2f,
                     listing_tr.anchoredPosition3D.y,
                     0f
                 );
@@ -180,7 +178,14 @@ namespace Route95.UI {
                 listing_bg_img.sprite = UIManager.Instance.FillSprite;
                 listing_bg_img.color = new Color(1f, 1f, 1f, 0.0f);
 
-                listings.Add(listing_bg);*/
+				Fadeable listing_bg_fade = listing_bg.AddComponent<Fadeable>();
+				listing_bg_fade.BlockRaycastsWhileFaded = false;
+				listing_bg_fade.StartFaded = true;
+
+				Highlighted listing_highlight = listing.AddComponent<Highlighted>();
+				listing_highlight.HighlightObject = listing_bg_fade;
+
+                _listings.Add(listing_bg);
 
                 // Create song text
                 GameObject listing_text = UIHelpers.MakeText(song.Name + "_text");
@@ -217,7 +222,7 @@ namespace Route95.UI {
                 Button listing_remove_button = listing_remove.GetComponent<Button>();
                 listing_remove_button.onClick.AddListener(() => {
                     UIManager.Instance.PlayMenuClickSound();
-                    MusicManager.Instance.CurrentProject.RemoveSong(num);
+                    MusicManager.Instance.RemoveSong(num);
                     Refresh();
                 });
 
@@ -250,12 +255,6 @@ namespace Route95.UI {
                     else UIManager.Instance.GoToSongArrangeMenu();
                 });
 
-                /*listing_sh.objects = new List<GameObject>() {
-                listing_edit,
-                listing_remove,
-                listing_bg
-            };*/
-
                 listing_edit.AddComponent<Tooltippable>().Message = "Edit \"" + song.Name + "\".";
 
                 // Create move song up button if not at top
@@ -287,8 +286,6 @@ namespace Route95.UI {
                         MusicManager.Instance.CurrentProject.Songs[num - 1] = temp;
                         Refresh();
                     });
-
-                    //listing_sh.objects.Add(listing_up);
                 }
 
                 // Create move song down button if not at bottom
@@ -321,10 +318,8 @@ namespace Route95.UI {
                         Refresh();
                     });
 
-                    //listing_sh.objects.Add(listing_down);
                 }
 
-               // foreach (GameObject obj in listing_sh.objects) obj.SetActive(false);
             }
 
             // Create new song button
@@ -333,8 +328,10 @@ namespace Route95.UI {
 
             RectTransform newSongButton_tr = newSongButton.GetComponent<RectTransform>();
             newSongButton_tr.SetParent(_playlistTR);
+			newSongButton_tr.AnchorAtPoint(0.15f, 1f);
             newSongButton_tr.sizeDelta = new Vector2(_buttonHeight * _iconScale, _buttonHeight * _iconScale);
-            newSongButton_tr.AnchorAtPoint(0.15f, 1f);
+			
+            
             newSongButton_tr.anchoredPosition3D = new Vector3(
                 //horizontalPadding + newSongButton_tr.sizeDelta.x/2f,
                 0f,
@@ -390,9 +387,13 @@ namespace Route95.UI {
             newSongButton_highlight_img.sprite = UIManager.Instance.ScribbleIcon;
             newSongButton_highlight_img.color = new Color(1f, 1f, 1f, 1f);
 
-            //ShowHide newSongButton_sh = newSongButton.ShowHide();
-            //newSongButton_sh.objects = new List<GameObject>() { newSongButton_highlight };
-            //newSongButton_sh.Hide();
+            Fadeable newSongButton_highlight_fade = newSongButton_highlight.AddComponent<Fadeable>();
+			newSongButton_highlight_fade.StartFaded = true;
+			newSongButton_highlight_fade.BlockRaycastsWhileFaded = false;
+			newSongButton_highlight_fade.FadeSpeed = 0.1f;
+
+			Highlighted newSongButton_highlighted = newSongButton.AddComponent<Highlighted>();
+			newSongButton_highlighted.HighlightObject = newSongButton_highlight_fade;
 
             // Create load song button
             GameObject loadSongButton = UIHelpers.MakeButton("Load Song Button (Playlist Browser)");
@@ -456,9 +457,13 @@ namespace Route95.UI {
             loadSongButton_highlight_img.sprite = UIManager.Instance.ScribbleIcon;
             loadSongButton_highlight_img.color = new Color(1f, 1f, 1f, 1f);
 
-            //ShowHide loadSongButton_sh = loadSongButton.ShowHide();
-            //loadSongButton_sh.objects = new List<GameObject>() { loadSongButton_highlight };
-            //loadSongButton_sh.Hide();
+            Fadeable loadSongButton_highlight_fade = loadSongButton_highlight.AddComponent<Fadeable>();
+			loadSongButton_highlight_fade.StartFaded = true;
+			loadSongButton_highlight_fade.BlockRaycastsWhileFaded = false;
+			loadSongButton_highlight_fade.FadeSpeed = 0.1f;
+
+			Highlighted loadSongButton_highlighted = loadSongButton.AddComponent<Highlighted>();
+			loadSongButton_highlighted.HighlightObject = loadSongButton_highlight_fade;
         }
 
         #endregion

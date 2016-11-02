@@ -82,6 +82,10 @@ namespace Route95.UI {
         [Tooltip("Circle icon.")]
         Sprite _circleIcon;
 
+		Sprite _percussionNoteIcon;
+
+		Sprite _melodicNoteIcon;
+
         /// <summary>
         /// Percussion note volume icon.
         /// </summary>
@@ -232,6 +236,8 @@ namespace Route95.UI {
             _loadIcon = Resources.Load<Sprite>("Sprites/LoadProject");
             _removeIcon = Resources.Load<Sprite>("Sprites/X");
             _circleIcon = Resources.Load<Sprite>("Sprites/Circle");
+			_percussionNoteIcon = Resources.Load<Sprite>("Sprites/FilledPercBeat");
+			_melodicNoteIcon = Resources.Load<Sprite>("Sprites/FilledMeloBeat");
             _percussionVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar");
             _melodicVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar_Melodic");
             _fillSprite = Resources.Load<Sprite>("Sprites/FillSprite");
@@ -363,6 +369,10 @@ namespace Route95.UI {
         /// Returns the scribble sprite (read-only).
         /// </summary>
         public Sprite ScribbleIcon { get { return _scribbleCircle; } }
+
+		public Sprite PercussionNoteIcon { get { return _percussionNoteIcon; } }
+
+		public Sprite MelodicNoteIcon { get { return _melodicNoteIcon; } }
 
         /// <summary>
         /// Returns the melodic note volume icon (read-only).

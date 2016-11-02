@@ -3,24 +3,37 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Route95.UI {
 
 	public class Highlighted : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
 		[SerializeField]
-		Fadeable _highlight;
+		Fadeable _highlightObject;
+
+		Selectable _selectable;
+
+		void Awake () {
+			_selectable = GetComponent<Selectable>();
+		}
 
 		void Start () {
-			_highlight.FadeInstant();
+			_highlightObject.FadeInstant();
 		}
 
 		public void OnPointerEnter (PointerEventData eventData) {
-			_highlight.UnFade();
+			if (!_selectable || _selectable.interactable)
+				_highlightObject.UnFade();
 		}
 
 		public void OnPointerExit (PointerEventData eventData) {
-			_highlight.Fade();
+			_highlightObject.Fade();
+		}
+
+		public Fadeable HighlightObject { 
+			get { return _highlightObject; }
+			set { _highlightObject = value; }
 		}
 	}
 }

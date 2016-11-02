@@ -720,6 +720,15 @@ namespace Route95.Music {
             Loop();
         }
 
+		public void RemoveSong (int songIndex) {
+			_currentProject.Songs.RemoveAt(songIndex);
+			if (songIndex == _currentPlayingSong) {
+				_currentPlayingSong = 0;
+				if (!_currentProject.Empty)
+					_currentSong = _currentProject.Songs[0];
+			}
+		}
+
 		public void ResetPlayback () {
 			_currentPlayingSong = 0;
 			_currentSong = _currentProject.Empty ? null : _currentProject.Songs[0];
