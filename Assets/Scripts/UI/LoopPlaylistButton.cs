@@ -20,7 +20,7 @@ namespace Route95.UI {
 
 			_button.onClick.AddListener(()=> {
 				if (MusicManager.Instance.LoopPlaylist)
-					_buttonSprite.sprite = UIManager.Instance.PercussionNoteIcon;
+					_buttonSprite.sprite = UIManager.Instance.FilledPercussionNoteIcon;
 				else _buttonSprite.sprite = UIManager.Instance.CircleIcon;
 			});
 		}

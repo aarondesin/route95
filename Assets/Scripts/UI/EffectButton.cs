@@ -56,7 +56,7 @@ namespace Route95.UI {
             else if (effectType == typeof(AudioFlangerFilter)) riff.FlangerEnabled = effect.enabled;
 
             // Update button art
-            _image.sprite = (effect.enabled ? RiffEditor.Instance.percussionFilled : RiffEditor.Instance.percussionEmpty);
+            _image.sprite = (effect.enabled ? UIManager.Instance.FilledPercussionNoteIcon : UIManager.Instance.EmptyPercussionNoteIcon);
 
             // Play sound
             if (effect.enabled) UIManager.Instance.PlayEnableEffectSound();

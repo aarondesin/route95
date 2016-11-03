@@ -21,6 +21,20 @@ TagManager:
   - RearRightWheel
   - RearLeftWheel
   - RiffEditorNotePanel
+  - RiffEditorDistortionButton
+  - RiffEditorTremoloButton
+  - RiffEditorChorusButton
+  - RiffEditorFlangerButton
+  - RiffEditorEchoButton
+  - RiffEditorReverbButton
+  - RiffEditorPlayRiffButton
+  - RiffEditorTempoText
+  - RiffEditorVerticalScrollbar
+  - RiffEditorNoteIconBar
+  - RiffEditorOctaveParent
+  - RiffEditorNoteIconBarContent
+  - RiffEditorBeatsBarContent
+  - RiffEditorRiffVolumeSlider
   layers:
   - Default
   - TransparentFX

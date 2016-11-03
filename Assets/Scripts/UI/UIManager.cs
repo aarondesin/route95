@@ -82,9 +82,21 @@ namespace Route95.UI {
         [Tooltip("Circle icon.")]
         Sprite _circleIcon;
 
-		Sprite _percussionNoteIcon;
+		Sprite _emptyPercussionNoteIcon;
 
-		Sprite _melodicNoteIcon;
+		Sprite _filledPercussionNoteIcon;
+
+		Sprite _emptyMelodicNoteIcon;
+
+		Sprite _filledMelodicNoteIcon;
+
+		Sprite _minorSuggestionIcon;
+
+		Sprite _majorSuggestionIcon;
+
+		Sprite _powerSuggestionIcon;
+
+		Sprite _octaveSuggestionIcon;
 
         /// <summary>
         /// Percussion note volume icon.
@@ -236,8 +248,14 @@ namespace Route95.UI {
             _loadIcon = Resources.Load<Sprite>("Sprites/LoadProject");
             _removeIcon = Resources.Load<Sprite>("Sprites/X");
             _circleIcon = Resources.Load<Sprite>("Sprites/Circle");
-			_percussionNoteIcon = Resources.Load<Sprite>("Sprites/FilledPercBeat");
-			_melodicNoteIcon = Resources.Load<Sprite>("Sprites/FilledMeloBeat");
+			_filledPercussionNoteIcon = Resources.Load<Sprite>("Sprites/FilledPercBeat");
+			_emptyPercussionNoteIcon = Resources.Load<Sprite>("Sprites/EmptyPercBeat");
+			_filledMelodicNoteIcon = Resources.Load<Sprite>("Sprites/FilledMeloBeat");
+			_emptyMelodicNoteIcon = Resources.Load<Sprite>("Sprites/EmptyMeloBeat");
+			_minorSuggestionIcon = Resources.Load<Sprite>("Sprites/MinorChord");
+			_majorSuggestionIcon = Resources.Load<Sprite>("Sprites/MajorChord");
+			_powerSuggestionIcon = Resources.Load<Sprite>("Sprites/PowerChord");
+			_octaveSuggestionIcon = Resources.Load<Sprite>("Sprites/Octave");
             _percussionVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar");
             _melodicVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar_Melodic");
             _fillSprite = Resources.Load<Sprite>("Sprites/FillSprite");
@@ -370,9 +388,21 @@ namespace Route95.UI {
         /// </summary>
         public Sprite ScribbleIcon { get { return _scribbleCircle; } }
 
-		public Sprite PercussionNoteIcon { get { return _percussionNoteIcon; } }
+		public Sprite EmptyPercussionNoteIcon { get { return _emptyPercussionNoteIcon; } }
 
-		public Sprite MelodicNoteIcon { get { return _melodicNoteIcon; } }
+		public Sprite FilledPercussionNoteIcon { get { return _filledPercussionNoteIcon; } }
+
+		public Sprite EmptyMelodicNoteIcon { get { return _emptyMelodicNoteIcon; } }
+
+		public Sprite FilledMelodicNoteIcon { get { return _filledPercussionNoteIcon; } }
+
+		public Sprite MinorSuggestionIcon { get { return _minorSuggestionIcon; } }
+
+		public Sprite MajorSuggestionIcon { get { return _majorSuggestionIcon; } }
+
+		public Sprite PowerSuggestionIcon { get { return _powerSuggestionIcon; } }
+
+		public Sprite OctaveSuggestionIcon { get { return _octaveSuggestionIcon; } }
 
         /// <summary>
         /// Returns the melodic note volume icon (read-only).

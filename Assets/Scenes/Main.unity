@@ -2342,7 +2342,7 @@ GameObject:
   - 114: {fileID: 99086122}
   m_Layer: 5
   m_Name: Toggle Button (Flanger)
-  m_TagString: Untagged
+  m_TagString: RiffEditorFlangerButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2767,7 +2767,7 @@ GameObject:
   - 114: {fileID: 116959979}
   m_Layer: 5
   m_Name: Play Riff Button (Riff Editor)
-  m_TagString: Untagged
+  m_TagString: RiffEditorPlayRiffButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5274,7 +5274,7 @@ GameObject:
   - 224: {fileID: 158361791}
   m_Layer: 5
   m_Name: Content
-  m_TagString: Untagged
+  m_TagString: RiffEditorNoteIconBarContent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5294,7 +5294,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.000061035156}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &177463291
@@ -10384,7 +10384,7 @@ GameObject:
   - 114: {fileID: 304970117}
   m_Layer: 5
   m_Name: Octaves Adjuster (Riff Editor)
-  m_TagString: Untagged
+  m_TagString: RiffEditorOctaveParent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15154,7 +15154,7 @@ GameObject:
   - 114: {fileID: 421280018}
   m_Layer: 5
   m_Name: ScrollbarV (Riff Editor)
-  m_TagString: Untagged
+  m_TagString: RiffEditorVerticalScrollbar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22960,7 +22960,7 @@ GameObject:
   - 114: {fileID: 704082809}
   m_Layer: 5
   m_Name: Slider
-  m_TagString: Untagged
+  m_TagString: RiffEditorRiffVolumeSlider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25015,7 +25015,7 @@ GameObject:
   - 114: {fileID: 826674094}
   m_Layer: 5
   m_Name: Toggle Button (Tremolo)
-  m_TagString: Untagged
+  m_TagString: RiffEditorTremoloButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27168,7 +27168,7 @@ GameObject:
   - 114: {fileID: 916065929}
   m_Layer: 5
   m_Name: Toggle Button (Echo)
-  m_TagString: Untagged
+  m_TagString: RiffEditorEchoButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27566,7 +27566,7 @@ GameObject:
   - 114: {fileID: 924589071}
   m_Layer: 5
   m_Name: Toggle Button (Distortion)
-  m_TagString: Untagged
+  m_TagString: RiffEditorDistortionButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29371,7 +29371,7 @@ GameObject:
   - 114: {fileID: 1008270405}
   m_Layer: 5
   m_Name: Tempo Adjuster (Riff Editor)
-  m_TagString: Untagged
+  m_TagString: RiffEditorTempoText
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29444,45 +29444,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1008270401}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 75b18e5e29cebdc449f8c6f09b996b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 622006809}
-          m_MethodName: ShowTooltip
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: The speed of your song.
-            m_BoolArgument: 0
-          m_CallState: 2
-      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
-        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 622006809}
-          m_MethodName: HideTooltip
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: The speed of your song.
-            m_BoolArgument: 0
-          m_CallState: 2
-      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
-        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  delegates: []
+  _message: Tempo
 --- !u!1 &1008409094
 GameObject:
   m_ObjectHideFlags: 0
@@ -29903,7 +29868,7 @@ GameObject:
   - 224: {fileID: 1015468147}
   m_Layer: 5
   m_Name: Content
-  m_TagString: Untagged
+  m_TagString: RiffEditorBeatsBarContent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29923,7 +29888,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -23.99945, y: 0}
+  m_AnchoredPosition: {x: -23.999878, y: 0}
   m_SizeDelta: {x: 1680, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1025051310
@@ -34568,7 +34533,7 @@ GameObject:
   - 114: {fileID: 1199481451}
   m_Layer: 5
   m_Name: Toggle Button (Reverb)
-  m_TagString: Untagged
+  m_TagString: RiffEditorReverbButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -35506,7 +35471,7 @@ GameObject:
   - 114: {fileID: 1240781515}
   m_Layer: 5
   m_Name: Scrollbar Vertical
-  m_TagString: Untagged
+  m_TagString: RiffEditorNoteIconBar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -36002,8 +35967,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1312511661}
   m_HandleRect: {fileID: 1312511660}
   m_Direction: 0
-  m_Value: 0.9999873
-  m_Size: 0.98571444
+  m_Value: 1
+  m_Size: 0.9857144
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -36585,7 +36550,7 @@ GameObject:
   - 114: {fileID: 1293270346}
   m_Layer: 5
   m_Name: Toggle Button (Chorus)
-  m_TagString: Untagged
+  m_TagString: RiffEditorChorusButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44229,6 +44194,17 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 500793669}
         m_MethodName: PlayAltMenuClickSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1803614123}
+        m_MethodName: IncreaseOctavesShown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -53475,6 +53451,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1803614123}
+        m_MethodName: DecreaseOctavesShown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1728560019
@@ -54893,44 +54880,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca45f7a19e20eb04d940db2404ae8d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enableEffectSound: {fileID: 0}
-  _disableEffectSound: {fileID: 0}
-  initialized: 0
-  buttonSpacing: 4
-  halfNoteScale: 0.8
-  quarterNoteScale: 0.6
-  volumeScale: 1.3
-  evenBackgroundAlpha: 0.05
-  oddBackgroundAlpha: 0.03
-  scrollbarWidth: 20
-  initialScrollV: 0.99
-  scrollBarH: {fileID: 0}
-  scrollBarV: {fileID: 0}
-  playRiffButton: {fileID: 0}
-  tempoText: {fileID: 0}
-  iconBar: {fileID: 0}
-  iconBar_tr: {fileID: 0}
-  sliders: []
-  beatsBar: {fileID: 0}
-  beatsBar_tr: {fileID: 0}
-  riffVolumeSlider: {fileID: 0}
-  octaveParent: {fileID: 0}
-  distortionButton: {fileID: 0}
-  tremoloButton: {fileID: 0}
-  chorusButton: {fileID: 0}
-  flangerButton: {fileID: 0}
-  echoButton: {fileID: 0}
-  reverbButton: {fileID: 0}
-  percussionEmpty: {fileID: 0}
-  percussionFilled: {fileID: 0}
-  percussionSuggested: {fileID: 0}
-  melodicEmpty: {fileID: 0}
-  melodicFilled: {fileID: 0}
-  melodicSuggested: {fileID: 0}
-  minorSuggestion: {fileID: 0}
-  majorSuggestion: {fileID: 0}
-  powerSuggestion: {fileID: 0}
-  octaveSuggestion: {fileID: 0}
+  _buttonSpacing: 4
+  _halfNoteScale: 0.8
+  _quarterNoteScale: 0.6
+  _volumeScale: 1.3
+  _evenBackgroundAlpha: 0.05
+  _oddBackgroundAlpha: 0.03
+  _scrollbarWidth: 20
 --- !u!1 &1815893181
 GameObject:
   m_ObjectHideFlags: 0
