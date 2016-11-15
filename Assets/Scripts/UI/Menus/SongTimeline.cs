@@ -92,7 +92,7 @@ namespace Route95.UI {
                 // Setup column button properties
                 column.GetComponent<Button>().onClick.AddListener(() => {
                     SongArrangeMenu.Instance.UpdateValue();
-                    Riff riff = MusicManager.Instance.CurrentSong.Riffs[SongArrangeMenu.Instance.selectedRiffIndex];
+                    Riff riff = MusicManager.Instance.CurrentSong.Riffs[SongArrangeMenu.Instance.SelectedRiffIndex];
                     song.ToggleRiff(riff, num);
                     RefreshColumn(column, song.SongPieces[song.SongPieceIndices[num]]);
                 });

@@ -35,6 +35,11 @@ TagManager:
   - RiffEditorNoteIconBarContent
   - RiffEditorBeatsBarContent
   - RiffEditorRiffVolumeSlider
+  - RadioThemeEmitter
+  - SongArrangeEditRiffButton
+  - SongArrangePlayRiffButton
+  - SongArrangePreviewSongButton
+  - SongArrangeAddRiffReminder
   layers:
   - Default
   - TransparentFX

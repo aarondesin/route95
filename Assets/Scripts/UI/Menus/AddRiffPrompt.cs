@@ -104,7 +104,7 @@ namespace Route95.UI {
 
             // Go to riff editor
             RiffEditor.CurrentRiff = temp;
-            SongArrangeMenu.Instance.selectedRiffIndex = temp.Index;
+            SongArrangeMenu.Instance.SelectedRiffIndex = temp.Index;
             SongArrangeMenu.Instance.SetValue(temp.Index);
             SongArrangeMenu.Instance.Refresh();
         }

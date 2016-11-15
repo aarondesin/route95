@@ -841,7 +841,7 @@ namespace Route95.Music {
             RiffEditor.CurrentRiff = temp;
 
             // Update song arrange
-            SongArrangeMenu.Instance.selectedRiffIndex = temp.Index;
+            SongArrangeMenu.Instance.SelectedRiffIndex = temp.Index;
             SongArrangeMenu.Instance.Refresh();
 
             return temp;

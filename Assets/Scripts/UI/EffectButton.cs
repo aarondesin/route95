@@ -23,6 +23,9 @@ namespace Route95.UI {
 		/// </summary>
 		Image _image;
 
+		[SerializeField]
+		GameObject _sliderPanel;
+
         #endregion
         #region Unity Callbacks
 
