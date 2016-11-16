@@ -99,7 +99,7 @@ MonoBehaviour:
   _dynamic: 1
   _density: 1
   _distribution: 1
-  _positionOffset: {x: 0, y: 0, z: 0}
+  _positionOffset: {x: 0, y: 5, z: 0}
   _rotationOffset: {x: 0, y: 0, z: 0}
   _heightRange: {x: 0, y: 0}
   _widthRange: {x: 0, y: 0}

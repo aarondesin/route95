@@ -177,7 +177,7 @@ namespace Route95.World {
                     WorldManager.Instance.RemoveDecoration(gameObject);
 
                 // Push with wind
-                GetComponent<Rigidbody>().AddForce(WorldManager.Instance.Wind);
+                GetComponent<Rigidbody>().AddForce(WorldManager.Instance.Wind * Time.fixedDeltaTime);
             }
         }
 

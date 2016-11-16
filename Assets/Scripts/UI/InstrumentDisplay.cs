@@ -47,6 +47,7 @@ namespace Route95.UI {
 
             // Init vars
             _icon = GetComponent<Image>();
+			_glow = GameObject.FindGameObjectWithTag ("InstrumentDisplayGlow").GetComponent<Image>();
         }
 
 		void Start () {

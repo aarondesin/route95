@@ -506,6 +506,9 @@ namespace Route95.World {
 		[SerializeField]
         float _roadMaxSlope = DEFAULT_ROAD_MAX_SLOPE;
 
+		[SerializeField]
+		float _roadClearDistance;
+
 		/// <summary>
 		/// Reference to the road object.
 		/// </summary>
@@ -841,6 +844,8 @@ namespace Route95.World {
 		}
 
 		public int RoadStepsPerCurve { get { return _roadStepsPerCurve; } }
+
+		public float RoadClearDistance { get { return _roadClearDistance; } }
 
 		public FFTWindow FrequencyFFTWindow { get { return _frequencyFFTWindow; } }
 
@@ -1406,6 +1411,10 @@ namespace Route95.World {
                     break;
         }
     }
+
+	public void ForceBulldoze (float start, float end) {
+			_road.DoBulldoze (start, end);
+		}
 
     public void DebugTerrain() {
         DynamicTerrain.Instance.SetDebugColors(DynamicTerrain.DebugColors.Constrained);

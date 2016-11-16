@@ -240,7 +240,7 @@ Material:
       second: 0
     - first:
         name: _Value
-      second: 0.32941177
+      second: 0
     - first:
         name: _ZWrite
       second: 1

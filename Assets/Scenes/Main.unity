@@ -238,7 +238,7 @@ GameObject:
   - 114: {fileID: 5125173}
   - 114: {fileID: 5125175}
   m_Layer: 9
-  m_Name: Image
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6058,7 +6058,7 @@ ParticleSystem:
   moveWithTransform: 0
   autoRandomSeed: 1
   scalingMode: 1
-  randomSeed: -979410621
+  randomSeed: 2938084
   InitialModule:
     serializedVersion: 2
     enabled: 1
@@ -26730,13 +26730,14 @@ MonoBehaviour:
   _rainEmitter: {fileID: 1686887395}
   _minRainDensity: 0
   _rainDensity: 0
-  _roadWidth: 10
-  _roadHeight: 0.2
-  _roadSlope: 0.9
-  _roadStepsPerCurve: 100
+  _roadWidth: 8
+  _roadHeight: 0.25
+  _roadSlope: 0.85
+  _roadStepsPerCurve: 25
   _roadPlacementDistance: 30
   _roadVariance: 0.4
   _roadMaxSlope: 0.0015
+  _roadClearDistance: 25
   _roadMaterial: {fileID: 2100000, guid: 5d36f2fcc4b7297449807dbaf4914b74, type: 2}
   _timeScale: 0.01
   _timeOfDay: 0
@@ -26745,7 +26746,8 @@ MonoBehaviour:
   _sunFlare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
   _maxMoonIntensity: 0
   _minMoonIntensity: 0
-  _moonSprites: []
+  _moonSprites:
+  - {fileID: 21300000, guid: 16b1aed2b39d339439f1671efa73148c, type: 3}
   _primaryColor: {r: 0, g: 0, b: 0, a: 0}
   _secondaryColor: {r: 0, g: 0, b: 0, a: 0}
   _primaryColors:
@@ -26754,16 +26756,16 @@ MonoBehaviour:
       rgba: 4284628772
     key1:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4285129679
     key2:
       serializedVersion: 2
-      rgba: 0
+      rgba: 4294246398
     key3:
       serializedVersion: 2
-      rgba: 0
+      rgba: 7719137
     key4:
       serializedVersion: 2
-      rgba: 0
+      rgba: 7229754
     key5:
       serializedVersion: 2
       rgba: 0
@@ -26774,22 +26776,22 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 0
     ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
+    ctime1: 16384
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
     ctime5: 0
     ctime6: 0
     ctime7: 0
     atime0: 0
     atime1: 65535
-    atime2: 0
+    atime2: 65535
     atime3: 0
     atime4: 0
     atime5: 0
     atime6: 0
     atime7: 0
-    m_NumColorKeys: 2
+    m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   _secondaryColors:
     key0:
@@ -26797,16 +26799,16 @@ MonoBehaviour:
       rgba: 4286669648
     key1:
       serializedVersion: 2
-      rgba: 4294967295
+      rgba: 4288277729
     key2:
       serializedVersion: 2
-      rgba: 0
+      rgba: 15659762
     key3:
       serializedVersion: 2
-      rgba: 0
+      rgba: 12177876
     key4:
       serializedVersion: 2
-      rgba: 0
+      rgba: 8875871
     key5:
       serializedVersion: 2
       rgba: 0
@@ -26817,10 +26819,10 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 0
     ctime0: 0
-    ctime1: 65535
-    ctime2: 0
-    ctime3: 0
-    ctime4: 0
+    ctime1: 16384
+    ctime2: 32768
+    ctime3: 49151
+    ctime4: 65535
     ctime5: 0
     ctime6: 0
     ctime7: 0
@@ -26832,7 +26834,7 @@ MonoBehaviour:
     atime5: 0
     atime6: 0
     atime7: 0
-    m_NumColorKeys: 2
+    m_NumColorKeys: 5
     m_NumAlphaKeys: 2
   _skyboxFade:
     key0:
@@ -26882,7 +26884,7 @@ MonoBehaviour:
   _frequencyFFTWindow: 0
   _decorationsPerStep: 100
   _grassPerChunk: 0
-  _roadPathCheckResolution: 4
+  _roadPathCheckResolution: 25
 --- !u!1 &900244165
 GameObject:
   m_ObjectHideFlags: 0
@@ -37125,9 +37127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _shadowCaster: {fileID: 1177469786}
-  _radius: 0
-  _scale: 0
-  _invert: 0
+  _radius: 1000
+  _scale: 100
 --- !u!108 &1294310297
 Light:
   m_ObjectHideFlags: 0
@@ -37170,7 +37171,7 @@ LensFlare:
   m_GameObject: {fileID: 1294310294}
   m_Enabled: 1
   m_Flare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Brightness: 1
   m_FadeSpeed: 3
   m_IgnoreLayers:
@@ -48712,7 +48713,7 @@ GameObject:
   - 114: {fileID: 1643627759}
   m_Layer: 9
   m_Name: Glow
-  m_TagString: Untagged
+  m_TagString: InstrumentDisplayGlow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49071,7 +49072,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -55209,8 +55210,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _shadowCaster: {fileID: 1833331607}
-  _radius: 0
-  _scale: 0
+  _radius: 1000
+  _scale: 100
 --- !u!108 &1802540243
 Light:
   m_ObjectHideFlags: 0

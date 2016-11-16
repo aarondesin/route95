@@ -160,8 +160,13 @@ namespace Route95.Music {
         /// </summary>
         public virtual void Load() {
             _icon = Resources.Load<Sprite>(_iconPath);
+			if (_icon == null) Debug.LogError ("Failed to load instrument icon at " + _iconPath);
+
             _glow = Resources.Load<Sprite>(_glowPath);
+			if (_glow == null) Debug.LogError ("Failed to load instrument glow at " + _glowPath);
+
             _switchSound = Resources.Load<AudioClip>(_switchSoundPath);
+			if (_switchSound == null) Debug.LogError ("Failed to load instrument switch sound at " + _switchSoundPath);
         }
 
         /// <summary>

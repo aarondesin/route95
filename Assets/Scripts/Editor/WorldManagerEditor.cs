@@ -25,6 +25,9 @@ namespace Route95.World {
         /// </summary>
         int _y = 0;
 
+		float _bulldozeMin = 0f;
+		float _bulldozeMax = 1f;
+
         float _vertBlend = 0f;
 
         #endregion
@@ -54,6 +57,14 @@ namespace Route95.World {
                 wm.VertexIndicator.transform.position = vert.WorldPos();
                 _vertBlend = vert.Color.a;
             }
+
+			_bulldozeMin = EditorGUILayout.FloatField("Bulldoze Start:", _bulldozeMin);
+			_bulldozeMax = EditorGUILayout.FloatField("Bulldoze End:", _bulldozeMax);
+
+			if (GUILayout.Button("Bulldoze")) {
+				WorldManager wm = target as WorldManager;
+				wm.ForceBulldoze (0f, 1f);
+			}
         }
 
         #endregion

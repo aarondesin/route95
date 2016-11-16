@@ -1,6 +1,7 @@
 ﻿// Moon.cs
 // ©2016 Team 95
 
+using System;
 using UnityEngine;
 
 namespace Route95.World {
@@ -16,6 +17,8 @@ namespace Route95.World {
 		/// Reference to this SpriteRenderer.
 		/// </summary>
 		SpriteRenderer _renderer;
+
+		float _offset = -Mathf.PI / 2f;
 
 		#endregion
 		#region Unity Callbacks
@@ -33,6 +36,8 @@ namespace Route95.World {
 		#region Properties
 
 		public SpriteRenderer Renderer { get { return _renderer; } }
+
+		public override float Offset { get { return _offset; } }
 
 		#endregion
 	}

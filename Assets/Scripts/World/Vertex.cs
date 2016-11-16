@@ -42,10 +42,7 @@ namespace Route95.World {
 		/// </summary>
 		float _currHeight = 0f;
 
-		/// <summary>
-		/// Is this vertex near a road?
-		/// </summary>
-		bool _nearRoad = false;
+		float _distToRoad = Mathf.Infinity;
 
 		/// <summary>
 		/// Does the vertex block decorations.
@@ -80,10 +77,11 @@ namespace Route95.World {
 			_y = y;
 			_chunkVertices = new List<KeyValuePair<IntVector2, int>>();
 			_decorations = new List<GameObject>();
+			float v = Mathf.PerlinNoise ((float)_x, (float)_y);
 			_color = new Color(
 				0f,
-				UnityEngine.Random.Range(0f, 1f),
-				UnityEngine.Random.Range(0f, 0.75f),
+				(v >= 0.5f ? 1f : 0f),
+				(v < 0.5f ? 0.75f : 0f),
 				0.5f
 			);
 		}
@@ -101,10 +99,18 @@ namespace Route95.World {
 
 		public bool Locked { get { return _locked; } }
 
-		public bool NearRoad {
-			get { return _nearRoad; }
-			set { _nearRoad = value; }
+		public float DistToRoad {
+			get { return _distToRoad; }
+			set { _distToRoad = value; }
 		}
+
+		public bool NearRoad {
+			get { return _distToRoad <= WorldManager.Instance.RoadClearDistance; }
+		}
+
+		public bool OnRoad {
+			get { return _distToRoad <= WorldManager.Instance.RoadWidth; } }
+
 
 		public List<GameObject> Decorations { get { return _decorations; } }
 
@@ -141,34 +147,34 @@ namespace Route95.World {
 			SetHeight(h);
 			VertexMap map = DynamicTerrain.Instance.VertexMap;
 			Vertex l = map.LeftNeighbor(this);
-			if (l != null && !l._locked && !l._nearRoad) l.Smooth(h, factor);
+			if (l != null && !l._locked && !l.NearRoad) l.Smooth(h, factor);
 
 			Vertex r = map.RightNeighbor(this);
-			if (r != null && !r._locked && r._nearRoad) r.Smooth(h, factor);
+			if (r != null && !r._locked && r.NearRoad) r.Smooth(h, factor);
 
 			Vertex d = map.DownNeighbor(this);
-			if (d != null && !d._locked && d._nearRoad) d.Smooth(h, factor);
+			if (d != null && !d._locked && d.NearRoad) d.Smooth(h, factor);
 
 			Vertex u = map.UpNeighbor(this);
-			if (u != null && !u._locked && u._nearRoad) u.Smooth(h, factor);
+			if (u != null && !u._locked && u.NearRoad) u.Smooth(h, factor);
 
 			float factor_squared = factor * factor;
 
 			if (u != null) {
 				Vertex ul = map.LeftNeighbor(u);
-				if (ul != null && !ul._locked && ul._nearRoad) ul.Smooth(h, factor_squared);
+				if (ul != null && !ul._locked && ul.NearRoad) ul.Smooth(h, factor_squared);
 
 				Vertex ur = map.RightNeighbor(u);
-				if (ur != null && !ur._locked && ur._nearRoad) ur.Smooth(h, factor_squared);
+				if (ur != null && !ur._locked && ur.NearRoad) ur.Smooth(h, factor_squared);
 			}
 
 			if (d != null) {
 
 				Vertex dl = map.LeftNeighbor(d);
-				if (dl != null && !dl._locked && dl._nearRoad) dl.Smooth(h, factor_squared);
+				if (dl != null && !dl._locked && dl.NearRoad) dl.Smooth(h, factor_squared);
 
 				Vertex dr = map.RightNeighbor(d);
-				if (dr != null && !dr._locked && dr._nearRoad) dr.Smooth(h, factor_squared);
+				if (dr != null && !dr._locked && dr.NearRoad) dr.Smooth(h, factor_squared);
 			}
 		}
 
@@ -463,7 +469,7 @@ namespace Route95.World {
 		}
 
 		public override string ToString() {
-			string result = "Vertex (" + _x + "," + _y + ") Height: " + _height + " | nearRoad: " + _nearRoad;
+			string result = "Vertex (" + _x + "," + _y + ") Height: " + _height + " | nearRoad: " + NearRoad;
 			//foreach (KeyValuePair<Chunk, int> member in chunkVertices) {
 			//	result += "\nChunk "+member.Key.x +","+member.Key.y;
 			//}

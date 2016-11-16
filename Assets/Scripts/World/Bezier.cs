@@ -44,24 +44,6 @@ namespace Route95.World {
 		protected List<BezierControlPointMode> _modes;
 
 		#endregion
-		#region Unity Callbacks
-
-		void OnDrawGizmosSelected() {
-			Gizmos.color = Color.blue;
-
-			Vector3[] verts = GetComponent<MeshFilter>().mesh.vertices;
-			int[] tris = GetComponent<MeshFilter>().mesh.triangles;
-			for (int i = 0; i < verts.Length - 4 && i < GetComponent<MeshFilter>().mesh.normals.Length; i++)
-				Gizmos.DrawLine(verts[i], verts[i + 4]);
-
-			for (int i = 0; i < tris.Length; i += 3) {
-				Gizmos.DrawLine(verts[tris[i]], verts[tris[i + 1]]);
-				Gizmos.DrawLine(verts[tris[i + 1]], verts[tris[i + 2]]);
-				Gizmos.DrawLine(verts[tris[i + 2]], verts[tris[i]]);
-			}
-		}
-
-		#endregion
 		#region Properties
 
 		/// <summary>

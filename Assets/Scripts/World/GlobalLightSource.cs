@@ -69,15 +69,17 @@ namespace Route95.World {
 
 		public Light ShadowCaster { get { return _shadowCaster; } }
 
+		public abstract float Offset { get; }
+
 		#endregion
 		#region Methods
 
 		protected void UpdateTransform() {
             _target = PlayerMovement.Instance.transform.position;
 
-            float newX = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay);
-            float newY = -_radius * Mathf.Sin(WorldManager.Instance.TimeOfDay);
-            float newZ = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay + Mathf.PI / 5);
+            float newX = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay + Offset);
+            float newY = -_radius * Mathf.Sin(WorldManager.Instance.TimeOfDay + Offset);
+            float newZ = -_radius * Mathf.Cos(WorldManager.Instance.TimeOfDay + Mathf.PI / 5 + Offset);
             transform.position = new Vector3(newX, newY, newZ);
 
             transform.LookAt(_target);

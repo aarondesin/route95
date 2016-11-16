@@ -324,6 +324,7 @@ namespace Route95.World {
             float diff = endProgress - startProgress;
             if (diff < 0f) yield break;
             float resolution = WorldManager.Instance.RoadPathCheckResolution * diff;
+
             while (progress < endProgress) {
                 Vector3 point = GetPoint(progress);
                 _toCheck.Add(point);
@@ -335,6 +336,7 @@ namespace Route95.World {
                 }
             }
             _toCheck.Add(GetPoint(endProgress));
+
             yield return null;
         }
 
@@ -375,8 +377,9 @@ namespace Route95.World {
             _uvs.Clear();
             _tris.Clear();
 
-            float UVoffset = 0.2f;
-            float UVslope = slope;
+            float UVoffset = 0f;
+            //float UVslope = slope;
+			float UVslope = 0f;
 
             float progressI = 0f;
             Vector3 pointI = GetPoint(progressI);
