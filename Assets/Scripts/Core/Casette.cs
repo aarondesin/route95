@@ -2,6 +2,7 @@
 // ©2016 Team 95
 
 using Route95.UI;
+using Route95.World;
 
 using UnityEngine;
 
@@ -75,34 +76,25 @@ namespace Route95.Core {
 
 		void Start () {
 
-			UIManager.Instance.onSwitchToMainMenu.AddListener(()=> {
-				MoveToBack();
-			});
+			UIManager.Instance.onSwitchToMainMenu.AddListener(MoveToBack);
 
-			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(()=> {
-				MoveToBack();
-			});
+			UIManager.Instance.onSwitchToKeySelectMenu.AddListener(MoveToBack);
 
-			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(()=> {
-				MoveToBack();
-			});
+			UIManager.Instance.onSwitchToSongArrangeMenu.AddListener(MoveToBack);
 
-			UIManager.Instance.onSwitchToRiffEditor.AddListener(()=> {
-				MoveToBack();
-			});
+			UIManager.Instance.onSwitchToRiffEditor.AddListener(MoveToBack);
 
 			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
-				MoveToFront();
 				_willMoveCasette = true;
 			});
 
-			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(()=> {
-				MoveToBack();
-			});
+			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(MoveToBack);
 
-			UIManager.Instance.onSwitchToLiveMode.AddListener(()=> {
-				SnapBack();
-			});
+			UIManager.Instance.onSwitchToPostPlayMenu.AddListener(MoveToBack);
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(SnapBack);
+
+			CameraControl.Instance.onCompleteLerp.AddListener(AttemptMove);
 		}
 
         void Update() {
@@ -192,7 +184,10 @@ namespace Route95.Core {
         /// If set to move casette, will do so.
         /// </summary>
         public void AttemptMove() {
-            if (_willMoveCasette) MoveToFront();
+            if (_willMoveCasette) {
+				MoveToFront();
+				_willMoveCasette = false;
+			}
         }
 
         #endregion

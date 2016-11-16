@@ -7,6 +7,7 @@ using Route95.UI;
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Route95.World {
 
@@ -15,12 +16,17 @@ namespace Route95.World {
     /// </summary>
     public class CameraControl : SingletonMonoBehaviour<CameraControl> {
 
-        #region CameraControl Enums
+		#region Nested Classes
 
-        /// <summary>
-        /// Current state of the game camera.
-        /// </summary>
-        public enum State {
+		public class CameraEvent : UnityEvent { }
+
+		#endregion
+		#region CameraControl Enums
+
+		/// <summary>
+		/// Current state of the game camera.
+		/// </summary>
+		public enum State {
             Setup,
             Live,
             Free
@@ -168,7 +174,8 @@ namespace Route95.World {
         Transform _rideFront;
 
 		/// <summary>
-		/// Frequency with which to automatically change camera angle in live mode.
+		/// Frequency with which to automatically change camera angle in live 
+		/// mode.
 		/// </summary>
         [Tooltip("Frequency with which to automatically change camera angle in live mode.")]
         [Range(1f, 600f)]
@@ -200,6 +207,8 @@ namespace Route95.World {
 			{ KeyCode.F10, 9 }
 		};
 
+		public CameraEvent onCompleteLerp;
+
         #endregion
         #region Unity Callbacks
 
@@ -209,6 +218,7 @@ namespace Route95.World {
 			// Init vars
             _transitionTimer = _liveModeTransitionFreq;
             _speed = DEFAULT_SPEED;
+			onCompleteLerp = new CameraEvent();
 
             // Outside car
 			_viewOutsideCar = GameObject.FindGameObjectWithTag("ViewOutsideCar").transform;
@@ -242,9 +252,6 @@ namespace Route95.World {
                 fov = 20f,
                 followMode = CameraView.CameraFollowMode.Static
             };
-
-            _initialView = _outsideCar;
-            SnapToView(_initialView);
 
 			_hoodForward = GameObject.FindGameObjectWithTag("ViewHoodForward").transform;
 			_nearChase = GameObject.FindGameObjectWithTag("ViewNearChase").transform;
@@ -374,7 +381,11 @@ namespace Route95.World {
         void Start() {
             _resetDistance = WorldManager.Instance.ChunkLoadRadius *
                 0.5f * WorldManager.Instance.ChunkSize;
-            _currentAngle = _outsideCar;
+
+			GameManager.Instance.onFinishLoading.AddListener(()=> {
+				_currentAngle = _outsideCar;
+				SnapToView (_outsideCar);
+			});
 
 			UIManager.Instance.onSwitchToMainMenu.AddListener(()=> {
 				LerpToView(_outsideCar);
@@ -417,7 +428,7 @@ namespace Route95.World {
                 case State.Setup:
                     if (_moving) {
 
-                        if (_progress < 1f) {
+                        if (_progress < 1f && _startTransform != _targetView.transform) {
 
                             _progress += _speed * Time.deltaTime;
 
@@ -435,7 +446,7 @@ namespace Route95.World {
                             _startTransform = _targetView.transform;
                             transform.position = _startTransform.position;
                             transform.rotation = _startTransform.rotation;
-                            OnCompleteLerp();
+                            onCompleteLerp.Invoke();
                         }
                     }
                     break;
@@ -682,7 +693,6 @@ namespace Route95.World {
         /// <summary>
         /// Teleports the camera to a position.
         /// </summary>
-        /// <param name="newPosition"></param>
         public void SnapToView(CameraView newView) {
             _targetView = newView;
             _startTransform = newView.transform;
@@ -692,11 +702,6 @@ namespace Route95.World {
         }
 
         public void LerpToView(CameraView newView, float newSpeed = DEFAULT_SPEED) {
-            if (_targetView == newView) {
-                OnCompleteLerp();
-                return;
-            }
-
             CameraView oldView = _targetView;
             _startFOV = oldView.fov;
             _startTransform = oldView.transform;
@@ -705,10 +710,6 @@ namespace Route95.World {
             _moving = true;
             _speed = newSpeed;
             _progress = 0f;
-        }
-
-        void OnCompleteLerp() {
-            Casette.Instance.AttemptMove();
         }
 
         #endregion

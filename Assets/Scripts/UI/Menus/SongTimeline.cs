@@ -1,52 +1,61 @@
-﻿using Route95.Core;
+﻿// SongTimeline.cs
+// ©2016 Team 95
+
+using Route95.Core;
 using Route95.Music;
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Route95.UI {
 
     /// <summary>
     /// Class to handle the song arranger timeline.
     /// </summary>
-    public class SongTimeline : MonoBehaviour {
+    public class SongTimeline : MenuBase<SongTimeline> {
 
-        #region SongTimeline Vars
+        #region Vars
 
-        public static SongTimeline Instance; // Quick reference to the song timeline
-        RectTransform timeline_tr;           // Transform of the timeline
+		/// <summary>
+		/// Transform of the timeline.
+		/// </summary>
+        RectTransform _timeline_tr;
 
-        static int NUM_COLUMNS = 4;          // Number of columns shown on timeline
+		/// <summary>
+		/// Number of columns shown on timeline.
+		/// </summary>
+        const int NUM_COLUMNS = 4;
 
-        [Tooltip("Sprite to use for columns.")]
-        public Sprite graphic;
+		/// <summary>
+		/// List of active columns.
+		/// </summary>
+        List<GameObject> _columns;
 
-        List<GameObject> columns;            // List of active columns
+        /// <summary>
+		/// Reference to scroll bar.
+		/// </summary>
+        Scrollbar _scrollbar;
 
-        [Tooltip("Reference to scrollbar.")]
-        public GameObject scrollbar;
-
-        float columnWidth;                   // Calculated width of columns
-        float columnHeight;                  // Calculated height of columns
+		/// <summary>
+		/// Calculated dimensions of columns.
+		/// </summary>
+        float _columnWidth, _columnHeight;
 
         #endregion
         #region Unity Callbacks
 
-        void Awake() {
-            Instance = this;
+        new void Awake() {
+            base.Awake();
 
             // Init lists
-            columns = new List<GameObject>();
+            _columns = new List<GameObject>();
 
             // Init vars
-            timeline_tr = gameObject.GetComponent<RectTransform>();
-            columnWidth = timeline_tr.rect.width / (float)NUM_COLUMNS;
-            columnHeight = ((RectTransform)timeline_tr.parent).rect.height;
+            _timeline_tr = GetComponent<RectTransform>();
+            _columnWidth = _timeline_tr.rect.width / (float)NUM_COLUMNS;
+            _columnHeight = ((RectTransform)_timeline_tr.parent).rect.height;
         }
 
 		void Start () {
@@ -54,7 +63,7 @@ namespace Route95.UI {
 		}
 
         #endregion
-        #region SongTimeline Methods
+        #region Methods
 
         /// <summary>
         /// Inits all song piece columns on the timeline.
@@ -64,11 +73,11 @@ namespace Route95.UI {
             int numSongPieces = MusicManager.Instance.CurrentSong.SongPieceIndices.Count;
 
             // Clear current columns
-            columns.Clear();
+            _columns.Clear();
 
             // Resize timeline
-            timeline_tr.sizeDelta = new Vector2(
-                (numSongPieces + 1) * columnWidth, columnHeight
+            _timeline_tr.sizeDelta = new Vector2(
+                (numSongPieces + 1) * _columnWidth, _columnHeight
             );
 
             // Make columns
@@ -81,10 +90,10 @@ namespace Route95.UI {
                 );
 
                 RectTransform tr = column.GetComponent<RectTransform>();
-                column.SetParent(timeline_tr);
-                tr.sizeDelta = new Vector2(columnWidth, columnHeight);
+                column.SetParent(_timeline_tr);
+                tr.sizeDelta = new Vector2(_columnWidth, _columnHeight);
                 tr.AnchorAtPoint(0f, 0f);
-                tr.anchoredPosition3D = new Vector3((i + 0.5f) * columnWidth, columnHeight / 2f, 0f);
+                tr.anchoredPosition3D = new Vector3((i + 0.5f) * _columnWidth, _columnHeight / 2f, 0f);
                 tr.ResetScaleRot();
 
                 int num = i; // avoid pointer problems
@@ -101,12 +110,12 @@ namespace Route95.UI {
                 Color color = Color.white;
                 color.a = (i % 2 == 1) ? 0.2f : 0.4f;
                 column.GetComponent<Image>().color = color;
-                columns.Add(column);
+                _columns.Add(column);
             }
 
             // Refresh all columns
-            for (int i = 0; i < columns.Count; i++)
-                RefreshColumn(columns[i], song.SongPieces[song.SongPieceIndices[i]]);
+            for (int i = 0; i < _columns.Count; i++)
+                RefreshColumn(_columns[i], song.SongPieces[song.SongPieceIndices[i]]);
 
             // Create add columns button
             GameObject addColumnButton = new GameObject("AddColumnButton",
@@ -118,10 +127,10 @@ namespace Route95.UI {
 
             RectTransform atr = addColumnButton.GetComponent<RectTransform>();
             addColumnButton.SetParent(gameObject.GetComponent<RectTransform>());
-            float width = Mathf.Min(columnWidth, columnHeight) / 3f;
+            float width = Mathf.Min(_columnWidth, _columnHeight) / 3f;
             atr.SetSideWidth(width);
             atr.AnchorAtPoint(1f, 0f);
-            atr.anchoredPosition3D = new Vector3(-columnWidth / 2f, columnHeight / 2f, 0f);
+            atr.anchoredPosition3D = new Vector3(-_columnWidth / 2f, _columnHeight / 2f, 0f);
             atr.ResetScaleRot();
 
             addColumnButton.GetComponent<Button>().onClick.AddListener(() => {
@@ -130,17 +139,17 @@ namespace Route95.UI {
             });
 
             addColumnButton.GetComponent<Image>().sprite = UIManager.Instance.AddIcon;
-            columns.Add(addColumnButton);
+            _columns.Add(addColumnButton);
         }
 
         /// <summary>
         /// Clears and remakes all columns.
         /// </summary>
         public void RefreshTimeline() {
-            while (columns.Count != 0) {
-                GameObject temp = columns[0];
+            while (_columns.Count != 0) {
+                GameObject temp = _columns[0];
                 Destroy(temp);
-                columns.RemoveAt(0);
+                _columns.RemoveAt(0);
             }
             MakeColumns();
         }
@@ -159,7 +168,7 @@ namespace Route95.UI {
                 Destroy(child.gameObject);
 
             int i = 0;
-            float height = columnHeight / Instrument.AllInstruments.Count;
+            float height = _columnHeight / Instrument.AllInstruments.Count;
             Measure measure = song.Measures[songpiece.MeasureIndices[0]];
 
             foreach (int r in measure.RiffIndices) {
@@ -171,7 +180,7 @@ namespace Route95.UI {
                 GameObject label = UIHelpers.MakeText(riff.Name);
                 RectTransform label_tr = label.GetComponent<RectTransform>();
                 label.SetParent(column_tr);
-                label_tr.sizeDelta = new Vector2(columnWidth, height);
+                label_tr.sizeDelta = new Vector2(_columnWidth, height);
                 label_tr.AnchorAtPoint(0f, 0f);
                 label_tr.anchoredPosition3D = new Vector3(2f * height, height * y, 0f);
                 label_tr.ResetScaleRot();
