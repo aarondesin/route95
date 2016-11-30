@@ -1,6 +1,7 @@
 ﻿// EffectButton.cs
 // ©2016 Team 95
 
+using Route95.Core;
 using Route95.Music;
 
 using System;
@@ -26,16 +27,29 @@ namespace Route95.UI {
 		[SerializeField]
 		GameObject _sliderPanel;
 
+		[SerializeField]
+		Button _dropdownButton;
+
         #endregion
         #region Unity Callbacks
 
         void Awake() {
             // Init vars
             _image = GetComponent<Image>();
+			_dropdownButton.onClick.AddListener(ToggleSliderPanel);
         }
+
+		void Start () {
+			_sliderPanel.SetActive(false);
+		}
 
         #endregion
         #region Methods
+
+		void ToggleSliderPanel () {
+			UIManager.Instance.PlayMenuClickSound();
+			_sliderPanel.ToggleActive();
+		}
 
         /// <summary>
         /// Toggles an effect on or off.

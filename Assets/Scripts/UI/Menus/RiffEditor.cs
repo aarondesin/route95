@@ -190,6 +190,8 @@ namespace Route95.UI {
 		/// </summary>
         Slider _riffVolumeSlider;
 
+		Slider _riffPanningSlider;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -242,6 +244,7 @@ namespace Route95.UI {
 			_iconBar_tr = GameObject.FindGameObjectWithTag("RiffEditorNoteIconBarContent").GetComponent<RectTransform>();
 			_beatsBar_tr = GameObject.FindGameObjectWithTag("RiffEditorBeatsBarContent").GetComponent<RectTransform>();
 			_riffVolumeSlider = GameObject.FindGameObjectWithTag("RiffEditorRiffVolumeSlider").GetComponent<Slider>();
+			_riffPanningSlider = GameObject.FindGameObjectWithTag("RiffEditorRiffPanningSlider").GetComponent<Slider>();
 
 			_distortionButton = GameObject.FindGameObjectWithTag("RiffEditorDistortionButton").GetComponent<Image>();
 			_tremoloButton = GameObject.FindGameObjectWithTag("RiffEditorTremoloButton").GetComponent<Image>();
@@ -265,6 +268,8 @@ namespace Route95.UI {
 
 		void Start () {
 			UIManager.Instance.onSwitchToRiffEditor.AddListener(Initialize);
+			_riffPanningSlider.onValueChanged.AddListener(UpdateRiffPanning);
+			_riffVolumeSlider.onValueChanged.AddListener(UpdateRiffVolume);
 		}
 
         #endregion
@@ -914,6 +919,14 @@ namespace Route95.UI {
         void SuggestOctave(GameObject button) {
             CreateSuggestion(button, "Octave", UIManager.Instance.OctaveSuggestionIcon, "Octave");
         }
+
+		void UpdateRiffVolume (float value) {
+			CurrentRiff.Volume = value;
+		}
+
+		void UpdateRiffPanning (float value) {
+			CurrentRiff.Panning = value;
+		}
 
         #endregion
     }

@@ -12,6 +12,7 @@ using System.Linq;
 
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 
 namespace Route95.Music {
 
@@ -77,6 +78,9 @@ namespace Route95.Music {
         }
 
         #endregion
+
+		public class MusicEvent : UnityEvent { }
+
         #region MusicManager Vars
 
         //-----------------------------------------------------------------------------------------------------------------
@@ -267,6 +271,10 @@ namespace Route95.Music {
         /// </summary>
         bool _riffMode = true;
 
+		public MusicEvent onCompleteSong;
+
+		public MusicEvent onStartSong;
+
         #endregion
         #region Unity Callbacks
 
@@ -275,6 +283,8 @@ namespace Route95.Music {
 
             // Init vars
             _source = GetComponent<AudioSource>();
+			onCompleteSong = new MusicEvent();
+			onStartSong = new MusicEvent();
 
             // Load instrument lists
             Instrument.LoadInstruments();
@@ -347,6 +357,8 @@ namespace Route95.Music {
 
                             // If song is finished
                             if (_beat >= _currentSong.BeatsCount || _currentSong.BeatsCount == 0) {
+								onCompleteSong.Invoke();
+
                                 _beat = 0;
 
                                 // Reset vars
@@ -360,6 +372,7 @@ namespace Route95.Music {
 
                                 // If another song available, switch
                                 if (_currentPlayingSong < _currentProject.Songs.Count - 1) {
+									onStartSong.Invoke();
                                     DisableAllAudioSources();
                                     _currentPlayingSong++;
                                     _currentSong = _currentProject.Songs[_currentPlayingSong];

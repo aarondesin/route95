@@ -359,7 +359,7 @@ namespace Route95.World {
             // Recalculate properties
             _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
-            _mesh.Optimize();
+            ;
 
             // Set mesh
             GetComponent<MeshFilter>().mesh = _mesh;

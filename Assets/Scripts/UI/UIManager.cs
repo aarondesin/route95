@@ -19,7 +19,7 @@ namespace Route95.UI {
 		#endregion
 		#region Vars
 
-		//-----------------------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------
 		[Header("UI Resources")]
 
         /// <summary>
@@ -150,7 +150,9 @@ namespace Route95.UI {
         [SerializeField]
         AudioClip _disableEffectSound;
 
-        //--------------------------------------------------------------------------
+		AudioSource _menuThemeSource;
+
+        //----------------------------------------------------------------------
         [Header("Menu Objects")]
 
         /// <summary>
@@ -168,7 +170,7 @@ namespace Route95.UI {
         /// </summary>
         Vector2 _canvasDimensions;
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         [Header("Tooltip Settings")]
 
         /// <summary>
@@ -260,6 +262,8 @@ namespace Route95.UI {
             _melodicVolumeIcon = Resources.Load<Sprite>("Sprites/VolumeBar_Melodic");
             _fillSprite = Resources.Load<Sprite>("Sprites/FillSprite");
             _scribbleCircle = Resources.Load<Sprite>("Sprites/ScribbleHighlight");
+
+			_menuThemeSource = GameObject.FindGameObjectWithTag("MenuThemeSource").GetComponent<AudioSource>();
 
 			onSwitchToLiveMode = new UIEvent();
 			onSwitchToPostplayMode = new UIEvent();
@@ -541,6 +545,9 @@ namespace Route95.UI {
                 // Otherwise show riff editor
                 ShowMenu(RiffEditor.Instance);
 
+				// Stop playing theme music
+				if (_menuThemeSource.isPlaying) _menuThemeSource.Stop();
+
 				onSwitchToRiffEditor.Invoke();
             }
         }
@@ -606,6 +613,11 @@ namespace Route95.UI {
 
         #endregion
         #region Sound Methods
+
+		public void PlayInstrumentSound (int instrumentIndex) {
+			var inst = Instrument.AllInstruments[instrumentIndex];
+			MusicManager.PlayMenuSound (inst.SwitchSound);
+		}
 
         /// <summary>
         /// Plays a click noise.

@@ -25,6 +25,9 @@ namespace Route95.Music {
         [SerializeField]
         string _name;
 
+		[SerializeField]
+		string _artistName;
+
         /// <summary>
         /// Musical key of song.
         /// </summary>
@@ -78,6 +81,11 @@ namespace Route95.Music {
             get { return _name; }
             set { _name = value; }
         }
+
+		public string ArtistName {
+			get { return _artistName; }
+			set { _artistName = value; }
+		}
 
         /// <summary>
         /// Returns a list of all beats in the song (read-only).

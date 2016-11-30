@@ -165,7 +165,7 @@ namespace Route95.Core {
             onFinishLoading = new GameEvent();
 
             // Remove profiler sample limit
-            Profiler.maxNumberOfSamplesPerFrame = -1;
+            UnityEngine.Profiling.Profiler.maxNumberOfSamplesPerFrame = -1;
 
             // Set application target frame rate
             Application.targetFrameRate = 120;

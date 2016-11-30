@@ -3,6 +3,8 @@
 
 using Route95.UI;
 
+using System;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +17,10 @@ namespace Route95.Core {
 
         #region GameObject Extensions
 
+		public static void ToggleActive (this GameObject obj) {
+			obj.SetActive (!obj.activeSelf);
+		}
+
         /// <summary>
         /// Sets a UI GameObject's parent.
         /// </summary>
@@ -24,6 +30,18 @@ namespace Route95.Core {
             tr.SetParent(parent);
             tr.localScale = scale;
         }
+
+		public static T GetComponentInSiblings<T> (this GameObject obj) 
+			where T : Component 
+		{
+			var parent = obj.transform.parent;
+			for (int i = 0; i < parent.childCount; i++) {
+				var component = parent.GetChild(i).GetComponent<T>();
+				if (component != default(T)) return component;
+			}
+
+			return default(T);
+		}
 
         /// <summary>
         /// Anchors a UI GameObject at a point.

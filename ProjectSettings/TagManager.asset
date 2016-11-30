@@ -41,6 +41,8 @@ TagManager:
   - SongArrangePreviewSongButton
   - SongArrangeAddRiffReminder
   - InstrumentDisplayGlow
+  - RiffEditorRiffPanningSlider
+  - MenuThemeSource
   layers:
   - Default
   - TransparentFX

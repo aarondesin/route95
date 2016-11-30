@@ -44,9 +44,8 @@ namespace Route95.UI {
             _confirmButton = GetComponentInChildren<Button>();
 
             // Reset listeners
-            _inputField.onEndEdit.AddListener(delegate {
-                _confirmButton.interactable = true;
-            });
+            _inputField.onEndEdit.AddListener(EnableConfirmButton);
+			_dropdown.onValueChanged.AddListener(PlayInstrumentSound);
         }
 
         void Start() {
@@ -87,6 +86,15 @@ namespace Route95.UI {
             _dropdown.AddOptions(options);
             _dropdown.value = 0;
         }
+
+		void EnableConfirmButton (string riffName) {
+			if (riffName != "" && riffName != default(string))
+				_confirmButton.interactable = true;
+		}
+
+		void PlayInstrumentSound (int instrumentIndex) {
+			UIManager.Instance.PlayInstrumentSound (instrumentIndex);
+		}
 
         /// <summary>
         /// Adds a riff from the prompt.

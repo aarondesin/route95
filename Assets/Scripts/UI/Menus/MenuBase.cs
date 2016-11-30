@@ -17,6 +17,10 @@ namespace Route95.UI {
 			_fade = GetComponent<Fadeable>();
 		}
 
+		public bool IsFullyVisible { get { return _fade.DoneUnfading; } }
+
+		public bool IsFullyInvisible { get { return _fade.DoneFading; } }
+
 		public void Show() {
 			_fade.UnFade();
 		}
