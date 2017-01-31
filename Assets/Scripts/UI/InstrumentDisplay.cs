@@ -1,66 +1,104 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿// InstrumentDisplay.cs
+// ©2016 Team 95
+
+using Route95.Core;
+using Route95.Music;
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to handle instrument display on the back of the car.
-/// </summary>
-public class InstrumentDisplay : MonoBehaviour {
+using UnityEngine;
+using UnityEngine.UI;
 
-	#region InstrumentDisplay Vars
+namespace Route95.UI {
 
-	public static InstrumentDisplay instance;
+    /// <summary>
+    /// Class to handle instrument display on the back of the car.
+    /// </summary>
+    public class InstrumentDisplay : SingletonMonoBehaviour<InstrumentDisplay> {
 
-	public Image glow;                        // Sprite to change for glow
-	public float fadeSpeed;                   // Speed of fade
-	public List<Fadeable> glows;                 // Instrument icons glows
+        #region InstrumentDisplay Vars
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Reference to icon.
+        /// </summary>
+        Image _icon;
 
-	void Awake () {
-		instance = this;
-	}
+        /// <summary>
+        /// Sprite to change for glow.
+        /// </summary>
+        Image _glow;
 
-	void FixedUpdate () {
+        /// <summary>
+        /// Speed of fade.
+        /// </summary>
+        [SerializeField]
+        float _fadeSpeed;
 
-		if (GameManager.instance.currentState != GameManager.State.Live) return;
-		if (GameManager.instance.paused) return;
+        /// <summary>
+        /// Instrument icons glows.
+        /// </summary>
+        List<Fadeable> _glows;
 
-		Color color = glow.color;
-		color.a -= fadeSpeed;
-		glow.color = color;
+        #endregion
+        #region Unity Callbacks
 
-	}
+        new void Awake () {
+            base.Awake();
 
-	#endregion
-	#region InstrumentDisplay Methods
+            // Init vars
+            _icon = GetComponent<Image>();
+			_glow = GameObject.FindGameObjectWithTag ("InstrumentDisplayGlow").GetComponent<Image>();
+        }
 
-	/// <summary>
-	/// Refreshes the display, changing art if necessary.
-	/// </summary>
-	public void Refresh () {
-		gameObject.Image().sprite = MusicManager.instance.currentInstrument.icon;
-		glow.sprite = MusicManager.instance.currentInstrument.glow;
-	}
+		void Start () {
+			UIManager.Instance.onSwitchToLiveMode.AddListener(Refresh);
+		}
 
-	/// <summary>
-	/// Sets glow to full.
-	/// </summary>
-	public void WakeGlow () {
-		Color color = glow.color;
-		color.a = 1f;
-		glow.color = color;
-	}
+        void FixedUpdate() {
 
-	public void WakeGlow (int index) {
-		glows[index].UnFade();
-	}
+            if (GameManager.Instance.CurrentState != GameManager.State.Live) return;
+            if (GameManager.Instance.Paused) return;
 
-	public void FadeGlow (int index) {
-		glows[index].Fade();
-	}
+            Color color = _glow.color;
+            color.a -= _fadeSpeed;
+            _glow.color = color;
 
-	#endregion
+        }
+
+        #endregion
+        #region InstrumentDisplay Methods
+
+        /// <summary>
+        /// Refreshes the display, changing art if necessary.
+        /// </summary>
+        public void Refresh() {
+            _icon.sprite = MusicManager.Instance.CurrentInstrument.Icon;
+            _glow.sprite = MusicManager.Instance.CurrentInstrument.Glow;
+        }
+
+        /// <summary>
+        /// Sets glow to full.
+        /// </summary>
+        public void WakeGlow() {
+            Color color = _glow.color;
+            color.a = 1f;
+            _glow.color = color;
+        }
+
+        /// <summary>
+        /// Wakes a particular glow.
+        /// </summary>
+        public void WakeGlow(int index) {
+            _glows[index].UnFade();
+        }
+
+        /// <summary>
+        /// Fades a particular glow.
+        /// </summary>
+        public void FadeGlow(int index) {
+            _glows[index].Fade();
+        }
+
+        #endregion
+    }
 }

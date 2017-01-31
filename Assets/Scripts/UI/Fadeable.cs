@@ -1,155 +1,176 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿// Fadeable.cs
+// ©2016 Team 95
+
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
-/// <summary>
-/// Class to fade all maskable graphics on and in a GameObject
-/// </summary>
-public class Fadeable : MonoBehaviour {
+using UnityEngine;
 
-	#region Fadeable Vars
+namespace Route95.UI {
 
-	[Tooltip("Does the graphic start faded?")]
-	public bool startFaded = true;
+    /// <summary>
+    /// Class to fade all maskable graphics on and in a GameObject
+    /// </summary>
+    [RequireComponent(typeof(CanvasGroup))]
+    public class Fadeable : MonoBehaviour {
 
-	[Tooltip("Rate of fade/unfade in percent per cycle.")]
-	public float fadeSpeed = 0.05f;         // Speed at which to perform fade
+        #region Fadeable Vars
 
-	[Tooltip("Fade all children graphics?")]
-	public bool fadeAllChildren = false;
+        /// <summary>
+        /// Does the graphic start faded?
+        /// </summary>
+        [Tooltip("Does the graphic start faded?")]
+        [SerializeField]
+        bool _startFaded = true;
 
-	[Tooltip("Prevent being faded by parents?")]
-	public bool blockParents = false;
+        /// <summary>
+        /// Rate of fade/unfade in percent per cycle.
+        /// </summary>
+        [Tooltip("Rate of fade/unfade in percent per cycle.")]
+        [SerializeField]
+        float _fadeSpeed = 0.05f;
 
-	[Tooltip("Disable GameObject after fading?")]
-	public bool disableAfterFading = false;
+        /// <summary>
+        /// Block raycasts while faded?
+        /// </summary>
+        [Tooltip("Block raycasts while faded?")]
+        [SerializeField]
+        bool _blockRaycastsWhileFaded = false;
 
-	float alpha;                                       // Current fade alpha
-	public bool busy = false;
-	Dictionary<MaskableGraphic, Color> originalColors; // Stores references to each graphic and its original color
+        /// <summary>
+        /// If true, busy fading.
+        /// </summary>
+        bool _busy = false;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// CanvasGroup to control.
+        /// </summary>
+        CanvasGroup _group;
 
-	public void Awake () {
+        #endregion
+        #region Unity Callbacks
 
-		// Build dicts of original colors
-		originalColors = new Dictionary<MaskableGraphic, Color>();
-		if (fadeAllChildren) {
-			List<MaskableGraphic> allGraphics = GetComponentsInChildren<MaskableGraphic>().ToList<MaskableGraphic>();
-			foreach (MaskableGraphic graphic in allGraphics)
-				if (graphic.GetComponent<Fadeable>() == null ||
-					!graphic.GetComponent<Fadeable>().blockParents) originalColors.Add (graphic, graphic.color);
-		} else if (GetComponent<MaskableGraphic>() != null)
-			originalColors.Add (GetComponent<MaskableGraphic>(), GetComponent<MaskableGraphic>().color);
+        public void Awake() {
+            // Init vars
+            _group = GetComponent<CanvasGroup>();
 
-		// Initially fade if necessary
-		if (startFaded) {
-			alpha = 0f;
-			ColorAll();
-			if (disableAfterFading) gameObject.SetActive(false);
+            // Initially fade if necessary
+            if (_startFaded) {
+                FadeInstant();
+            }
+        }
+
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Returns true if this fader is busy (read-only).
+        /// </summary>
+        public bool Busy { get { return _busy; } }
+
+        /// <summary>
+        /// Gets/sets whether this object starts faded.
+        /// </summary>
+        public bool StartFaded {
+            get { return _startFaded; }
+            set { _startFaded = value; }
+        }
+
+        /// <summary>
+        /// Returns true if the object is done fading.
+        /// </summary>
+        public bool DoneFading { get {
+            return _group.alpha == 0f && !_busy;
+        } }
+
+        /// <summary>
+        /// Returns true if the object is done unfading.
+        /// </summary>
+        public bool DoneUnfading { get {
+            return _group.alpha == 1f && !_busy;
+        } }
+
+        /// <summary>
+        /// Returns true if this object is not busy (read-only).
+        /// </summary>
+        public bool NotFading {
+            get {
+                return DoneFading || DoneUnfading;
+            }
+        }
+
+		public bool BlockRaycastsWhileFaded {
+			get { return _blockRaycastsWhileFaded; }
+			set { _blockRaycastsWhileFaded = value; }
 		}
-	}
 
-	#endregion
-	#region Fadeable Methods
-
-	/// <summary>
-	/// Returns true if the object is done fading.
-	/// </summary>
-	public bool DoneFading {
-		get {
-			return alpha == 0f && !busy;
+		public float FadeSpeed {
+			get { return _fadeSpeed; }
+			set { _fadeSpeed = value; }
 		}
-	}
 
-	/// <summary>
-	/// Returns true if the object is done unfading.
-	/// </summary>
-	public bool DoneUnfading {
-		get {
-			return alpha == 1f && !busy;
+        /// <summary>
+        /// Starts fading the object.
+        /// </summary>
+        public void Fade() {
+            if (gameObject.activeSelf) StopCoroutine("DoUnFade");
+            _group.blocksRaycasts = _blockRaycastsWhileFaded;
+            _busy = true;
+            StartCoroutine("DoFade");
+        }
+
+		public void FadeInstant () {
+			StopAllCoroutines();
+			_group.blocksRaycasts = _blockRaycastsWhileFaded;
+			_group.alpha = 0f;
+			_busy = false;
 		}
-	}
 
-	public bool NotFading {
-		get {
-			return DoneFading || DoneUnfading;
-		}
-	}
+        /// <summary>
+        /// Starts unfading the object.
+        /// </summary>
+        public void UnFade() {
+            if (gameObject.activeSelf) StopCoroutine("DoFade");
+			_group.blocksRaycasts = true;
+            _busy = true;
+            StartCoroutine("DoUnFade");
+        }
 
-	/// <summary>
-	/// Starts fading the object.
-	/// </summary>
-	public void Fade () {
-		if (gameObject.activeSelf) StopCoroutine ("DoUnFade");
-		else return;
-		busy = true;
-		StartCoroutine("DoFade");
-	}
+        /// <summary>
+        /// Fades an object.
+        /// </summary>
+        IEnumerator DoFade() {
+            while (true) {
+                if (_group.alpha >= _fadeSpeed) {
 
-	/// <summary>
-	/// Starts unfading the object.
-	/// </summary>
-	public void UnFade () {
-		if (gameObject.activeSelf) StopCoroutine("DoFade");
-		else gameObject.SetActive(true);
-		busy = true;
-		StartCoroutine("DoUnFade");
-	}
+                    _group.alpha -= _fadeSpeed;
 
-	/// <summary>
-	/// Fades an object.
-	/// </summary>
-	/// <returns></returns>
-	IEnumerator DoFade () {
-		while (true) {
-			if (alpha >= fadeSpeed) {
+                    yield return null;
+                }
+                else {
+                    _busy = false;
+                    //if (disableAfterFading) gameObject.SetActive(false);
+                    if (_blockRaycastsWhileFaded) _group.blocksRaycasts = true;
+                    _group.alpha = 0f;
+                    yield break;
+                }
+            }
+        }
 
-				alpha -= fadeSpeed;
-				ColorAll();
-					
-				yield return null;
-			} else {
-				busy = false;
-				if (disableAfterFading) gameObject.SetActive(false);
-				alpha = 0f;
-				ColorAll();
-				yield break;
-			}
-		}
-	}
+        /// <summary>
+        /// Unfades an object.
+        /// </summary>
+        IEnumerator DoUnFade() {
+            while (_group.alpha <= 1f - _fadeSpeed) {
 
-	/// <summary>
-	/// Unfades an object.
-	/// </summary>
-	/// <returns></returns>
-	IEnumerator DoUnFade () {
-		while (alpha <= 1f-fadeSpeed) {
+                _group.alpha += _fadeSpeed;
 
-			alpha += fadeSpeed;
-			ColorAll();
+                yield return null;
+            }
+            _busy = false;
+            _group.alpha = 1f;
+            yield break;
+        }
 
-			yield return null;
-		}
-		busy = false;
-		alpha = 1f;
-		ColorAll();
-		yield break;
-	}
-
-	/// <summary>
-	/// Updates the alphas of parent and all children.
-	/// </summary>
-	void ColorAll () {
-		foreach (MaskableGraphic graphic in originalColors.Keys) {
-			Color newColor = originalColors[graphic];
-			newColor.a *= alpha;
-			graphic.color = newColor;
-		}
-	}
-
-	#endregion
+        #endregion
+    }
 }

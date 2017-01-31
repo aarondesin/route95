@@ -1,55 +1,44 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// Moon.cs
+// ©2016 Team 95
 
-/// <summary>
-/// Class to handle moon movement and lighting.
-/// </summary>
-public class Moon : GlobalLightSource {
+using System;
+using UnityEngine;
 
-	#region Moon Vars
+namespace Route95.World {
 
-	public static Moon instance;  // Quick reference to this instance
-	Light _light;                 // Reference to this light component
+    /// <summary>
+    /// Class to handle moon movement and lighting.
+    /// </summary>
+    public class Moon : GlobalLightSource<Moon> {
 
-	public Light shadowCaster;
+		#region Vars
 
-	public float radius;
-	public float scale;
+		/// <summary>
+		/// Reference to this SpriteRenderer.
+		/// </summary>
+		SpriteRenderer _renderer;
 
-	private Vector3 target; // target for the sun to point at: the car or the origin
+		float _offset = -Mathf.PI / 2f;
 
-	#endregion
-	#region Unity Callbacks
+		#endregion
+		#region Unity Callbacks
 
-	void Awake () {
-		instance = this;
-		GetComponent<Light>().cullingMask = 
-			(1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
+		new protected void Awake() {
+            base.Awake();
+
+			// Init vars
+			_renderer = GetComponent<SpriteRenderer>();
+            _light.cullingMask =
+                (1 << 0 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5 | 1 << 8 | 1 << 9);
+        }
+
+		#endregion
+		#region Properties
+
+		public SpriteRenderer Renderer { get { return _renderer; } }
+
+		public override float Offset { get { return _offset; } }
+
+		#endregion
 	}
-
-	void Start () {
-		transform.SetParent (PlayerMovement.instance.transform);
-		transform.localScale = new Vector3 (scale, scale, scale);
-	}
-
-	void Update() {
-		UpdateTransform();
-	}
-
-	#endregion
-	#region Moon Callbacks
-		
-	private void UpdateTransform(){
-		target = PlayerMovement.instance.transform.position;
-
-		float newX = -radius * Mathf.Cos(WorldManager.instance.timeOfDay);
-		float newY = -radius * Mathf.Sin(WorldManager.instance.timeOfDay);
-		float newZ = -radius * Mathf.Cos(WorldManager.instance.timeOfDay + Mathf.PI/5);
-		this.transform.position = new Vector3(newX, newY, newZ);
-
-		this.transform.LookAt (target);
-	}
-
-	#endregion
-
 }

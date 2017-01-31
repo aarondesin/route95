@@ -1,55 +1,88 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// SongPiece.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to store all measure data.
-/// </summary>
-[System.Serializable]
-public class SongPiece {
+using UnityEngine;
 
-	#region NonSerialized Song Piece Vars
+namespace Route95.Music {
 
-	const int DEFAULT_MEASURES = 1;
+    /// <summary>
+    /// Class to store all measure data.
+    /// </summary>
+    [System.Serializable]
+    public class SongPiece {
 
-	#endregion
-	#region Serialized Song Piece Vars
+        #region NonSerialized Song Piece Vars
 
-	[SerializeField]
-	public string name;              // Name of song piece
+        /// <summary>
+        /// Default number of measures per song piece.
+        /// </summary>
+        const int DEFAULT_MEASURES = 1;
 
-	[SerializeField]
-	public int index;                // Project-assigned index
+        #endregion
+        #region Serialized Song Piece Vars
 
-	[SerializeField]
-	public List<int> measureIndices; // List of indices of measures used
+        /// <summary>
+        /// Name of song piece.
+        /// </summary>
+        [SerializeField]
+        string _name;
 
-	#endregion
-	#region Song Piece Methods
+        /// <summary>
+        /// Project-assigned index.
+        /// </summary>
+        [SerializeField]
+        int _index;
 
-	/// <summary>
-	/// Default constructor.
-	/// </summary>
-	public SongPiece () {
-		measureIndices = new List<int> ();
-	}
+        /// <summary>
+        /// List of indices of measures used.
+        /// </summary>
+        [SerializeField]
+        List<int> _measureIndices;
 
-	/// <summary>
-	/// Plays all notes at the given position.
-	/// </summary>
-	/// <param name="pos">Beat at which to play notes.</param>
-	public void PlaySongPiece (int pos){
-		int measureNum = pos/4;
-		Song song = MusicManager.instance.currentSong;
-		Measure measure = song.measures[measureNum];
+        #endregion
+        #region Properties
 
-		// Play all riffs
-		foreach (int r in measure.riffIndices) {
-			Riff riff = song.riffs[r];
-			riff.PlayRiff (pos % 4);
-		}
-	}
+        /// <summary>
+        /// Gets/sets the index of this song piece.
+        /// </summary>
+        public int Index {
+            get { return _index; }
+            set { _index = value; }
+        }
 
-	#endregion
+        /// <summary>
+        /// Returns a list of the indices of the measures used in this song piece (read-only).
+        /// </summary>
+        public List<int> MeasureIndices { get { return _measureIndices; } }
 
+        #endregion
+        #region Song Piece Methods
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public SongPiece() {
+            _measureIndices = new List<int>();
+        }
+
+        /// <summary>
+        /// Plays all notes at the given position.
+        /// </summary>
+        /// <param name="pos">Beat at which to play notes.</param>
+        public void PlaySongPiece(int pos) {
+            int measureNum = pos / 4;
+            Song song = MusicManager.Instance.CurrentSong;
+            Measure measure = song.Measures[measureNum];
+
+            // Play all riffs
+            foreach (int r in measure.RiffIndices) {
+                Riff riff = song.Riffs[r];
+                riff.PlayRiff(pos % 4);
+            }
+        }
+
+        #endregion
+    }
 }

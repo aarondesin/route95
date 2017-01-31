@@ -1,169 +1,253 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// PlayerMovement.cs
+// ©2016 Team 95
+
+using Route95.Core;
+using Route95.Music;
+using Route95.UI;
+
 using System.Collections.Generic;
 using System.Linq;
 
-public class PlayerMovement : MonoBehaviour {
-	public static PlayerMovement instance;
-	Road road;
+using UnityEngine;
 
-	public GameObject lightRight;
-	public GameObject lightLeft;
-	//public float velocity;
-	const float distPerBeat = 0.0012f; // Tempo -> velocity
-	const float particlesPerUnit = 100f; // Distance -> particle emission
-	const float lookAhead = 0.01f;
-	public bool moving;
-	public bool lights;
-	public float progress;
-	float roadHeight;
-	public List<ParticleSystem> particles;
+namespace Route95.World {
 
-	public GameObject frontLeftWheel;
-	public GameObject frontRightWheel;
-	public GameObject backLeftWheel;
-	public GameObject backRightWheel;
+	/// <summary>
+	/// Ckass to handle player movement.
+	/// </summary>
+    public class PlayerMovement : SingletonMonoBehaviour<PlayerMovement> {
 
-	float minVelocity;
-	float maxVelocity;
-	float velocity;
-	const float velocityToRotation = 10000f;
-	//float acceleration;
-	Vector3 target;
-	float offsetH = 0f;
-	float velocityOffset = 0f;
+		#region Vars
 
-	public AudioClip engineClip;
+		/// <summary>
+		/// Car headlights.
+		/// </summary>
+		[Tooltip("Car headlights.")]
+		[SerializeField]
+		List<Light> _headlights;
 
-	List<ReflectionProbe> reflectionProbes;
-	//Vector3 prevPosition;
+		/// <summary>
+		/// Tempo to velocity ratio.
+		/// </summary>
+        const float DIST_PER_BEAT = 0.0012f;
 
-	bool initialized = false;
-	float dOffset;
+		/// <summary>
+		/// Particle emission rate to distance ratio.
+		/// </summary>
+        const float PARTICLES_PER_DIST = 100f;
 
-	// Use this for initialization
-	void Awake () {
-		instance = this;
-		lights = false;
-		moving = false;
-		velocity = 0f;
+		/// <summary>
+		/// Distance to look ahead.
+		/// </summary>
+        const float LOOK_AHEAD_DIST = 0.01f;
 
-		//prevPosition = Vector3.zero;
-		reflectionProbes = GetComponentsInChildren<ReflectionProbe> ().ToList<ReflectionProbe>();
+		/// <summary>
+		/// 
+		/// </summary>
+        bool _moving = false;
 
-		target = new Vector3 (0f, 0f, 0f);
+        bool _lightsOn = false;
 
-		progress = 0f;
-		StopMoving();
+		/// <summary>
+		/// Progress along road.
+		/// </summary>
+        float _progress = 0f;
 
-		minVelocity = MusicManager.tempoToFloat [Tempo.Slowest] * distPerBeat;
-		maxVelocity = MusicManager.tempoToFloat [Tempo.Fastest] * distPerBeat;
+		/// <summary>
+		/// Dust emitters.
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Dust emitters.")]
+        List<ParticleSystem> _particles;
 
-		GetComponent<AudioSource>().volume = 0.0f;
+		/// <summary>
+		/// 
+		/// </summary>
+        float _minVelocity;
 
-		dOffset = 0f;
+		/// <summary>
+		/// 
+		/// </summary>
+        float _maxVelocity;
 
+		/// <summary>
+		/// 
+		/// </summary>
+        float _velocity = 0f;
 
+		/// <summary>
+		/// 
+		/// </summary>
+        const float VELOCITY_TO_ROTATION = 10000f;
 
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        Vector3 _target;
 
-	void Start () {
-		road = WorldManager.instance.road;
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        float _offsetH = 0f;
 
-	public void StartMoving() {
-		roadHeight = WorldManager.instance.roadHeight;
-		moving = true;
-		foreach (ParticleSystem ps in particles) ps.Play();
-		GetComponent<AudioSource>().clip = engineClip;
-		GetComponent<AudioSource>().loop = true;
-		GetComponent<AudioSource>().Play();
-		GetComponent<AudioSource>().volume = 0f;
-		//EnableReflections();
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        float _velocityOffset = 0f;
 
-	public void StopMoving() {
-		moving = false;
-		foreach (ParticleSystem ps in particles) ps.Pause();
-		GetComponent<AudioSource>().Stop();
-		//DisableReflections();
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        List<ReflectionProbe> _reflectionProbes;
 
-	public void DisableReflections () {
-		foreach (ReflectionProbe probe in reflectionProbes)
-			probe.enabled = false;
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        bool _initialized = false;
 
-	public void EnableReflections () {
-		foreach (ReflectionProbe probe in reflectionProbes)
-			probe.enabled = true;
-	}
+		/// <summary>
+		/// 
+		/// </summary>
+        float _dOffset;
 
-	void Initialize() {
-		//DisableReflections ();
-		initialized = true;
-		//frontLeftWheel.transform.Rotate (new Vector3 (0f, 180f,0f));
-		//frontLeftWheel.transform.Rotate (new Vector3 (0f, 180f,0f));
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-		if (!initialized)
-			Initialize ();
+		GameObject _FRWheel;
+		GameObject _FLWheel;
+		GameObject _RRWheel;
+		GameObject _RLWheel;
 
-		if (Sun.instance != null) {
-			if (moving && !GameManager.instance.paused) {
-				
-				dOffset += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - 0.5f);
-				velocityOffset = Mathf.Clamp (velocityOffset + dOffset, minVelocity, maxVelocity);
+		#endregion
+		#region Unity Callbacks
 
-				velocity = MusicManager.tempoToFloat [MusicManager.instance.tempo] * distPerBeat + velocityOffset;
+		// Use this for initialization
+		new void Awake() {
+			base.Awake();
 
-				progress += velocity * Time.fixedDeltaTime / road.CurveCount;
-				if (progress >= 1f)
-					progress = 1f;
-				
-				offsetH += (Mathf.PerlinNoise (Random.Range (0f, 1f), 0f) - Random.Range (0f, offsetH)) * Time.deltaTime;
-				Vector3 offset = new Vector3 (offsetH, 2.27f + roadHeight, 0f);
-				Vector3 point = road.GetPoint(progress);
-				Vector3 ahead = point + road.GetVelocity (progress);
-				transform.position = point + offset - 
-					road.BezRight (point) * road.Width / 3f;
-				
-				transform.LookAt (ahead);
-				float rotation = velocity * velocityToRotation * Time.deltaTime;
+			// Init vars
+            _FRWheel = GameObject.FindGameObjectWithTag("FrontRightWheel");
+			_FLWheel = GameObject.FindGameObjectWithTag("FrontLeftWheel");
+			_RRWheel = GameObject.FindGameObjectWithTag("RearRightWheel");
+			_RLWheel = GameObject.FindGameObjectWithTag("RearLeftWheel");
 
-				//Vector2 point2 = new Vector2 (point.x, point.z);
-				//Vector2 ahead2 = new Vector2 (ahead.x, ahead.z);
+            //prevPosition = Vector3.zero;
+            _reflectionProbes = GetComponentsInChildren<ReflectionProbe>().ToList();
 
-				frontLeftWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f), Space.Self);
-				frontRightWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f),Space.Self);
-				backLeftWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f), Space.Self);
-				backRightWheel.transform.Rotate (new Vector3 (rotation, 0f, 0f), Space.Self);
+            _target = new Vector3(0f, 0f, 0f);
 
-				//frontLeftWheel.transform.Rotate (new Vector3 (0f, Vector2.Angle (ahead2-point2, point2)-frontLeftWheel.transform.rotation.eulerAngles.y, 0f));
-				//frontRightWheel.transform.Rotate (new Vector3 (0f, Vector2.Angle (ahead2-point2, point2)-frontRightWheel.transform.rotation.eulerAngles.y, 0f));
+            _progress = 0f;
+            StopMoving();
 
-				foreach (ParticleSystem particle in particles) {
-					var emission = particle.emission;
-					var rate = emission.rate;
-					rate.constantMax = velocity * particlesPerUnit;
-					emission.rate = rate;
-				}
+            _minVelocity = MusicManager.TempoToFloat[Tempo.Slowest] * DIST_PER_BEAT;
+            _maxVelocity = MusicManager.TempoToFloat[Tempo.Fastest] * DIST_PER_BEAT;
 
-				GetComponent<AudioSource>().pitch = Mathf.Clamp (0.75f + (velocity - minVelocity) / (maxVelocity - minVelocity), 0.75f, 1.75f);
+            GetComponent<AudioSource>().volume = 0.0f;
 
-			}
+            _dOffset = 0f;
+        }
 
-			lights = (WorldManager.instance.timeOfDay  > (Mathf.PI * (7f / 8f))
-				|| WorldManager.instance.timeOfDay <= Mathf.PI * (1f / 8f));
-			lightRight.GetComponent<Light> ().enabled = lights;
-			lightLeft.GetComponent<Light> ().enabled = lights;
+        void Start() {
+			UIManager.Instance.onSwitchToPlaylistMenu.AddListener(()=> {
+				StopMoving();
+			});
+
+			UIManager.Instance.onSwitchToLiveMode.AddListener(StartMoving);
+
+			UIManager.Instance.onSwitchToPostplayMode.AddListener(StopMoving);
+        }
+
+		// Update is called once per frame
+        void FixedUpdate() {
+            if (!_initialized)
+                Initialize();
+
+            if (Sun.Instance != null) {
+                if (_moving && !GameManager.Instance.Paused) {
+
+					Road road = WorldManager.Instance.Road;
+
+                    _dOffset += (Mathf.PerlinNoise(Random.Range(0f, 1f), 0f) - 0.5f);
+                    _velocityOffset = Mathf.Clamp(_velocityOffset + _dOffset, _minVelocity, _maxVelocity);
+
+                    _velocity = MusicManager.TempoToFloat[MusicManager.Instance.Tempo] * DIST_PER_BEAT + _velocityOffset;
+
+                    _progress += _velocity * Time.fixedDeltaTime / road.CurveCount;
+                    if (_progress >= 1f)
+                        _progress = 1f;
+
+                    _offsetH += (Mathf.PerlinNoise(Random.Range(0f, 1f), 0f) - Random.Range(0f, _offsetH)) * Time.deltaTime;
+                    Vector3 offset = new Vector3(_offsetH, 2.27f + WorldManager.Instance.RoadHeight, 0f);
+                    Vector3 point = road.GetPoint(_progress);
+                    Vector3 ahead = point + road.GetVelocity(_progress);
+                    transform.position = point + offset -
+                        road.BezRight(point) * WorldManager.Instance.RoadWidth / 3f;
+
+                    transform.LookAt(ahead);
+                    float rotation = _velocity * VELOCITY_TO_ROTATION * Time.deltaTime;
+
+                    _FLWheel.transform.Rotate(new Vector3(rotation, 0f, 0f), Space.Self);
+                    _FRWheel.transform.Rotate(new Vector3(rotation, 0f, 0f), Space.Self);
+                    _RLWheel.transform.Rotate(new Vector3(rotation, 0f, 0f), Space.Self);
+                    _RRWheel.transform.Rotate(new Vector3(rotation, 0f, 0f), Space.Self);
+
+                    foreach (ParticleSystem particle in _particles) {
+                        var emission = particle.emission;
+                        var rate = emission.rate;
+                        rate.constantMax = _velocity * PARTICLES_PER_DIST;
+                        emission.rate = rate;
+                    }
+
+                    GetComponent<AudioSource>().pitch = Mathf.Clamp(0.75f + (_velocity - _minVelocity) / (_maxVelocity - _minVelocity), 0.75f, 1.75f);
+
+                }
+
+                _lightsOn = (WorldManager.Instance.TimeOfDay > (Mathf.PI * (7f / 8f))
+                    || WorldManager.Instance.TimeOfDay <= Mathf.PI * (1f / 8f));
+				foreach (Light light in _headlights) light.enabled = _lightsOn;
+            }
+        }
+
+        void OnDrawGizmosSelected() {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(_target, 1f);
+        }
+
+		#endregion
+		#region Properties
+
+		public bool Moving { get { return _moving; } }
+
+		public float Progress {
+			get { return _progress; }
+			set { _progress = value; }
 		}
-	}
 
-	void OnDrawGizmosSelected () {
-		Gizmos.color = Color.blue;
-		Gizmos.DrawSphere (target, 1f);
-	}
+		#endregion
+		#region Methods
+
+		public void StartMoving() {
+            _moving = true;
+            foreach (ParticleSystem ps in _particles) ps.Play();
+        }
+
+        public void StopMoving() {
+            _moving = false;
+            foreach (ParticleSystem ps in _particles) ps.Pause();
+            GetComponent<AudioSource>().Stop();
+        }
+
+        public void DisableReflections() {
+            foreach (ReflectionProbe probe in _reflectionProbes)
+                probe.enabled = false;
+        }
+
+        public void EnableReflections() {
+            foreach (ReflectionProbe probe in _reflectionProbes)
+                probe.enabled = true;
+        }
+
+        void Initialize() {
+            _initialized = true;
+        }
+    }
+
+	#endregion
 }

@@ -40,17 +40,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 96e550064f03f67439ae14991e912127, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -75,50 +78,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b8cb4bf408079438b1e6e1dd729279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  group: 3
-  dynamic: 0
-  density: 1
-  distribution: 1
-  positionOffset: {x: 0, y: 0, z: 0}
-  rotationOffset: {x: -90, y: 0, z: 0}
-  heightRange: {x: 1, y: 1}
-  widthRange: {x: 1, y: 1}
-  pitchRange: {x: 0, y: 0}
-  yawRange: {x: 0, y: 0}
-  rollRange: {x: 0, y: 0}
-  heightAnimation:
+  _group: 3
+  _dynamic: 0
+  _density: 1
+  _distribution: 2
+  _positionOffset: {x: 0, y: 0, z: 0}
+  _rotationOffset: {x: 0, y: 0, z: 0}
+  _heightRange: {x: 0, y: 0}
+  _widthRange: {x: 0, y: 0}
+  _pitchRange: {x: 0, y: 0}
+  _yawRange: {x: 0, y: 0}
+  _rollRange: {x: 0, y: 0}
+  _heightAnimation:
     serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
-    - time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
-  widthAnimation:
+    m_RotationOrder: 4
+  _widthAnimation:
     serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
-    - time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 10
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
-  animationSpeed: 0.5
+    m_RotationOrder: 4
+  _animationSpeed: 0.5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

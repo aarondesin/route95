@@ -1,56 +1,70 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// AudioTremoloFilter.cs
+// ©2016 Team 95
 
-/// <summary>
-/// Custom audio tremolo filter.
-/// </summary>
-public class AudioTremoloFilter : MonoBehaviour {
+using UnityEngine;
 
-	#region AudioTremoloFilter Vars
+namespace Route95.Music {
 
-	[Tooltip("Tremolo oscillation rate.")]
-	[Range(Mathf.PI/32f, Mathf.PI/16f)]
-	public float rate = Mathf.PI/32f;
+    /// <summary>
+    /// Custom audio tremolo filter.
+    /// </summary>
+    public class AudioTremoloFilter : MonoBehaviour {
 
-	[Tooltip("Tremolo oscillation depth.")]
-	[Range(0f, 1f)]
-	public float depth;
+        #region AudioTremoloFilter Vars
 
-	[Tooltip("Current oscillation theta.")]
-	[SerializeField]
-	[Range(0f, Mathf.PI*2f)]
-	float r;
+        /// <summary>
+        /// Tremolo oscillation rate.
+        /// </summary>
+        [Tooltip("Tremolo oscillation rate.")]
+        [Range(Mathf.PI / 32f, Mathf.PI / 16f)]
+        public float rate = Mathf.PI / 32f;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Tremolo oscillation depth.
+        /// </summary>
+        [Tooltip("Tremolo oscillation depth.")]
+        [Range(0f, 1f)]
+        public float depth;
 
-	void FixedUpdate () {
+        /// <summary>
+        /// Current oscillation theta.
+        /// </summary>
+        [Tooltip("Current oscillation theta.")]
+        [SerializeField]
+        [Range(0f, Mathf.PI * 2f)]
+        float _r;
 
-		// Add rate to r
-		r += rate;
+        #endregion
+        #region Unity Callbacks
 
-		// Wrap r if past 2PI
-		if (r > Mathf.PI * 2f) r -= (Mathf.PI * 2f);
-	}
+        void FixedUpdate() {
 
-	void OnEnable() {
+            // Add rate to r
+            _r += rate;
 
-		// Start r at 0
-		r = 0f;
-	}
+            // Wrap r if past 2PI
+            if (_r > Mathf.PI * 2f) _r -= (Mathf.PI * 2f);
+        }
 
-	void OnDisable () {
+        void OnEnable() {
 
-		// Reset volume while disabled
-		GetComponent<AudioSource>().volume = 1f;
-	}
+            // Start r at 0
+            _r = 0f;
+        }
 
-	void OnAudioFilterRead (float[] data, int channels) {
+        void OnDisable() {
 
-		// Multiply data amplitude by current cos value
-		for (int i=0; i<data.Length; i++)
-			data[i] = data[i] *( 1f - (1f-depth)/2f + 0.5f*Mathf.Cos(r));
-	}
+            // Reset volume while disabled
+            GetComponent<AudioSource>().volume = 1f;
+        }
 
-	#endregion
+        void OnAudioFilterRead(float[] data, int channels) {
+
+            // Multiply data amplitude by current cos value
+            for (int i = 0; i < data.Length; i++)
+                data[i] = data[i] * (1f - (1f - depth) / 2f + 0.5f * Mathf.Cos(_r));
+        }
+
+        #endregion
+    }
 }

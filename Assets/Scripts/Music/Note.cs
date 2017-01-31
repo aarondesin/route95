@@ -1,148 +1,217 @@
+// Note.cs
+// ©2016 Team 95
+
 using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;// need for using lists
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+namespace Route95.Music {
 
-/// <summary>
-/// Class to store note data.
-/// </summary>
-[System.Serializable]
-public class Note {
+    /// <summary>
+    /// Class to store note data.
+    /// </summary>
+    [System.Serializable]
+    public class Note {
 
-	#region Note Vars
+        /// <summary>
+        /// Enum for the type of percussion.
+        /// </summary>
+        public enum PercType {
+            None,
+            Kick,
+            Snare,
+            Tom,
+            Shaker,
+            Cymbal,
+            Hat,
+            Wood
+        }
 
-	const float DEFAULT_VOLUME = 0.75f;          // Default volume
-	const float DEFAULT_DURATION = 1f;        // Default duration
+        #region Note Vars
 
-	[SerializeField]
-	public string filename;                   // Filename of audio clip
+        /// <summary>
+        /// Default note volume.
+        /// </summary>
+        const float DEFAULT_VOLUME = 0.75f;
 
-	[SerializeField]
-	public float volume = DEFAULT_VOLUME;     // Note volume
+        /// <summary>
+        /// Default note duration.
+        /// </summary>
+        const float DEFAULT_DURATION = 1f;
 
-	[SerializeField]
-	public float duration = DEFAULT_DURATION; // Note duration
+        /// <summary>
+        /// Filename of audio clip.
+        /// </summary>
+        [SerializeField]
+        string _filename;
 
-	#endregion
-	#region Note Methods
+        /// <summary>
+        /// Note volume.
+        /// </summary>
+        [SerializeField]
+        float _volume = DEFAULT_VOLUME;
 
-	/// <summary>
-	/// Default constructor.
-	/// </summary>
-	public Note () {
-		filename = null;
-	}
+        /// <summary>
+        /// Note duration.
+        /// </summary>
+        [SerializeField]
+        float _duration = DEFAULT_DURATION;
 
-	/// <summary>
-	/// Filename/volume/duration constructor.
-	/// </summary>
-	/// <param name="fileName">Filename to use.</param>
-	/// <param name="vol">Initial volume.</param>
-	/// <param name="dur">Initial duration.</param>
-	public Note (string fileName, float vol=DEFAULT_VOLUME, float dur=DEFAULT_DURATION) {
+        /// <summary>
+        /// Type of percussion (if applicable).
+        /// </summary>
+        [SerializeField]
+        PercType _percType = PercType.None;
 
-		// Check if MM has sound
-		if (!MusicManager.SoundClips.ContainsKey(fileName)) {
-			Debug.LogError ("Note.Note(): filename \"" + fileName + "\" invalid!");
-			filename = null;
-		} else filename = fileName;
+        #endregion
+        #region Constructors
 
-		// Set vars
-		volume = vol;
-		duration = dur;
-	}
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Note() {
+            _filename = null;
+        }
 
-	/// <summary>
-	/// Plays a note.
-	/// </summary>
-	/// <param name="source">AudioSource on which to play the note.</param>
-	/// <param name="newVolume">Volume scaler.</param>
-	/// <param name="cutoff">Cut the AudioSource before playing?</param>
-	public void PlayNote (AudioSource source, float newVolume=1f, bool cutoff=false) {
-		if (!source.enabled) source.enabled = true;
-		else if (cutoff) source.Stop();
-		source.PlayOneShot(MusicManager.SoundClips[filename], newVolume*volume*source.volume);
-	}
+        /// <summary>
+        /// Filename/volume/duration constructor.
+        /// </summary>
+        /// <param name="fileName">Filename to use.</param>
+        /// <param name="vol">Initial volume.</param>
+        /// <param name="dur">Initial duration.</param>
+        public Note(string fileName, float vol = DEFAULT_VOLUME, float dur = DEFAULT_DURATION) {
 
-	/// <summary>
-	/// Returns whether or not the other note is the same.
-	/// </summary>
-	/// <param name="other">Note to compare.</param>
-	/// <returns></returns>
-	public bool Equals (Note other) {
-		return filename == other.filename || (this == null && other == null);
-	}
+            // Check if MM has sound
+            if (!MusicManager.SoundClips.ContainsKey(fileName)) {
+                Debug.LogError("Note.Note(): filename \"" + fileName + "\" invalid!");
+                _filename = null;
+            }
+            else _filename = fileName;
 
-	/// <summary>
-	/// Checks if a note is a kick.
-	/// </summary>
-	/// <returns>Returns true if the note is a kick note.</returns>
-	public bool IsKick () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
-	}
+            // Assign percussion type, if applicable
+            if (IsKick())        _percType = PercType.Kick;
+            else if (IsCymbal()) _percType = PercType.Cymbal;
+            else if (IsHat())    _percType = PercType.Hat;
+            else if (IsShaker()) _percType = PercType.Shaker;
+            else if (IsSnare())  _percType = PercType.Snare;
+            else if (IsTom())    _percType = PercType.Tom;
+            else if (IsWood())   _percType = PercType.Wood;
 
-	/// <summary>
-	/// Checks if a note is a snare.
-	/// </summary>
-	/// <returns></returns>
-	public bool IsSnare () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare";
-	}
+            // Set vars
+            _volume = vol;
+            _duration = dur;
+        }
 
-	/// <summary>
-	/// Checks if a note is a tom.
-	/// </summary>
-	/// <returns></returns>
-	public bool IsTom () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom" || 
-			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom" || 
-			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom";
-	}
+        #endregion
+        #region Properties
 
-	/// <summary>
-	/// Checks if a note is a shaker.
-	/// </summary>
-	/// <returns></returns>
-	public bool IsShaker () {
-		return 
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2";
-	}
+        /// <summary>
+        /// Returns this note's filename (read-only).
+        /// </summary>
+        public string Filename { get { return _filename; } }
 
-	/// <summary>
-	/// Checks if a note is a cymbal.
-	/// </summary>
-	/// <returns></returns>
-	public bool IsCymbal () {
-		return filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash";
-	}
+        /// <summary>
+        /// Gets/sets the volume of this note.
+        /// </summary>
+        public float Volume {
+            get { return _volume; }
+            set { _volume = value; }
+        }
 
-	/// <summary>
-	/// Checks if a note is a hat.
-	/// </summary>
-	/// <returns></returns>
-	public bool IsHat () {
-		return 
-			filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine";
-	}
+        /// <summary>
+        /// Gets/sets the duration of this note.
+        /// </summary>
+        public float Duration {
+            get { return _duration; }
+            set { _duration = value; }
+        }
 
-	/// <summary>
-	/// Checks if a note is wood (claves, castinets, cowbell, jam block).
-	/// </summary>
-	/// <returns></returns>
-	public bool IsWood () {
-		return
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2" ||
-			filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock";
-	}
+        /// <summary>
+        /// Returns the type of percussion of this note (read-only).
+        /// </summary>
+        public PercType PercussionType { get { return _percType; } }
 
-	#endregion
+        #endregion
+        #region Methods
+
+        /// <summary>
+        /// Plays a note.
+        /// </summary>
+        /// <param name="source">AudioSource on which to play the note.</param>
+        /// <param name="newVolume">Volume scaler.</param>
+        /// <param name="cutoff">Cut the AudioSource before playing?</param>
+        public void PlayNote(AudioSource source, float newVolume = 1f, bool cutoff = false) {
+            if (!source.enabled) source.enabled = true;
+            else if (cutoff) source.Stop();
+            source.PlayOneShot(MusicManager.SoundClips[_filename], newVolume * _volume * source.volume);
+        }
+
+        /// <summary>
+        /// Returns whether or not the other note is the same.
+        /// </summary>
+        /// <param name="other">Note to compare.</param>
+        public bool Equals(Note other) {
+            return _filename == other._filename || (this == null && other == null);
+        }
+
+        /// <summary>
+        /// Checks if a note is a kick.
+        /// </summary>
+        bool IsKick() {
+            return _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Kick";
+        }
+
+        /// <summary>
+        /// Checks if a note is a snare.
+        /// </summary>
+        bool IsSnare() {
+            return _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Snare";
+        }
+
+        /// <summary>
+        /// Checks if a note is a tom.
+        /// </summary>
+        bool IsTom() {
+            return _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_LowTom" ||
+                _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_MidTom" ||
+                _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_HiTom";
+        }
+
+        /// <summary>
+        /// Checks if a note is a shaker.
+        /// </summary>
+        bool IsShaker() {
+            return
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas1" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Maracas2";
+        }
+
+        /// <summary>
+        /// Checks if a note is a cymbal.
+        /// </summary>
+        public bool IsCymbal() {
+            return _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Crash";
+        }
+
+        /// <summary>
+        /// Checks if a note is a hat.
+        /// </summary>
+        public bool IsHat() {
+            return
+                _filename == "Audio/Instruments/Percussion/RockDrums/RockDrums_Hat" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Tambourine";
+        }
+
+        /// <summary>
+        /// Checks if a note is wood (claves, castinets, cowbell, jam block).
+        /// </summary>
+        public bool IsWood() {
+            return
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Castinets" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Claves" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_Cowbell2" ||
+                _filename == "Audio/Instruments/Percussion/ExoticPercussion/ExoticPercussion_JamBlock";
+        }
+
+        #endregion
+    }
 }

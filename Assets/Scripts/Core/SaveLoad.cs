@@ -1,269 +1,284 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿// SaveLoad.cs
+// ©2016 Team 95
+
+using Route95.Music;
+using Route95.UI;
+
 using System;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-using System.Linq;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
 
-/// <summary>
-/// Non-MonoBehaviour class to handle IO.
-/// </summary>
-public static class SaveLoad {
+namespace Route95.Core {
 
-	#region Exceptions
+    /// <summary>
+    /// Class to handle I/O operations.
+    /// </summary>
+    public static class SaveLoad {
 
-	/// <summary>
-	/// Exception thrown whenever a file fails to save.
-	/// </summary>
-	[Serializable]
-	public class FailedToSaveException : ApplicationException {
-		public FailedToSaveException(string info, Exception standard) : base(info, standard) { }
-		public FailedToSaveException(string info) : base(info) { }
-		public FailedToSaveException() { }
-	}
+        #region Exceptions
 
-	/// <summary>
-	/// Exception thrown whenever a file fails to load.
-	/// </summary>
-	[Serializable]
-	public class FailedToLoadException : ApplicationException {
-		public FailedToLoadException(string info, Exception standard) : base(info, standard) { }
-		public FailedToLoadException(string info) : base(info) { }
-		public FailedToLoadException() { }
-	}
+        /// <summary>
+        /// Exception thrown whenever a file fails to save.
+        /// </summary>
+        [Serializable]
+        public class FailedToSaveException : ApplicationException {
+            public FailedToSaveException(string info, Exception standard) : base(info, standard) { }
+            public FailedToSaveException(string info) : base(info) { }
+            public FailedToSaveException() { }
+        }
 
-	#endregion
-	#region SaveLoad Vars
+        /// <summary>
+        /// Exception thrown whenever a file fails to load.
+        /// </summary>
+        [Serializable]
+        public class FailedToLoadException : ApplicationException {
+            public FailedToLoadException(string info, Exception standard) : base(info, standard) { }
+            public FailedToLoadException(string info) : base(info) { }
+            public FailedToLoadException() { }
+        }
 
-	public static string projectSaveExtension = ".r95p"; // File extension for projects
-	public static string songSaveExtension = ".r95s";    // File extension for songs
+        #endregion
+        #region SaveLoad Vars
 
-	#endregion
-	#region Save Methods
+        /// <summary>
+        /// File extension for projects.
+        /// </summary>
+        public const string PROJECT_SAVE_EXT = ".r95p";
 
-	/// <summary>
-	/// Saves an item to a particular path with a certain name.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <param name="toSave">Object to save (must be serializable).</param>
-	/// <param name="dirPath">Full path to save directory.</param>
-	/// <param name="filePath">Full save path, including file name, extension, and directory.</param>
-	public static void Save<T> (T toSave, string dirPath, string filePath) where T : new() {
+        /// <summary>
+        /// File extension for songs.
+        /// </summary>
+        public const string SONG_SAVE_EXT = ".r95s";
 
-		// Check if type is serializable
-		if (!typeof(T).IsSerializable)
-			throw new FailedToSaveException("SaveLoad.Save(): type " + toSave.GetType().ToString() + " is not serializable!");
+        #endregion
+        #region Save Methods
 
-		// Init BinaryFormatter
-		BinaryFormatter bf = new BinaryFormatter();
+        /// <summary>
+        /// Saves an item to a particular path with a certain name.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="toSave">Object to save (must be serializable).</param>
+        /// <param name="dirPath">Full path to save directory.</param>
+        /// <param name="filePath">Full save path, including file name, extension, and directory.</param>
+        public static void Save<T>(T toSave, string dirPath, string filePath) where T : new() {
 
-		// Create directory
-		Directory.CreateDirectory(dirPath);
+            // Check if type is serializable
+            if (!typeof(T).IsSerializable)
+                throw new FailedToSaveException("SaveLoad.Save(): type " + 
+                    toSave.GetType().ToString() + " is not serializable!");
 
-		// Open file
-		FileStream file = File.Open(filePath, FileMode.Create);
+            // Init BinaryFormatter
+            BinaryFormatter bf = new BinaryFormatter();
 
-		// Serialize object
-		bf.Serialize(file, toSave);
+            // Create directory
+            Directory.CreateDirectory(dirPath);
 
-		// Close file
-		file.Close();
-	}
+            // Open file
+            FileStream file = File.Open(filePath, FileMode.Create);
 
-	/// <summary>
-	/// Saves the current open project.
-	/// </summary>
-	public static void SaveCurrentProject () {
+            // Serialize object
+            bf.Serialize(file, toSave);
 
-		// Build paths
-		string directoryPath = GameManager.instance.projectSavePath;
-		string filePath = directoryPath + MusicManager.instance.currentProject.name + projectSaveExtension;
+            // Close file
+            file.Close();
+        }
 
-		try {
+        /// <summary>
+        /// Saves the current open project.
+        /// </summary>
+        public static void SaveCurrentProject() {
 
-			// Save project
-			Save<Project>(MusicManager.instance.currentProject, directoryPath, filePath);
+            // Build paths
+            string directoryPath = GameManager.Instance.ProjectSavePath;
+            string filePath = directoryPath + MusicManager.Instance.CurrentProject.Name + 
+                PROJECT_SAVE_EXT;
 
-			// Prompt
-			Prompt.instance.PromptMessage("Save Project", "Successfully saved project to \"" + filePath + "\".", "Okay");
+            try {
 
-		// Catch exceptions
-		} catch (FailedToSaveException e) {
-			Debug.LogError(e.Message);
-			return;
-		}
-	}
+                // Save project
+                Save<Project>(MusicManager.Instance.CurrentProject, directoryPath, filePath);
 
-	/// <summary>
-	/// Saves the indicated song.
-	/// </summary>
-	/// <param name="song">Song to save.</param>
-	public static void SaveSong(Song song) {
-	
-		// Build paths
-		string directoryPath = Application.dataPath + "/Songs/";
-		string filePath = directoryPath + song.name + songSaveExtension;
+                // Prompt
+                Prompt.Instance.PromptMessage("Save Project", "Successfully saved project to \"" + filePath + "\".", "Okay");
 
-		// Save song
-		Save<Song>(song, directoryPath, filePath);
-		
-		// Prompt
-		Prompt.instance.PromptMessage("Save Project", "Successfully saved Song!", "Okay");
-	}
+                // Catch exceptions
+            }
+            catch (FailedToSaveException e) {
+                Debug.LogError(e.Message);
+                return;
+            }
+        }
 
-	/// <summary>
-	/// Saves the currently open song.
-	/// </summary>
-	public static void SaveCurrentSong() {
-		Song song = MusicManager.instance.currentSong;
+        /// <summary>
+        /// Saves the indicated song.
+        /// </summary>
+        /// <param name="song">Song to save.</param>
+        public static void SaveSong(Song song) {
 
-		// Check if song is null
-		if (song == null) {
-			Debug.LogError("SaveLoad.SaveCurrentSong(): tried to save null song!");
-			return;
-		}
+            // Build paths
+            string directoryPath = Application.dataPath + "/Songs/";
+            string filePath = directoryPath + song.Name + SONG_SAVE_EXT;
 
-		// Save song
-		SaveSong(song);
-	}
+            // Save song
+            Save<Song>(song, directoryPath, filePath);
 
-	#endregion
-	#region Load Methods
+            // Prompt
+            Prompt.Instance.PromptMessage("Save Project", "Successfully saved Song!", "Okay");
+        }
 
-	/// <summary>
-	/// Loads the specified object.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <param name="dirPath">Full path to load directory.</param>
-	/// <param name="filePath">Full load path, including file name, extension, and directory.</param>
-	public static T Load<T> (string filePath) where T : new() {
+        /// <summary>
+        /// Saves the currently open song.
+        /// </summary>
+        public static void SaveCurrentSong() {
+            Song song = MusicManager.Instance.CurrentSong;
 
-		// Check if file exists
-		if (!File.Exists(filePath))
-			throw new FailedToLoadException("SaveLoad.Load(): invalid path \"" + filePath + "\"");
+            // Check if song is null
+            if (song == null) {
+                Debug.LogError("SaveLoad.SaveCurrentSong(): tried to save null song!");
+                return;
+            }
 
-		try {
+            // Save song
+            SaveSong(song);
+        }
 
-			Debug.Log("SaveLoad.Load<" + typeof(T).ToString() + ">(): loading path \"" + filePath + "\".");
+        #endregion
+        #region Load Methods
 
-			// Init BinaryFormatter
-			BinaryFormatter bf = new BinaryFormatter();
+        /// <summary>
+        /// Loads the specified object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dirPath">Full path to load directory.</param>
+        /// <param name="filePath">Full load path, including file name, extension, and directory.</param>
+        public static T Load<T>(string filePath) where T : new() {
 
-			// Open file
-			FileStream file = File.Open(filePath, FileMode.Open);
+            // Check if file exists
+            if (!File.Exists(filePath))
+                throw new FailedToLoadException("SaveLoad.Load(): invalid path \"" + filePath + "\"");
 
-			// Deserialize object
-			T result = (T)bf.Deserialize(file);
+            try {
 
-			// Check if valid result
-			if (result == null) throw new FailedToLoadException (
-				"SaveLoad.Load(): loaded file \"" + filePath + "\" was null.\n"
-				);
+                Debug.Log("SaveLoad.Load<" + typeof(T).ToString() + ">(): loading path \"" + filePath + "\".");
 
-			// Close file
-			file.Close();
+                // Init BinaryFormatter
+                BinaryFormatter bf = new BinaryFormatter();
 
-			// Return object
-			return result;
+                // Open file
+                FileStream file = File.Open(filePath, FileMode.Open);
 
-		// Catch SerializationExceptions
-		} catch (SerializationException e) {
-			throw new FailedToLoadException(
-				"SaveLoad.Load(): failed to deserialize file \"" + filePath + "\".\n" + e.Message
-			);
+                // Deserialize object
+                T result = (T)bf.Deserialize(file);
 
-		// Catch EndOfStreamExceptions
-		} catch (EndOfStreamException e) {
-			throw new FailedToLoadException(
-				"SaveLoad.Load(): hit unexpected end of stream in file \"" + filePath + "\".\n" + e.Message
-			);
-		}
-	}
+                // Check if valid result
+                if (result == null) throw new FailedToLoadException(
+                    "SaveLoad.Load(): loaded file \"" + filePath + "\" was null.\n"
+                    );
 
-	/// <summary>
-	/// Loads the project at the specified path.
-	/// </summary>
-	/// <param name="path">Project path.</param>
-	public static void LoadProject (string path) {
+                // Close file
+                file.Close();
 
-		// Backup project and song
-		Project backupProject = MusicManager.instance.currentProject;
-		Song backupSong = MusicManager.instance.currentSong;
+                // Return object
+                return result;
 
-		try {
+                // Catch SerializationExceptions
+            }
+            catch (SerializationException e) {
+                throw new FailedToLoadException(
+                    "SaveLoad.Load(): failed to deserialize file \"" + filePath + "\".\n" + e.Message
+                );
 
-			// Load project
-			Project project = Load<Project>(path);
-			MusicManager.instance.currentProject = project;
+                // Catch EndOfStreamExceptions
+            }
+            catch (EndOfStreamException e) {
+                throw new FailedToLoadException(
+                    "SaveLoad.Load(): hit unexpected end of stream in file \"" + filePath + "\".\n" + e.Message
+                );
+            }
+        }
 
-			// Load first song, if available
-			if (!project.Empty)
-				MusicManager.instance.currentSong = project.songs[0];
+        /// <summary>
+        /// Loads the project at the specified path.
+        /// </summary>
+        /// <param name="path">Project path.</param>
+        public static void LoadProject(string path) {
 
-		// Catch and print any FailedToLoadExceptions
-		} catch (FailedToLoadException f) {
+            // Backup project and song
+            Project backupProject = MusicManager.Instance.CurrentProject;
+            Song backupSong = MusicManager.Instance.CurrentSong;
 
-			// Restore backups
-			MusicManager.instance.currentProject = backupProject;
-			MusicManager.instance.currentSong = backupSong;
+            try {
 
-			throw f;
-		}
-	}
+                // Load project
+                Project project = Load<Project>(path);
+                MusicManager.Instance.CurrentProject = project;
 
-	/// <summary>
-	/// Loads the specified song to the project.
-	/// </summary>
-	/// <param name="path">Song path.</param>
-	public static void LoadSongToProject (string path) {
+                // Load first song, if available
+                if (!project.Empty)
+                    MusicManager.Instance.CurrentSong = project.Songs[0];
 
-		// Load song
-		Song song = LoadSong(path);
+                // Catch and print any FailedToLoadExceptions
+            }
+            catch (FailedToLoadException f) {
 
-		// Add song to project
-		MusicManager.instance.currentProject.AddSong(song);
+                // Restore backups
+                MusicManager.Instance.CurrentProject = backupProject;
+                MusicManager.Instance.CurrentSong = backupSong;
 
-		// Set current song to song
-		MusicManager.instance.currentSong = song;
-	}
+                throw f;
+            }
+        }
 
-	/// <summary>
-	/// Loads a song.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns>Song path.</returns>
-	public static Song LoadSong (string path) {
+        /// <summary>
+        /// Loads the specified song to the project.
+        /// </summary>
+        /// <param name="path">Song path.</param>
+        public static void LoadSongToProject(string path) {
 
-		try {
+            // Load song
+            Song song = LoadSong(path);
 
-			// Load song
-			Song result = Load<Song>(path);
+            // Add song to project
+            MusicManager.Instance.CurrentProject.AddSong(song);
 
-			//Prompt.instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
+            // Set current song to song
+            MusicManager.Instance.CurrentSong = song;
+        }
 
-			return result;
+        /// <summary>
+        /// Loads a song.
+        /// </summary>
+        /// <param name="path"></param>
+        public static Song LoadSong(string path) {
 
-		// Catch and print FailedToLoadExceptions
-		} catch (FailedToLoadException e) {
+            try {
 
-			// Print exception
-			Debug.LogError(e.Message);
+                // Load song
+                Song result = Load<Song>(path);
 
-			// Prompt
-			Prompt.instance.PromptMessage("Failed to load song", 
-				"Failed to load song \"" + path + "\". It may be in an older format or corrupt.", 
-				"Okay");
+                //Prompt.Instance.PromptMessage("Load Song", "Successfully loaded Song!", "Okay");
 
-			return null;
-		}
-	}
+                return result;
 
-	#endregion
+                // Catch and print FailedToLoadExceptions
+            }
+            catch (FailedToLoadException e) {
 
+                // Print exception
+                Debug.LogError(e.Message);
+
+                // Prompt
+                Prompt.Instance.PromptMessage("Failed to load song",
+                    "Failed to load song \"" + path + "\". It may be in an older format or corrupt.",
+                    "Okay");
+
+                return null;
+            }
+        }
+
+        #endregion
+    }
 }

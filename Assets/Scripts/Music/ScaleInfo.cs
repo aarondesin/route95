@@ -1,63 +1,148 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// ScaleInfo.cs
+// ©2016 Team 95
+
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to hold all types of scales.
-/// </summary>
-public class ScaleInfo {
+namespace Route95.Music {
 
-	#region ScaleInfo Vars
+    /// <summary>
+    /// Class to hold all types of scales.
+    /// </summary>
+    public class ScaleInfo {
 
-	public string name;      // Name of scale
-	public int scaleIndex;   // Index in list of all scales
+        #region ScaleInfo Vars
 
-	public int rootIndex;    // Interval to root
-	public int secondIndex;  // Interval to second
-	public int thirdIndex;   // Interval to third
-	public int fourthIndex;  // Interval to fourth
-	public int fifthIndex;   // Interval to fifth
-	public int sixthIndex;   // Interval to sixth
-	public int seventhIndex; // Interval to seventh
+        /// <summary>
+        /// Name of scale.
+        /// </summary>
+        string _name;
 
-	/// <summary>
-	/// Major scale.
-	/// </summary>
-	public static ScaleInfo Major = new ScaleInfo () {
-		name = "Major",
-		scaleIndex = 0,
-		secondIndex = 2,
-		thirdIndex = 2,
-		fourthIndex = 1,
-		fifthIndex = 2,
-		sixthIndex = 2,
-		seventhIndex = 2,
-		rootIndex = 1
-	};
+        /// <summary>
+        /// Index in list of all scales.
+        /// </summary>
+        int _scaleIndex;
 
-	/// <summary>
-	/// Minor scale.
-	/// </summary>
-	public static ScaleInfo Minor = new ScaleInfo () {
-		name = "Minor",
-		scaleIndex = 1,
-		secondIndex = 2,
-		thirdIndex = 1,
-		fourthIndex = 2,
-		fifthIndex = 2,
-		sixthIndex = 1,
-		seventhIndex = 2,
-		rootIndex = 2
-	};
-			
-	/// <summary>
-	/// List of all scale types.
-	/// </summary>
-	public static List<ScaleInfo> AllScales = new List<ScaleInfo> () {
-		Major,
-		Minor
-	};
+        /// <summary>
+        /// Interval to root.
+        /// </summary>
+        int _rootInterval;
 
-	#endregion
+        /// <summary>
+        /// Interval to second.
+        /// </summary>
+        int _secondInterval;
 
+        /// <summary>
+        /// Interval to third.
+        /// </summary>
+        int _thirdInterval;
+
+        /// <summary>
+        /// Interval to fourth.
+        /// </summary>
+        int _fourthInterval;
+
+        /// <summary>
+        /// Interval to fifth.
+        /// </summary>
+        int _fifthInterval;
+
+        /// <summary>
+        /// Interval to sixth.
+        /// </summary>
+        int _sixthInterval;
+
+        /// <summary>
+        /// Interval to seventh.
+        /// </summary>
+        int _seventhInterval;
+
+        /// <summary>
+        /// Major scale.
+        /// </summary>
+        public static ScaleInfo Major = new ScaleInfo() {
+            _name = "Major",
+            _scaleIndex = 0,
+            _secondInterval = 2,
+            _thirdInterval = 2,
+            _fourthInterval = 1,
+            _fifthInterval = 2,
+            _sixthInterval = 2,
+            _seventhInterval = 2,
+            _rootInterval = 1
+        };
+
+        /// <summary>
+        /// Minor scale.
+        /// </summary>
+        public static ScaleInfo Minor = new ScaleInfo() {
+            _name = "Minor",
+            _scaleIndex = 1,
+            _secondInterval = 2,
+            _thirdInterval = 1,
+            _fourthInterval = 2,
+            _fifthInterval = 2,
+            _sixthInterval = 1,
+            _seventhInterval = 2,
+            _rootInterval = 2
+        };
+
+        /// <summary>
+        /// List of all scale types.
+        /// </summary>
+        public static List<ScaleInfo> AllScales = new List<ScaleInfo>() {
+            Major,
+            Minor
+        };
+
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Returns the name of this scale (read-only).
+        /// </summary>
+        public string Name { get { return _name; } }
+
+        /// <summary>
+        /// Returns the root interval (read-only).
+        /// </summary>
+        public int RootInterval { get { return _rootInterval; } }
+
+        /// <summary>
+        /// Returns the second interval (read-only).
+        /// </summary>
+        public int SecondInterval { get { return _secondInterval; } }
+
+        /// <summary>
+        /// Returns the third interval (read-only).
+        /// </summary>
+        public int ThirdInterval { get { return _thirdInterval; } }
+
+        /// <summary>
+        /// Returns the fourth interval (read-only).
+        /// </summary>
+        public int FourthInterval { get { return _fourthInterval; } }
+
+        /// <summary>
+        /// Returns the fifth interval (read-only).
+        /// </summary>
+        public int FifthInterval { get { return _fifthInterval; } }
+
+        /// <summary>
+        /// Returns the sixth interval (read-only).
+        /// </summary>
+        public int SixthInterval { get { return _sixthInterval; } }
+
+        /// <summary>
+        /// Returns the seventh interval (read-only).
+        /// </summary>
+        public int SeventhInterval { get { return _seventhInterval; } }
+
+        /// <summary>
+        /// Returns the index of this scale (read-only).
+        /// </summary>
+        public int ScaleIndex { get { return _scaleIndex; } }
+
+        #endregion
+    }
 }

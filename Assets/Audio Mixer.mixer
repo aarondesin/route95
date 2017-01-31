@@ -13,6 +13,7 @@ AudioMixerController:
   m_StartSnapshot: {fileID: 24500003}
   m_SuspendThreshold: -80
   m_EnableSuspend: 1
+  m_UpdateMode: 0
   m_ExposedParameters: []
   m_AudioMixerGroupViews:
   - guids:
@@ -29,6 +30,7 @@ AudioMixerController:
     - cc14e904f9938514884cb3d3331749fa
     - 88c233345c20a124d804fdaaee334ec7
     - d64ced3572d237e4ca80a0a061d94ec4
+    - 3df96cfa14fc501458dd28734f4d9062
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500003}
@@ -78,6 +80,7 @@ AudioMixerGroupController:
   m_GroupID: bb9c0583babf7f14bb8a98389076983b
   m_Children:
   - {fileID: 24307416}
+  - {fileID: 243000010310611124}
   m_Volume: 89845c7833513c3498b99656e5723ffc
   m_Pitch: bf119e9475820144ea7ab09937b33cab
   m_Effects:
@@ -482,3 +485,33 @@ AudioMixerSnapshotController:
     c9a5194a746d4184aa940953ad83882f: 3.2656894
     af5748baa4727be409853b0d4c92f131: 0.903
   m_TransitionOverrides: {}
+--- !u!243 &243000010310611124
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Radio
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 3df96cfa14fc501458dd28734f4d9062
+  m_Children: []
+  m_Volume: 7e136c04515038e4682922355e433c31
+  m_Pitch: 7ec59f26fcd714b489edf38574b1addc
+  m_Effects:
+  - {fileID: 244000010633540054}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &244000010633540054
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: 90baebe9570359a4197df533df01f988
+  m_EffectName: Attenuation
+  m_MixLevel: ed436a11e60d1a0458bb9a7d7dea99f9
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0

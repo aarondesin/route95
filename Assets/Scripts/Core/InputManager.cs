@@ -1,350 +1,417 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using System;
-using System.Collections;
+﻿// InputManager.cs
+// ©2016 Team 95
+
+using Route95.Music;
+using Route95.UI;
+using Route95.World;
+
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Instanced class to handle all keyboard and mouse input.
-/// </summary>
-public class InputManager : MonoBehaviour {
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-	#region InputManager Vars
+namespace Route95.Core {
 
-	public static InputManager instance;
+    /// <summary>
+    /// Instanced class to handle all keyboard and mouse input.
+    /// </summary>
+    public class InputManager : SingletonMonoBehaviour<InputManager> {
 
-	[Header("InputManager Values")]
+        #region InputManager Vars
 
-	[Tooltip("Current selected object.")]
-	public GameObject selected;
+        [Header("InputManager Values")]
 
-	[Tooltip("List of scroll views to disable while dragging.")]
-	public List<ScrollRect> scrollviews;
+        /// <summary>
+        /// Amount by which volume changes when pressed.
+        /// </summary>
+        [SerializeField]
+        float _volumeChangeAmount;
 
-	Vector3 prevMouse = Vector3.zero;    // Mouse position during last frame
+        /// <summary>
+        /// Current selected object.
+        /// </summary>
+        [Tooltip("Current selected object.")]
+        [SerializeField]
+        GameObject _selected;
 
-	[NonSerialized]
-	public Vector3 mouseDelta;           // Change in mouse position between last frame and this frame
+        /// <summary>
+        /// List of scroll views to disable while dragging.
+        /// </summary>
+        [Tooltip("List of scroll views to disable while dragging.")]
+        [SerializeField]
+        List<ScrollRect> _scrollviews;
 
-	Vector3 clickPosition;               // Position clicked
-	List<AudioSource> audioSources;      // List of all note audiosources
+        /// <summary>
+        /// Mouse position during last frame.
+        /// </summary>
+        Vector3 _prevMouse = Vector3.zero;
 
-	[NonSerialized]
-	public int framesDragged = 0;        // Number of frames dragged
+        /// <summary>
+        /// Change in mouse position between last frame and this frame.
+        /// </summary>
+        Vector3 _mouseDelta;
 
-	[Tooltip("Number of frames user must hold click to be considered a drag.")]
-	public int dragThreshold = 30; 
+        /// <summary>
+        /// Position clicked.
+        /// </summary>
+        Vector3 _clickPosition;
 
-	#endregion
-	#region Key Mappings
+        /// <summary>
+        /// All note audiosources.
+        /// </summary>
+        List<AudioSource> _audioSources;
 
-	// Mappings of number keys to instruments
-	public static Dictionary<KeyCode, Instrument> keyToInstrument = new Dictionary<KeyCode, Instrument>() {
-		{ KeyCode.Alpha1, PercussionInstrument.RockDrums },
-		{ KeyCode.Alpha2, PercussionInstrument.ExoticPercussion },
-		{ KeyCode.Alpha3, MelodicInstrument.ElectricGuitar },
-		{ KeyCode.Alpha4, MelodicInstrument.ElectricBass },
-		{ KeyCode.Alpha5, MelodicInstrument.AcousticGuitar },
-		{ KeyCode.Alpha6, MelodicInstrument.ClassicalGuitar },
-		{ KeyCode.Alpha7, MelodicInstrument.PipeOrgan },
-		{ KeyCode.Alpha8, MelodicInstrument.Keyboard },
-		{ KeyCode.Alpha9, MelodicInstrument.Trumpet }
-	};
-		
-	// Mappings of keys to notes
-	public static Dictionary<KeyCode, int> keyToNote = new Dictionary<KeyCode, int>() {
-		{ KeyCode.P, 0 },
-		{ KeyCode.O, 1 },
-		{ KeyCode.I, 2 },
-		{ KeyCode.U, 3 },
-		{ KeyCode.Y, 4 },
-		{ KeyCode.T, 5 },
-		{ KeyCode.R, 6 },
-		{ KeyCode.E, 7 },
-		{ KeyCode.W, 8 },
-		{ KeyCode.Q, 9 },
-		{ KeyCode.L, 10 },
-		{ KeyCode.K, 11 },
-		{ KeyCode.J, 12 },
-		{ KeyCode.H, 13 },
-		{ KeyCode.G, 14 },
-		{ KeyCode.F, 15 },
-		{ KeyCode.D, 16 },
-		{ KeyCode.S, 17 },
-		{ KeyCode.A, 18 },
-		{ KeyCode.M, 19 },
-		{ KeyCode.N, 20 },
-		{ KeyCode.B, 21 },
-		{ KeyCode.V, 22 },
-		{ KeyCode.C, 23 },
-		{ KeyCode.X, 24 },
-		{ KeyCode.Z, 25 }
-	};
+        /// <summary>
+        /// Number of frames dragged.
+        /// </summary>
+        int _framesDragged = 0;
 
-	#endregion
-	#region Unity Callbacks
+        /// <summary>
+        /// Number of frames a user must hold down to drag.
+        /// </summary>
+        [Tooltip("Number of frames user must hold click to be considered a drag.")]
+        [SerializeField]
+        int _dragThreshold = 30;
 
-	void Awake () {
-		instance = this;
+        #endregion
+        #region Key Mappings
 
-		// Initialize audio sources for all notes
-		audioSources = new List<AudioSource>();
-		Transform tr = transform;
-		for (int i=0; i<26; i++) {
+        /// <summary>
+        /// Mappings of number keys to instruments.
+        /// </summary>
+        public static Dictionary<KeyCode, Instrument> keyToInstrument = 
+            new Dictionary<KeyCode, Instrument>() {
+            { KeyCode.Alpha1, PercussionInstrument.RockDrums },
+            { KeyCode.Alpha2, PercussionInstrument.ExoticPercussion },
+            { KeyCode.Alpha3, MelodicInstrument.ElectricGuitar },
+            { KeyCode.Alpha4, MelodicInstrument.ElectricBass },
+            { KeyCode.Alpha5, MelodicInstrument.AcousticGuitar },
+            { KeyCode.Alpha6, MelodicInstrument.ClassicalGuitar },
+            { KeyCode.Alpha7, MelodicInstrument.PipeOrgan },
+            { KeyCode.Alpha8, MelodicInstrument.Keyboard },
+            { KeyCode.Alpha9, MelodicInstrument.Trumpet }
+        };
 
-			// Create GameObject
-			GameObject obj = new GameObject("Note"+i+"Source");
-			AudioSource temp = obj.AddComponent<AudioSource>();
-			audioSources.Add(temp);
+        /// <summary>
+        /// Mappings of letter keys to note indices.
+        /// </summary>
+        public static Dictionary<KeyCode, int> keyToNote = 
+            new Dictionary<KeyCode, int>() {
+            { KeyCode.P, 0 },
+            { KeyCode.O, 1 },
+            { KeyCode.I, 2 },
+            { KeyCode.U, 3 },
+            { KeyCode.Y, 4 },
+            { KeyCode.T, 5 },
+            { KeyCode.R, 6 },
+            { KeyCode.E, 7 },
+            { KeyCode.W, 8 },
+            { KeyCode.Q, 9 },
+            { KeyCode.L, 10 },
+            { KeyCode.K, 11 },
+            { KeyCode.J, 12 },
+            { KeyCode.H, 13 },
+            { KeyCode.G, 14 },
+            { KeyCode.F, 15 },
+            { KeyCode.D, 16 },
+            { KeyCode.S, 17 },
+            { KeyCode.A, 18 },
+            { KeyCode.M, 19 },
+            { KeyCode.N, 20 },
+            { KeyCode.B, 21 },
+            { KeyCode.V, 22 },
+            { KeyCode.C, 23 },
+            { KeyCode.X, 24 },
+            { KeyCode.Z, 25 }
+        };
 
-			// Parent to InputManager (for easy hiding)
-			obj.transform.parent = tr;
-			
-			// Set default volume
-			temp.volume = 1.0f;
-		}
-	}
+        #endregion
+        #region Unity Callbacks
 
-	void Update() {
+        new void Awake() {
+            base.Awake();
 
-		// Update mouse delta
-		mouseDelta = Input.mousePosition - prevMouse;
+            // Initialize audio sources for all notes
+            _audioSources = new List<AudioSource>();
+            MakeNoteAudioSources();
+        }
 
-		switch (GameManager.instance.currentState) {
+        void Update() {
 
-			// Live mode
-			case GameManager.State.Live:
+            // Update mouse delta
+            _mouseDelta = Input.mousePosition - _prevMouse;
 
-				Instrument inst = MusicManager.instance.currentInstrument;
+            switch (GameManager.Instance.CurrentState) {
 
-				// If available, get current playing song
-				Song song = null;
-				if (MusicManager.instance.currentProject.songs.Count > 0) 
-					song = MusicManager.instance.currentProject.songs[MusicManager.instance.currentPlayingSong];
+                // Live mode
+                case GameManager.State.Live:
 
-				// Check for pause
-				if (Input.GetKeyDown (KeyCode.Escape)) GameManager.instance.TogglePause ();
+                    CheckForPause();
 
-				// Check for tempo up/down
-				else if (Input.GetKeyDown (KeyCode.UpArrow)) MusicManager.instance.IncreaseTempo ();
-				else if (Input.GetKeyDown (KeyCode.DownArrow))  MusicManager.instance.DecreaseTempo ();
+                    MusicManager music = MusicManager.Instance;
+                    Instrument inst = music.CurrentInstrument;
 
-				// Check for instrument volume up/down
-				else if (Input.GetKeyDown (KeyCode.LeftArrow)) {
-					AudioSource source = MusicManager.instance.instrumentAudioSources[inst];
-					if (source.volume >= 0.1f) source.volume -= 0.1f;
-				} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
-					AudioSource source = MusicManager.instance.instrumentAudioSources[inst];
-					if (source.volume <= 0.9f) source.volume += 0.1f;
-				}
+                    // If available, get current playing song
+                    Song song = null;
+                    Project project = music.CurrentProject;
+                    int songIndex = music.CurrentPlayingSong;
+                    if (!project.Empty)
+                        song = project.Songs[songIndex];
 
-				else {
-				
-					// Check for instruments switch
-					foreach (KeyValuePair<KeyCode, Instrument> key in keyToInstrument) {
-						if (Input.GetKeyDown(key.Key)) {
-							SwitchInstrument(keyToInstrument[key.Key]);
-							GameManager.instance.WakeLiveUI();
-						}
-					}
-					
-					// Check for note presses
-					foreach (KeyCode keyPress in keyToNote.Keys.ToList()) {
-						if (Input.GetKeyDown(keyPress)) {
-							
-							int noteIndex;
-							AudioSource source = audioSources[keyToNote[keyPress]];
+                    // Check for tempo up/down
+                    else if (Input.GetKeyDown(KeyCode.UpArrow))
+                        music.IncreaseTempo();
+                    else if (Input.GetKeyDown(KeyCode.DownArrow))
+                        music.DecreaseTempo();
 
-							// If percussion is selected
-							if (inst.type == Instrument.Type.Percussion) {
-								noteIndex = KeyManager.instance.percussionSets[inst].Count-1-keyToNote[keyPress];
-								if (noteIndex >= 0) {
-									Note note = new Note(KeyManager.instance.percussionSets[inst][noteIndex]);
-									note.PlayNote(source, 1f, false);
+                    // Check for instrument volume up/down
+                    else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                        AudioSource source = music.GetAudioSource(inst);
+                        if (source.volume >= _volumeChangeAmount)
+                            source.volume -= _volumeChangeAmount;
+                    }
+                    else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                        AudioSource source = music.GetAudioSource(inst);
+                        if (source.volume <= _volumeChangeAmount)
+                            source.volume += _volumeChangeAmount;
+                    }
 
-									// If snare, cause lightning strike
-									if (note.IsSnare()) WorldManager.instance.LightningStrike(note.volume * source.volume);
+                    else {
 
-									// If kick or tom, cause lightning flash
-									else if (note.IsKick()) WorldManager.instance.LightningFlash(note.volume * source.volume);
-									else if (note.IsTom()) WorldManager.instance.LightningFlash(0.75f * note.volume * source.volume);
+                        // Check for instruments switch
+                        foreach (var key in keyToInstrument) {
+                            if (Input.GetKeyDown(key.Key)) {
+                                SwitchInstrument(keyToInstrument[key.Key]);
+                                LiveInstrumentIcons.Instance.WakeLiveUI();
+                            }
+                        }
 
-									// If shaker, increase rain density
-									else if (note.IsShaker()) WorldManager.instance.shakers++;
+                        // Check for note presses
+                        foreach (var keyPress in keyToNote.Keys.ToList()) {
+                            if (Input.GetKeyDown(keyPress)) {
 
-									// If hat, create stars
-									else if (note.IsHat()) WorldManager.instance.StarBurst();
+                                int noteIndex;
+                                AudioSource source = 
+                                    _audioSources[keyToNote[keyPress]];
+                                KeyManager keyManager = KeyManager.Instance;
 
-									// If cymbal, create shooting star
-									else if (note.IsCymbal()) WorldManager.instance.ShootingStar();
+                                // If percussion is selected
+                                if (inst.InstrumentType == Instrument.Type.Percussion) {
+                                    var percNotes = keyManager.GetNoteSet((PercussionInstrument)inst);
+                                    noteIndex = percNotes.Count - 1 - keyToNote[keyPress];
+                                    if (noteIndex >= 0) {
+                                        Note note = new Note(percNotes[noteIndex]);
+                                        note.PlayNote(source, 1f, false);
 
-									// If wood, create exhaust puff
-									else if (note.IsWood()) WorldManager.instance.ExhaustPuff();
-								}
+                                        WorldManager.Instance.ShowWeatherEffect (note);
+                                    }
 
-							// If melodic is selected (must be a valid song)
-							} else if (song != null && song.scale != -1 && song.key != Key.None){
+                                    // If melodic is selected (must be a valid song)
+                                }
+                                else if (song != null && song.Scale != -1 && song.Key != Key.None) {
 
-								Key key = MusicManager.instance.currentSong.key;
-								ScaleInfo scale = ScaleInfo.AllScales[MusicManager.instance.currentSong.scale];
+                                    Key key = MusicManager.Instance.CurrentSong.Key;
+                                    ScaleInfo scaleType = ScaleInfo.AllScales[MusicManager.Instance.CurrentSong.Scale];
+                                    MelodicInstrument meloInst = inst as MelodicInstrument;
+                                    Scale scale = KeyManager.Instance.GetScale(key, scaleType, meloInst);
 
-								noteIndex = KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes.Count - 1 - keyToNote[keyPress];
-								if (noteIndex >= 0) {
-									Note note = new Note(KeyManager.instance.scales[key][scale][(MelodicInstrument)inst].allNotes[noteIndex]);
-									if (note != null) note.PlayNote(source, 1f, true);
-								}
 
-								// If electric bass
-								if (inst.codeName == "ElectricBass") {
+                                    noteIndex = scale.NoteCount - 1 - keyToNote[keyPress];
+                                    if (noteIndex >= 0) {
+                                        Note note = new Note(scale.NoteAt(noteIndex));
+                                        if (note != null) note.PlayNote(source, 1f, true);
+                                    }
 
-									// Cause terrain deformation
-									WorldManager.instance.DeformRandom();
+                                    // If electric bass
+                                    if (inst.CodeName == "ElectricBass") {
 
-								// All other melodic instruments
-								} else {
-									switch (inst.family) {
-										case Instrument.Family.Guitar:
-											MusicManager.instance.guitarNotes++;
-											break;
-										case Instrument.Family.Keyboard:
-											MusicManager.instance.keyboardNotes++;
-											break;
-										case Instrument.Family.Brass:
-											MusicManager.instance.brassNotes++;
-											break;
-									}
-								}
-							}
+                                        // Cause terrain deformation
+                                        WorldManager.Instance.DeformRandom();
 
-						// If key released, stop note
-						} else if (Input.GetKeyUp(keyPress) && inst.type != Instrument.Type.Percussion)
-							audioSources[keyToNote[keyPress]].Stop();
-					} 
-				}
-				break;
+                                        // All other melodic instruments
+                                    }
+                                    else {
+                                        switch (inst.InstrumentFamily) {
+                                            case Instrument.Family.Guitar:
+                                                MusicManager.Instance.RegisterGuitarNote();
+                                                break;
+                                            case Instrument.Family.Keyboard:
+                                                MusicManager.Instance.RegisterKeyboardNote();
+                                                break;
+                                            case Instrument.Family.Brass:
+                                                MusicManager.Instance.RegisterBrassNote();
+                                                break;
+                                        }
+                                    }
+                                }
 
-			// Setup mode
-			case GameManager.State.Setup:
+                                // If key released, stop note
+                            }
+                            else if (Input.GetKeyUp(keyPress) && inst.InstrumentType != Instrument.Type.Percussion)
+                                _audioSources[keyToNote[keyPress]].Stop();
+                        }
+                    }
+                    break;
 
-				// If left mouse button released
-				if (Input.GetMouseButtonUp(0)) {
-					if (selected != null) {
-					
-						// Call OnMouseUp() if possible
-						if (selected.GetComponent<DraggableButton>() != null)
-							selected.GetComponent<DraggableButton>().OnMouseUp();
-					}
-				
-					// Clear selected
-					selected = null;
-				
-					// Unfreeze scroll views
-					UnfreezeAllScrollviews();
-				
-					// Reset click position
-					clickPosition = Vector3.zero;
-				
-				// If left mouse button clicked
-				} else if (Input.GetMouseButtonDown(0)) {
-				
-					// Get click position
-					clickPosition = Input.mousePosition;
-				
-					// Get selected object from EventSystem
-					selected = EventSystem.current.currentSelectedGameObject;
-				
-					// If something was clicked
-					if (selected != null) {
-					
-						// Freeze scroll views if necessary
-						if (selected.tag == "StopScrolling") FreezeAllScrollviews();
-							
-						// Call OnMouseDown() if possible
-						if (selected.GetComponent<DraggableButton>() != null)
-							selected.GetComponent<DraggableButton>().OnMouseDown();
-					}
+                // Setup mode
+                case GameManager.State.Setup:
 
-				// If mouse button held down or not down
-				} else {
+                    // If left mouse button released
+                    if (Input.GetMouseButtonUp(0)) {
+                        if (_selected != null) {
 
-					// If held down on an object
-					if (selected) {
+                            // Call OnMouseUp() if possible
+                            if (_selected.GetComponent<DraggableButton>() != null)
+                                _selected.GetComponent<DraggableButton>().OnMouseUp();
+                        }
 
-						// Increment frames dragged
-						framesDragged++;
+                        // Clear selected
+                        _selected = null;
 
-						// Call Drag() if possible
-						if (selected.GetComponent<DraggableButton>() != null)
-							selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - clickPosition);
+                        // Unfreeze scroll views
+                        UnfreezeAllScrollviews();
 
-					// If no object, reset frames dragged
-					} else framesDragged = 0;
-				}
+                        // Reset click position
+                        _clickPosition = Vector3.zero;
 
-				break;
-		}
+                        // If left mouse button clicked
+                    }
+                    else if (Input.GetMouseButtonDown(0)) {
 
-		// If in free camera mode
-		if (CameraControl.instance.state == CameraControl.State.Free) {
+                        // Get click position
+                        _clickPosition = Input.mousePosition;
 
-			// Space -> start car movement
-			if (Input.GetKeyDown (KeyCode.Space)) GameManager.instance.SwitchToLive();
+                        // Get selected object from EventSystem
+                        _selected = EventSystem.current.currentSelectedGameObject;
 
-			// Left/Right -> adjust time of day
-			else if (Input.GetKeyDown (KeyCode.LeftArrow)) WorldManager.instance.timeOfDay -= Mathf.PI/16f;
-			else if (Input.GetKeyDown (KeyCode.RightArrow)) WorldManager.instance.timeOfDay += Mathf.PI/16f;
-		}
+                        // If something was clicked
+                        if (_selected != null) {
 
-		// Update prevMouse
-		prevMouse = Input.mousePosition;
-	}
+                            // Freeze scroll views if necessary
+                            if (_selected.tag == "StopScrolling") FreezeAllScrollviews();
 
-	#endregion
-	#region InputManager Methods
+                            // Call OnMouseDown() if possible
+                            if (_selected.GetComponent<DraggableButton>() != null)
+                                _selected.GetComponent<DraggableButton>().OnMouseDown();
+                        }
 
-	/// <summary>
-	/// Returns whether or not the user is dragging.
-	/// </summary>
-	public bool IsDragging
-	{
-		get
-		{
-			return framesDragged >= dragThreshold;
-		}
-	}
+                        // If mouse button held down or not down
+                    }
+                    else {
 
-	/// <summary>
-	/// Freezes all selected scrollviews.
-	/// </summary>
-	void FreezeAllScrollviews () {
-		foreach (ScrollRect scrollview in scrollviews)
-			scrollview.enabled = false;
-	}
+                        // If held down on an object
+                        if (_selected) {
 
-	/// <summary>
-	/// Unfreezes all selected scrollviews.
-	/// </summary>
-	void UnfreezeAllScrollviews () {
-		foreach (ScrollRect scrollview in scrollviews)
-			scrollview.enabled = true;
-	}
+                            // Increment frames dragged
+                            _framesDragged++;
 
-	/// <summary>
-	/// Switches the instrument.
-	/// </summary>
-	/// <param name="instrument">Instrument.</param>
-	void SwitchInstrument (Instrument instrument) {
-		Instrument inst = MusicManager.instance.currentInstrument;
-		if (instrument != inst) {
-			InstrumentDisplay.instance.FadeGlow (inst.index);
-			MusicManager.instance.currentInstrument = instrument;
-			InstrumentDisplay.instance.WakeGlow(instrument.index);
-			MusicManager.PlayMenuSound(instrument.switchSound);
-			InstrumentDisplay.instance.Refresh();
-		}
-	}
+                            // Call Drag() if possible
+                            if (_selected.GetComponent<DraggableButton>() != null)
+                                _selected.GetComponent<DraggableButton>().Drag(Input.mousePosition - _clickPosition);
 
-	#endregion
+                            // If no object, reset frames dragged
+                        }
+                        else _framesDragged = 0;
+                    }
+
+                    break;
+            }
+
+            // If in free camera mode
+            if (CameraControl.Instance.CurrentState == CameraControl.State.Free) {
+
+                // Space -> start car movement
+                if (Input.GetKeyDown(KeyCode.Space)) UIManager.Instance.SwitchToLive();
+
+                // Left/Right -> adjust time of day
+                else if (Input.GetKeyDown(KeyCode.LeftArrow)) WorldManager.Instance.TimeOfDay -= Mathf.PI / 16f;
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) WorldManager.Instance.TimeOfDay += Mathf.PI / 16f;
+            }
+
+            // Update prevMouse
+            _prevMouse = Input.mousePosition;
+        }
+
+        #endregion
+        #region InputManager Properties
+
+        /// <summary>
+        /// Returns the currently selected GameObject (read-only).
+        /// </summary>
+        public GameObject Selected { get { return _selected; } }
+
+        /// <summary>
+        /// Returns the change in mouse position since the last frame 
+        /// (read-only).
+        /// </summary>
+        public Vector2 MouseDelta { get { return _mouseDelta; } }
+
+        /// <summary>
+        /// Returns whether or not the user is dragging (read-only).
+        /// </summary>
+        public bool IsDragging { get {
+            return _framesDragged >= _dragThreshold;
+        } }
+
+        #endregion
+        #region InputManager Methods
+
+        
+
+        void MakeNoteAudioSources () {
+            for (int i = 0; i < 26; i++) {
+                // Create GameObject
+                GameObject obj = new GameObject("Note" + i + "Source");
+                obj.transform.parent = transform;
+
+                // Set default volume
+                AudioSource temp = obj.AddComponent<AudioSource>();
+                temp.volume = 1.0f;
+                _audioSources.Add(temp);
+            }
+        }
+
+        /// <summary>
+        /// Pauses if the key is pressed.
+        /// </summary>
+        void CheckForPause () {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                GameManager.Instance.TogglePause();
+        }
+
+        /// <summary>
+        /// Freezes all selected scrollviews.
+        /// </summary>
+        void FreezeAllScrollviews() {
+            foreach (ScrollRect scrollview in _scrollviews)
+                scrollview.enabled = false;
+        }
+
+        /// <summary>
+        /// Unfreezes all selected scrollviews.
+        /// </summary>
+        void UnfreezeAllScrollviews() {
+            foreach (ScrollRect scrollview in _scrollviews)
+                scrollview.enabled = true;
+        }
+
+        /// <summary>
+        /// Switches the instrument.
+        /// </summary>
+        /// <param name="instrument">Instrument.</param>
+        void SwitchInstrument(Instrument instrument) {
+            Instrument inst = MusicManager.Instance.CurrentInstrument;
+            if (instrument != inst) {
+                InstrumentDisplay.Instance.FadeGlow(inst.Index);
+                MusicManager.Instance.CurrentInstrument = instrument;
+                InstrumentDisplay.Instance.WakeGlow(instrument.Index);
+                MusicManager.PlayMenuSound(instrument.SwitchSound);
+                InstrumentDisplay.Instance.Refresh();
+            }
+        }
+
+        #endregion
+    }
 }

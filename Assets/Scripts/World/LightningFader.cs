@@ -1,42 +1,57 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// LightningFader.cs
+// ©2016 Team 95
 
-/// <summary>
-/// Class to handle fading of lightning.
-/// </summary>
-public class LightningFader : MonoBehaviour {
+using UnityEngine;
 
-	#region LightningFader Vars
+namespace Route95.World {
 
-	Light _light;             // Reference to light
-	SpriteRenderer _renderer; // Lightning sprite renderer
-	public float fadeSpeed;   // Lightning fade speed
-	float baseIntensity;      // Base lightning intensity
+	/// <summary>
+	/// Class to handle fading of lightning.
+	/// </summary>
+	public class LightningFader : MonoBehaviour {
 
-	#endregion
-	#region Unity Callbacks
+		#region LightningFader Vars
 
-	void Awake () {
-		_light = gameObject.Light();
-		_renderer = gameObject.SpriteRenderer();
-	}
+		/// <summary>
+		/// Reference to light component.
+		/// </summary>
+		Light _light;
 
-	void Start () {
-		baseIntensity = WorldManager.instance.baseLightningIntensity;
-	}
+		/// <summary>
+		/// Reference to sprite renderer.
+		/// </summary>
+		SpriteRenderer _renderer;
 
-	void Update () {
-		if (_light.intensity > 0f) _light.intensity -= baseIntensity* fadeSpeed * Time.deltaTime;
-		else {
-			gameObject.SetActive(false);
-			return;
+		/// <summary>
+		/// Lightning fade speed (seconds).
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Lightning fade speed (seconds).")]
+		float _fadeSpeed;
+
+		#endregion
+		#region Unity Callbacks
+
+		void Awake() {
+			// Init vars
+			_light = gameObject.GetComponent<Light>();
+			_renderer = gameObject.GetComponent<SpriteRenderer>();
 		}
 
-		Color temp = Color.white;
-		temp.a = _light.intensity;
-		_renderer.color = temp;
+		void Update() {
+			float baseIntensity = WorldManager.Instance.BaseLightningIntensity;
 
+			if (_light.intensity > 0f) _light.intensity -= baseIntensity * (Time.deltaTime / _fadeSpeed);
+			else {
+				gameObject.SetActive(false);
+				return;
+			}
+
+			Color temp = Color.white;
+			temp.a = _light.intensity;
+			_renderer.color = temp;
+		}
+
+		#endregion
 	}
-
-	#endregion
 }

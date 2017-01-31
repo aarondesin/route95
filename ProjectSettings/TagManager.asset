@@ -6,6 +6,43 @@ TagManager:
   tags:
   - cubes
   - StopScrolling
+  - ViewOutsideCar
+  - ViewDriving
+  - ViewRadio
+  - ViewHoodForward
+  - ViewNearChase
+  - ViewFarChase
+  - ViewFrontRightWheel
+  - ViewFrontLeftWheel
+  - ViewRearRightWheel
+  - ViewRearLeftWheel
+  - FrontRightWheel
+  - FrontLeftWheel
+  - RearRightWheel
+  - RearLeftWheel
+  - RiffEditorNotePanel
+  - RiffEditorDistortionButton
+  - RiffEditorTremoloButton
+  - RiffEditorChorusButton
+  - RiffEditorFlangerButton
+  - RiffEditorEchoButton
+  - RiffEditorReverbButton
+  - RiffEditorPlayRiffButton
+  - RiffEditorTempoText
+  - RiffEditorVerticalScrollbar
+  - RiffEditorNoteIconBar
+  - RiffEditorOctaveParent
+  - RiffEditorNoteIconBarContent
+  - RiffEditorBeatsBarContent
+  - RiffEditorRiffVolumeSlider
+  - RadioThemeEmitter
+  - SongArrangeEditRiffButton
+  - SongArrangePlayRiffButton
+  - SongArrangePreviewSongButton
+  - SongArrangeAddRiffReminder
+  - InstrumentDisplayGlow
+  - RiffEditorRiffPanningSlider
+  - MenuThemeSource
   layers:
   - Default
   - TransparentFX

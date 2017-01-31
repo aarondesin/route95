@@ -1,42 +1,72 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// WorldManagerEditor.cs
+// ©2016 Team 95
+
 using UnityEditor;
 
-/// <summary>
-/// Custom editor for WorldManager.
-/// </summary>
-[CustomEditor(typeof(WorldManager))]
-public class WorldManagerEditor : Editor {
+using UnityEngine;
 
-	int x = 0;
-	int y = 0;
+namespace Route95.World {
 
-	float vertBlend = 0f;
+    /// <summary>
+    /// Custom editor for WorldManager.
+    /// </summary>
+    [CustomEditor(typeof(WorldManager))]
+    public class WorldManagerEditor : Editor {
 
-	public override void OnInspectorGUI () {
+        #region Vars
 
-		DrawDefaultInspector();
+        /// <summary>
+        /// Current shown x.
+        /// </summary>
+        int _x = 0;
 
-		// Button to show debug colors
-		if (GUILayout.Button("Show constraints")) {
-			((WorldManager)target).DebugTerrain();
-		}
+        /// <summary>
+        /// Current shown y.
+        /// </summary>
+        int _y = 0;
 
-		if (GUILayout.Button("Print vertex map")) {
-			((WorldManager)target).PrintVertexMap();
-		}
+		float _bulldozeMin = 0f;
+		float _bulldozeMax = 1f;
 
-		x = EditorGUILayout.IntField ("X:", x);
-		y = EditorGUILayout.IntField ("Y:", y);
+        float _vertBlend = 0f;
 
-		vertBlend = EditorGUILayout.FloatField ("Blend: ",vertBlend);
+        #endregion
+        #region Unity Overrides
 
-		if (GUILayout.Button("Show coordinates")) {
-			WorldManager wm = target as WorldManager;
-			Vertex vert = wm.terrain.vertexmap.VertexAt(x, y);
-			wm.vertexIndicator.transform.position = vert.WorldPos();
-			vertBlend = vert.color.a;
-		}
+        public override void OnInspectorGUI() {
 
-	}
+            DrawDefaultInspector();
+
+            // Button to show debug colors
+            if (GUILayout.Button("Show constraints")) {
+                ((WorldManager)target).DebugTerrain();
+            }
+
+            if (GUILayout.Button("Print vertex map")) {
+                ((WorldManager)target).PrintVertexMap();
+            }
+
+            _x = EditorGUILayout.IntField("X:", _x);
+            _y = EditorGUILayout.IntField("Y:", _y);
+
+            _vertBlend = EditorGUILayout.FloatField("Blend: ", _vertBlend);
+
+            if (GUILayout.Button("Show coordinates")) {
+                WorldManager wm = target as WorldManager;
+                Vertex vert = DynamicTerrain.Instance.VertexMap.VertexAt(_x, _y);
+                wm.VertexIndicator.transform.position = vert.WorldPos();
+                _vertBlend = vert.Color.a;
+            }
+
+			_bulldozeMin = EditorGUILayout.FloatField("Bulldoze Start:", _bulldozeMin);
+			_bulldozeMax = EditorGUILayout.FloatField("Bulldoze End:", _bulldozeMax);
+
+			if (GUILayout.Button("Bulldoze")) {
+				WorldManager wm = target as WorldManager;
+				wm.ForceBulldoze (0f, 1f);
+			}
+        }
+
+        #endregion
+    }
 }

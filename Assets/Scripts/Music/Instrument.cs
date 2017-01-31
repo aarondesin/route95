@@ -1,97 +1,197 @@
-﻿using UnityEngine;
+﻿// Instrument.cs
+// ©2016 Team 95
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class to store all relevant instrument data and references.
-/// </summary>
-public class Instrument : IComparable {
+using UnityEngine;
 
-	#region Instrument Enums
+namespace Route95.Music {
 
-	/// <summary>
-	/// Base type of instrument.
-	/// </summary>
-	public enum Type {
-		Percussion,
-		Melodic
-	};
+    /// <summary>
+    /// Class to store all relevant instrument data and references.
+    /// </summary>
+    public abstract class Instrument : IComparable {
 
-	/// <summary>
-	/// Instrument family.
-	/// </summary>
-	public enum Family {
-		Percussion,
-		Guitar,
-		Bass,
-		Keyboard,
-		Brass
-	};
+        #region Instrument Enums
 
-	#endregion
-	#region Instrument Vars
+        /// <summary>
+        /// Base type of instrument.
+        /// </summary>
+        public enum Type {
+            Percussion,
+            Melodic
+        };
 
-	public string name;                            // User-friendly name
-	public string codeName;                        // Name in code
-	public int index;                              // Game index
-	public Type type;                              // Instrument type
-	public Family family;                          // Instrument family
+        /// <summary>
+        /// Instrument family.
+        /// </summary>
+        public enum Family {
+            Percussion,
+            Guitar,
+            Bass,
+            Keyboard,
+            Brass
+        };
 
-	public Sprite icon;                            // Icon sprite
-	protected string iconPath;                     // Path from which to load icon
+        #endregion
+        #region Instrument Vars
 
-	public Sprite glow;                            // Glow sprite
-	protected string glowPath;                     // Path from which to load glow sprite
+        /// <summary>
+        /// User-friendly name.
+        /// </summary>
+        protected string _name;
 
-	public AudioClip switchSound;                  // Sound to play when switched to in live mode
-	protected string switchSoundPath;              // Path from which to load switch sound
+        /// <summary>
+        /// Name in code.
+        /// </summary>
+        protected string _codeName;
 
-	public static List<Instrument> AllInstruments; // List of all instruments available in the game
+        /// <summary>
+        /// Game index.
+        /// </summary>
+        protected int _index;
 
-	#endregion
-	#region Instrument Methods
+        /// <summary>
+        /// Instrument type.
+        /// </summary>
+        protected Type _type;
 
-	/// <summary>
-	/// Loads all resources associated with an instrument.
-	/// </summary>
-	public virtual void Load () {
-		icon = Resources.Load<Sprite>(iconPath);
-		glow = Resources.Load<Sprite>(glowPath);
-		switchSound = Resources.Load<AudioClip>(switchSoundPath);
-	}
+        /// <summary>
+        /// Instrument family.
+        /// </summary>
+        protected Family _family;
 
-	/// <summary>
-	/// Loads all instruments.
-	/// </summary>
-	public static void LoadInstruments () {
+        /// <summary>
+        /// Icon sprite.
+        /// </summary>
+        protected Sprite _icon;
 
-		// Populate list of instruments
-		AllInstruments = new List<Instrument> () {
-			PercussionInstrument.RockDrums,
-			PercussionInstrument.ExoticPercussion,
-			MelodicInstrument.ElectricGuitar,
-			MelodicInstrument.ElectricBass,
-			MelodicInstrument.AcousticGuitar,
-			MelodicInstrument.ClassicalGuitar,
-			MelodicInstrument.PipeOrgan,
-			MelodicInstrument.Keyboard,
-			MelodicInstrument.Trumpet
-		};
+        /// <summary>
+        /// Path from which to load icon.
+        /// </summary>
+        protected string _iconPath;
 
-		// Load all instruments
-		foreach (Instrument instrument in AllInstruments)
-			instrument.Load();
-	}
+        /// <summary>
+        /// Glow sprite.
+        /// </summary>
+        protected Sprite _glow;
 
-	public int CompareTo (object obj) {
-		if (obj == null) return 1;
+        /// <summary>
+        /// Path from which to load glow sprite.
+        /// </summary>
+        protected string _glowPath;
 
-		Instrument other = obj as Instrument;
-		if (other != null) return this.index.CompareTo (other.index);
-		else throw new ArgumentException ("Argument is not an instrument.");
-		
-	}
+        /// <summary>
+        /// Sound to play when instrument is switched to.
+        /// </summary>
+        protected AudioClip _switchSound;
 
-	#endregion
+        /// <summary>
+        /// Path from which to load switch sound.
+        /// </summary>
+        protected string _switchSoundPath;
+
+        /// <summary>
+        /// List of all instruments available.
+        /// </summary>
+        public static List<Instrument> AllInstruments;
+
+        #endregion
+        #region Properties
+
+        /// <summary>
+        /// Returns the user-friendly name of this instrument (read-only).
+        /// </summary>
+        public string Name { get { return _name; } }
+
+        /// <summary>
+        /// Returns the in-code name of this instrument (read-only).
+        /// </summary>
+        public string CodeName { get { return _codeName; } }
+
+        /// <summary>
+        /// Returns the icon for this instrument (read-only).
+        /// </summary>
+        public Sprite Icon { get { return _icon; } }
+
+        /// <summary>
+        /// Returns the glow sprite for this instrument (read-only).
+        /// </summary>
+        public Sprite Glow { get { return _glow; } }
+
+        /// <summary>
+        /// Returns the index of this instrument (read-only).
+        /// </summary>
+        public int Index { get { return _index; } }
+
+        /// <summary>
+        /// Returns the type of this instrument (read-only).
+        /// </summary>
+        public Instrument.Type InstrumentType { get { return _type; } }
+
+        /// <summary>
+        /// Returns the family of this instrument (read-only).
+        /// </summary>
+        public Family InstrumentFamily { get { return _family; } }
+
+        /// <summary>
+        /// Returns the switch sound for this instrument (read-only).
+        /// </summary>
+        public AudioClip SwitchSound { get { return _switchSound; } }
+
+        #endregion
+        #region IComparable Implementation
+
+        public int CompareTo(object obj) {
+            if (obj == null) return 1;
+
+            Instrument other = obj as Instrument;
+            if (other != null) return this._index.CompareTo(other.Index);
+            else throw new ArgumentException("Argument is not an instrument.");
+
+        }
+
+        #endregion
+        #region Instrument Methods
+
+        /// <summary>
+        /// Loads all resources associated with an instrument.
+        /// </summary>
+        public virtual void Load() {
+            _icon = Resources.Load<Sprite>(_iconPath);
+			if (_icon == null) Debug.LogError ("Failed to load instrument icon at " + _iconPath);
+
+            _glow = Resources.Load<Sprite>(_glowPath);
+			if (_glow == null) Debug.LogError ("Failed to load instrument glow at " + _glowPath);
+
+            _switchSound = Resources.Load<AudioClip>(_switchSoundPath);
+			if (_switchSound == null) Debug.LogError ("Failed to load instrument switch sound at " + _switchSoundPath);
+        }
+
+        /// <summary>
+        /// Loads all instruments.
+        /// </summary>
+        public static void LoadInstruments() {
+
+            // Populate list of instruments
+            AllInstruments = new List<Instrument>() {
+            PercussionInstrument.RockDrums,
+            PercussionInstrument.ExoticPercussion,
+            MelodicInstrument.ElectricGuitar,
+            MelodicInstrument.ElectricBass,
+            MelodicInstrument.AcousticGuitar,
+            MelodicInstrument.ClassicalGuitar,
+            MelodicInstrument.PipeOrgan,
+            MelodicInstrument.Keyboard,
+            MelodicInstrument.Trumpet
+        };
+
+            // Load all instruments
+            foreach (Instrument instrument in AllInstruments)
+                instrument.Load();
+        }
+
+        #endregion
+    }
 }
